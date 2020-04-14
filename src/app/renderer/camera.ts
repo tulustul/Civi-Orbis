@@ -8,13 +8,13 @@ export interface Transform {
 }
 
 export class Camera {
-  transform$ = new BehaviorSubject<Transform>({ x: 500, y: 500, scale: 1 });
+  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 1 });
 
   constructor(private renderer: Renderer) {}
 
   moveBy(x: number, y: number) {
-    this.transform$.value.x -= x;
-    this.transform$.value.y -= y;
+    this.transform$.value.x -= x / this.transform$.value.scale;
+    this.transform$.value.y -= y / this.transform$.value.scale;
     this.transform$.next(this.transform$.value);
   }
 
@@ -27,25 +27,14 @@ export class Camera {
   scaleBy(scaleFactor: number, screenPivotX: number, screenPivotY: number) {
     const t = this.transform$.value;
 
-    let x = screenPivotX - this.renderer.canvas.width / 2;
-    let y = screenPivotY - this.renderer.canvas.height / 2;
-
-    x = x / t.scale - t.x;
-    y = y / t.scale - t.y;
-
-    const oldScale = t.scale;
+    const [x1, y1] = this.screenToCanvas(screenPivotX, screenPivotY);
     t.scale *= scaleFactor;
+    const [x2, y2] = this.screenToCanvas(screenPivotX, screenPivotY);
 
-    t.x += (oldScale - t.scale) * x;
-    t.y += (oldScale - t.scale) * y;
-
-    console.log((oldScale - t.scale) * x);
+    t.x += x1 - x2;
+    t.y += y1 - y2;
 
     this.transform$.next(t);
-
-    // this.moveBy(diffX * (1 - scaleFactor), diffY * (1 - scaleFactor));
-    // this.centerAt(...this.screenToCanvas(screenPivotX, screenPivotY));
-    // this.transform$.next(this.transform$.value);
   }
 
   centerAt(x: number, y: number) {
@@ -58,6 +47,17 @@ export class Camera {
 
   screenToCanvas(screenX: number, screenY: number): [number, number] {
     const t = this.transform$.value;
-    return [screenX / t.scale - t.x, screenY / t.scale - t.y];
+    return [
+      (screenX - this.renderer.canvas.width / 2) / t.scale + t.x,
+      (screenY - this.renderer.canvas.height / 2) / t.scale + t.y
+    ];
+  }
+
+  canvasToScreen(canvasX: number, canvasY: number): [number, number] {
+    const t = this.transform$.value;
+    return [
+      t.scale * (canvasX - t.x) + this.renderer.canvas.width / 2,
+      t.scale * (canvasY - t.y) + this.renderer.canvas.height / 2
+    ];
   }
 }

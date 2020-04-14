@@ -4,7 +4,7 @@ import { Renderer } from '../renderer';
 @Component({
   selector: 'app-game-canvas',
   templateUrl: './game-canvas.component.html',
-  styleUrls: ['./game-canvas.component.scss'],
+  styleUrls: ['./game-canvas.component.scss']
 })
 export class GameCanvasComponent implements AfterViewInit {
   renderer: Renderer;
@@ -33,18 +33,13 @@ export class GameCanvasComponent implements AfterViewInit {
     if (this.isMousePressed) {
       this.renderer.camera.moveBy(event.movementX, event.movementY);
     }
-
-    // const t = this.renderer.camera.transform$.value;
-    // console.log(t.scale, event.offsetX, event.offsetX / t.scale, t.x);
-    // console.log([event.offsetX / t.scale - t.x, event.offsetY / t.scale - t.y]);
   }
 
   onWheel(event: WheelEvent) {
     this.renderer.camera.scaleBy(
-      1 + (event.deltaY > 0 ? -0.1 : 0.1),
+      1 + (event.deltaY > 0 ? -0.2 : 0.2),
       event.clientX,
       event.clientY
     );
-    // this.renderer.camera.scaleBy(2, 1000, 0);
   }
 }
