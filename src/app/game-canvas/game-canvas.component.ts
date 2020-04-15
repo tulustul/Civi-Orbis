@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Renderer } from '../renderer';
+import { Game } from '../game/game';
 
 @Component({
   selector: 'app-game-canvas',
@@ -11,6 +12,8 @@ export class GameCanvasComponent implements AfterViewInit {
 
   isMousePressed = false;
 
+  game = new Game();
+
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>;
 
   constructor() {}
@@ -18,7 +21,7 @@ export class GameCanvasComponent implements AfterViewInit {
   ngOnInit(): void {}
 
   ngAfterViewInit() {
-    this.renderer = new Renderer(this.canvas.nativeElement);
+    this.renderer = new Renderer(this.canvas.nativeElement, this.game);
   }
 
   onMouseDown(event: MouseEvent) {
