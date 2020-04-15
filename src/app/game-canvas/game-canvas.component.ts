@@ -1,11 +1,12 @@
 import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Renderer } from '../renderer';
 import { Game } from '../game/game';
+import { Camera } from '../renderer/camera';
 
 @Component({
   selector: 'app-game-canvas',
   templateUrl: './game-canvas.component.html',
-  styleUrls: ['./game-canvas.component.scss']
+  styleUrls: ['./game-canvas.component.scss'],
 })
 export class GameCanvasComponent implements AfterViewInit {
   renderer: Renderer;
@@ -21,7 +22,14 @@ export class GameCanvasComponent implements AfterViewInit {
   ngOnInit(): void {}
 
   ngAfterViewInit() {
-    this.renderer = new Renderer(this.canvas.nativeElement, this.game);
+    this.game.camera = new Camera(this.game);
+
+    this.game.renderer.setCanvas(this.canvas.nativeElement);
+
+    this.game.camera.moveToTile(
+      Math.floor(this.game.map.width / 2),
+      Math.floor(this.game.map.height / 2)
+    );
   }
 
   onMouseDown(event: MouseEvent) {
@@ -34,12 +42,12 @@ export class GameCanvasComponent implements AfterViewInit {
 
   onMouseMove(event: MouseEvent) {
     if (this.isMousePressed) {
-      this.renderer.camera.moveBy(event.movementX, event.movementY);
+      this.game.camera.moveBy(event.movementX, event.movementY);
     }
   }
 
   onWheel(event: WheelEvent) {
-    this.renderer.camera.scaleBy(
+    this.game.camera.scaleBy(
       1 + (event.deltaY > 0 ? -0.2 : 0.2),
       event.clientX,
       event.clientY

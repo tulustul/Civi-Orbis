@@ -3,37 +3,43 @@ import { Game } from '../game/game';
 import { Tile, SeaLevel, Climate } from '../game/tile.interface';
 
 const SEA_COLORS: Record<SeaLevel, string> = {
-  [SeaLevel.deep]: 'blue',
-  [SeaLevel.shallow]: 'lightblue',
+  [SeaLevel.deep]: 'royalblue',
+  [SeaLevel.shallow]: 'dodgerblue',
   [SeaLevel.flood]: 'red',
-  [SeaLevel.none]: 'none'
+  [SeaLevel.none]: 'none',
 };
 
 const CLIMATE_COLORS: Record<Climate, string> = {
   [Climate.continental]: 'darkgreen',
   [Climate.desert]: 'yellow',
   [Climate.oceanic]: 'lightgreen',
-  [Climate.savanna]: 'darkyellow',
+  [Climate.savanna]: 'bisque',
   [Climate.tropical]: 'green',
-  [Climate.tundra]: 'lightgrey'
+  [Climate.tundra]: 'whitesmoke',
 };
 
 export class Renderer {
   ctx: CanvasRenderingContext2D;
 
-  camera = new Camera(this);
+  canvas: HTMLCanvasElement;
 
-  constructor(public canvas: HTMLCanvasElement, private game: Game) {
+  constructor(private game: Game) {}
+
+  setCanvas(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     this.ctx = canvas.getContext('2d')!;
 
-    this.camera.transform$.subscribe(transform => {
+    this.game.camera.transform$.subscribe((transform) => {
       this.render(transform);
     });
   }
 
   render(t: Transform) {
+    if (!this.ctx) {
+      return;
+    }
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
     this.ctx.scale(t.scale, t.scale);

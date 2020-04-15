@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { Renderer } from './renderer';
+import { Game } from '../game/game';
 
 export interface Transform {
   x: number;
@@ -8,9 +8,9 @@ export interface Transform {
 }
 
 export class Camera {
-  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 1 });
+  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 0.3 });
 
-  constructor(private renderer: Renderer) {}
+  constructor(private game: Game) {}
 
   moveBy(x: number, y: number) {
     this.transform$.value.x -= x / this.transform$.value.scale;
@@ -37,27 +37,27 @@ export class Camera {
     this.transform$.next(t);
   }
 
-  centerAt(x: number, y: number) {
-    const scale = this.transform$.value.scale;
-    this.moveTo(
-      x - this.renderer.canvas.width / scale / 2,
-      y - this.renderer.canvas.height / scale / 2
-    );
+  moveToTile(tileX: number, tileY: number) {
+    this.moveTo(tileX * 100, tileY * 100);
   }
 
   screenToCanvas(screenX: number, screenY: number): [number, number] {
     const t = this.transform$.value;
     return [
-      (screenX - this.renderer.canvas.width / 2) / t.scale + t.x,
-      (screenY - this.renderer.canvas.height / 2) / t.scale + t.y
+      (screenX - this.canvas.width / 2) / t.scale + t.x,
+      (screenY - this.canvas.height / 2) / t.scale + t.y,
     ];
   }
 
   canvasToScreen(canvasX: number, canvasY: number): [number, number] {
     const t = this.transform$.value;
     return [
-      t.scale * (canvasX - t.x) + this.renderer.canvas.width / 2,
-      t.scale * (canvasY - t.y) + this.renderer.canvas.height / 2
+      t.scale * (canvasX - t.x) + this.canvas.width / 2,
+      t.scale * (canvasY - t.y) + this.canvas.height / 2,
     ];
+  }
+
+  get canvas() {
+    return this.game.renderer.canvas;
   }
 }
