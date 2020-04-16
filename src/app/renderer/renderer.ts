@@ -1,6 +1,16 @@
-import { Camera, Transform } from './camera';
+import { Transform } from './camera';
 import { Game } from '../game/game';
-import { Tile, SeaLevel, Climate } from '../game/tile.interface';
+import {
+  Tile,
+  SeaLevel,
+  Climate,
+  DIR_TOP_LEFT,
+  DIR_TOP_RIGHT,
+  DIR_RIGHT,
+  DIR_BOTTOM_RIGHT,
+  DIR_BOTTOM_LEFT,
+  DIR_LEFT,
+} from '../game/tile.interface';
 
 const SEA_COLORS: Record<SeaLevel, string> = {
   [SeaLevel.deep]: 'royalblue',
@@ -83,5 +93,68 @@ export class Renderer {
     }
 
     this.ctx.fill();
+
+    if (tile.river) {
+      this.ctx.lineWidth = 25;
+      this.ctx.strokeStyle = 'blue';
+
+      this.ctx.fillStyle = 'blue';
+      if (tile.riverSource) {
+        this.ctx.fillStyle = 'red';
+      }
+      this.ctx.beginPath();
+      this.ctx.ellipse(50, 50, 20, 20, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      if (tile.river & DIR_TOP_LEFT) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, 25);
+        this.ctx.lineTo(50, 0);
+        this.ctx.stroke();
+      }
+
+      if (tile.river & DIR_TOP_RIGHT) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(50, 0);
+        this.ctx.lineTo(100, 25);
+        this.ctx.stroke();
+      }
+
+      if (tile.river & DIR_RIGHT) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(100, 25);
+        this.ctx.lineTo(100, 75);
+        this.ctx.stroke();
+      }
+
+      if (tile.river & DIR_BOTTOM_RIGHT) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(100, 75);
+        this.ctx.lineTo(50, 100);
+        this.ctx.stroke();
+      }
+
+      if (tile.river & DIR_BOTTOM_LEFT) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(50, 100);
+        this.ctx.lineTo(0, 75);
+        this.ctx.stroke();
+      }
+
+      if (tile.river & DIR_LEFT) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, 75);
+        this.ctx.lineTo(0, 25);
+        this.ctx.stroke();
+      }
+
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeStyle = 'black';
+    }
+    if (tile.height) {
+      this.ctx.fillStyle = 'black';
+      this.ctx.font = '20px sans-serif';
+      this.ctx.fillText(tile.height.toFixed(4), 0, 50);
+    }
   }
 }
