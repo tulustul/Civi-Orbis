@@ -29,6 +29,7 @@ describe('map-generators:utils', () => {
     ]);
 
     // top right
+    console.log(toCoords(getTilesAround(tiles, 4, 0)));
     expect(toCoords(getTilesAround(tiles, 4, 0))).toEqual([
       [4, 1],
       [3, 1],

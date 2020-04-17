@@ -26,24 +26,19 @@ export interface Tile {
   climate: Climate;
   landForm: Landform;
   seaLevel: SeaLevel;
-  river: number;
+  riverParts: TileDirection[];
   riverSource: boolean;
+  riverMouth: boolean;
   height?: number;
+  neighbours: Tile[];
 }
 
-export const DIR_TOP_LEFT = 1;
-export const DIR_TOP_RIGHT = 1 << 1;
-export const DIR_RIGHT = 1 << 2;
-export const DIR_BOTTOM_RIGHT = 1 << 3;
-export const DIR_BOTTOM_LEFT = 1 << 4;
-export const DIR_LEFT = 1 << 5;
-
 export enum TileDirection {
-  NONE = 0,
-  TOP_LEFT = 1,
-  TOP_RIGHT = 1 << 1,
-  RIGHT = 1 << 2,
-  BOTTOM_RIGHT = 1 << 3,
-  BOTTOM_LEFT = 1 << 4,
-  LEFT = 1 << 5,
+  NONE,
+  TOP_LEFT,
+  TOP_RIGHT,
+  RIGHT,
+  BOTTOM_RIGHT,
+  BOTTOM_LEFT,
+  LEFT,
 }
