@@ -5,6 +5,7 @@ import {
   SeaLevel,
   TileDirection,
 } from '../game/tile.interface';
+import { getTileDirection, getTileNeighbours } from '../game/hex-math';
 
 export function makeEmptyTile(x: number, y: number): Tile {
   return {
@@ -17,6 +18,7 @@ export function makeEmptyTile(x: number, y: number): Tile {
     riverSource: false,
     riverMouth: false,
     neighbours: [],
+    units: [],
     height: 0,
   };
 }
@@ -34,95 +36,11 @@ export function fillWithEmptyTiles(width: number, height: number): Tile[][] {
 
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
-      tiles[x][y].neighbours = getTilesAround(tiles, x, y);
+      tiles[x][y].neighbours = getTileNeighbours(tiles, x, y);
     }
   }
 
   return tiles;
-}
-
-export function getTilesAround(tiles: Tile[][], x: number, y: number): Tile[] {
-  return [
-    getTileInDirection(tiles, tiles[x][y], TileDirection.TOP_LEFT),
-    getTileInDirection(tiles, tiles[x][y], TileDirection.TOP_RIGHT),
-    getTileInDirection(tiles, tiles[x][y], TileDirection.RIGHT),
-    getTileInDirection(tiles, tiles[x][y], TileDirection.BOTTOM_RIGHT),
-    getTileInDirection(tiles, tiles[x][y], TileDirection.BOTTOM_LEFT),
-    getTileInDirection(tiles, tiles[x][y], TileDirection.LEFT),
-  ].filter((t) => !!t) as Tile[];
-}
-
-export function getTileInDirection(
-  tiles: Tile[][],
-  tile: Tile,
-  direction: TileDirection
-): Tile | null {
-  switch (direction) {
-    case TileDirection.TOP_LEFT:
-      if ((tile.y % 2 === 0 && tile.x === 0) || tile.y === 0) {
-        return null;
-      }
-      return tiles[tile.x - (tile.y % 2 ? 0 : 1)][tile.y - 1];
-
-    case TileDirection.TOP_RIGHT:
-      if ((tile.y % 2 && tile.x === tiles.length - 1) || tile.y === 0) {
-        return null;
-      }
-      return tiles[tile.x + (tile.y % 2 ? 1 : 0)][tile.y - 1];
-
-    case TileDirection.RIGHT:
-      if (tile.x === tiles.length - 1) {
-        return null;
-      }
-      return tiles[tile.x + 1][tile.y];
-
-    case TileDirection.BOTTOM_RIGHT:
-      if (
-        (tile.y % 2 && tile.x === tiles.length - 1) ||
-        tile.y === tiles[tile.x].length - 1
-      ) {
-        return null;
-      }
-      return tiles[tile.x + (tile.y % 2 ? 1 : 0)][tile.y + 1];
-
-    case TileDirection.BOTTOM_LEFT:
-      if (
-        (tile.y % 2 === 0 && tile.x === 0) ||
-        tile.y === tiles[tile.x].length - 1
-      ) {
-        return null;
-      }
-      return tiles[tile.x - (tile.y % 2 ? 0 : 1)][tile.y + 1];
-
-    case TileDirection.LEFT:
-      if (tile.x === 0) {
-        return null;
-      }
-      return tiles[tile.x - 1][tile.y];
-  }
-  return null;
-}
-
-export function getTileDirection(start: Tile, end: Tile): TileDirection {
-  if (end.x === start.x - (start.y % 2 ? 0 : 1) && end.y === start.y - 1) {
-    return TileDirection.TOP_LEFT;
-  }
-  if (end.x === start.x + (start.y % 2 ? 1 : 0) && end.y === start.y - 1) {
-    return TileDirection.TOP_RIGHT;
-  }
-  if (end.x === start.x + 1 && end.y === start.y) {
-    return TileDirection.RIGHT;
-  }
-  if (end.x === start.x + (start.y % 2 ? 1 : 0) && end.y === start.y + 1) {
-    return TileDirection.BOTTOM_RIGHT;
-  }
-  if (end.x === start.x - (start.y % 2 ? 0 : 1) && end.y === start.y + 1) {
-    return TileDirection.BOTTOM_LEFT;
-  }
-  if (end.x === start.x - 1 && end.y === start.y) {
-    return TileDirection.LEFT;
-  }
-  return TileDirection.NONE;
 }
 
 export function findCoastline(tiles: Tile[][]): Tile[] {

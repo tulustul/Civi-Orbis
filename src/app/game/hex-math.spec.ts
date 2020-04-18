@@ -1,13 +1,9 @@
 import { Tile, TileDirection } from '../game/tile.interface';
-import {
-  fillWithEmptyTiles,
-  getTilesAround,
-  makeEmptyTile,
-  getTileDirection,
-} from './utils';
+import { getTileNeighbours, getTileDirection } from '../game/hex-math';
+import { fillWithEmptyTiles, makeEmptyTile } from '../map-generators/utils';
 
-describe('map-generators:utils', () => {
-  it('#getTilesAround', () => {
+describe('hex-math:utils', () => {
+  it('#getTileNeighbours', () => {
     function toCoords(tiles: Iterable<Tile>) {
       return Array.from(tiles).map((tile) => [tile.x, tile.y]);
     }
@@ -15,13 +11,13 @@ describe('map-generators:utils', () => {
     const tiles = fillWithEmptyTiles(5, 5);
 
     // top left
-    expect(toCoords(getTilesAround(tiles, 0, 0))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 0, 0))).toEqual([
       [1, 0],
       [0, 1],
     ]);
 
     // top
-    expect(toCoords(getTilesAround(tiles, 2, 0))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 2, 0))).toEqual([
       [3, 0],
       [2, 1],
       [1, 1],
@@ -29,15 +25,15 @@ describe('map-generators:utils', () => {
     ]);
 
     // top right
-    console.log(toCoords(getTilesAround(tiles, 4, 0)));
-    expect(toCoords(getTilesAround(tiles, 4, 0))).toEqual([
+    console.log(toCoords(getTileNeighbours(tiles, 4, 0)));
+    expect(toCoords(getTileNeighbours(tiles, 4, 0))).toEqual([
       [4, 1],
       [3, 1],
       [3, 0],
     ]);
 
     // right even
-    expect(toCoords(getTilesAround(tiles, 4, 2))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 4, 2))).toEqual([
       [3, 1],
       [4, 1],
       [4, 3],
@@ -46,21 +42,21 @@ describe('map-generators:utils', () => {
     ]);
 
     // right odd
-    expect(toCoords(getTilesAround(tiles, 4, 3))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 4, 3))).toEqual([
       [4, 2],
       [4, 4],
       [3, 3],
     ]);
 
     // bottom right
-    expect(toCoords(getTilesAround(tiles, 4, 4))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 4, 4))).toEqual([
       [3, 3],
       [4, 3],
       [3, 4],
     ]);
 
     // bottom
-    expect(toCoords(getTilesAround(tiles, 2, 4))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 2, 4))).toEqual([
       [1, 3],
       [2, 3],
       [3, 4],
@@ -68,20 +64,20 @@ describe('map-generators:utils', () => {
     ]);
 
     // bottom left
-    expect(toCoords(getTilesAround(tiles, 0, 4))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 0, 4))).toEqual([
       [0, 3],
       [1, 4],
     ]);
 
     // left even
-    expect(toCoords(getTilesAround(tiles, 0, 2))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 0, 2))).toEqual([
       [0, 1],
       [1, 2],
       [0, 3],
     ]);
 
     // left odd
-    expect(toCoords(getTilesAround(tiles, 0, 3))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 0, 3))).toEqual([
       [0, 2],
       [1, 2],
       [1, 3],
@@ -90,7 +86,7 @@ describe('map-generators:utils', () => {
     ]);
 
     // middle even
-    expect(toCoords(getTilesAround(tiles, 2, 2))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 2, 2))).toEqual([
       [1, 1],
       [2, 1],
       [3, 2],
@@ -100,7 +96,7 @@ describe('map-generators:utils', () => {
     ]);
 
     // middle odd
-    expect(toCoords(getTilesAround(tiles, 2, 3))).toEqual([
+    expect(toCoords(getTileNeighbours(tiles, 2, 3))).toEqual([
       [2, 2],
       [3, 2],
       [3, 3],

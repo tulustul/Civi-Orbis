@@ -1,7 +1,7 @@
 <canvas
   #canvas
-  (mousedown)="onMouseDown($event)"
-  (mouseup)="onMouseUp($event)"
-  (mousemove)="onMouseMove($event)"
-  (wheel)="onWheel($event)"
+  (mousedown)="game.controls.onMouseDown($event)"
+  (mouseup)="game.controls.onMouseUp($event)"
+  (mousemove)="game.controls.onMouseMove($event)"
+  (wheel)="game.controls.onWheel($event)"
 ></canvas>

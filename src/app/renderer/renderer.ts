@@ -34,6 +34,10 @@ export class Renderer {
     this.game.camera.transform$.subscribe((transform) => {
       this.render(transform);
     });
+
+    this.game.tilesManager.activeTile$.subscribe((tile) => {
+      this.render(this.game.camera.transform$.value);
+    });
   }
 
   render(t: Transform) {
@@ -48,32 +52,31 @@ export class Renderer {
       -t.y + this.canvas.height / 2 / t.scale
     );
 
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = 0.02;
 
+    this.ctx.save();
     for (let y = 0; y < this.game.map.height; y++) {
       this.ctx.save();
-      this.ctx.translate(y % 2 ? 50 : 0, 0);
+      this.ctx.translate(y % 2 ? 0.5 : 0, 0);
       for (let x = 0; x < this.game.map.width; x++) {
         this.drawTile(this.game.map.tiles[x][y]);
-        this.ctx.translate(100, 0);
+        this.ctx.translate(1, 0);
       }
       this.ctx.restore();
-      this.ctx.translate(0, 75);
+      this.ctx.translate(0, 0.75);
     }
+    this.ctx.restore();
+
+    this.renderActiveTile();
+
+    this.renderUnits();
+
     this.ctx.restore();
   }
 
   drawTile(tile: Tile) {
-    this.ctx.beginPath();
+    this.renderHex();
 
-    this.ctx.moveTo(0, 25);
-    this.ctx.lineTo(50, 0);
-    this.ctx.lineTo(100, 25);
-    this.ctx.lineTo(100, 75);
-    this.ctx.lineTo(50, 100);
-    this.ctx.lineTo(0, 75);
-
-    this.ctx.closePath();
     this.ctx.stroke();
 
     if (tile.seaLevel === SeaLevel.none) {
@@ -86,8 +89,31 @@ export class Renderer {
 
     this.ctx.fill();
 
+    this.renderRivers(tile);
+
+    // if (tile.height) {
+    //   this.ctx.fillStyle = 'black';
+    //   this.ctx.font = '20px sans-serif';
+    //   this.ctx.fillText(tile.height.toFixed(4), 0, 50);
+    // }
+  }
+
+  private renderHex() {
+    this.ctx.beginPath();
+
+    this.ctx.moveTo(0, 0.25);
+    this.ctx.lineTo(0.5, 0);
+    this.ctx.lineTo(1, 0.25);
+    this.ctx.lineTo(1, 0.75);
+    this.ctx.lineTo(0.5, 1);
+    this.ctx.lineTo(0, 0.75);
+
+    this.ctx.closePath();
+  }
+
+  private renderRivers(tile: Tile) {
     if (tile.riverParts.length) {
-      this.ctx.lineWidth = 15;
+      this.ctx.lineWidth = 0.15;
       this.ctx.strokeStyle = 'royalblue';
 
       this.ctx.fillStyle = 'royalblue';
@@ -102,56 +128,86 @@ export class Renderer {
     for (const river of tile.riverParts) {
       if (river === TileDirection.TOP_LEFT) {
         this.ctx.beginPath();
-        this.ctx.moveTo(0, 25);
-        this.ctx.lineTo(50, 0);
+        this.ctx.moveTo(0, 0.25);
+        this.ctx.lineTo(0.5, 0);
         this.ctx.stroke();
       }
 
       if (river === TileDirection.TOP_RIGHT) {
         this.ctx.beginPath();
-        this.ctx.moveTo(50, 0);
-        this.ctx.lineTo(100, 25);
+        this.ctx.moveTo(0.5, 0);
+        this.ctx.lineTo(1, 0.25);
         this.ctx.stroke();
       }
 
       if (river === TileDirection.RIGHT) {
         this.ctx.beginPath();
-        this.ctx.moveTo(100, 25);
-        this.ctx.lineTo(100, 75);
+        this.ctx.moveTo(1, 0.25);
+        this.ctx.lineTo(1, 0.75);
         this.ctx.stroke();
       }
 
       if (river === TileDirection.BOTTOM_RIGHT) {
         this.ctx.beginPath();
-        this.ctx.moveTo(100, 75);
-        this.ctx.lineTo(50, 100);
+        this.ctx.moveTo(1, 0.75);
+        this.ctx.lineTo(0.5, 1);
         this.ctx.stroke();
       }
 
       if (river === TileDirection.BOTTOM_LEFT) {
         this.ctx.beginPath();
-        this.ctx.moveTo(50, 100);
-        this.ctx.lineTo(0, 75);
+        this.ctx.moveTo(0.5, 1);
+        this.ctx.lineTo(0, 0.75);
         this.ctx.stroke();
       }
 
       if (river === TileDirection.LEFT) {
         this.ctx.beginPath();
-        this.ctx.moveTo(0, 75);
-        this.ctx.lineTo(0, 25);
+        this.ctx.moveTo(0, 0.75);
+        this.ctx.lineTo(0, 0.25);
         this.ctx.stroke();
       }
     }
 
     if (tile.riverParts.length) {
-      this.ctx.lineWidth = 1;
+      this.ctx.lineWidth = 0.01;
       this.ctx.strokeStyle = 'black';
     }
+  }
 
-    // if (tile.height) {
-    //   this.ctx.fillStyle = 'black';
-    //   this.ctx.font = '20px sans-serif';
-    //   this.ctx.fillText(tile.height.toFixed(4), 0, 50);
-    // }
+  renderActiveTile() {
+    const tile = this.game.tilesManager.activeTile;
+    if (!tile) {
+      return;
+    }
+
+    this.ctx.save();
+    this.translateToTile(tile);
+    this.renderHex();
+    this.ctx.lineWidth = 0.05;
+    this.ctx.strokeStyle = 'orange';
+    this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.restore();
+    this.ctx.lineWidth = 0.02;
+  }
+
+  renderUnits() {
+    for (const unit of this.game.unitsManager.units) {
+      this.ctx.save();
+      this.translateToTile(unit.tile);
+
+      this.ctx.fillStyle = 'blue';
+      this.ctx.beginPath();
+      this.ctx.ellipse(0.5, 0.5, 0.2, 0.2, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      this.ctx.restore();
+    }
+  }
+
+  translateToTile(tile: Tile) {
+    this.ctx.translate(tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75);
   }
 }

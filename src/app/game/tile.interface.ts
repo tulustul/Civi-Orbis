@@ -1,3 +1,5 @@
+import { Unit } from './unit';
+
 export enum Climate {
   tropical,
   oceanic,
@@ -31,6 +33,7 @@ export interface Tile {
   riverMouth: boolean;
   height: number;
   neighbours: Tile[];
+  units: Unit[];
 }
 
 export enum TileDirection {

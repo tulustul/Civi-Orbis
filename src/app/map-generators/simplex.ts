@@ -4,20 +4,27 @@ import { MapGenerator } from './map-generator.interface';
 import { TilesMap } from '../game/tiles-map';
 import {
   fillWithEmptyTiles,
-  getTileDirection,
   findCoastline,
-  getTileInDirection,
   placeRiverBetweenTiles,
   POSSIBLE_RIVER_PATHS,
 } from './utils';
 import { SeaLevel, Tile, Climate, TileDirection } from '../game/tile.interface';
+import { getTileInDirection, getTileDirection } from '../game/hex-math';
 
 export class SimplexMapGenerator implements MapGenerator {
-  tiles: Tile[][];
+  private tiles: Tile[][];
 
-  width: number;
+  private width: number;
 
-  height: number;
+  private height: number;
+
+  private startingLocations: Tile[] = [];
+
+  constructor(private startingLocationsCount: number) {}
+
+  getStartingLocations() {
+    return this.startingLocations;
+  }
 
   generate(width: number, height: number) {
     this.tiles = fillWithEmptyTiles(width, height);
@@ -66,10 +73,12 @@ export class SimplexMapGenerator implements MapGenerator {
 
     this.placeRivers(riversSources);
 
+    this.findStartingPositions();
+
     return new TilesMap(width, height, this.tiles);
   }
 
-  *getNoisedTiles(
+  private *getNoisedTiles(
     noise: ComplexNoise,
     threshold: number
   ): Iterable<[Tile, number, number]> {
@@ -85,7 +94,7 @@ export class SimplexMapGenerator implements MapGenerator {
     }
   }
 
-  fixShallowWater() {
+  private fixShallowWater() {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         const tile = this.tiles[x][y];
@@ -100,7 +109,7 @@ export class SimplexMapGenerator implements MapGenerator {
     }
   }
 
-  adjustHeightmap() {
+  private adjustHeightmap() {
     // Make heighmap suitable for rivers placement - the deeper into land the higher.
     let currentTiles = findCoastline(this.tiles);
     const nextTiles = new Set<Tile>();
@@ -125,7 +134,7 @@ export class SimplexMapGenerator implements MapGenerator {
     }
   }
 
-  placeRivers(sources: Tile[]) {
+  private placeRivers(sources: Tile[]) {
     for (const tile of sources) {
       if (tile.riverParts.length) {
         continue;
@@ -145,7 +154,7 @@ export class SimplexMapGenerator implements MapGenerator {
     }
   }
 
-  buildRiverPath(tile: Tile, direction: TileDirection) {
+  private buildRiverPath(tile: Tile, direction: TileDirection) {
     if (direction === TileDirection.NONE) {
       return;
     }
@@ -193,6 +202,20 @@ export class SimplexMapGenerator implements MapGenerator {
         pairToPlace[0],
         getTileDirection(pairToPlace[0], pairToPlace[1])
       );
+    }
+  }
+
+  private findStartingPositions() {
+    while (this.startingLocations.length < this.startingLocationsCount) {
+      const x = Math.floor(Math.random() * this.width);
+      const y = Math.floor(Math.random() * this.height);
+      const tile = this.tiles[x][y];
+      if (
+        tile.seaLevel === SeaLevel.none &&
+        !this.startingLocations.includes(tile)
+      ) {
+        this.startingLocations.push(tile);
+      }
     }
   }
 }

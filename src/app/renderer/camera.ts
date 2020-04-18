@@ -8,7 +8,7 @@ export interface Transform {
 }
 
 export class Camera {
-  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 0.3 });
+  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 35 });
 
   constructor(private game: Game) {}
 
@@ -38,7 +38,7 @@ export class Camera {
   }
 
   moveToTile(tileX: number, tileY: number) {
-    this.moveTo(tileX * 100, tileY * 100);
+    this.moveTo(tileX, tileY);
   }
 
   screenToCanvas(screenX: number, screenY: number): [number, number] {
@@ -47,6 +47,13 @@ export class Camera {
       (screenX - this.canvas.width / 2) / t.scale + t.x,
       (screenY - this.canvas.height / 2) / t.scale + t.y,
     ];
+  }
+
+  screenToGame(screenX: number, screenY: number): [number, number] {
+    let [x, y] = this.screenToCanvas(screenX, screenY);
+    y = Math.floor(y / 0.75);
+    x = Math.floor(x - (y % 2 ? 0.5 : 0));
+    return [x, y];
   }
 
   canvasToScreen(canvasX: number, canvasY: number): [number, number] {

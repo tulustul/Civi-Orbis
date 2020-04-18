@@ -2,6 +2,8 @@ import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Renderer } from '../renderer';
 import { Game } from '../game/game';
 import { Camera } from '../renderer/camera';
+import { SimplexMapGenerator } from '../map-generators/simplex';
+import { Player } from '../game/player';
 
 @Component({
   selector: 'app-game-canvas',
@@ -11,15 +13,24 @@ import { Camera } from '../renderer/camera';
 export class GameCanvasComponent implements AfterViewInit {
   renderer: Renderer;
 
-  isMousePressed = false;
-
-  game = new Game();
-
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>;
 
-  constructor() {}
+  constructor(public game: Game) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const generator = new SimplexMapGenerator(10);
+    const map = generator.generate(40, 30);
+
+    const human_player = new Player('human');
+    this.game.players.push();
+    this.game.start(map);
+
+    this.game.unitsManager.spawn(
+      'scout',
+      generator.getStartingLocations()[0],
+      human_player
+    );
+  }
 
   ngAfterViewInit() {
     this.game.camera = new Camera(this.game);
@@ -29,28 +40,6 @@ export class GameCanvasComponent implements AfterViewInit {
     this.game.camera.moveToTile(
       Math.floor(this.game.map.width / 2),
       Math.floor(this.game.map.height / 2)
-    );
-  }
-
-  onMouseDown(event: MouseEvent) {
-    this.isMousePressed = true;
-  }
-
-  onMouseUp(event: MouseEvent) {
-    this.isMousePressed = false;
-  }
-
-  onMouseMove(event: MouseEvent) {
-    if (this.isMousePressed) {
-      this.game.camera.moveBy(event.movementX, event.movementY);
-    }
-  }
-
-  onWheel(event: WheelEvent) {
-    this.game.camera.scaleBy(
-      1 + (event.deltaY > 0 ? -0.2 : 0.2),
-      event.clientX,
-      event.clientY
     );
   }
 }

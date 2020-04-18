@@ -1,4 +1,4 @@
-import { Tile, Climate, Landform, SeaLevel } from './tile.interface';
+import { Tile } from './tile.interface';
 
 export class TilesMap {
   constructor(
