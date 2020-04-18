@@ -10,7 +10,7 @@ const SEA_COLORS: Record<SeaLevel, string> = {
 };
 
 const CLIMATE_COLORS: Record<Climate, string> = {
-  [Climate.continental]: 'darkgreen',
+  [Climate.continental]: 'mediumseagreen',
   [Climate.desert]: 'yellow',
   [Climate.oceanic]: 'lightgreen',
   [Climate.savanna]: 'bisque',
@@ -78,6 +78,8 @@ export class Renderer {
 
     if (tile.seaLevel === SeaLevel.none) {
       this.ctx.fillStyle = CLIMATE_COLORS[tile.climate];
+      // const color = Math.round(tile.height * 90);
+      // this.ctx.fillStyle = `rgb(${color},${color},${color})`;
     } else {
       this.ctx.fillStyle = SEA_COLORS[tile.seaLevel];
     }
@@ -85,12 +87,11 @@ export class Renderer {
     this.ctx.fill();
 
     if (tile.riverParts.length) {
-      this.ctx.lineWidth = 25;
-      this.ctx.strokeStyle = 'blue';
+      this.ctx.lineWidth = 15;
+      this.ctx.strokeStyle = 'royalblue';
 
-      // this.ctx.fillStyle = 'blue';
+      this.ctx.fillStyle = 'royalblue';
       // if (tile.riverSource) {
-      //   console.log('riverSource', tile);
       //   this.ctx.fillStyle = 'red';
       //   this.ctx.beginPath();
       //   this.ctx.ellipse(50, 50, 20, 20, 0, 0, Math.PI * 2);
@@ -147,10 +148,10 @@ export class Renderer {
       this.ctx.strokeStyle = 'black';
     }
 
-    if (tile.height) {
-      this.ctx.fillStyle = 'black';
-      this.ctx.font = '20px sans-serif';
-      this.ctx.fillText(tile.height.toFixed(4), 0, 50);
-    }
+    // if (tile.height) {
+    //   this.ctx.fillStyle = 'black';
+    //   this.ctx.font = '20px sans-serif';
+    //   this.ctx.fillText(tile.height.toFixed(4), 0, 50);
+    // }
   }
 }

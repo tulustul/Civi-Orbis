@@ -6,11 +6,9 @@ import {
   fillWithEmptyTiles,
   getTileDirection,
   findCoastline,
-  POSSIBLE_RIVER_DIRECTION_FROM_WATER_TILE,
   getTileInDirection,
   placeRiverBetweenTiles,
-  POSSIBLE_RIVER_PATHS_CLOCKWISE,
-  POSSIBLE_RIVER_PATHS_COUNTERCLOCKWISE,
+  POSSIBLE_RIVER_PATHS,
 } from './utils';
 import { SeaLevel, Tile, Climate, TileDirection } from '../game/tile.interface';
 
@@ -39,7 +37,7 @@ export class SimplexMapGenerator implements MapGenerator {
       -0.4
     )) {
       tile.seaLevel = threshold > -0.2 ? SeaLevel.none : SeaLevel.shallow;
-      if (threshold > 0.05 && Math.random() > 0.95) {
+      if (threshold > 0.05 && Math.random() > 0.9) {
         riversSources.push(tile);
       }
     }
@@ -64,7 +62,9 @@ export class SimplexMapGenerator implements MapGenerator {
 
     this.fixShallowWater();
 
-    this.placeRivers(heightmapNoise, riversSources);
+    this.adjustHeightmap();
+
+    this.placeRivers(riversSources);
 
     return new TilesMap(width, height, this.tiles);
   }
@@ -100,66 +100,57 @@ export class SimplexMapGenerator implements MapGenerator {
     }
   }
 
-  placeRivers(noise: ComplexNoise, sources: Tile[]) {
-    // const coastline = findCoastline(this.tiles);
-    // for (const tile of coastline) {
-    //   if (Math.random() < 0.8) {
-    //     continue;
-    //   }
-    //   const possibleRiverMouths = new Set<[Tile, Tile, boolean]>();
-    //   for (const neighbour of tile.neighbours) {
-    //     if (neighbour.seaLevel !== SeaLevel.none) {
-    //       const dir = getTileDirection(tile, neighbour);
-    //       const [dirA, dirB] = POSSIBLE_RIVER_DIRECTION_FROM_WATER_TILE[dir];
-    //       const dirATile = getTileInDirection(this.tiles, tile, dirA);
-    //       const dirBTile = getTileInDirection(this.tiles, tile, dirB);
-    //       if (dirATile && dirATile.seaLevel === SeaLevel.none) {
-    //         possibleRiverMouths.add([tile, dirATile, true]);
-    //       }
-    //       if (dirBTile && dirBTile.seaLevel === SeaLevel.none) {
-    //         possibleRiverMouths.add([tile, dirBTile, false]);
-    //       }
-    //     }
-    //   }
-    //   if (possibleRiverMouths.size) {
-    //     let items = Array.from(possibleRiverMouths);
-    //     const [tileA, tileB, clockwise] = items[
-    //       Math.floor(Math.random() * items.length)
-    //     ];
-    //     placeRiverBetweenTiles(tileA, tileB);
-    //     this.buildRiverPath(
-    //       noise,
-    //       tileA,
-    //       getTileDirection(tileA, tileB),
-    //       clockwise
-    //     );
-    //   }
-    // }
-
-    for (const tile of sources) {
-      tile.riverSource = true;
-      console.log(tile);
-      this.buildRiverPath(
-        noise,
-        tile,
-        Math.round(Math.random() * 5),
-        Math.random() > 0.5
-      );
+  adjustHeightmap() {
+    // Make heighmap suitable for rivers placement - the deeper into land the higher.
+    let currentTiles = findCoastline(this.tiles);
+    const nextTiles = new Set<Tile>();
+    const visitedTiles = new Set<Tile>(currentTiles);
+    let offset = 0;
+    while (currentTiles.length) {
+      offset += 0.15;
+      for (const tile of currentTiles) {
+        for (const neighbour of tile.neighbours) {
+          if (
+            neighbour.seaLevel === SeaLevel.none &&
+            !visitedTiles.has(neighbour)
+          ) {
+            visitedTiles.add(neighbour);
+            nextTiles.add(neighbour);
+            neighbour.height += offset;
+          }
+        }
+      }
+      currentTiles = Array.from(nextTiles);
+      nextTiles.clear();
     }
   }
 
-  buildRiverPath(
-    noise: ComplexNoise,
-    tile: Tile,
-    direction: TileDirection,
-    clockwise: boolean
-  ) {
+  placeRivers(sources: Tile[]) {
+    for (const tile of sources) {
+      if (tile.riverParts.length) {
+        continue;
+      }
+
+      let ok = true;
+      for (const neighbour of tile.neighbours) {
+        if (neighbour.seaLevel !== SeaLevel.none) {
+          ok = false;
+        }
+      }
+
+      if (ok) {
+        tile.riverSource = true;
+        this.buildRiverPath(tile, Math.round(Math.random() * 5));
+      }
+    }
+  }
+
+  buildRiverPath(tile: Tile, direction: TileDirection) {
     if (direction === TileDirection.NONE) {
       return;
     }
-    const possibleNeighboursDirections = clockwise
-      ? POSSIBLE_RIVER_PATHS_CLOCKWISE[direction]
-      : POSSIBLE_RIVER_PATHS_COUNTERCLOCKWISE[direction];
+
+    const possibleNeighboursDirections = POSSIBLE_RIVER_PATHS[direction];
 
     const pairs = possibleNeighboursDirections
       .map((pair) => {
@@ -175,12 +166,12 @@ export class SimplexMapGenerator implements MapGenerator {
           pair[0] &&
           pair[1] &&
           pair[0].seaLevel === SeaLevel.none &&
-          pair[1].seaLevel === SeaLevel.none
+          pair[1].seaLevel === SeaLevel.none &&
+          pair[0].riverParts.length < 4 && // small loops prevention, big loops are still an issue
+          pair[1].riverParts.length < 4
       ) as [Tile, Tile][];
 
     if (pairs.length === 0) {
-      // throw Error('buildRiverPath: no path candidates');
-      // tile.seaLevel = SeaLevel.shallow;
       return;
     }
 
@@ -191,59 +182,19 @@ export class SimplexMapGenerator implements MapGenerator {
     } else {
       const [pairA, pairB] = pairs;
 
-      const noiseAValue = noise.at(
-        (pairA[0].x + pairA[1].x) / 2,
-        (pairA[0].y + pairA[1].y) / 2
-      );
-      const noiseBValue = noise.at(
-        (pairB[0].x + pairB[1].x) / 2,
-        (pairB[0].y + pairB[1].y) / 2
-      );
+      const heightA = (pairA[0].height + pairA[1].height) / 2;
+      const heightB = (pairB[0].height + pairB[1].height) / 2;
 
-      pairToPlace = noiseAValue < noiseBValue ? pairA : pairB;
+      pairToPlace = heightA < heightB ? pairA : pairB;
     }
 
     if (placeRiverBetweenTiles(...pairToPlace)) {
       this.buildRiverPath(
-        noise,
         pairToPlace[0],
-        getTileDirection(pairToPlace[0], pairToPlace[1]),
-        true
+        getTileDirection(pairToPlace[0], pairToPlace[1])
       );
     }
   }
-  // buildRiverPath(noise: ComplexNoise, tile: Tile, previousTile: Tile | null) {
-  //   let nextTile: Tile | null = null;
-  //   let minHeight = noise.at(tile.x, tile.y);
-
-  //   for (const neighbour of tile.neighbours) {
-  //     if (neighbour.riverParts.length) {
-  //       continue;
-  //     }
-  //     const noiseValue = noise.at(neighbour.x, neighbour.y);
-  //     if (noiseValue < minHeight) {
-  //       minHeight = noiseValue;
-  //       nextTile = neighbour;
-  //     }
-  //   }
-
-  //   if (!nextTile && tile.seaLevel === SeaLevel.none) {
-  //     tile.seaLevel = SeaLevel.shallow;
-  //     if (previousTile) {
-  //       const direction = getTileDirection(previousTile, tile);
-  //       previousTile.riverParts.push(direction);
-  //     }
-  //   }
-
-  //   if (nextTile && nextTile.seaLevel === SeaLevel.none) {
-  //     // console.log('next tile');
-  //     const direction = getTileDirection(tile, nextTile);
-  //     tile.riverParts.push(direction);
-  //     this.buildRiverPath(noise, nextTile, tile);
-  //   }
-
-  //   // console.log(nextTile, tile);
-  // }
 }
 
 class ComplexNoise {

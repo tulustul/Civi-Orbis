@@ -17,6 +17,7 @@ export function makeEmptyTile(x: number, y: number): Tile {
     riverSource: false,
     riverMouth: false,
     neighbours: [],
+    height: 0,
   };
 }
 
@@ -41,41 +42,6 @@ export function fillWithEmptyTiles(width: number, height: number): Tile[][] {
 }
 
 export function getTilesAround(tiles: Tile[][], x: number, y: number): Tile[] {
-  // if (y > 0) {
-  //   if (y % 2) {
-  //     yield tiles[x][y - 1];
-  //     if (x < tiles.length - 1) {
-  //       yield tiles[x + 1][y - 1];
-  //     }
-  //   } else {
-  //     if (x > 0) {
-  //       yield tiles[x - 1][y - 1];
-  //     }
-  //     yield tiles[x][y - 1];
-  //   }
-  // }
-
-  // if (x < tiles.length - 1) {
-  //   yield tiles[x + 1][y];
-  // }
-
-  // if (y < tiles[x].length - 1) {
-  //   if (y % 2) {
-  //     if (x < tiles.length - 1) {
-  //       yield tiles[x + 1][y + 1];
-  //     }
-  //     yield tiles[x][y + 1];
-  //   } else {
-  //     yield tiles[x][y + 1];
-  //     if (x > 0) {
-  //       yield tiles[x - 1][y + 1];
-  //     }
-  //   }
-  // }
-
-  // if (x > 0) {
-  //   yield tiles[x - 1][y];
-  // }
   return [
     getTileInDirection(tiles, tiles[x][y], TileDirection.TOP_LEFT),
     getTileInDirection(tiles, tiles[x][y], TileDirection.TOP_RIGHT),
@@ -203,7 +169,7 @@ export const POSSIBLE_RIVER_DIRECTION_FROM_WATER_TILE: Record<
 };
 
 // flow is clockwise for first tile
-export const POSSIBLE_RIVER_PATHS_CLOCKWISE: Record<
+export const POSSIBLE_RIVER_PATHS: Record<
   TileDirection,
   [[TileDirection, TileDirection], [TileDirection, TileDirection]]
 > = {
@@ -224,47 +190,12 @@ export const POSSIBLE_RIVER_PATHS_CLOCKWISE: Record<
     [TileDirection.NONE, TileDirection.BOTTOM_LEFT],
   ],
   [TileDirection.BOTTOM_LEFT]: [
-    [TileDirection.LEFT, TileDirection.BOTTOM_RIGHT],
+    [TileDirection.LEFT, TileDirection.BOTTOM_LEFT],
     [TileDirection.NONE, TileDirection.LEFT],
   ],
   [TileDirection.LEFT]: [
     [TileDirection.TOP_LEFT, TileDirection.LEFT],
     [TileDirection.NONE, TileDirection.TOP_LEFT],
-  ],
-  [TileDirection.NONE]: [
-    [TileDirection.NONE, TileDirection.NONE],
-    [TileDirection.NONE, TileDirection.NONE],
-  ],
-};
-
-// flow is clockwise for first tile
-export const POSSIBLE_RIVER_PATHS_COUNTERCLOCKWISE: Record<
-  TileDirection,
-  [[TileDirection, TileDirection], [TileDirection, TileDirection]]
-> = {
-  [TileDirection.TOP_LEFT]: [
-    [TileDirection.TOP_LEFT, TileDirection.LEFT],
-    [TileDirection.LEFT, TileDirection.NONE],
-  ],
-  [TileDirection.TOP_RIGHT]: [
-    [TileDirection.TOP_RIGHT, TileDirection.TOP_LEFT],
-    [TileDirection.TOP_LEFT, TileDirection.NONE],
-  ],
-  [TileDirection.RIGHT]: [
-    [TileDirection.RIGHT, TileDirection.TOP_RIGHT],
-    [TileDirection.TOP_RIGHT, TileDirection.NONE],
-  ],
-  [TileDirection.BOTTOM_RIGHT]: [
-    [TileDirection.BOTTOM_RIGHT, TileDirection.RIGHT],
-    [TileDirection.BOTTOM_LEFT, TileDirection.NONE],
-  ],
-  [TileDirection.BOTTOM_LEFT]: [
-    [TileDirection.BOTTOM_LEFT, TileDirection.BOTTOM_RIGHT],
-    [TileDirection.BOTTOM_RIGHT, TileDirection.NONE],
-  ],
-  [TileDirection.LEFT]: [
-    [TileDirection.LEFT, TileDirection.BOTTOM_LEFT],
-    [TileDirection.BOTTOM_LEFT, TileDirection.NONE],
   ],
   [TileDirection.NONE]: [
     [TileDirection.NONE, TileDirection.NONE],

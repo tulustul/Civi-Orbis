@@ -29,7 +29,7 @@ export interface Tile {
   riverParts: TileDirection[];
   riverSource: boolean;
   riverMouth: boolean;
-  height?: number;
+  height: number;
   neighbours: Tile[];
 }
 
