@@ -32,18 +32,27 @@ export class Renderer {
     this.ctx = canvas.getContext('2d')!;
 
     this.game.camera.transform$.subscribe((transform) => {
-      this.render(transform);
+      this.render();
     });
 
     this.game.tilesManager.activeTile$.subscribe((tile) => {
-      this.render(this.game.camera.transform$.value);
+      this.render();
     });
   }
 
-  render(t: Transform) {
+  resize(width: number, height: number) {
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.render();
+  }
+
+  render() {
     if (!this.ctx) {
       return;
     }
+
+    const t = this.game.camera.transform$.value;
+
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
     this.ctx.scale(t.scale, t.scale);

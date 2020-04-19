@@ -1,4 +1,11 @@
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  HostListener,
+} from '@angular/core';
+
 import { Renderer } from '../renderer';
 import { Game } from '../game/game';
 import { Camera } from '../renderer/camera';
@@ -11,8 +18,6 @@ import { Player } from '../game/player';
   styleUrls: ['./game-canvas.component.scss'],
 })
 export class GameCanvasComponent implements AfterViewInit {
-  renderer: Renderer;
-
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>;
 
   constructor(public game: Game) {}
@@ -45,5 +50,10 @@ export class GameCanvasComponent implements AfterViewInit {
 
   onContextMenu(event: Event) {
     event.preventDefault();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.game.renderer.resize(window.innerWidth, window.innerHeight);
   }
 }
