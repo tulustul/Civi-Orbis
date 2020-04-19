@@ -10,6 +10,8 @@ export class OverlaysCanvas extends Canvas {
 
     this.renderActiveTile();
 
+    this.renderActivePath();
+
     this.ctx.restore();
   }
 
@@ -27,6 +29,27 @@ export class OverlaysCanvas extends Canvas {
     this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
     this.ctx.fill();
     this.ctx.stroke();
+    this.ctx.restore();
+  }
+
+  renderActivePath() {
+    const path = this.game.unitsManager.activePath;
+    if (!path) {
+      return;
+    }
+
+    this.ctx.lineWidth = 0.1;
+    this.ctx.strokeStyle = 'black';
+
+    this.ctx.save();
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(...this.getTileCenter(path[0]));
+    for (const tile of path.slice(1)) {
+      this.ctx.lineTo(...this.getTileCenter(tile));
+    }
+    this.ctx.stroke();
+
     this.ctx.restore();
   }
 }

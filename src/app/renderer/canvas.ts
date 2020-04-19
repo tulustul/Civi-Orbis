@@ -35,6 +35,10 @@ export abstract class Canvas {
     this.ctx.translate(tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75);
   }
 
+  protected getTileCenter(tile: Tile): [number, number] {
+    return [0.5 + tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75 + 0.5];
+  }
+
   protected moveToCamera() {
     const t = this.game.camera.transform$.value;
 

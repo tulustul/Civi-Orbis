@@ -29,11 +29,16 @@ export interface Tile {
   landForm: Landform;
   seaLevel: SeaLevel;
   riverParts: TileDirection[];
+  units: Unit[];
+
+  // cached data
+  neighbours: Tile[];
+  neighboursCosts: Map<Tile, number>;
+
+  // debug staff
+  height: number;
   riverSource: boolean;
   riverMouth: boolean;
-  height: number;
-  neighbours: Tile[];
-  units: Unit[];
 }
 
 export enum TileDirection {

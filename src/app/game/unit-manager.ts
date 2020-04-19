@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { UNITS_DEFINITIONS } from '../data/units';
 import { Player } from './player';
 import { Tile } from './tile.interface';
+import { findPath } from './pathfinding';
 
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
@@ -11,6 +12,8 @@ export class UnitsManager {
   units: Unit[] = [];
 
   activeUnit$ = new BehaviorSubject<Unit | null>(null);
+
+  activePath: Tile[] | null = null;
 
   constructor() {
     for (const definition of UNITS_DEFINITIONS) {
@@ -40,8 +43,17 @@ export class UnitsManager {
     tile.units.push(unit);
   }
 
+  findPath(unit: Unit, tile: Tile) {
+    this.activePath = findPath(unit, unit.tile, tile);
+  }
+
   move(unit: Unit, tile: Tile) {
     if (!unit.actionPointsLeft) {
+      return;
+    }
+
+    const cost = this.getMovementCost(unit, tile);
+    if (cost === Infinity) {
       return;
     }
 
@@ -52,12 +64,15 @@ export class UnitsManager {
     tile.units.push(unit);
     unit.tile = tile;
 
-    const cost = this.getMovementCost(unit, tile);
     unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
   }
 
   getMovementCost(unit: Unit, target: Tile) {
-    return 1;
+    const index = unit.tile.neighbours.indexOf(target);
+    if (index !== -1) {
+      return unit.tile.neighboursCosts[index];
+    }
+    return Infinity;
   }
 
   nextTurn() {

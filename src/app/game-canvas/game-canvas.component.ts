@@ -6,7 +6,6 @@ import {
   HostListener,
 } from '@angular/core';
 
-import { Renderer } from '../renderer';
 import { Game } from '../game/game';
 import { Camera } from '../renderer/camera';
 import { SimplexMapGenerator } from '../map-generators/simplex';
@@ -25,6 +24,7 @@ export class GameCanvasComponent implements AfterViewInit {
   ngOnInit(): void {
     const generator = new SimplexMapGenerator(10);
     const map = generator.generate(40, 30);
+    map.precomputeMovementCosts();
 
     const human_player = new Player('human');
     this.game.players.push();

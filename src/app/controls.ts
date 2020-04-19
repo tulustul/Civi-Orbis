@@ -50,6 +50,11 @@ export class Controls {
 
     if (tile !== this.game.tilesManager.activeTile) {
       this.game.tilesManager.activeTile$.next(tile);
+
+      const activeUnit = this.game.unitsManager.activeUnit;
+      if (activeUnit) {
+        this.game.unitsManager.findPath(activeUnit, this.game.map.tiles[x][y]);
+      }
     }
 
     if (this.isMousePressed) {

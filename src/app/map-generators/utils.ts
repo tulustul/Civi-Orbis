@@ -18,6 +18,7 @@ export function makeEmptyTile(x: number, y: number): Tile {
     riverSource: false,
     riverMouth: false,
     neighbours: [],
+    neighboursCosts: new Map(),
     units: [],
     height: 0,
   };
