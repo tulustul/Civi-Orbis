@@ -1,7 +1,9 @@
 <canvas
   #canvas
+  (click)="game.controls.onClick($event)"
   (mousedown)="game.controls.onMouseDown($event)"
   (mouseup)="game.controls.onMouseUp($event)"
   (mousemove)="game.controls.onMouseMove($event)"
   (wheel)="game.controls.onWheel($event)"
+  (contextmenu)="onContextMenu($event)"
 ></canvas>

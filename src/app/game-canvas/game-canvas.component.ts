@@ -42,4 +42,8 @@ export class GameCanvasComponent implements AfterViewInit {
       Math.floor(this.game.map.height / 2)
     );
   }
+
+  onContextMenu(event: Event) {
+    event.preventDefault();
+  }
 }
