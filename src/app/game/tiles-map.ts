@@ -28,4 +28,11 @@ export class TilesMap {
       }
     }
   }
+
+  get(x: number, y: number): Tile | null {
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+      return null;
+    }
+    return this.tiles[x][y];
+  }
 }

@@ -31,7 +31,10 @@ export class Controls {
 
     const activeUnit = this.game.unitsManager.activeUnit;
     if (activeUnit) {
-      this.game.unitsManager.move(activeUnit, this.game.map.tiles[x][y]);
+      const tile = this.game.map.get(x, y);
+      if (tile) {
+        this.game.unitsManager.move(activeUnit, tile);
+      }
     }
 
     this.isMousePressed = false;
@@ -53,7 +56,10 @@ export class Controls {
 
       const activeUnit = this.game.unitsManager.activeUnit;
       if (activeUnit) {
-        this.game.unitsManager.findPath(activeUnit, this.game.map.tiles[x][y]);
+        const tile = this.game.map.get(x, y);
+        if (tile) {
+          this.game.unitsManager.findPath(activeUnit, tile);
+        }
       }
     }
 

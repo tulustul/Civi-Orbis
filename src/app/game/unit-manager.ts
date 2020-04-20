@@ -13,7 +13,7 @@ export class UnitsManager {
 
   activeUnit$ = new BehaviorSubject<Unit | null>(null);
 
-  activePath: Tile[] | null = null;
+  activePath: Tile[][] | null = null;
 
   constructor() {
     for (const definition of UNITS_DEFINITIONS) {

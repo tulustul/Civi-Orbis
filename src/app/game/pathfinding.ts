@@ -1,16 +1,15 @@
 import { Tile } from './tile.interface';
 import { Unit } from './unit';
 
-/**
- * TODO returns tiles in a path aggregated by turns
- */
-export function findPath(unit: Unit, start: Tile, end: Tile): Tile[] | null {
+export function findPath(unit: Unit, start: Tile, end: Tile): Tile[][] | null {
   const visitedTiles = new Set<Tile>();
   const tilesToVisit = new Set<Tile>([start]);
-  const cameFrom = new Map<Tile, Tile>();
+  const cameFrom = new Map<Tile, [number, number, Tile | null]>();
   const costs = new Map<Tile, number>();
 
+  const turnCost = 1 / unit.definition.actionPoints;
   costs.set(start, 0);
+  cameFrom.set(start, [0, unit.definition.actionPoints, null]);
 
   while (tilesToVisit.size) {
     let nextTile!: Tile;
@@ -24,19 +23,33 @@ export function findPath(unit: Unit, start: Tile, end: Tile): Tile[] | null {
       }
     }
 
+    let [turn, actionPointsLeft, ..._] = cameFrom.get(nextTile)!;
+
+    if (!actionPointsLeft) {
+      actionPointsLeft = unit.definition.actionPoints;
+      turn++;
+    }
+
     visitedTiles.add(nextTile);
     tilesToVisit.delete(nextTile);
 
     if (nextTile === end) {
-      return recostructPath(cameFrom, end);
+      return reconstructPath(cameFrom, end);
     }
 
     for (const neighbour of nextTile.neighbours) {
       if (!visitedTiles.has(neighbour)) {
-        const cost = nextTile.neighboursCosts.get(neighbour)!;
-
+        let cost = nextTile.neighboursCosts.get(neighbour)!;
         if (cost === Infinity) {
           continue;
+        }
+
+        let newActionPointsLeft = Math.max(0, actionPointsLeft - cost);
+
+        cost *= turnCost;
+
+        if (!newActionPointsLeft) {
+          cost = 1; // ??
         }
 
         const totalCost = costs.get(nextTile)! + cost;
@@ -44,7 +57,7 @@ export function findPath(unit: Unit, start: Tile, end: Tile): Tile[] | null {
         if (!costs.has(neighbour) || totalCost < costs.get(neighbour)!) {
           costs.set(neighbour, totalCost);
           tilesToVisit.add(neighbour);
-          cameFrom.set(neighbour, nextTile);
+          cameFrom.set(neighbour, [turn, newActionPointsLeft, nextTile]);
         }
       }
     }
@@ -61,10 +74,26 @@ function getEuclideanDistance(start: Tile, end: Tile) {
   );
 }
 
-function recostructPath(cameFrom: Map<Tile, Tile>, target: Tile): Tile[] {
-  const path: Tile[] = [target];
-  while (cameFrom.has(path[0])) {
-    path.unshift(cameFrom.get(path[0])!);
+function reconstructPath(
+  cameFrom: Map<Tile, [number, number, Tile | null]>,
+  target: Tile
+): Tile[][] {
+  let lastTile = target;
+  let lastTurn: number | null = null;
+
+  let turnPath: Tile[] = [target];
+  const path: Tile[][] = [turnPath];
+  while (cameFrom.has(lastTile)) {
+    const [turn, _, tile] = cameFrom.get(lastTile)!;
+    if (turn !== lastTurn) {
+      lastTurn = turn;
+      turnPath = [];
+      path.unshift(turnPath);
+    }
+    if (tile) {
+      turnPath.unshift(tile!);
+    }
+    lastTile = tile!;
   }
   return path;
 }

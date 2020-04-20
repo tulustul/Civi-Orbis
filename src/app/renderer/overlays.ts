@@ -1,4 +1,5 @@
 import { Canvas } from './canvas';
+import { Tile } from '../game/tile.interface';
 
 export class OverlaysCanvas extends Canvas {
   render() {
@@ -39,17 +40,33 @@ export class OverlaysCanvas extends Canvas {
     }
 
     this.ctx.lineWidth = 0.1;
-    this.ctx.strokeStyle = 'black';
+    this.ctx.strokeStyle = 'orange';
+    this.ctx.font = '0.5px sans-serif';
+    this.ctx.fillStyle = 'white';
+    this.ctx.shadowBlur = 4;
+    this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
 
-    this.ctx.save();
+    // this.ctx.save();
 
     this.ctx.beginPath();
-    this.ctx.moveTo(...this.getTileCenter(path[0]));
-    for (const tile of path.slice(1)) {
-      this.ctx.lineTo(...this.getTileCenter(tile));
+    this.ctx.moveTo(...this.getTileCenter(path[0][0]));
+
+    for (const turn of path) {
+      for (const tile of turn) {
+        this.ctx.lineTo(...this.getTileCenter(tile));
+      }
     }
     this.ctx.stroke();
 
-    this.ctx.restore();
+    for (let turn = 0; turn < path.length; turn++) {
+      if (path[turn][0]) {
+        const [x, y] = this.getTileCenter(path[turn][0]);
+        const text = turn.toString();
+        const metrics = this.ctx.measureText(text);
+        this.ctx.fillText(text, x - metrics.width / 2, y + 0.15);
+      }
+    }
+
+    // this.ctx.restore();
   }
 }
