@@ -3,22 +3,22 @@ import { Unit } from './unit';
 
 export function findPath(unit: Unit, start: Tile, end: Tile): Tile[][] | null {
   const visitedTiles = new Set<Tile>();
-  const tilesToVisit = new Set<Tile>([start]);
+  const tilesToVisit = new Map<Tile, number>();
   const cameFrom = new Map<Tile, [number, number, Tile | null]>();
-  const costs = new Map<Tile, number>();
+  const costsSoFar = new Map<Tile, number>();
 
   const turnCost = 1 / unit.definition.actionPoints;
-  costs.set(start, 0);
+  tilesToVisit.set(start, 0);
+  costsSoFar.set(start, 0);
   cameFrom.set(start, [0, unit.definition.actionPoints, null]);
 
   while (tilesToVisit.size) {
     let nextTile!: Tile;
-    let minPredictedCost = Infinity;
+    let minEstimatedCost = Infinity;
 
-    for (const tile of tilesToVisit) {
-      const cost = costs.get(tile)! + getEuclideanDistance(tile, end);
-      if (cost < minPredictedCost) {
-        minPredictedCost = cost;
+    for (const [tile, estimatedCost] of tilesToVisit.entries()) {
+      if (estimatedCost < minEstimatedCost) {
+        minEstimatedCost = estimatedCost;
         nextTile = tile;
       }
     }
@@ -39,24 +39,30 @@ export function findPath(unit: Unit, start: Tile, end: Tile): Tile[][] | null {
 
     for (const neighbour of nextTile.neighbours) {
       if (!visitedTiles.has(neighbour)) {
-        let cost = nextTile.neighboursCosts.get(neighbour)!;
-        if (cost === Infinity) {
+        let moveCost = nextTile.neighboursCosts.get(neighbour)!;
+        if (moveCost === Infinity) {
           continue;
         }
 
-        let newActionPointsLeft = Math.max(0, actionPointsLeft - cost);
+        let newActionPointsLeft = Math.max(0, actionPointsLeft - moveCost);
 
-        cost *= turnCost;
+        moveCost *= turnCost;
 
         if (!newActionPointsLeft) {
-          cost = 1; // ??
+          moveCost = 1; // ??
         }
 
-        const totalCost = costs.get(nextTile)! + cost;
+        const costSoFar = costsSoFar.get(nextTile)! + moveCost;
 
-        if (!costs.has(neighbour) || totalCost < costs.get(neighbour)!) {
-          costs.set(neighbour, totalCost);
-          tilesToVisit.add(neighbour);
+        if (
+          !costsSoFar.has(neighbour) ||
+          costSoFar < costsSoFar.get(neighbour)!
+        ) {
+          costsSoFar.set(neighbour, costSoFar);
+          tilesToVisit.set(
+            neighbour,
+            costSoFar + getEuclideanDistance(neighbour, end) * turnCost
+          );
           cameFrom.set(neighbour, [turn, newActionPointsLeft, nextTile]);
         }
       }
@@ -67,10 +73,9 @@ export function findPath(unit: Unit, start: Tile, end: Tile): Tile[][] | null {
 }
 
 function getEuclideanDistance(start: Tile, end: Tile) {
-  // skip the square root, it doesn't change the pathfinding result
-  return (
+  return Math.sqrt(
     (start.x - end.x) * (start.x - end.x) +
-    (start.y - end.y) * (start.y - end.y)
+      (start.y - end.y) * (start.y - end.y)
   );
 }
 

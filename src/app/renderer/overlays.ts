@@ -46,8 +46,6 @@ export class OverlaysCanvas extends Canvas {
     this.ctx.shadowBlur = 4;
     this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
 
-    // this.ctx.save();
-
     this.ctx.beginPath();
     this.ctx.moveTo(...this.getTileCenter(path[0][0]));
 
@@ -66,7 +64,5 @@ export class OverlaysCanvas extends Canvas {
         this.ctx.fillText(text, x - metrics.width / 2, y + 0.15);
       }
     }
-
-    // this.ctx.restore();
   }
 }
