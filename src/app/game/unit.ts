@@ -7,5 +7,5 @@ export class Unit {
   definition: UnitDefinition;
   actionPointsLeft: number;
   player: Player;
-  path: Tile[];
+  path: Tile[][] | null;
 }

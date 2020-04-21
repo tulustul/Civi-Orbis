@@ -2,6 +2,10 @@ import { Tile } from './tile.interface';
 import { Unit } from './unit';
 
 export function findPath(unit: Unit, start: Tile, end: Tile): Tile[][] | null {
+  if (start === end) {
+    return null;
+  }
+
   const visitedTiles = new Set<Tile>();
   const tilesToVisit = new Map<Tile, number>();
   const cameFrom = new Map<Tile, [number, number, Tile | null]>();

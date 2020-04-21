@@ -45,6 +45,7 @@ export class UnitsManager {
 
   findPath(unit: Unit, tile: Tile) {
     this.activePath = findPath(unit, unit.tile, tile);
+    return this.activePath;
   }
 
   move(unit: Unit, tile: Tile) {
@@ -67,18 +68,33 @@ export class UnitsManager {
     unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
   }
 
-  getMovementCost(unit: Unit, target: Tile) {
-    const index = unit.tile.neighbours.indexOf(target);
-    if (index !== -1) {
-      return unit.tile.neighboursCosts[index];
+  moveAlongPath(unit: Unit) {
+    if (!unit.path) {
+      return;
     }
-    return Infinity;
+
+    while (unit.actionPointsLeft && unit.path.length) {
+      this.move(unit, unit.path[0][0]);
+      unit.path[0].shift();
+      if (!unit.path[0].length) {
+        unit.path.shift();
+      }
+      if (!unit.path.length) {
+        unit.path = null;
+        return;
+      }
+    }
+  }
+
+  getMovementCost(unit: Unit, target: Tile) {
+    return unit.tile.neighboursCosts.get(target) || Infinity;
   }
 
   nextTurn() {
     for (const unit of this.units) {
       unit.actionPointsLeft = unit.definition.actionPoints;
-      if (unit.path.length) {
+      if (unit.path) {
+        this.moveAlongPath(unit);
       }
     }
   }

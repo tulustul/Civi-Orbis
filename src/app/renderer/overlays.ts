@@ -35,7 +35,7 @@ export class OverlaysCanvas extends Canvas {
 
   renderActivePath() {
     const path = this.game.unitsManager.activePath;
-    if (!path) {
+    if (!path || !path.length) {
       return;
     }
 
