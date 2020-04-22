@@ -92,6 +92,18 @@ export function getDistance(start: Tile, end: Tile): number {
   return 0;
 }
 
-export function getPath(tiles: Tile[][], start: Tile, end: Tile): Tile[] {
-  return [];
+export function getTilesInRange(start: Tile, range: number): Set<Tile> {
+  const result = new Set<Tile>([start]);
+  for (let i = 0; i < range; i++) {
+    let neighbours = new Set<Tile>();
+    for (const tile of result) {
+      for (const neighbour of tile.neighbours) {
+        neighbours.add(neighbour);
+      }
+    }
+    for (const tile of neighbours) {
+      result.add(tile);
+    }
+  }
+  return result;
 }

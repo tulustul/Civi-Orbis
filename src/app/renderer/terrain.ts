@@ -41,6 +41,10 @@ export class TerrainCanvas extends Canvas {
   }
 
   drawTile(tile: Tile) {
+    if (!this.game.activeHumanPlayer?.exploredTiles.has(tile)) {
+      return;
+    }
+
     this.renderHex();
 
     this.ctx.stroke();

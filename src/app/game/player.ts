@@ -1,7 +1,10 @@
 import { Tile } from './tile.interface';
 import { Unit } from './unit';
 
-export type PlayerType = 'human' | 'ai';
+export enum PlayerType {
+  human,
+  ai,
+}
 
 export class Player {
   exploredTiles = new Set<Tile>();
@@ -10,5 +13,5 @@ export class Player {
 
   units: Unit[] = [];
 
-  constructor(private type: PlayerType) {}
+  constructor(public type: PlayerType) {}
 }

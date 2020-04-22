@@ -8,9 +8,14 @@ export interface Transform {
 }
 
 export class Camera {
-  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 35 });
+  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 50 });
 
-  constructor(private game: Game) {}
+  constructor(private game: Game) {
+    const unit = game.activePlayer$.value?.units[0];
+    if (unit) {
+      this.moveToTile(unit.tile.x, unit.tile.y);
+    }
+  }
 
   moveBy(x: number, y: number) {
     this.transform$.value.x -= x / this.transform$.value.scale;

@@ -1,5 +1,5 @@
 import { Canvas } from './canvas';
-import { Tile } from '../game/tile.interface';
+import { Unit } from '../game/unit';
 
 export class OverlaysCanvas extends Canvas {
   render() {
@@ -11,7 +11,7 @@ export class OverlaysCanvas extends Canvas {
 
     this.renderActiveTile();
 
-    this.renderActivePath();
+    this.renderActivePath(this.game.unitsManager.activeUnit);
 
     this.ctx.restore();
   }
@@ -33,9 +33,8 @@ export class OverlaysCanvas extends Canvas {
     this.ctx.restore();
   }
 
-  renderActivePath() {
-    const path = this.game.unitsManager.activePath;
-    if (!path || !path.length) {
+  renderActivePath(unit: Unit | null) {
+    if (!unit || !unit.path?.length) {
       return;
     }
 
@@ -47,7 +46,9 @@ export class OverlaysCanvas extends Canvas {
     this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
 
     this.ctx.beginPath();
-    this.ctx.moveTo(...this.getTileCenter(path[0][0]));
+    this.ctx.moveTo(...this.getTileCenter(unit.tile));
+
+    const path = unit.path;
 
     for (const turn of path) {
       for (const tile of turn) {
@@ -59,9 +60,11 @@ export class OverlaysCanvas extends Canvas {
     for (let turn = 0; turn < path.length; turn++) {
       if (path[turn][0]) {
         const [x, y] = this.getTileCenter(path[turn][0]);
+        // if (turn) {
         const text = turn.toString();
         const metrics = this.ctx.measureText(text);
         this.ctx.fillText(text, x - metrics.width / 2, y + 0.15);
+        // }
       }
     }
   }

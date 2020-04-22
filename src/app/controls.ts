@@ -1,5 +1,5 @@
 import { Game } from './game/game';
-import { Tile } from './game/tile.interface';
+import { findPath } from './game/pathfinding';
 
 export class Controls {
   isMousePressed = false;
@@ -10,19 +10,29 @@ export class Controls {
   onMouseDown(event: MouseEvent) {
     this.isMousePressed = true;
     this.mouseButton = event.button;
-    const activeTile = this.game.tilesManager.activeTile;
-    const newActiveUnit = activeTile?.units[0] || null;
-    if (newActiveUnit !== this.game.unitsManager.activeUnit) {
-      this.game.unitsManager.activeUnit$.next(newActiveUnit);
-    }
     event.preventDefault();
     event.stopPropagation();
+
+    if (this.activeUnit && this.mouseButton === 2) {
+      const tile = this.getTileFromMouseEvent(event);
+      if (tile) {
+        this.activeUnit.path = findPath(this.activeUnit, tile);
+      }
+    }
+
     return false;
   }
 
   onClick(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
+
+    const activeTile = this.game.tilesManager.activeTile;
+    const newActiveUnit = activeTile?.units[0] || null;
+    if (newActiveUnit !== this.game.unitsManager.activeUnit) {
+      this.game.unitsManager.activeUnit$.next(newActiveUnit);
+    }
+
     return false;
   }
 
@@ -30,10 +40,11 @@ export class Controls {
     const [x, y] = this.game.camera.screenToGame(event.clientX, event.clientY);
 
     const activeUnit = this.game.unitsManager.activeUnit;
-    if (activeUnit) {
+    if (activeUnit && this.mouseButton === 2) {
       const tile = this.game.map.get(x, y);
       if (tile) {
         this.game.unitsManager.moveAlongPath(activeUnit);
+        this.game.renderer.terrainCanvas.render();
       }
     }
 
@@ -42,29 +53,18 @@ export class Controls {
   }
 
   onMouseMove(event: MouseEvent) {
-    const [x, y] = this.game.camera.screenToGame(event.clientX, event.clientY);
-
-    const map = this.game.map;
-    let tile: Tile | null = null;
-
-    if (x >= 0 && x < map.width && y >= 0 && y < map.height) {
-      tile = map.tiles[x][y];
-    }
+    const tile = this.getTileFromMouseEvent(event);
 
     if (tile !== this.game.tilesManager.activeTile) {
       this.game.tilesManager.activeTile$.next(tile);
 
-      const activeUnit = this.game.unitsManager.activeUnit;
-      if (activeUnit) {
-        const tile = this.game.map.get(x, y);
-        if (tile) {
-          activeUnit.path = this.game.unitsManager.findPath(activeUnit, tile);
-        }
+      if (tile && this.activeUnit && this.mouseButton === 2) {
+        this.activeUnit.path = findPath(this.activeUnit, tile);
       }
     }
 
     if (this.isMousePressed) {
-      if (this.mouseButton === 0) {
+      if (this.mouseButton === 1) {
         this.game.camera.moveBy(event.movementX, event.movementY);
       }
     }
@@ -76,5 +76,22 @@ export class Controls {
       event.clientX,
       event.clientY
     );
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      this.game.nextTurn();
+    }
+  }
+
+  onKeyUp(event: KeyboardEvent) {}
+
+  getTileFromMouseEvent(event: MouseEvent) {
+    const [x, y] = this.game.camera.screenToGame(event.clientX, event.clientY);
+    return this.game.map.get(x, y);
+  }
+
+  get activeUnit() {
+    return this.game.unitsManager.activeUnit;
   }
 }

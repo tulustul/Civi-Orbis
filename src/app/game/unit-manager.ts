@@ -5,6 +5,7 @@ import { UNITS_DEFINITIONS } from '../data/units';
 import { Player } from './player';
 import { Tile } from './tile.interface';
 import { findPath } from './pathfinding';
+import { getTilesInRange } from './hex-math';
 
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
@@ -12,8 +13,6 @@ export class UnitsManager {
   units: Unit[] = [];
 
   activeUnit$ = new BehaviorSubject<Unit | null>(null);
-
-  activePath: Tile[][] | null = null;
 
   constructor() {
     for (const definition of UNITS_DEFINITIONS) {
@@ -41,11 +40,8 @@ export class UnitsManager {
     this.units.push(unit);
     player.units.push(unit);
     tile.units.push(unit);
-  }
 
-  findPath(unit: Unit, tile: Tile) {
-    this.activePath = findPath(unit, unit.tile, tile);
-    return this.activePath;
+    unit.player.exploredTiles = getTilesInRange(unit.tile, 2);
   }
 
   move(unit: Unit, tile: Tile) {
@@ -66,6 +62,10 @@ export class UnitsManager {
     unit.tile = tile;
 
     unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
+
+    for (const exploredTile of getTilesInRange(tile, 2)) {
+      unit.player.exploredTiles.add(exploredTile);
+    }
   }
 
   moveAlongPath(unit: Unit) {
@@ -92,10 +92,10 @@ export class UnitsManager {
 
   nextTurn() {
     for (const unit of this.units) {
-      unit.actionPointsLeft = unit.definition.actionPoints;
       if (unit.path) {
         this.moveAlongPath(unit);
       }
+      unit.actionPointsLeft = unit.definition.actionPoints;
     }
   }
 }

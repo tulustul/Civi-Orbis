@@ -9,7 +9,7 @@ import {
 import { Game } from '../game/game';
 import { Camera } from '../renderer/camera';
 import { SimplexMapGenerator } from '../map-generators/simplex';
-import { Player } from '../game/player';
+import { Player, PlayerType } from '../game/player';
 
 @Component({
   selector: 'app-game-canvas',
@@ -26,26 +26,22 @@ export class GameCanvasComponent implements AfterViewInit {
     const map = generator.generate(40, 30);
     map.precomputeMovementCosts();
 
-    const human_player = new Player('human');
-    this.game.players.push();
-    this.game.start(map);
+    const human_player = new Player(PlayerType.human);
+    this.game.players.push(human_player);
 
     this.game.unitsManager.spawn(
       'scout',
       generator.getStartingLocations()[0],
       human_player
     );
+
+    this.game.start(map);
   }
 
   ngAfterViewInit() {
     this.game.camera = new Camera(this.game);
 
     this.game.renderer.setCanvas(this.canvas.nativeElement);
-
-    this.game.camera.moveToTile(
-      Math.floor(this.game.map.width / 2),
-      Math.floor(this.game.map.height / 2)
-    );
   }
 
   onContextMenu(event: Event) {
@@ -55,5 +51,15 @@ export class GameCanvasComponent implements AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     this.game.renderer.resize(window.innerWidth, window.innerHeight);
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    this.game.controls.onKeyDown(event);
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    this.game.controls.onKeyUp(event);
   }
 }

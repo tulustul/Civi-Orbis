@@ -1,7 +1,9 @@
 import { Tile } from './tile.interface';
 import { Unit } from './unit';
 
-export function findPath(unit: Unit, start: Tile, end: Tile): Tile[][] | null {
+export function findPath(unit: Unit, end: Tile): Tile[][] | null {
+  const start = unit.tile;
+
   if (start === end) {
     return null;
   }
@@ -43,7 +45,11 @@ export function findPath(unit: Unit, start: Tile, end: Tile): Tile[][] | null {
 
     for (const neighbour of nextTile.neighbours) {
       if (!visitedTiles.has(neighbour)) {
-        let moveCost = nextTile.neighboursCosts.get(neighbour)!;
+        const isExplored = unit.player.exploredTiles.has(neighbour);
+        let moveCost = isExplored
+          ? nextTile.neighboursCosts.get(neighbour)!
+          : 1;
+
         if (moveCost === Infinity) {
           continue;
         }

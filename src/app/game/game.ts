@@ -1,7 +1,7 @@
 import { Renderer } from '../renderer';
 import { Camera } from '../renderer/camera';
 import { Controls } from '../controls';
-import { Player } from './player';
+import { Player, PlayerType } from './player';
 import { TilesMap } from './tiles-map';
 import { BehaviorSubject } from 'rxjs';
 import { UnitsManager } from './unit-manager';
@@ -17,6 +17,8 @@ export class Game {
   controls = new Controls(this);
 
   players: Player[] = [];
+
+  activeHumanPlayer: Player | null;
 
   activePlayerIndex = -1;
 
@@ -40,10 +42,15 @@ export class Game {
       this.activePlayerIndex = 0;
     }
     this.activePlayer$.next(this.players[this.activePlayerIndex]);
+
+    if (this.activePlayer$.value?.type === PlayerType.human) {
+      this.activeHumanPlayer = this.activePlayer$.value;
+    }
   }
 
   nextTurn() {
     this.unitsManager.nextTurn();
     this.turn$.next(this.turn$.value + 1);
+    this.renderer.terrainCanvas.render();
   }
 }
