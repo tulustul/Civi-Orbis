@@ -4,4 +4,7 @@
   right: 0;
   background-color: lightgrey;
   padding: 5px 20px;
+  .bar > *:not(:last-child) {
+    margin-right: 15px;
+  }
 }

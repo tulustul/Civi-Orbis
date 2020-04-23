@@ -6,8 +6,11 @@ import { TilesMap } from './tiles-map';
 import { BehaviorSubject } from 'rxjs';
 import { UnitsManager } from './unit-manager';
 import { TilesManager } from './tiles-manager';
+import { Debug } from './debug';
 
 export class Game {
+  debug = new Debug();
+
   map: TilesMap;
 
   camera: Camera;

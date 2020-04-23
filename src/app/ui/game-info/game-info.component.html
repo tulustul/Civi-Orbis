@@ -1,1 +1,6 @@
-<span>turn: {{ game.turn$ | async }}</span>
+<div class="bar">
+  <span>turn: {{ game.turn$ | async }}</span>
+  <button (click)="debugModalVisible = !debugModalVisible">debug</button>
+</div>
+
+<app-debug *ngIf="debugModalVisible"></app-debug>

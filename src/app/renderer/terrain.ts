@@ -5,7 +5,7 @@ const SEA_COLORS: Record<SeaLevel, string> = {
   [SeaLevel.deep]: 'royalblue',
   [SeaLevel.shallow]: 'dodgerblue',
   [SeaLevel.flood]: 'red',
-  [SeaLevel.none]: 'none',
+  [SeaLevel.none]: 'none'
 };
 
 const CLIMATE_COLORS: Record<Climate, string> = {
@@ -14,7 +14,7 @@ const CLIMATE_COLORS: Record<Climate, string> = {
   [Climate.oceanic]: 'lightgreen',
   [Climate.savanna]: 'bisque',
   [Climate.tropical]: 'green',
-  [Climate.tundra]: 'whitesmoke',
+  [Climate.tundra]: 'whitesmoke'
 };
 
 export class TerrainCanvas extends Canvas {
@@ -41,7 +41,10 @@ export class TerrainCanvas extends Canvas {
   }
 
   drawTile(tile: Tile) {
-    if (!this.game.activeHumanPlayer?.exploredTiles.has(tile)) {
+    if (
+      !this.game.debug.revealMap &&
+      !this.game.activeHumanPlayer?.exploredTiles.has(tile)
+    ) {
       return;
     }
 

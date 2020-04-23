@@ -1,0 +1,8 @@
+<label>
+  <input
+    type="checkbox"
+    [(ngModel)]="game.debug.revealMap"
+    (ngModelChange)="game.renderer.terrainCanvas.render()"
+  />
+  Reveal map
+</label>
