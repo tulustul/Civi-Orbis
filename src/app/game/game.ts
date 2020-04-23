@@ -54,6 +54,6 @@ export class Game {
   nextTurn() {
     this.unitsManager.nextTurn();
     this.turn$.next(this.turn$.value + 1);
-    this.renderer.terrainCanvas.render();
+    this.controls.nextTurn();
   }
 }

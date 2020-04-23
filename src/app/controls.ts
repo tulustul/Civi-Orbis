@@ -1,9 +1,16 @@
+import { BehaviorSubject } from 'rxjs';
+
 import { Game } from './game/game';
 import { findPath } from './game/pathfinding';
+import { Tile } from './game/tile.interface';
 
 export class Controls {
   isMousePressed = false;
+
   mouseButton: number | null = null;
+
+  private _activePath$ = new BehaviorSubject<Tile[][] | null>(null);
+  activePath$ = this._activePath$.asObservable();
 
   constructor(private game: Game) {}
 
@@ -17,6 +24,7 @@ export class Controls {
       const tile = this.getTileFromMouseEvent(event);
       if (tile) {
         this.activeUnit.path = findPath(this.activeUnit, tile);
+        this._activePath$.next(this.activeUnit.path);
       }
     }
 
@@ -31,6 +39,7 @@ export class Controls {
     const newActiveUnit = activeTile?.units[0] || null;
     if (newActiveUnit !== this.game.unitsManager.activeUnit) {
       this.game.unitsManager.activeUnit$.next(newActiveUnit);
+      this._activePath$.next(newActiveUnit?.path || null);
     }
 
     return false;
@@ -44,7 +53,7 @@ export class Controls {
       const tile = this.game.map.get(x, y);
       if (tile) {
         this.game.unitsManager.moveAlongPath(activeUnit);
-        this.game.renderer.terrainCanvas.render();
+        this._activePath$.next(activeUnit.path);
       }
     }
 
@@ -60,6 +69,7 @@ export class Controls {
 
       if (tile && this.activeUnit && this.mouseButton === 2) {
         this.activeUnit.path = findPath(this.activeUnit, tile);
+        this._activePath$.next(this.activeUnit.path);
       }
     }
 
@@ -89,6 +99,10 @@ export class Controls {
   getTileFromMouseEvent(event: MouseEvent) {
     const [x, y] = this.game.camera.screenToGame(event.clientX, event.clientY);
     return this.game.map.get(x, y);
+  }
+
+  nextTurn() {
+    this._activePath$.next(this.activeUnit?.path || null);
   }
 
   get activeUnit() {

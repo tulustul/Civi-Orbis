@@ -1,60 +1,55 @@
+import * as PIXIE from 'pixi.js';
+
 import { Game } from '../game/game';
-import { TerrainCanvas } from './terrain';
-import { UnitsCanvas } from './units';
-import { OverlaysCanvas } from './overlays';
+import { TerrainRenderer } from './terrain';
+import { UnitsRenderer } from './units';
+import { OverlaysRenderer } from './overlays';
+import { PathRenderer } from './path';
 
 export class Renderer {
+  app: PIXIE.Application;
+
   canvas: HTMLCanvasElement;
 
-  terrainCanvas: TerrainCanvas;
+  terrain: TerrainRenderer;
 
-  unitsCanvas: UnitsCanvas;
+  units: UnitsRenderer;
 
-  overlaysCanvas: OverlaysCanvas;
+  overlays: OverlaysRenderer;
 
-  ctx: CanvasRenderingContext2D;
+  path: PathRenderer;
 
   constructor(private game: Game) {}
 
   setCanvas(canvas: HTMLCanvasElement) {
-    const [w, h] = [window.innerWidth, window.innerHeight];
+    const [width, height] = [window.innerWidth, window.innerHeight];
+
+    this.app = new PIXIE.Application({ view: canvas, width, height });
 
     this.canvas = canvas;
-    canvas.width = w;
-    canvas.height = h;
 
-    this.ctx = this.canvas.getContext('2d')!;
+    this.terrain = new TerrainRenderer(this.game);
+    this.units = new UnitsRenderer(this.game);
+    this.overlays = new OverlaysRenderer(this.game);
+    this.path = new PathRenderer(this.game);
 
-    this.terrainCanvas = new TerrainCanvas(this.game, w, h);
-    this.unitsCanvas = new UnitsCanvas(this.game, w, h);
-    this.overlaysCanvas = new OverlaysCanvas(this.game, w, h);
+    this.app.stage.addChild(this.terrain.container);
+    this.app.stage.addChild(this.overlays.container);
+    this.app.stage.addChild(this.units.container);
+    this.app.stage.addChild(this.path.container);
 
-    this.game.camera.transform$.subscribe(() => {
-      this.terrainCanvas.render();
+    this.game.camera.transform$.subscribe((t) => {
+      const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
+      const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
+      this.app.stage.setTransform(x, y, t.scale, t.scale);
     });
-
-    requestAnimationFrame(this.render.bind(this));
   }
 
   resize(width: number, height: number) {
-    this.canvas.width = width;
-    this.canvas.height = height;
-    this.terrainCanvas.resize(width, height);
-    this.unitsCanvas.resize(width, height);
-    this.overlaysCanvas.resize(width, height);
+    this.app.renderer.resize(width, height);
   }
 
   render() {
-    this.unitsCanvas.render();
-    this.overlaysCanvas.render();
-    this.compose();
-    requestAnimationFrame(this.render.bind(this));
-  }
-
-  compose() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(this.terrainCanvas.canvas, 0, 0);
-    this.ctx.drawImage(this.unitsCanvas.canvas, 0, 0);
-    this.ctx.drawImage(this.overlaysCanvas.canvas, 0, 0);
+    this.app.render();
   }
 }

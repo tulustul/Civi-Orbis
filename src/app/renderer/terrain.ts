@@ -1,43 +1,38 @@
-import { Canvas } from './canvas';
+import * as PIXIE from 'pixi.js';
+
 import { Tile, SeaLevel, Climate, TileDirection } from '../game/tile.interface';
+import { Game } from '../game/game';
+import { drawHex } from './utils';
 
-const SEA_COLORS: Record<SeaLevel, string> = {
-  [SeaLevel.deep]: 'royalblue',
-  [SeaLevel.shallow]: 'dodgerblue',
-  [SeaLevel.flood]: 'red',
-  [SeaLevel.none]: 'none'
+const SEA_COLORS: Record<SeaLevel, number> = {
+  [SeaLevel.deep]: 0x4169e1,
+  [SeaLevel.shallow]: 0x1e90ff,
+  [SeaLevel.flood]: 0xff0000,
+  [SeaLevel.none]: 0x000000,
 };
 
-const CLIMATE_COLORS: Record<Climate, string> = {
-  [Climate.continental]: 'mediumseagreen',
-  [Climate.desert]: 'yellow',
-  [Climate.oceanic]: 'lightgreen',
-  [Climate.savanna]: 'bisque',
-  [Climate.tropical]: 'green',
-  [Climate.tundra]: 'whitesmoke'
+const CLIMATE_COLORS: Record<Climate, number> = {
+  [Climate.continental]: 0x3cb371,
+  [Climate.desert]: 0xffff00,
+  [Climate.oceanic]: 0x90ee90,
+  [Climate.savanna]: 0xffe4c4,
+  [Climate.tropical]: 0x00ff00,
+  [Climate.tundra]: 0xf5f5f5,
 };
 
-export class TerrainCanvas extends Canvas {
-  render() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+export class TerrainRenderer {
+  container = new PIXIE.Container();
 
-    this.ctx.save();
+  constructor(private game: Game) {
+    this.buildContainer();
+  }
 
-    this.moveToCamera();
-
-    this.ctx.lineWidth = 0.02;
-
+  buildContainer() {
     for (let y = 0; y < this.game.map.height; y++) {
-      this.ctx.save();
-      this.ctx.translate(y % 2 ? 0.5 : 0, 0);
       for (let x = 0; x < this.game.map.width; x++) {
         this.drawTile(this.game.map.tiles[x][y]);
-        this.ctx.translate(1, 0);
       }
-      this.ctx.restore();
-      this.ctx.translate(0, 0.75);
     }
-    this.ctx.restore();
   }
 
   drawTile(tile: Tile) {
@@ -48,90 +43,66 @@ export class TerrainCanvas extends Canvas {
       return;
     }
 
-    this.renderHex();
-
-    this.ctx.stroke();
-
+    let color: number;
     if (tile.seaLevel === SeaLevel.none) {
-      this.ctx.fillStyle = CLIMATE_COLORS[tile.climate];
-      // const color = Math.round(tile.humidity * 250);
-      // this.ctx.fillStyle = `rgb(${color},${color},${color})`;
+      color = CLIMATE_COLORS[tile.climate];
+      // color = Math.round(tile.humidity * 255);
     } else {
-      this.ctx.fillStyle = SEA_COLORS[tile.seaLevel];
+      color = SEA_COLORS[tile.seaLevel];
     }
 
-    this.ctx.fill();
+    // TODO graphics aren't batched and performance is poor on large maps.
+    // Rewrite to sprites.
+    const graphics = new PIXIE.Graphics();
+    graphics.beginFill(color);
+    drawHex(graphics);
+    graphics.endFill();
 
-    this.renderRivers(tile);
+    graphics.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+    graphics.position.y = tile.y * 0.75;
 
-    // if (tile.height) {
-    //   this.ctx.fillStyle = 'black';
-    //   this.ctx.font = '20px sans-serif';
-    //   this.ctx.fillText(tile.height.toFixed(4), 0, 50);
-    // }
+    this.container.addChild(graphics);
+
+    this.renderRivers(tile, graphics);
   }
 
-  private renderRivers(tile: Tile) {
-    if (tile.riverParts.length) {
-      this.ctx.lineWidth = 0.15;
-      this.ctx.strokeStyle = 'royalblue';
-
-      this.ctx.fillStyle = 'royalblue';
-      // if (tile.riverSource) {
-      //   this.ctx.fillStyle = 'red';
-      //   this.ctx.beginPath();
-      //   this.ctx.ellipse(50, 50, 20, 20, 0, 0, Math.PI * 2);
-      //   this.ctx.fill();
-      // }
+  private renderRivers(tile: Tile, graphics: PIXIE.Graphics) {
+    if (!tile.riverParts.length) {
+      return;
     }
+
+    graphics.lineStyle(0.15, SEA_COLORS[SeaLevel.deep]);
 
     for (const river of tile.riverParts) {
       if (river === TileDirection.TOP_LEFT) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(0, 0.25);
-        this.ctx.lineTo(0.5, 0);
-        this.ctx.stroke();
+        graphics.moveTo(0, 0.25);
+        graphics.lineTo(0.5, 0);
       }
 
       if (river === TileDirection.TOP_RIGHT) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(0.5, 0);
-        this.ctx.lineTo(1, 0.25);
-        this.ctx.stroke();
+        graphics.moveTo(0.5, 0);
+        graphics.lineTo(1, 0.25);
       }
 
       if (river === TileDirection.RIGHT) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(1, 0.25);
-        this.ctx.lineTo(1, 0.75);
-        this.ctx.stroke();
+        graphics.moveTo(1, 0.25);
+        graphics.lineTo(1, 0.75);
       }
 
       if (river === TileDirection.BOTTOM_RIGHT) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(1, 0.75);
-        this.ctx.lineTo(0.5, 1);
-        this.ctx.stroke();
+        graphics.moveTo(1, 0.75);
+        graphics.lineTo(0.5, 1);
       }
 
       if (river === TileDirection.BOTTOM_LEFT) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(0.5, 1);
-        this.ctx.lineTo(0, 0.75);
-        this.ctx.stroke();
+        graphics.moveTo(0.5, 1);
+        graphics.lineTo(0, 0.75);
       }
 
       if (river === TileDirection.LEFT) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(0, 0.75);
-        this.ctx.lineTo(0, 0.25);
-        this.ctx.stroke();
+        graphics.moveTo(0, 0.75);
+        graphics.lineTo(0, 0.25);
       }
-    }
-
-    if (tile.riverParts.length) {
-      this.ctx.lineWidth = 0.01;
-      this.ctx.strokeStyle = 'black';
     }
   }
 }

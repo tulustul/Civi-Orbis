@@ -1,10 +1,9 @@
 import { UnitDefinition } from './unit.interface';
 import { Unit } from './unit';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { UNITS_DEFINITIONS } from '../data/units';
 import { Player } from './player';
 import { Tile } from './tile.interface';
-import { findPath } from './pathfinding';
 import { getTilesInRange } from './hex-math';
 
 export class UnitsManager {
@@ -13,6 +12,15 @@ export class UnitsManager {
   units: Unit[] = [];
 
   activeUnit$ = new BehaviorSubject<Unit | null>(null);
+
+  private _updated$ = new Subject<Unit>();
+  updated$ = this._updated$.asObservable();
+
+  private _spawned$ = new Subject<Unit>();
+  spawned$ = this._spawned$.asObservable();
+
+  private _destroyed$ = new Subject<Unit>();
+  destroyed$ = this._destroyed$.asObservable();
 
   constructor() {
     for (const definition of UNITS_DEFINITIONS) {
@@ -42,6 +50,8 @@ export class UnitsManager {
     tile.units.push(unit);
 
     unit.player.exploredTiles = getTilesInRange(unit.tile, 2);
+
+    this._spawned$.next(unit);
   }
 
   move(unit: Unit, tile: Tile) {
@@ -66,6 +76,8 @@ export class UnitsManager {
     for (const exploredTile of getTilesInRange(tile, 2)) {
       unit.player.exploredTiles.add(exploredTile);
     }
+
+    this._updated$.next(unit);
   }
 
   moveAlongPath(unit: Unit) {

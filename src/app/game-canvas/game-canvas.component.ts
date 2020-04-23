@@ -3,7 +3,7 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
-  HostListener
+  HostListener,
 } from '@angular/core';
 
 import { Game } from '../game/game';
@@ -14,7 +14,7 @@ import { Player, PlayerType } from '../game/player';
 @Component({
   selector: 'app-game-canvas',
   templateUrl: './game-canvas.component.html',
-  styleUrls: ['./game-canvas.component.scss']
+  styleUrls: ['./game-canvas.component.scss'],
 })
 export class GameCanvasComponent implements AfterViewInit {
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>;
@@ -23,7 +23,7 @@ export class GameCanvasComponent implements AfterViewInit {
 
   ngOnInit(): void {
     const generator = new SimplexMapGenerator(10);
-    const map = generator.generate(140, 130);
+    const map = generator.generate(50, 40);
     map.precomputeMovementCosts();
 
     const humanPlayer = new Player(PlayerType.human);

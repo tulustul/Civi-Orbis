@@ -1,29 +1,54 @@
-import { Canvas } from './canvas';
+import * as PIXIE from 'pixi.js';
 
-export class UnitsCanvas extends Canvas {
-  render() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+import { Unit } from '../game/unit';
+import { Game } from '../game/game';
+import { getTileCoords } from './utils';
 
-    this.ctx.save();
+export class UnitsRenderer {
+  container = new PIXIE.Container();
 
-    this.moveToCamera();
+  unitGraphics = new Map<Unit, PIXIE.Graphics>();
 
-    this.renderUnits();
+  constructor(private game: Game) {
+    this.buildContainer();
 
-    this.ctx.restore();
+    game.unitsManager.updated$.subscribe((unit) => this.update(unit));
+
+    game.unitsManager.spawned$.subscribe((unit) => this.spawn(unit));
+    game.unitsManager.destroyed$.subscribe((unit) => this.destroy(unit));
   }
 
-  renderUnits() {
+  buildContainer() {
     for (const unit of this.game.unitsManager.units) {
-      this.ctx.save();
-      this.translateToTile(unit.tile);
-
-      this.ctx.fillStyle = 'blue';
-      this.ctx.beginPath();
-      this.ctx.ellipse(0.5, 0.5, 0.2, 0.2, 0, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      this.ctx.restore();
+      this.spawn(unit);
     }
+  }
+
+  spawn(unit: Unit) {
+    const g = new PIXIE.Graphics();
+    this.container.addChild(g);
+    this.unitGraphics.set(unit, g);
+
+    const [x, y] = getTileCoords(unit.tile);
+    g.position.x = x;
+    g.position.y = y;
+
+    g.beginFill(0x0000ff);
+    g.drawCircle(0.5, 0.5, 0.2);
+    g.endFill();
+  }
+
+  destroy(unit: Unit) {
+    const g = this.unitGraphics.get(unit)!;
+    this.unitGraphics.delete(unit);
+    g.destroy();
+  }
+
+  update(unit: Unit) {
+    const g = this.unitGraphics.get(unit)!;
+
+    const [x, y] = getTileCoords(unit.tile);
+    g.position.x = x;
+    g.position.y = y;
   }
 }
