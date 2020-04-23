@@ -6,7 +6,7 @@ import {
   fillWithEmptyTiles,
   findCoastline,
   placeRiverBetweenTiles,
-  POSSIBLE_RIVER_PATHS,
+  POSSIBLE_RIVER_PATHS
 } from './utils';
 import { SeaLevel, Tile, Climate, TileDirection } from '../game/tile.interface';
 import { getTileInDirection, getTileDirection } from '../game/hex-math';
@@ -20,6 +20,8 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private startingLocations: Tile[] = [];
 
+  private riversSources: Tile[] = [];
+
   constructor(private startingLocationsCount: number) {}
 
   getStartingLocations() {
@@ -31,39 +33,31 @@ export class SimplexMapGenerator implements MapGenerator {
     this.width = width;
     this.height = height;
 
-    const riversSources: Tile[] = [];
+    this.generateHeightmap();
 
-    const heightmapNoise = new ComplexNoise([0.05, 0.01, 0.03, 0.08, 0.11]);
+    this.generateTemperature();
 
-    for (const [tile, threshold] of this.getNoisedTiles(heightmapNoise, -1)) {
-      tile.height = threshold;
-    }
+    this.generateHumidity();
 
-    for (const [tile, threshold, _] of this.getNoisedTiles(
-      heightmapNoise,
-      -0.4
-    )) {
-      tile.seaLevel = threshold > -0.2 ? SeaLevel.none : SeaLevel.shallow;
-      if (threshold > 0.05 && Math.random() > 0.9) {
-        riversSources.push(tile);
-      }
-    }
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        const tile = this.tiles[x][y];
 
-    for (const [tile, _] of this.getNoisedTiles(
-      new ComplexNoise([0.012, 0.07, 0.2, 0.05]),
-      0.4
-    )) {
-      tile.climate = Climate.oceanic;
-    }
+        if (tile.temperature < 0.05) {
+          tile.climate = Climate.tundra;
+          continue;
+        }
 
-    for (const [tile, noise, longitude] of this.getNoisedTiles(
-      new ComplexNoise([0.025, 0.2]),
-      0
-    )) {
-      if (longitude > 0.6) {
-        tile.climate = Climate.tundra;
-      } else {
-        tile.climate = noise > 0.7 ? Climate.desert : Climate.savanna;
+        if (tile.humidity < 0.1) {
+          tile.climate = Climate.desert;
+        } else if (tile.humidity < 0.3) {
+          tile.climate = Climate.savanna;
+        } else if (tile.humidity < 0.7) {
+          tile.climate = Climate.continental;
+        } else {
+          tile.climate =
+            tile.temperature > 0.5 ? Climate.tropical : Climate.oceanic;
+        }
       }
     }
 
@@ -71,25 +65,60 @@ export class SimplexMapGenerator implements MapGenerator {
 
     this.adjustHeightmap();
 
-    this.placeRivers(riversSources);
+    this.placeRivers();
 
     this.findStartingPositions();
 
     return new TilesMap(width, height, this.tiles);
   }
 
+  private generateHeightmap() {
+    const heightmapNoise = new ComplexNoise([0.05, 0.01, 0.03, 0.08, 0.11]);
+
+    for (const [tile, value] of this.getNoisedTiles(heightmapNoise)) {
+      tile.height = value;
+    }
+
+    for (const [tile, value, _] of this.getNoisedTiles(heightmapNoise)) {
+      if (value > 0.4) {
+        tile.seaLevel = value > -0.2 ? SeaLevel.none : SeaLevel.shallow;
+        if (value > 0.05 && Math.random() > 0.9) {
+          this.riversSources.push(tile);
+        }
+      }
+    }
+  }
+
+  private generateTemperature() {
+    for (const [tile, value, longitude] of this.getNoisedTiles(
+      new ComplexNoise([0.012, 0.07, 0.2, 0.05])
+    )) {
+      const base = (1 - longitude) / 2;
+      const noise = ((value + 1) / 2) * (1 - longitude);
+      tile.temperature = Math.max(base, Math.min(1, base + noise));
+    }
+  }
+
+  private generateHumidity() {
+    for (const [tile, value, longitude] of this.getNoisedTiles(
+      new ComplexNoise([0.025, 0.2])
+    )) {
+      const x = longitude * 10;
+      const base = x < Math.PI * 1.5 ? (Math.cos(x) + 1) / 2 - 0.5 : 0;
+      const noise = (value + 1) / 2;
+      tile.humidity = Math.max(0, Math.min(1, base * 0.8 + noise));
+    }
+  }
+
   private *getNoisedTiles(
-    noise: ComplexNoise,
-    threshold: number
+    noise: ComplexNoise
   ): Iterable<[Tile, number, number]> {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         const noiseValue = noise.at(x, y);
-        if (noiseValue > threshold) {
-          const halfHeight = Math.floor(this.height / 2);
-          const longitude = Math.abs((y - halfHeight) / halfHeight);
-          yield [this.tiles[x][y], noiseValue, longitude];
-        }
+        const halfHeight = Math.floor(this.height / 2);
+        const longitude = Math.abs((y - halfHeight) / halfHeight);
+        yield [this.tiles[x][y], noiseValue, longitude];
       }
     }
   }
@@ -134,8 +163,8 @@ export class SimplexMapGenerator implements MapGenerator {
     }
   }
 
-  private placeRivers(sources: Tile[]) {
-    for (const tile of sources) {
+  private placeRivers() {
+    for (const tile of this.riversSources) {
       if (tile.riverParts.length) {
         continue;
       }
@@ -162,8 +191,8 @@ export class SimplexMapGenerator implements MapGenerator {
     const possibleNeighboursDirections = POSSIBLE_RIVER_PATHS[direction];
 
     const pairs = possibleNeighboursDirections
-      .map((pair) => {
-        return pair.map((dir) => {
+      .map(pair => {
+        return pair.map(dir => {
           if (dir === TileDirection.NONE) {
             return tile;
           }
@@ -171,7 +200,7 @@ export class SimplexMapGenerator implements MapGenerator {
         });
       })
       .filter(
-        (pair) =>
+        pair =>
           pair[0] &&
           pair[1] &&
           pair[0].seaLevel === SeaLevel.none &&

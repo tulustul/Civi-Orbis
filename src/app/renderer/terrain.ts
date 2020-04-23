@@ -54,7 +54,7 @@ export class TerrainCanvas extends Canvas {
 
     if (tile.seaLevel === SeaLevel.none) {
       this.ctx.fillStyle = CLIMATE_COLORS[tile.climate];
-      // const color = Math.round(tile.height * 90);
+      // const color = Math.round(tile.humidity * 250);
       // this.ctx.fillStyle = `rgb(${color},${color},${color})`;
     } else {
       this.ctx.fillStyle = SEA_COLORS[tile.seaLevel];

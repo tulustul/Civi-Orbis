@@ -1,3 +1,3 @@
 export class Debug {
-  revealMap = false;
+  revealMap = true;
 }

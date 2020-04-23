@@ -3,7 +3,7 @@ import {
   Climate,
   Landform,
   SeaLevel,
-  TileDirection,
+  TileDirection
 } from '../game/tile.interface';
 import { getTileDirection, getTileNeighbours } from '../game/hex-math';
 
@@ -21,6 +21,8 @@ export function makeEmptyTile(x: number, y: number): Tile {
     neighboursCosts: new Map(),
     units: [],
     height: 0,
+    humidity: 0,
+    temperature: 0
   };
 }
 
@@ -52,7 +54,7 @@ export function findCoastline(tiles: Tile[][]): Tile[] {
       if (tile.seaLevel !== SeaLevel.none) {
         continue;
       }
-      if (tile.neighbours.find((t) => t.seaLevel !== SeaLevel.none)) {
+      if (tile.neighbours.find(t => t.seaLevel !== SeaLevel.none)) {
         coastline.push(tile);
       }
     }
@@ -80,11 +82,11 @@ export const POSSIBLE_RIVER_DIRECTION_FROM_WATER_TILE: Record<
   [TileDirection.RIGHT]: [TileDirection.BOTTOM_RIGHT, TileDirection.TOP_RIGHT],
   [TileDirection.BOTTOM_RIGHT]: [
     TileDirection.BOTTOM_LEFT,
-    TileDirection.RIGHT,
+    TileDirection.RIGHT
   ],
   [TileDirection.BOTTOM_LEFT]: [TileDirection.LEFT, TileDirection.BOTTOM_RIGHT],
   [TileDirection.LEFT]: [TileDirection.TOP_LEFT, TileDirection.BOTTOM_LEFT],
-  [TileDirection.NONE]: [TileDirection.NONE, TileDirection.NONE],
+  [TileDirection.NONE]: [TileDirection.NONE, TileDirection.NONE]
 };
 
 // flow is clockwise for first tile
@@ -94,32 +96,32 @@ export const POSSIBLE_RIVER_PATHS: Record<
 > = {
   [TileDirection.TOP_LEFT]: [
     [TileDirection.TOP_RIGHT, TileDirection.TOP_LEFT],
-    [TileDirection.NONE, TileDirection.TOP_RIGHT],
+    [TileDirection.NONE, TileDirection.TOP_RIGHT]
   ],
   [TileDirection.TOP_RIGHT]: [
     [TileDirection.RIGHT, TileDirection.TOP_RIGHT],
-    [TileDirection.NONE, TileDirection.RIGHT],
+    [TileDirection.NONE, TileDirection.RIGHT]
   ],
   [TileDirection.RIGHT]: [
     [TileDirection.BOTTOM_RIGHT, TileDirection.RIGHT],
-    [TileDirection.NONE, TileDirection.BOTTOM_RIGHT],
+    [TileDirection.NONE, TileDirection.BOTTOM_RIGHT]
   ],
   [TileDirection.BOTTOM_RIGHT]: [
     [TileDirection.BOTTOM_LEFT, TileDirection.BOTTOM_RIGHT],
-    [TileDirection.NONE, TileDirection.BOTTOM_LEFT],
+    [TileDirection.NONE, TileDirection.BOTTOM_LEFT]
   ],
   [TileDirection.BOTTOM_LEFT]: [
     [TileDirection.LEFT, TileDirection.BOTTOM_LEFT],
-    [TileDirection.NONE, TileDirection.LEFT],
+    [TileDirection.NONE, TileDirection.LEFT]
   ],
   [TileDirection.LEFT]: [
     [TileDirection.TOP_LEFT, TileDirection.LEFT],
-    [TileDirection.NONE, TileDirection.TOP_LEFT],
+    [TileDirection.NONE, TileDirection.TOP_LEFT]
   ],
   [TileDirection.NONE]: [
     [TileDirection.NONE, TileDirection.NONE],
-    [TileDirection.NONE, TileDirection.NONE],
-  ],
+    [TileDirection.NONE, TileDirection.NONE]
+  ]
 };
 
 export const OPPOSITE_DIRECTIONS: Record<TileDirection, TileDirection> = {
@@ -129,5 +131,5 @@ export const OPPOSITE_DIRECTIONS: Record<TileDirection, TileDirection> = {
   [TileDirection.BOTTOM_RIGHT]: TileDirection.TOP_LEFT,
   [TileDirection.BOTTOM_LEFT]: TileDirection.TOP_RIGHT,
   [TileDirection.LEFT]: TileDirection.RIGHT,
-  [TileDirection.NONE]: TileDirection.NONE,
+  [TileDirection.NONE]: TileDirection.NONE
 };

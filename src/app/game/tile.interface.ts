@@ -6,20 +6,20 @@ export enum Climate {
   continental,
   desert,
   savanna,
-  tundra,
+  tundra
 }
 
 export enum Landform {
   plains,
   hills,
-  mountains,
+  mountains
 }
 
 export enum SeaLevel {
   none,
   flood,
   shallow,
-  deep,
+  deep
 }
 
 export interface Tile {
@@ -37,6 +37,8 @@ export interface Tile {
 
   // debug staff
   height: number;
+  temperature: number;
+  humidity: number;
   riverSource: boolean;
   riverMouth: boolean;
 }
@@ -48,5 +50,5 @@ export enum TileDirection {
   RIGHT,
   BOTTOM_RIGHT,
   BOTTOM_LEFT,
-  LEFT,
+  LEFT
 }
