@@ -66,7 +66,9 @@ export class Renderer {
   }
 
   onLoad() {
-    this.textures = this.atlas.resources['assets/atlas.json'].textures!;
+    const atlas = this.atlas.resources['assets/atlas.json'];
+    atlas.spritesheet!.baseTexture.mipmap = PIXIE.MIPMAP_MODES.POW2;
+    this.textures = atlas.textures!;
     if (this.canvas) {
       this.onReady();
     }

@@ -7,6 +7,7 @@ spritesheet('src/assets-src/**/*.png', {
   name: 'atlas',
   path: 'src/assets',
   trim: true,
+  powerOfTwo: true,
 }, function (err) {
   if (err) throw err;
 
