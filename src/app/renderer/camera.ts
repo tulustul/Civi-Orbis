@@ -1,5 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Game } from '../game/game';
+import { getTileCoords } from './utils';
+import { Tile } from '../game/tile.interface';
 
 export interface Transform {
   x: number;
@@ -13,7 +15,7 @@ export class Camera {
   constructor(private game: Game) {
     const unit = game.activePlayer$.value?.units[0];
     if (unit) {
-      this.moveToTile(unit.tile.x, unit.tile.y);
+      this.moveToTile(unit.tile);
     }
   }
 
@@ -42,15 +44,16 @@ export class Camera {
     this.transform$.next(t);
   }
 
-  moveToTile(tileX: number, tileY: number) {
-    this.moveTo(tileX, tileY);
+  moveToTile(tile: Tile) {
+    const [x, y] = getTileCoords(tile);
+    this.moveTo(x, y);
   }
 
   screenToCanvas(screenX: number, screenY: number): [number, number] {
     const t = this.transform$.value;
     return [
       (screenX - this.canvas.width / 2) / t.scale + t.x,
-      (screenY - this.canvas.height / 2) / t.scale + t.y,
+      (screenY - this.canvas.height / 2) / t.scale + t.y
     ];
   }
 
@@ -65,7 +68,7 @@ export class Camera {
     const t = this.transform$.value;
     return [
       t.scale * (canvasX - t.x) + this.canvas.width / 2,
-      t.scale * (canvasY - t.y) + this.canvas.height / 2,
+      t.scale * (canvasY - t.y) + this.canvas.height / 2
     ];
   }
 
