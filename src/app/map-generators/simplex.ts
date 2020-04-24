@@ -8,7 +8,13 @@ import {
   placeRiverBetweenTiles,
   POSSIBLE_RIVER_PATHS
 } from './utils';
-import { SeaLevel, Tile, Climate, TileDirection } from '../game/tile.interface';
+import {
+  SeaLevel,
+  Tile,
+  Climate,
+  TileDirection,
+  Landform
+} from '../game/tile.interface';
 import { getTileInDirection, getTileDirection } from '../game/hex-math';
 
 export class SimplexMapGenerator implements MapGenerator {
@@ -42,6 +48,12 @@ export class SimplexMapGenerator implements MapGenerator {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         const tile = this.tiles[x][y];
+
+        if (tile.height > 0.9) {
+          tile.landForm = Landform.mountains;
+        } else if (tile.height > 0.7) {
+          tile.landForm = Landform.hills;
+        }
 
         if (tile.temperature < 0.05) {
           tile.climate = Climate.tundra;

@@ -19,6 +19,12 @@ export class Renderer {
 
   path: PathRenderer;
 
+  loader = new PIXIE.Loader();
+
+  atlas = this.loader.add('assets/atlas.json').load(() => this.onLoad());
+
+  textures: PIXIE.ITextureDictionary;
+
   constructor(private game: Game) {}
 
   setCanvas(canvas: HTMLCanvasElement) {
@@ -28,6 +34,20 @@ export class Renderer {
 
     this.canvas = canvas;
 
+    if (this.isLoaded) {
+      this.onReady();
+    }
+  }
+
+  resize(width: number, height: number) {
+    this.app.renderer.resize(width, height);
+  }
+
+  render() {
+    this.app.render();
+  }
+
+  onReady() {
     this.terrain = new TerrainRenderer(this.game);
     this.units = new UnitsRenderer(this.game);
     this.overlays = new OverlaysRenderer(this.game);
@@ -38,18 +58,21 @@ export class Renderer {
     this.app.stage.addChild(this.units.container);
     this.app.stage.addChild(this.path.container);
 
-    this.game.camera.transform$.subscribe((t) => {
+    this.game.camera.transform$.subscribe(t => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
       this.app.stage.setTransform(x, y, t.scale, t.scale);
     });
   }
 
-  resize(width: number, height: number) {
-    this.app.renderer.resize(width, height);
+  onLoad() {
+    this.textures = this.atlas.resources['assets/atlas.json'].textures!;
+    if (this.canvas) {
+      this.onReady();
+    }
   }
 
-  render() {
-    this.app.render();
+  get isLoaded() {
+    return !!this.textures;
   }
 }

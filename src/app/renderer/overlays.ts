@@ -13,7 +13,7 @@ export class OverlaysRenderer {
 
     this.buildActiveTileGraphics();
 
-    game.tilesManager.activeTile$.subscribe((tile) => {
+    game.tilesManager.activeTile$.subscribe(tile => {
       if (tile) {
         const [x, y] = getTileCoords(tile);
         this.activeTileGraphics.position.x = x;
@@ -26,8 +26,8 @@ export class OverlaysRenderer {
   }
 
   buildActiveTileGraphics() {
-    this.activeTileGraphics.lineStyle(0.05, 0xff0000);
-    this.activeTileGraphics.beginFill(0xffffff, 0.5);
+    this.activeTileGraphics.lineStyle(0.02, 0xffffff, 0.5);
+    this.activeTileGraphics.beginFill(0xffffff, 0.1);
     drawClosedHex(this.activeTileGraphics);
     this.activeTileGraphics.endFill();
   }
