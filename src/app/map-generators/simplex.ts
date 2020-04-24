@@ -49,9 +49,9 @@ export class SimplexMapGenerator implements MapGenerator {
       for (let y = 0; y < this.height; y++) {
         const tile = this.tiles[x][y];
 
-        if (tile.height > 0.9) {
+        if (tile.height > 1.9) {
           tile.landForm = Landform.mountains;
-        } else if (tile.height > 0.7) {
+        } else if (tile.height > 1.3) {
           tile.landForm = Landform.hills;
         }
 
@@ -69,6 +69,21 @@ export class SimplexMapGenerator implements MapGenerator {
         } else {
           tile.climate =
             tile.temperature > 0.5 ? Climate.tropical : Climate.oceanic;
+        }
+      }
+    }
+
+    for (const [tile, value, _] of this.getNoisedTiles(
+      new ComplexNoise([0.015, 0.06, 0.3])
+    )) {
+      if (value > 0.5) {
+        if (
+          tile.seaLevel === SeaLevel.none &&
+          tile.landForm === Landform.plains &&
+          tile.climate !== Climate.desert &&
+          tile.climate !== Climate.savanna
+        ) {
+          tile.forest = true;
         }
       }
     }
@@ -92,8 +107,8 @@ export class SimplexMapGenerator implements MapGenerator {
     }
 
     for (const [tile, value, _] of this.getNoisedTiles(heightmapNoise)) {
-      if (value > 0.4) {
-        tile.seaLevel = value > -0.2 ? SeaLevel.none : SeaLevel.shallow;
+      if (value > 0.2) {
+        tile.seaLevel = SeaLevel.none;
         if (value > 0.05 && Math.random() > 0.9) {
           this.riversSources.push(tile);
         }

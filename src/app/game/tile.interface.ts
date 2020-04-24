@@ -30,6 +30,7 @@ export interface Tile {
   seaLevel: SeaLevel;
   riverParts: TileDirection[];
   units: Unit[];
+  forest: boolean;
 
   // cached data
   neighbours: Tile[];

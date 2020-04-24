@@ -14,6 +14,7 @@ export function makeEmptyTile(x: number, y: number): Tile {
     climate: Climate.continental,
     landForm: Landform.plains,
     seaLevel: SeaLevel.deep,
+    forest: false,
     riverParts: [],
     riverSource: false,
     riverMouth: false,

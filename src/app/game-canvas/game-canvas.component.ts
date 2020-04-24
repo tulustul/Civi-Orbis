@@ -23,7 +23,7 @@ export class GameCanvasComponent implements AfterViewInit {
 
   ngOnInit(): void {
     const generator = new SimplexMapGenerator(10);
-    const map = generator.generate(50, 40);
+    const map = generator.generate(100, 80);
     map.precomputeMovementCosts();
 
     const humanPlayer = new Player(PlayerType.human);
