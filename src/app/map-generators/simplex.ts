@@ -6,14 +6,14 @@ import {
   fillWithEmptyTiles,
   findCoastline,
   placeRiverBetweenTiles,
-  POSSIBLE_RIVER_PATHS
+  POSSIBLE_RIVER_PATHS,
 } from './utils';
 import {
   SeaLevel,
   Tile,
   Climate,
   TileDirection,
-  Landform
+  Landform,
 } from '../game/tile.interface';
 import { getTileInDirection, getTileDirection } from '../game/hex-math';
 
@@ -218,8 +218,8 @@ export class SimplexMapGenerator implements MapGenerator {
     const possibleNeighboursDirections = POSSIBLE_RIVER_PATHS[direction];
 
     const pairs = possibleNeighboursDirections
-      .map(pair => {
-        return pair.map(dir => {
+      .map((pair) => {
+        return pair.map((dir) => {
           if (dir === TileDirection.NONE) {
             return tile;
           }
@@ -227,7 +227,7 @@ export class SimplexMapGenerator implements MapGenerator {
         });
       })
       .filter(
-        pair =>
+        (pair) =>
           pair[0] &&
           pair[1] &&
           pair[0].seaLevel === SeaLevel.none &&
@@ -268,6 +268,7 @@ export class SimplexMapGenerator implements MapGenerator {
       const tile = this.tiles[x][y];
       if (
         tile.seaLevel === SeaLevel.none &&
+        tile.landForm !== Landform.mountains &&
         !this.startingLocations.includes(tile)
       ) {
         this.startingLocations.push(tile);
