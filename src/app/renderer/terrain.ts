@@ -5,7 +5,7 @@ import {
   SeaLevel,
   Climate,
   TileDirection,
-  Landform
+  Landform,
 } from '../game/tile.interface';
 import { Game } from '../game/game';
 
@@ -21,40 +21,40 @@ const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants('hexOcean', 4),
   [SeaLevel.shallow]: getTileVariants('hexShallowWater', 4),
   [SeaLevel.flood]: [],
-  [SeaLevel.none]: []
+  [SeaLevel.none]: [],
 };
 
 const CLIMATE_TEXTURES: Record<Climate, Record<Landform, string[]>> = {
   [Climate.continental]: {
     [Landform.plains]: getTileVariants('hexPlains', 4),
     [Landform.hills]: getTileVariants('hexHillsCold', 4),
-    [Landform.mountains]: getTileVariants('hexMountain', 4)
+    [Landform.mountains]: getTileVariants('hexMountain', 4),
   },
   [Climate.desert]: {
     [Landform.plains]: getTileVariants('hexSand', 4),
     [Landform.hills]: getTileVariants('hexHillsDesert', 4),
-    [Landform.mountains]: getTileVariants('hexMountainDesert', 4)
+    [Landform.mountains]: getTileVariants('hexMountainDesert', 4),
   },
   [Climate.oceanic]: {
     [Landform.plains]: getTileVariants('hexWoodlands', 4),
     [Landform.hills]: getTileVariants('hexHighlands', 4),
-    [Landform.mountains]: getTileVariants('hexMountain', 4)
+    [Landform.mountains]: getTileVariants('hexMountain', 4),
   },
   [Climate.savanna]: {
     [Landform.plains]: getTileVariants('hexScrublands', 4),
     [Landform.hills]: getTileVariants('hexHillsSavanna', 4),
-    [Landform.mountains]: getTileVariants('hexMountainDesert', 4)
+    [Landform.mountains]: getTileVariants('hexMountainDesert', 4),
   },
   [Climate.tropical]: {
     [Landform.plains]: getTileVariants('hexTropicalPlains', 4),
     [Landform.hills]: getTileVariants('hexHills', 4),
-    [Landform.mountains]: getTileVariants('hexMountain', 4)
+    [Landform.mountains]: getTileVariants('hexMountain', 4),
   },
   [Climate.tundra]: {
     [Landform.plains]: getTileVariants('hexPlainsColdSnowCovered', 4),
     [Landform.hills]: getTileVariants('hexHillsColdSnowCovered', 4),
-    [Landform.mountains]: getTileVariants('hexMountainSnow', 4)
-  }
+    [Landform.mountains]: getTileVariants('hexMountainSnow', 4),
+  },
 };
 
 const FOREST_TEXTURES: Record<Climate, string[]> = {
@@ -63,18 +63,25 @@ const FOREST_TEXTURES: Record<Climate, string[]> = {
   [Climate.tropical]: getTileVariants('hexJungle', 4),
   [Climate.tundra]: getTileVariants('hexForestPineSnowCovered', 4),
   [Climate.savanna]: [],
-  [Climate.desert]: []
+  [Climate.desert]: [],
 };
 
 export class TerrainRenderer {
   container = new PIXIE.Container();
 
+  tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
+
   constructor(private game: Game) {
     this.buildContainer();
 
-    this.game.tilesManager.revealedTiles$.subscribe(tiles => {
+    this.game.tilesManager.revealedTiles$.subscribe((tiles) => {
       for (const tile of tiles) {
-        this.drawTile(tile);
+        const displayObjects = this.tilesMap.get(tile);
+        if (displayObjects) {
+          for (const obj of displayObjects) {
+            obj.visible = true;
+          }
+        }
       }
     });
   }
@@ -92,13 +99,6 @@ export class TerrainRenderer {
   }
 
   drawTile(tile: Tile) {
-    if (
-      !this.game.debug.revealMap &&
-      !this.game.activeHumanPlayer?.exploredTiles.has(tile)
-    ) {
-      return;
-    }
-
     let variants: string[];
     if (tile.forest) {
       variants = FOREST_TEXTURES[tile.climate];
@@ -116,7 +116,19 @@ export class TerrainRenderer {
     sprite.scale.set(1 / sprite.width, 1 / sprite.width);
     this.container.addChild(sprite);
 
-    this.renderRivers(tile);
+    const riverGraphics = this.renderRivers(tile);
+
+    const displayObjects: PIXIE.DisplayObject[] = [sprite];
+    if (riverGraphics) {
+      displayObjects.push(riverGraphics);
+    }
+    this.tilesMap.set(tile, displayObjects);
+
+    if (!this.game.activeHumanPlayer?.exploredTiles.has(tile)) {
+      for (const obj of displayObjects) {
+        obj.visible = false;
+      }
+    }
   }
 
   private renderRivers(tile: Tile) {
@@ -162,5 +174,7 @@ export class TerrainRenderer {
         graphics.lineTo(0, 0.25);
       }
     }
+
+    return graphics;
   }
 }
