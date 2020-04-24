@@ -27,7 +27,7 @@ export class Game {
 
   activePlayer$ = new BehaviorSubject<Player | null>(null);
 
-  turn$ = new BehaviorSubject<number>(0);
+  turn$ = new BehaviorSubject<number>(1);
 
   unitsManager = new UnitsManager(this);
 

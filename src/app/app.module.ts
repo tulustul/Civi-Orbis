@@ -9,6 +9,7 @@ import { Game } from './game/game';
 import { NextTurnButtonComponent } from './ui/next-turn-button/next-turn-button.component';
 import { GameInfoComponent } from './ui/game-info/game-info.component';
 import { DebugComponent } from './ui/debug/debug.component';
+import { TurnCounterComponent } from './ui/turn-counter/turn-counter.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { DebugComponent } from './ui/debug/debug.component';
     UnitPanelComponent,
     NextTurnButtonComponent,
     GameInfoComponent,
-    DebugComponent
+    DebugComponent,
+    TurnCounterComponent
   ],
   imports: [BrowserModule, FormsModule],
   providers: [Game],
