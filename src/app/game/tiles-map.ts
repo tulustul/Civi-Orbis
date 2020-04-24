@@ -1,4 +1,4 @@
-import { Tile, SeaLevel } from './tile.interface';
+import { Tile, SeaLevel, Landform } from './tile.interface';
 import { getTileDirection } from './hex-math';
 
 export class TilesMap {
@@ -17,11 +17,16 @@ export class TilesMap {
           let cost = 1;
           if (neighbour.seaLevel !== SeaLevel.none) {
             cost = Infinity;
-          }
-          if (tile.riverParts.includes(dir)) {
-            cost = 3;
-          } else if (tile.riverParts.length && neighbour.riverParts.length) {
-            cost = 0.5;
+          } else if (neighbour.landForm === Landform.mountains) {
+            cost = Infinity;
+          } else if (neighbour.landForm === Landform.hills) {
+            cost = 2;
+          } else {
+            if (tile.riverParts.includes(dir)) {
+              cost = 3;
+            } else if (tile.riverParts.length && neighbour.riverParts.length) {
+              cost = 0.5;
+            }
           }
           tile.neighboursCosts.set(neighbour, cost);
         }
