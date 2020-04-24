@@ -1,4 +1,5 @@
 <label>
-  <input type="checkbox" [(ngModel)]="game.debug.revealMap" />
+  <!-- <input type="checkbox" [(ngModel)]="game.debug.revealMap" /> -->
   Reveal map
+  <button (click)="game.tilesManager.revealAll()">Reveal map</button>
 </label>

@@ -29,9 +29,9 @@ export class Game {
 
   turn$ = new BehaviorSubject<number>(0);
 
-  unitsManager = new UnitsManager();
+  unitsManager = new UnitsManager(this);
 
-  tilesManager = new TilesManager();
+  tilesManager = new TilesManager(this);
 
   start(map: TilesMap) {
     this.map = map;

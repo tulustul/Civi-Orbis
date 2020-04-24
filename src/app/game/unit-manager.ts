@@ -5,6 +5,7 @@ import { UNITS_DEFINITIONS } from '../data/units';
 import { Player } from './player';
 import { Tile } from './tile.interface';
 import { getTilesInRange } from './hex-math';
+import { Game } from './game';
 
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
@@ -22,7 +23,7 @@ export class UnitsManager {
   private _destroyed$ = new Subject<Unit>();
   destroyed$ = this._destroyed$.asObservable();
 
-  constructor() {
+  constructor(private game: Game) {
     for (const definition of UNITS_DEFINITIONS) {
       this.definitions.set(definition.id, definition);
     }
@@ -43,13 +44,14 @@ export class UnitsManager {
       definition,
       player,
       actionPointsLeft: definition.actionPoints,
-      path: [],
+      path: []
     };
     this.units.push(unit);
     player.units.push(unit);
     tile.units.push(unit);
 
     unit.player.exploredTiles = getTilesInRange(unit.tile, 2);
+    this.game;
 
     this._spawned$.next(unit);
   }
@@ -73,9 +75,17 @@ export class UnitsManager {
 
     unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
 
-    for (const exploredTile of getTilesInRange(tile, 2)) {
-      unit.player.exploredTiles.add(exploredTile);
+    const visibleTiles = getTilesInRange(tile, 2);
+    const exploredTiles: Tile[] = [];
+    for (const exploredTile of visibleTiles) {
+      if (!unit.player.exploredTiles.has(exploredTile)) {
+        unit.player.exploredTiles.add(exploredTile);
+        exploredTiles.push(exploredTile);
+      }
     }
+
+    // TODO temporary solution, doesn't support multiple players.
+    this.game.tilesManager.reveal(exploredTiles);
 
     this._updated$.next(unit);
   }

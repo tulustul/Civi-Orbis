@@ -71,6 +71,12 @@ export class TerrainRenderer {
 
   constructor(private game: Game) {
     this.buildContainer();
+
+    this.game.tilesManager.revealedTiles$.subscribe(tiles => {
+      for (const tile of tiles) {
+        this.drawTile(tile);
+      }
+    });
   }
 
   get textures() {

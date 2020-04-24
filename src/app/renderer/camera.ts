@@ -10,7 +10,7 @@ export interface Transform {
 }
 
 export class Camera {
-  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 50 });
+  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 130 });
 
   constructor(private game: Game) {
     const unit = game.activePlayer$.value?.units[0];
