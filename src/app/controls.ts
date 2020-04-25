@@ -35,7 +35,8 @@ export class Controls {
     event.preventDefault();
     event.stopPropagation();
 
-    const activeTile = this.game.tilesManager.activeTile;
+    const activeTile = this.game.tilesManager.hoveredTile;
+    this.game.tilesManager.selectedTile$.next(activeTile);
     const newActiveUnit = activeTile?.units[0] || null;
     if (newActiveUnit !== this.game.unitsManager.activeUnit) {
       this.game.unitsManager.activeUnit$.next(newActiveUnit);
@@ -64,8 +65,8 @@ export class Controls {
   onMouseMove(event: MouseEvent) {
     const tile = this.getTileFromMouseEvent(event);
 
-    if (tile !== this.game.tilesManager.activeTile) {
-      this.game.tilesManager.activeTile$.next(tile);
+    if (tile !== this.game.tilesManager.hoveredTile) {
+      this.game.tilesManager.hoveredTile$.next(tile);
 
       if (tile && this.activeUnit && this.mouseButton === 2) {
         this.activeUnit.path = findPath(this.activeUnit, tile);

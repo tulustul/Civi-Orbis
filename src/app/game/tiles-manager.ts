@@ -4,7 +4,11 @@ import { Tile } from './tile.interface';
 import { Game } from './game';
 
 export class TilesManager {
-  activeTile$ = new BehaviorSubject<Tile | null>(null);
+  hoveredTile$ = new BehaviorSubject<Tile | null>(null);
+
+  selectedTile$ = new BehaviorSubject<Tile | null>(null);
+
+  updatedTile$ = new Subject<Tile>();
 
   private _revealedTiles$ = new Subject<Tile[]>();
   revealedTiles$ = this._revealedTiles$.asObservable();
@@ -27,7 +31,7 @@ export class TilesManager {
     this.reveal(tiles);
   }
 
-  get activeTile() {
-    return this.activeTile$.value;
+  get hoveredTile() {
+    return this.hoveredTile$.value;
   }
 }

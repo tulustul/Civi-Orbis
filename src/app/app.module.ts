@@ -10,6 +10,12 @@ import { NextTurnButtonComponent } from './ui/next-turn-button/next-turn-button.
 import { GameInfoComponent } from './ui/game-info/game-info.component';
 import { DebugComponent } from './ui/debug/debug.component';
 import { TurnCounterComponent } from './ui/turn-counter/turn-counter.component';
+import { EditorComponent } from './ui/editor/editor.component';
+import { UIStateService } from './ui/ui-state.service';
+import { TabsComponent, TabComponent } from './ui/widgets/tabs';
+import { TileEditorComponent } from './ui/editor/tile-editor/tile-editor.component';
+import { RadioComponent } from './ui/widgets/radio/radio.component';
+import { MultiselectComponent } from './ui/widgets/multiselect/multiselect.component';
 
 @NgModule({
   declarations: [
@@ -19,10 +25,16 @@ import { TurnCounterComponent } from './ui/turn-counter/turn-counter.component';
     NextTurnButtonComponent,
     GameInfoComponent,
     DebugComponent,
-    TurnCounterComponent
+    TurnCounterComponent,
+    EditorComponent,
+    TabsComponent,
+    TabComponent,
+    TileEditorComponent,
+    RadioComponent,
+    MultiselectComponent,
   ],
   imports: [BrowserModule, FormsModule],
-  providers: [Game],
-  bootstrap: [AppComponent]
+  providers: [Game, UIStateService],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -20,7 +20,6 @@ function getTileVariants(tileName: string, variants: number): string[] {
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants('hexOcean', 4),
   [SeaLevel.shallow]: getTileVariants('hexShallowWater', 4),
-  [SeaLevel.flood]: [],
   [SeaLevel.none]: [],
 };
 
@@ -69,7 +68,7 @@ const FOREST_TEXTURES: Record<Climate, string[]> = {
 export class TerrainRenderer {
   container = new PIXIE.Container();
 
-  tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
+  private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   constructor(private game: Game) {
     this.buildContainer();
@@ -84,13 +83,17 @@ export class TerrainRenderer {
         }
       }
     });
+
+    this.game.tilesManager.updatedTile$.subscribe((tile) =>
+      this.updateTile(tile)
+    );
   }
 
-  get textures() {
+  private get textures() {
     return this.game.renderer.textures;
   }
 
-  buildContainer() {
+  private buildContainer() {
     for (let y = 0; y < this.game.map.height; y++) {
       for (let x = 0; x < this.game.map.width; x++) {
         this.drawTile(this.game.map.tiles[x][y]);
@@ -98,7 +101,25 @@ export class TerrainRenderer {
     }
   }
 
-  drawTile(tile: Tile) {
+  private clearTile(tile: Tile) {
+    const displayObjects = this.tilesMap.get(tile);
+    if (!displayObjects) {
+      return;
+    }
+
+    for (const obj of displayObjects) {
+      obj.destroy();
+    }
+
+    this.tilesMap.delete(tile);
+  }
+
+  private updateTile(tile: Tile) {
+    this.clearTile(tile);
+    this.drawTile(tile);
+  }
+
+  private drawTile(tile: Tile) {
     let variants: string[];
     if (tile.forest) {
       variants = FOREST_TEXTURES[tile.climate];

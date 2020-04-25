@@ -33,6 +33,8 @@ export class Game {
 
   tilesManager = new TilesManager(this);
 
+  editorMode = false;
+
   start(map: TilesMap) {
     this.map = map;
     this.nextPlayer();

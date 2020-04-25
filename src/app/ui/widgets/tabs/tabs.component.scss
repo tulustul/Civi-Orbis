@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    .tab {
+      text-align: center;
+      padding: 10px 30px;
+      cursor: pointer;
+      border-bottom: 3px solid grey;
+      &:hover {
+        border-color: transparentize(green, 0.6);
+      }
+      &.active {
+        border-color: green;
+      }
+    }
+  }
+}

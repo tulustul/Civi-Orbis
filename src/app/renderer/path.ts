@@ -41,12 +41,7 @@ export class PathRenderer {
     const g = this.pathGraphics;
 
     g.lineStyle(0.1, 0xff0000);
-    // g.font = '0.5px sans-serif';
-    // g.fillStyle = 'white';
-    // g.shadowBlur = 4;
-    // g.shadowColor = 'rgba(0,0,0,0.8)';
 
-    // g.beginPath();
     g.moveTo(...getTileCenter(unit.tile));
 
     for (const turn of path) {

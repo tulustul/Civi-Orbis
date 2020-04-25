@@ -1,0 +1,8 @@
+:host {
+  .tile {
+    display: flex;
+    > * {
+      margin-right: 50px;
+    }
+  }
+}

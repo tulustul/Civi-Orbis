@@ -98,17 +98,17 @@ function reconstructPath(
 
   let turnPath: Tile[] = [target];
   const path: Tile[][] = [turnPath];
-  while (cameFrom.has(lastTile)) {
+  while (true) {
     const [turn, _, tile] = cameFrom.get(lastTile)!;
+    if (!tile || !cameFrom.has(tile)) {
+      return path;
+    }
     if (turn !== lastTurn) {
       lastTurn = turn;
       turnPath = [];
       path.unshift(turnPath);
     }
-    if (tile) {
-      turnPath.unshift(tile!);
-    }
+    turnPath.unshift(tile!);
     lastTile = tile!;
   }
-  return path;
 }

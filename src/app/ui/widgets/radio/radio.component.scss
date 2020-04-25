@@ -1,0 +1,13 @@
+:host {
+  .option {
+    cursor: pointer;
+    padding: 3px 10px;
+    &:not(.selected):hover {
+      background-color: lightblue;
+    }
+    &.selected {
+      background-color: royalblue;
+      color: white;
+    }
+  }
+}

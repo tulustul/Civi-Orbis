@@ -1,9 +1,15 @@
 <app-game-canvas></app-game-canvas>
 
-<app-unit-panel></app-unit-panel>
+<app-editor
+  *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
+></app-editor>
 
-<app-next-turn-button></app-next-turn-button>
+<ng-template #gameUiTmpl>
+  <app-unit-panel></app-unit-panel>
 
-<app-game-info></app-game-info>
+  <app-next-turn-button></app-next-turn-button>
 
-<app-turn-counter></app-turn-counter>
+  <app-turn-counter></app-turn-counter>
+
+  <app-game-info></app-game-info>
+</ng-template>

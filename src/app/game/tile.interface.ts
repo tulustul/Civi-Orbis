@@ -2,24 +2,23 @@ import { Unit } from './unit';
 
 export enum Climate {
   tropical,
-  oceanic,
-  continental,
-  desert,
   savanna,
-  tundra
+  desert,
+  continental,
+  oceanic,
+  tundra,
 }
 
 export enum Landform {
   plains,
   hills,
-  mountains
+  mountains,
 }
 
 export enum SeaLevel {
   none,
-  flood,
   shallow,
-  deep
+  deep,
 }
 
 export interface Tile {
@@ -51,5 +50,5 @@ export enum TileDirection {
   RIGHT,
   BOTTOM_RIGHT,
   BOTTOM_LEFT,
-  LEFT
+  LEFT,
 }
