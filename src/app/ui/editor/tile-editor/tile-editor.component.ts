@@ -14,6 +14,7 @@ import {
 } from '../constants';
 import { getTileDirection } from 'src/app/game/hex-math';
 import { OPPOSITE_DIRECTIONS } from 'src/app/map-generators/utils';
+import { isTileForestable } from '../utils';
 
 @Component({
   selector: 'app-tile-editor',
@@ -50,6 +51,13 @@ export class TileEditorComponent implements OnInit {
   update() {
     if (this.tile) {
       this.game.tilesManager.updatedTile$.next(this.tile);
+    }
+  }
+
+  updateForest(forest: boolean) {
+    if (this.tile) {
+      this.tile.forest = forest && isTileForestable(this.tile);
+      this.update();
     }
   }
 

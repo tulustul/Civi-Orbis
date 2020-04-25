@@ -31,7 +31,7 @@
     <app-radio
       [options]="FOREST_OPTIONS"
       [value]="tile.forest"
-      (changed)="tile.forest = $event; update()"
+      (changed)="updateForest($event)"
     ></app-radio>
   </div>
 

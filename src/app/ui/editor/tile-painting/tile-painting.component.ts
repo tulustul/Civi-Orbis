@@ -12,6 +12,7 @@ import { Game } from 'src/app/game/game';
 import { Observable } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { getTilesInRange } from 'src/app/game/hex-math';
+import { isTileForestable } from '../utils';
 
 const IGNORE_OPTION: Option = { label: 'ignore', value: null };
 
@@ -109,6 +110,9 @@ export class TilePaintingComponent implements OnInit {
       if (this.paintData.forest !== null) {
         tile.forest = this.paintData.forest;
       }
+
+      tile.forest = tile.forest && isTileForestable(tile);
+
       this.game.tilesManager.updatedTile$.next(tile);
     }
   }

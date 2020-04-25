@@ -2,7 +2,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 
 import { distinctUntilChanged } from 'rxjs/operators';
 
-import { Tile } from './tile.interface';
+import { Tile, Climate } from './tile.interface';
 import { Game } from './game';
 
 export class TilesManager {
