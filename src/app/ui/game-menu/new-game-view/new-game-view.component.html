@@ -1,1 +1,21 @@
-<div class="item" (click)="return.next()">Return</div>
+<label>
+  Width:
+  <input type="range" [(ngModel)]="width" min="10" max="300" />
+  {{ width }}
+</label>
+
+<label>
+  Height:
+  <input type="range" [(ngModel)]="height" min="10" max="300" />
+  {{ height }}
+</label>
+
+<label>
+  Seed:
+  <input type="text" [(ngModel)]="seed" />
+</label>
+
+<div class="actions">
+  <button (click)="return.next()">Return</button>
+  <button (click)="start()">Start</button>
+</div>

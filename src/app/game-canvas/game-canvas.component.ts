@@ -8,8 +8,6 @@ import {
 
 import { Game } from '../game/game';
 import { Camera } from '../renderer/camera';
-import { SimplexMapGenerator } from '../map-generators/simplex';
-import { Player, PlayerType } from '../game/player';
 import { UIState } from '../ui/ui-state';
 
 @Component({
@@ -24,21 +22,6 @@ export class GameCanvasComponent implements AfterViewInit {
 
   ngOnInit(): void {
     this.game.uiState = this.uiState;
-
-    const generator = new SimplexMapGenerator(10);
-    const map = generator.generate(100, 80);
-    map.precomputeMovementCosts();
-
-    const humanPlayer = new Player(this.game, PlayerType.human);
-    this.game.addPlayer(humanPlayer);
-
-    this.game.unitsManager.spawn(
-      'scout',
-      generator.getStartingLocations()[0],
-      humanPlayer
-    );
-
-    this.game.start(map);
   }
 
   ngAfterViewInit() {

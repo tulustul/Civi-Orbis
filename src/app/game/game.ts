@@ -44,11 +44,15 @@ export class Game {
 
   tilesManager = new TilesManager(this);
 
+  private _started$ = new BehaviorSubject<boolean>(false);
+  started$ = this._started$.asObservable();
+
   uiState: UIState;
 
   start(map: TilesMap) {
     this.map = map;
     this.nextPlayer();
+    this._started$.next(true);
   }
 
   addPlayer(player: Player) {

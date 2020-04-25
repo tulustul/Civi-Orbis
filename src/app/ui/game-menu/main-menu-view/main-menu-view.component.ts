@@ -12,7 +12,7 @@ import { MenuView } from '../menu-view';
 export class MainMenuViewComponent implements OnInit {
   @Output() change = new EventEmitter<MenuView>();
 
-  constructor(private game: Game) {}
+  constructor(public game: Game) {}
 
   ngOnInit(): void {}
 

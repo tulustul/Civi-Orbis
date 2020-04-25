@@ -41,7 +41,7 @@ export class SimplexMapGenerator implements MapGenerator {
     return this.startingLocations;
   }
 
-  generate(width: number, height: number) {
+  generate(width: number, height: number, seed: number | null = null) {
     this.map = new TilesMap(width, height);
     this.width = width;
     this.height = height;
@@ -306,7 +306,7 @@ class ComplexNoise {
   private noises: SimplexNoise[];
 
   constructor(private scales: number[]) {
-    this.noises = scales.map(() => new SimplexNoise());
+    this.noises = scales.map(() => new SimplexNoise('1'));
   }
 
   at(x: number, y: number) {

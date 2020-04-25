@@ -1,10 +1,12 @@
-<app-game-canvas></app-game-canvas>
-
-<app-editor
-  *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
-></app-editor>
-
 <app-game-menu *ngIf="uiState.menuVisible$ | async"></app-game-menu>
+
+<ng-container *ngIf="game.started$ | async">
+  <app-game-canvas></app-game-canvas>
+
+  <app-editor
+    *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
+  ></app-editor>
+</ng-container>
 
 <ng-template #gameUiTmpl>
   <app-unit-panel></app-unit-panel>

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 import { UIState } from './ui/ui-state';
+import { Game } from './game/game';
 
 @Component({
   selector: 'app-root',
@@ -10,5 +11,5 @@ import { UIState } from './ui/ui-state';
 export class AppComponent {
   title = 'civ';
 
-  constructor(public uiState: UIState) {}
+  constructor(public game: Game, public uiState: UIState) {}
 }
