@@ -44,15 +44,17 @@ export class TilePaintingComponent implements OnInit {
   CLIMATE_OPTIONS: Option[] = [IGNORE_OPTION, ...CLIMATE_OPTIONS];
   FOREST_OPTIONS: Option[] = [IGNORE_OPTION, ...FOREST_OPTIONS];
 
-  @Input() isVisible$: Observable<boolean>;
-
-  paintData: PaintData = {
+  DEFAULT_PAINT_DATA: PaintData = {
     size: 1,
     climate: null,
     forest: null,
     landForm: null,
     seaLevel: null,
   };
+
+  @Input() isVisible$: Observable<boolean>;
+
+  paintData = { ...this.DEFAULT_PAINT_DATA };
 
   constructor(private game: Game) {}
 
@@ -109,5 +111,9 @@ export class TilePaintingComponent implements OnInit {
       }
       this.game.tilesManager.updatedTile$.next(tile);
     }
+  }
+
+  reset() {
+    this.paintData = { ...this.DEFAULT_PAINT_DATA };
   }
 }
