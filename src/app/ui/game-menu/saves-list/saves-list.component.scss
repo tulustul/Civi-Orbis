@@ -1,0 +1,10 @@
+:host {
+  .save {
+    cursor: pointer;
+    padding: 10px 20px;
+    &.selected {
+      background-color: royalblue;
+      color: white;
+    }
+  }
+}

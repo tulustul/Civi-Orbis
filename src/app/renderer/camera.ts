@@ -81,4 +81,8 @@ export class Camera {
   get canvas() {
     return this.game.renderer.canvas;
   }
+
+  serialize(): Transform {
+    return this.transform$.value;
+  }
 }

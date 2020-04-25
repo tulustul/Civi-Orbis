@@ -4,6 +4,8 @@
   *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
 ></app-editor>
 
+<app-game-menu *ngIf="uiState.menuVisible$ | async"></app-game-menu>
+
 <ng-template #gameUiTmpl>
   <app-unit-panel></app-unit-panel>
 

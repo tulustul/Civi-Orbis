@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { UIStateService } from './ui/ui-state.service';
+import { UIState } from './ui/ui-state';
 
 @Component({
   selector: 'app-root',
@@ -10,5 +10,5 @@ import { UIStateService } from './ui/ui-state.service';
 export class AppComponent {
   title = 'civ';
 
-  constructor(public uiState: UIStateService) {}
+  constructor(public uiState: UIState) {}
 }

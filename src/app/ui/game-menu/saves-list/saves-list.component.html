@@ -1,0 +1,12 @@
+<div
+  class="save"
+  *ngFor="let save of saves"
+  [class.selected]="save === selectedSave"
+  (click)="change.next(save)"
+>
+  {{ save }}
+</div>
+
+<div *ngIf="!saves.length">
+  No saves yet
+</div>

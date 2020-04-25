@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { UIStateService } from '../ui-state.service';
+import { UIState } from '../ui-state';
 import { Game } from 'src/app/game/game';
 
 @Component({
@@ -9,7 +9,7 @@ import { Game } from 'src/app/game/game';
   styleUrls: ['./editor.component.scss'],
 })
 export class EditorComponent implements OnInit, OnDestroy {
-  constructor(private game: Game, private uiState: UIStateService) {}
+  constructor(private game: Game, private uiState: UIState) {}
 
   ngOnInit(): void {}
 

@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 
-export class UIStateService {
+export class UIState {
   editorEnabled$ = new BehaviorSubject<boolean>(false);
+  menuVisible$ = new BehaviorSubject<boolean>(false);
 }

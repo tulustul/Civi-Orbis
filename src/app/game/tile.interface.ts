@@ -24,23 +24,25 @@ export enum SeaLevel {
 export interface Tile {
   x: number;
   y: number;
+
   climate: Climate;
   landForm: Landform;
   seaLevel: SeaLevel;
   riverParts: TileDirection[];
-  units: Unit[];
   forest: boolean;
+
+  units: Unit[];
 
   // cached data
   neighbours: Tile[];
   neighboursCosts: Map<Tile, number>;
 
   // debug staff
-  height: number;
-  temperature: number;
-  humidity: number;
-  riverSource: boolean;
-  riverMouth: boolean;
+  // height?: number;
+  // temperature?: number;
+  // humidity?: number;
+  // riverSource?: boolean;
+  // riverMouth?: boolean;
 }
 
 export enum TileDirection {
@@ -51,4 +53,12 @@ export enum TileDirection {
   SE,
   SW,
   W,
+}
+
+export interface TileSerialized {
+  climate?: Climate;
+  landForm?: Landform;
+  seaLevel?: SeaLevel;
+  riverParts?: TileDirection[];
+  forest?: boolean;
 }

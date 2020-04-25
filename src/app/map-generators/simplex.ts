@@ -3,7 +3,6 @@ import * as SimplexNoise from 'simplex-noise';
 import { MapGenerator } from './map-generator.interface';
 import { TilesMap } from '../game/tiles-map';
 import {
-  fillWithEmptyTiles,
   findCoastline,
   placeRiverBetweenTiles,
   POSSIBLE_RIVER_PATHS,
@@ -17,8 +16,14 @@ import {
 } from '../game/tile.interface';
 import { getTileInDirection, getTileDirection } from '../game/hex-math';
 
+interface TileMetadata {
+  height: number;
+  humidity: number;
+  temperature: number;
+}
+
 export class SimplexMapGenerator implements MapGenerator {
-  private tiles: Tile[][];
+  private map: TilesMap;
 
   private width: number;
 
@@ -28,6 +33,8 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private riversSources: Tile[] = [];
 
+  private metadata = new Map<Tile, TileMetadata>();
+
   constructor(private startingLocationsCount: number) {}
 
   getStartingLocations() {
@@ -35,9 +42,20 @@ export class SimplexMapGenerator implements MapGenerator {
   }
 
   generate(width: number, height: number) {
-    this.tiles = fillWithEmptyTiles(width, height);
+    this.map = new TilesMap(width, height);
     this.width = width;
     this.height = height;
+
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        const metadata: TileMetadata = {
+          height: 0,
+          humidity: 0,
+          temperature: 0,
+        };
+        this.metadata.set(this.map.tiles[x][y], metadata);
+      }
+    }
 
     this.generateHeightmap();
 
@@ -47,28 +65,28 @@ export class SimplexMapGenerator implements MapGenerator {
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        const tile = this.tiles[x][y];
-
-        if (tile.height > 1.9) {
+        const tile = this.map.tiles[x][y];
+        const metadata = this.metadata.get(tile)!;
+        if (metadata.height > 1.9) {
           tile.landForm = Landform.mountains;
-        } else if (tile.height > 1.3) {
+        } else if (metadata.height > 1.3) {
           tile.landForm = Landform.hills;
         }
 
-        if (tile.temperature < 0.05) {
+        if (metadata.temperature < 0.05) {
           tile.climate = Climate.tundra;
           continue;
         }
 
-        if (tile.humidity < 0.1) {
+        if (metadata.humidity < 0.1) {
           tile.climate = Climate.desert;
-        } else if (tile.humidity < 0.3) {
+        } else if (metadata.humidity < 0.3) {
           tile.climate = Climate.savanna;
-        } else if (tile.humidity < 0.7) {
+        } else if (metadata.humidity < 0.7) {
           tile.climate = Climate.continental;
         } else {
           tile.climate =
-            tile.temperature > 0.5 ? Climate.tropical : Climate.oceanic;
+            metadata.temperature > 0.5 ? Climate.tropical : Climate.oceanic;
         }
       }
     }
@@ -96,14 +114,14 @@ export class SimplexMapGenerator implements MapGenerator {
 
     this.findStartingPositions();
 
-    return new TilesMap(width, height, this.tiles);
+    return this.map;
   }
 
   private generateHeightmap() {
     const heightmapNoise = new ComplexNoise([0.05, 0.01, 0.03, 0.08, 0.11]);
 
     for (const [tile, value] of this.getNoisedTiles(heightmapNoise)) {
-      tile.height = value;
+      this.metadata.get(tile)!.height = value;
     }
 
     for (const [tile, value, _] of this.getNoisedTiles(heightmapNoise)) {
@@ -122,7 +140,8 @@ export class SimplexMapGenerator implements MapGenerator {
     )) {
       const base = (1 - longitude) / 2;
       const noise = ((value + 1) / 2) * (1 - longitude);
-      tile.temperature = Math.max(base, Math.min(1, base + noise));
+      const metadata = this.metadata.get(tile)!;
+      metadata.temperature = Math.max(base, Math.min(1, base + noise));
     }
   }
 
@@ -133,7 +152,8 @@ export class SimplexMapGenerator implements MapGenerator {
       const x = longitude * 10;
       const base = x < Math.PI * 1.5 ? (Math.cos(x) + 1) / 2 - 0.5 : 0;
       const noise = (value + 1) / 2;
-      tile.humidity = Math.max(0, Math.min(1, base * 0.8 + noise));
+      const metadata = this.metadata.get(tile)!;
+      metadata.humidity = Math.max(0, Math.min(1, base * 0.8 + noise));
     }
   }
 
@@ -145,7 +165,7 @@ export class SimplexMapGenerator implements MapGenerator {
         const noiseValue = noise.at(x, y);
         const halfHeight = Math.floor(this.height / 2);
         const longitude = Math.abs((y - halfHeight) / halfHeight);
-        yield [this.tiles[x][y], noiseValue, longitude];
+        yield [this.map.tiles[x][y], noiseValue, longitude];
       }
     }
   }
@@ -153,7 +173,7 @@ export class SimplexMapGenerator implements MapGenerator {
   private fixShallowWater() {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        const tile = this.tiles[x][y];
+        const tile = this.map.tiles[x][y];
         if (tile.seaLevel === SeaLevel.none) {
           for (const neighbour of tile.neighbours) {
             if (neighbour.seaLevel === SeaLevel.deep) {
@@ -167,7 +187,7 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private adjustHeightmap() {
     // Make heighmap suitable for rivers placement - the deeper into land the higher.
-    let currentTiles = findCoastline(this.tiles);
+    let currentTiles = findCoastline(this.map.tiles);
     const nextTiles = new Set<Tile>();
     const visitedTiles = new Set<Tile>(currentTiles);
     let offset = 0;
@@ -181,7 +201,7 @@ export class SimplexMapGenerator implements MapGenerator {
           ) {
             visitedTiles.add(neighbour);
             nextTiles.add(neighbour);
-            neighbour.height += offset;
+            this.metadata.get(neighbour)!.height += offset;
           }
         }
       }
@@ -204,7 +224,6 @@ export class SimplexMapGenerator implements MapGenerator {
       }
 
       if (ok) {
-        tile.riverSource = true;
         this.buildRiverPath(tile, Math.round(Math.random() * 5));
       }
     }
@@ -223,7 +242,7 @@ export class SimplexMapGenerator implements MapGenerator {
           if (dir === TileDirection.NONE) {
             return tile;
           }
-          return getTileInDirection(this.tiles, tile, dir);
+          return getTileInDirection(this.map.tiles, tile, dir);
         });
       })
       .filter(
@@ -247,8 +266,14 @@ export class SimplexMapGenerator implements MapGenerator {
     } else {
       const [pairA, pairB] = pairs;
 
-      const heightA = (pairA[0].height + pairA[1].height) / 2;
-      const heightB = (pairB[0].height + pairB[1].height) / 2;
+      const heightA =
+        (this.metadata.get(pairA[0])!.height +
+          this.metadata.get(pairA[1])!.height) /
+        2;
+      const heightB =
+        (this.metadata.get(pairB[0])!.height +
+          this.metadata.get(pairB[1])!.height) /
+        2;
 
       pairToPlace = heightA < heightB ? pairA : pairB;
     }
@@ -265,7 +290,7 @@ export class SimplexMapGenerator implements MapGenerator {
     while (this.startingLocations.length < this.startingLocationsCount) {
       const x = Math.floor(Math.random() * this.width);
       const y = Math.floor(Math.random() * this.height);
-      const tile = this.tiles[x][y];
+      const tile = this.map.tiles[x][y];
       if (
         tile.seaLevel === SeaLevel.none &&
         tile.landForm !== Landform.mountains &&

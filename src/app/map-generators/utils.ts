@@ -5,7 +5,7 @@ import {
   SeaLevel,
   TileDirection,
 } from '../game/tile.interface';
-import { getTileDirection, getTileNeighbours } from '../game/hex-math';
+import { getTileDirection } from '../game/hex-math';
 
 export function makeEmptyTile(x: number, y: number): Tile {
   return {
@@ -16,35 +16,10 @@ export function makeEmptyTile(x: number, y: number): Tile {
     seaLevel: SeaLevel.deep,
     forest: false,
     riverParts: [],
-    riverSource: false,
-    riverMouth: false,
     neighbours: [],
     neighboursCosts: new Map(),
     units: [],
-    height: 0,
-    humidity: 0,
-    temperature: 0,
   };
-}
-
-export function fillWithEmptyTiles(width: number, height: number): Tile[][] {
-  const tiles: Tile[][] = [];
-
-  for (let x = 0; x < width; x++) {
-    const row: Tile[] = [];
-    tiles.push(row);
-    for (let y = 0; y < height; y++) {
-      row.push(makeEmptyTile(x, y));
-    }
-  }
-
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      tiles[x][y].neighbours = getTileNeighbours(tiles, x, y);
-    }
-  }
-
-  return tiles;
 }
 
 export function findCoastline(tiles: Tile[][]): Tile[] {

@@ -58,7 +58,7 @@ export class Renderer {
     this.app.stage.addChild(this.units.container);
     this.app.stage.addChild(this.path.container);
 
-    this.game.camera.transform$.subscribe(t => {
+    this.game.camera.transform$.subscribe((t) => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
       this.app.stage.setTransform(x, y, t.scale, t.scale);
@@ -73,6 +73,8 @@ export class Renderer {
       this.onReady();
     }
   }
+
+  clear() {}
 
   get isLoaded() {
     return !!this.textures;

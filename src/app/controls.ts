@@ -93,6 +93,8 @@ export class Controls {
   onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter') {
       this.game.nextTurn();
+    } else if (event.key === 'Escape') {
+      this.game.uiState.menuVisible$.next(true);
     }
   }
 

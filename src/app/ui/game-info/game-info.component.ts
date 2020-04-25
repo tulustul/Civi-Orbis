@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Game } from 'src/app/game/game';
-import { UIStateService } from '../ui-state.service';
+import { UIState } from '../ui-state';
 
 @Component({
   selector: 'app-game-info',
@@ -11,11 +11,14 @@ import { UIStateService } from '../ui-state.service';
 export class GameInfoComponent implements OnInit {
   debugModalVisible = false;
 
-  constructor(public game: Game, private uiState: UIStateService) {}
+  constructor(public game: Game, private uiState: UIState) {}
 
   ngOnInit(): void {}
 
   openEditor() {
     this.uiState.editorEnabled$.next(true);
+  }
+  openMenu() {
+    this.uiState.menuVisible$.next(true);
   }
 }

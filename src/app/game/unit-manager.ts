@@ -1,11 +1,12 @@
 import { UnitDefinition } from './unit.interface';
-import { Unit } from './unit';
+import { Unit, UnitSerialized } from './unit';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { UNITS_DEFINITIONS } from '../data/units';
 import { Player } from './player';
 import { Tile } from './tile.interface';
 import { getTilesInRange } from './hex-math';
 import { Game } from './game';
+import { getTileFromIndex } from './serialization';
 
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
@@ -39,21 +40,19 @@ export class UnitsManager {
       throw Error(`UnitsManager: No unit with id "${id}"`);
     }
 
-    const unit: Unit = {
-      tile,
-      definition,
-      player,
-      actionPointsLeft: definition.actionPoints,
-      path: []
-    };
+    const unit = new Unit(tile, definition, player);
+
     this.units.push(unit);
     player.units.push(unit);
     tile.units.push(unit);
 
-    unit.player.exploredTiles = getTilesInRange(unit.tile, 2);
-    this.game;
+    for (const tile of getTilesInRange(unit.tile, 2)) {
+      unit.player.exploredTiles.add(tile);
+    }
 
     this._spawned$.next(unit);
+
+    return unit;
   }
 
   move(unit: Unit, tile: Tile) {
@@ -112,12 +111,26 @@ export class UnitsManager {
     return unit.tile.neighboursCosts.get(target) || Infinity;
   }
 
+  clear() {}
+
   nextTurn() {
     for (const unit of this.units) {
       if (unit.path) {
         this.moveAlongPath(unit);
       }
       unit.actionPointsLeft = unit.definition.actionPoints;
+    }
+  }
+
+  serialize() {
+    return this.units.map((u) => u.serialize());
+  }
+
+  deserialize(data: UnitSerialized[]) {
+    for (const unitData of data) {
+      const tile = getTileFromIndex(this.game.map, unitData.tile);
+      const player = this.game.players[unitData.player];
+      this.spawn(unitData.definition, tile, player);
     }
   }
 }

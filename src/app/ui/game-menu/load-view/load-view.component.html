@@ -1,0 +1,11 @@
+<h3>Load the game</h3>
+
+<app-saves-list
+  [selectedSave]="saveName"
+  (change)="saveName = $event"
+></app-saves-list>
+
+<div class="actions">
+  <button (click)="return.next()">Back</button>
+  <button [disabled]="!saveName" (click)="load()">Load</button>
+</div>
