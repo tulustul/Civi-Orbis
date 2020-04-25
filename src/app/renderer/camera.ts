@@ -10,6 +10,9 @@ export interface Transform {
 }
 
 export class Camera {
+  MAX_ZOOM = 256;
+  MIN_ZOOM = 5;
+
   transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 130 });
 
   constructor(private game: Game) {
@@ -35,9 +38,12 @@ export class Camera {
     const t = this.transform$.value;
 
     const [x1, y1] = this.screenToCanvas(screenPivotX, screenPivotY);
-    t.scale *= scaleFactor;
     const [x2, y2] = this.screenToCanvas(screenPivotX, screenPivotY);
 
+    t.scale = Math.max(
+      this.MIN_ZOOM,
+      Math.min(this.MAX_ZOOM, t.scale * scaleFactor)
+    );
     t.x += x1 - x2;
     t.y += y1 - y2;
 
@@ -53,7 +59,7 @@ export class Camera {
     const t = this.transform$.value;
     return [
       (screenX - this.canvas.width / 2) / t.scale + t.x,
-      (screenY - this.canvas.height / 2) / t.scale + t.y
+      (screenY - this.canvas.height / 2) / t.scale + t.y,
     ];
   }
 
@@ -68,7 +74,7 @@ export class Camera {
     const t = this.transform$.value;
     return [
       t.scale * (canvasX - t.x) + this.canvas.width / 2,
-      t.scale * (canvasY - t.y) + this.canvas.height / 2
+      t.scale * (canvasY - t.y) + this.canvas.height / 2,
     ];
   }
 
