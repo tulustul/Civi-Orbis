@@ -67,7 +67,7 @@ export class Controls {
     const tile = this.getTileFromMouseEvent(event);
 
     if (tile !== this.game.tilesManager.hoveredTile) {
-      this.game.tilesManager.hoveredTile$.next(tile);
+      this.game.tilesManager.hoverTile(tile);
 
       if (tile && this.activeUnit && this.mouseButton === 2) {
         this.activeUnit.path = findPath(this.activeUnit, tile);

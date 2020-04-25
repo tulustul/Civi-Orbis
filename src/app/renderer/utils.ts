@@ -10,13 +10,13 @@ export function getTileCoords(tile: Tile): [number, number] {
   return [tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75];
 }
 
-export function drawHex(graphics: PIXIE.Graphics) {
-  graphics.moveTo(0, 0.25);
-  graphics.lineTo(0.5, 0);
-  graphics.lineTo(1, 0.25);
-  graphics.lineTo(1, 0.75);
-  graphics.lineTo(0.5, 1);
-  graphics.lineTo(0, 0.75);
+export function drawHex(graphics: PIXIE.Graphics, x = 0, y = 0) {
+  graphics.moveTo(x + 0, y + 0.25);
+  graphics.lineTo(x + 0.5, y + 0);
+  graphics.lineTo(x + 1, y + 0.25);
+  graphics.lineTo(x + 1, y + 0.75);
+  graphics.lineTo(x + 0.5, y + 1);
+  graphics.lineTo(x + 0, y + 0.75);
 }
 
 export function drawClosedHex(graphics: PIXIE.Graphics) {

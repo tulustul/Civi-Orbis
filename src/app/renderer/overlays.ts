@@ -1,8 +1,19 @@
 import * as PIXIE from 'pixi.js';
 
 import { Game } from '../game/game';
-import { drawClosedHex, getTileCoords } from './utils';
-import { Tile } from '../game/tile.interface';
+import { drawClosedHex, getTileCoords, drawHex } from './utils';
+import { Tile, TileDirection } from '../game/tile.interface';
+import { getTileDirection } from '../game/hex-math';
+
+const HEX_VERTICES: Record<TileDirection, [number, number]> = {
+  [TileDirection.NW]: [0.5, 0],
+  [TileDirection.NE]: [1, 0.25],
+  [TileDirection.E]: [1, 0.75],
+  [TileDirection.SE]: [0.5, 1],
+  [TileDirection.SW]: [0, 0.75],
+  [TileDirection.W]: [0, 0.25],
+  [TileDirection.NONE]: [0, 0],
+};
 
 export class OverlaysRenderer {
   container = new PIXIE.Container();
@@ -10,6 +21,8 @@ export class OverlaysRenderer {
   hoveredTileGraphics = new PIXIE.Graphics();
 
   selectedTileGraphics = new PIXIE.Graphics();
+
+  highlightedTilesGraphics = new PIXIE.Graphics();
 
   constructor(game: Game) {
     this.container.addChild(this.hoveredTileGraphics);
@@ -24,6 +37,10 @@ export class OverlaysRenderer {
 
     game.tilesManager.selectedTile$.subscribe((tile) => {
       this.displayAtTile(this.selectedTileGraphics, tile);
+    });
+
+    game.tilesManager.highlightedTiles$.subscribe((tiles) => {
+      this.buildHighlightedTiles(tiles);
     });
   }
 
@@ -50,5 +67,24 @@ export class OverlaysRenderer {
     this.selectedTileGraphics.beginFill(0xffffff, 0.1);
     drawClosedHex(this.selectedTileGraphics);
     this.selectedTileGraphics.endFill();
+  }
+
+  buildHighlightedTiles(tiles: Set<Tile>) {
+    this.highlightedTilesGraphics.clear();
+    if (!tiles.size) {
+      this.container.removeChild(this.highlightedTilesGraphics);
+      return;
+    }
+
+    const g = this.highlightedTilesGraphics;
+    for (const tile of tiles) {
+      const [x, y] = getTileCoords(tile);
+
+      g.beginFill(0xffffff, 0.3);
+      drawHex(g, x, y);
+      g.endFill();
+    }
+
+    this.container.addChild(g);
   }
 }

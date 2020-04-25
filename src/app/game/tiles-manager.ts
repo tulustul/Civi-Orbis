@@ -1,13 +1,19 @@
 import { BehaviorSubject, Subject } from 'rxjs';
 
+import { distinctUntilChanged } from 'rxjs/operators';
+
 import { Tile } from './tile.interface';
 import { Game } from './game';
 
 export class TilesManager {
-  hoveredTile$ = new BehaviorSubject<Tile | null>(null);
+  private _hoveredTile$ = new BehaviorSubject<Tile | null>(null);
+  hoveredTile$ = this._hoveredTile$.asObservable().pipe(distinctUntilChanged());
 
   private _selectedTile$ = new BehaviorSubject<Tile | null>(null);
   selectedTile$ = this._selectedTile$.asObservable();
+
+  private _highlightedTiles$ = new BehaviorSubject<Set<Tile>>(new Set());
+  highlightedTiles$ = this._highlightedTiles$.asObservable();
 
   updatedTile$ = new Subject<Tile>();
 
@@ -35,7 +41,7 @@ export class TilesManager {
   }
 
   get hoveredTile() {
-    return this.hoveredTile$.value;
+    return this._hoveredTile$.value;
   }
 
   enableSelectingTile(enable: boolean) {
@@ -49,5 +55,13 @@ export class TilesManager {
     if (this.selectingTileEnabled) {
       this._selectedTile$.next(tile);
     }
+  }
+
+  highlightTiles(tiles: Set<Tile>) {
+    this._highlightedTiles$.next(tiles);
+  }
+
+  hoverTile(tile: Tile | null) {
+    this._hoveredTile$.next(tile);
   }
 }

@@ -10,7 +10,7 @@ export interface Transform {
 }
 
 export class Camera {
-  MAX_ZOOM = 256;
+  MAX_ZOOM = 256; // tile graphics width in pixels
   MIN_ZOOM = 5;
 
   transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 130 });
