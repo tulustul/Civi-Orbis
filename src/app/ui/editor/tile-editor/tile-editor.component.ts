@@ -4,14 +4,16 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { Game } from 'src/app/game/game';
+import { Tile, TileDirection } from 'src/app/game/tile.interface';
 import {
-  Tile,
-  SeaLevel,
-  Landform,
-  Climate,
-  TileDirection,
-} from 'src/app/game/tile.interface';
-import { Option } from '../../widgets/option.interface';
+  CLIMATE_OPTIONS,
+  FOREST_OPTIONS,
+  LAND_FORM_OPTIONS,
+  RIVER_OPTIONS,
+  SEA_LEVEL_OPTIONS,
+} from '../constants';
+import { getTileDirection } from 'src/app/game/hex-math';
+import { OPPOSITE_DIRECTIONS } from 'src/app/map-generators/utils';
 
 @Component({
   selector: 'app-tile-editor',
@@ -23,40 +25,11 @@ export class TileEditorComponent implements OnInit, OnDestroy {
 
   ngUnsubscribe = new Subject<void>();
 
-  SEA_LEVEL_OPTIONS: Option[] = [
-    { label: 'none', value: SeaLevel.none },
-    { label: 'shallow', value: SeaLevel.shallow },
-    { label: 'deep', value: SeaLevel.deep },
-  ];
-
-  LAND_FORM_OPTIONS: Option[] = [
-    { label: 'plains', value: Landform.plains },
-    { label: 'hills', value: Landform.hills },
-    { label: 'mountains', value: Landform.mountains },
-  ];
-
-  CLIMATE_OPTIONS: Option[] = [
-    { label: 'tropical', value: Climate.tropical },
-    { label: 'savanna', value: Climate.savanna },
-    { label: 'desert', value: Climate.desert },
-    { label: 'continental', value: Climate.continental },
-    { label: 'oceanic', value: Climate.oceanic },
-    { label: 'tundra', value: Climate.tundra },
-  ];
-
-  FOREST_OPTIONS: Option[] = [
-    { label: 'no forest', value: false },
-    { label: 'forest', value: true },
-  ];
-
-  RIVER_OPTIONS: Option[] = [
-    { label: 'NW', value: TileDirection.TOP_LEFT },
-    { label: 'NE', value: TileDirection.TOP_RIGHT },
-    { label: 'E', value: TileDirection.RIGHT },
-    { label: 'SE', value: TileDirection.BOTTOM_RIGHT },
-    { label: 'SW', value: TileDirection.BOTTOM_LEFT },
-    { label: 'W', value: TileDirection.LEFT },
-  ];
+  SEA_LEVEL_OPTIONS = SEA_LEVEL_OPTIONS;
+  LAND_FORM_OPTIONS = LAND_FORM_OPTIONS;
+  CLIMATE_OPTIONS = CLIMATE_OPTIONS;
+  FOREST_OPTIONS = FOREST_OPTIONS;
+  RIVER_OPTIONS = RIVER_OPTIONS;
 
   constructor(private game: Game) {}
 
@@ -75,5 +48,27 @@ export class TileEditorComponent implements OnInit, OnDestroy {
     if (this.tile) {
       this.game.tilesManager.updatedTile$.next(this.tile);
     }
+  }
+
+  updateRiver(riverParts: TileDirection[]) {
+    if (!this.tile) {
+      return;
+    }
+
+    this.tile.riverParts = riverParts;
+    for (const neighbour of this.tile.neighbours) {
+      const dir = getTileDirection(this.tile, neighbour);
+      const hasRiver = riverParts.includes(dir);
+      const oppositeDir = OPPOSITE_DIRECTIONS[dir];
+      const neighbourRiverParts = new Set(neighbour.riverParts);
+      if (hasRiver) {
+        neighbourRiverParts.add(oppositeDir);
+      } else {
+        neighbourRiverParts.delete(oppositeDir);
+      }
+      neighbour.riverParts = Array.from(neighbourRiverParts);
+      this.game.tilesManager.updatedTile$.next(neighbour);
+    }
+    this.update();
   }
 }

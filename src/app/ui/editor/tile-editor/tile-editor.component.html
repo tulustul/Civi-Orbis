@@ -40,7 +40,7 @@
     <app-multiselect
       [options]="RIVER_OPTIONS"
       [value]="tile.riverParts"
-      (changed)="tile.riverParts = $event; update()"
+      (changed)="updateRiver($event)"
     ></app-multiselect>
   </div>
 </div>
