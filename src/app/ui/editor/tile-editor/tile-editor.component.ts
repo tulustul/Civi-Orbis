@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import { Game } from 'src/app/game/game';
 import { Tile, TileDirection } from 'src/app/game/tile.interface';
@@ -20,10 +20,10 @@ import { OPPOSITE_DIRECTIONS } from 'src/app/map-generators/utils';
   templateUrl: './tile-editor.component.html',
   styleUrls: ['./tile-editor.component.scss'],
 })
-export class TileEditorComponent implements OnInit, OnDestroy {
-  tile: Tile | null = null;
+export class TileEditorComponent implements OnInit {
+  @Input() isVisible$: Observable<boolean>;
 
-  ngUnsubscribe = new Subject<void>();
+  tile: Tile | null = null;
 
   SEA_LEVEL_OPTIONS = SEA_LEVEL_OPTIONS;
   LAND_FORM_OPTIONS = LAND_FORM_OPTIONS;
@@ -34,14 +34,17 @@ export class TileEditorComponent implements OnInit, OnDestroy {
   constructor(private game: Game) {}
 
   ngOnInit(): void {
-    this.game.tilesManager.selectedTile$
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((tile) => (this.tile = tile));
-  }
+    const shown = this.isVisible$.pipe(filter((v) => v));
+    const hidden = this.isVisible$.pipe(filter((v) => !v));
 
-  ngOnDestroy() {
-    this.ngUnsubscribe.next();
-    this.ngUnsubscribe.complete();
+    shown.subscribe(() => {
+      this.game.tilesManager.enableSelectingTile(true);
+      this.game.tilesManager.selectedTile$
+        .pipe(takeUntil(hidden))
+        .subscribe((tile) => (this.tile = tile));
+    });
+
+    hidden.subscribe(() => this.game.tilesManager.enableSelectingTile(false));
   }
 
   update() {

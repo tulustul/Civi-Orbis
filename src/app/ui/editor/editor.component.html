@@ -1,6 +1,12 @@
 <app-tabs>
-  <app-tab tabTitle="tile"><app-tile-editor></app-tile-editor></app-tab>
-  <app-tab tabTitle="paint">2</app-tab>
+  <app-tab #tileTab tabTitle="Tile"
+    ><app-tile-editor [isVisible$]="tileTab.isVisible$"></app-tile-editor
+  ></app-tab>
+  <app-tab #tilePaintingTab tabTitle="Tile painting"
+    ><app-tile-painting
+      [isVisible$]="tilePaintingTab.isVisible$"
+    ></app-tile-painting
+  ></app-tab>
   <app-tab tabTitle="units">3</app-tab>
 </app-tabs>
 

@@ -16,6 +16,7 @@ import { TabsComponent, TabComponent } from './ui/widgets/tabs';
 import { TileEditorComponent } from './ui/editor/tile-editor/tile-editor.component';
 import { RadioComponent } from './ui/widgets/radio/radio.component';
 import { MultiselectComponent } from './ui/widgets/multiselect/multiselect.component';
+import { TilePaintingComponent } from './ui/editor/tile-painting/tile-painting.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { MultiselectComponent } from './ui/widgets/multiselect/multiselect.compo
     TileEditorComponent,
     RadioComponent,
     MultiselectComponent,
+    TilePaintingComponent,
   ],
   imports: [BrowserModule, FormsModule],
   providers: [Game, UIStateService],

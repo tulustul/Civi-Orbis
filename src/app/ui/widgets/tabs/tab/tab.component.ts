@@ -1,5 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
+import { BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
+
 @Component({
   selector: 'app-tab',
   templateUrl: './tab.component.html',
@@ -10,14 +13,19 @@ export class TabComponent {
 
   @Output() select = new EventEmitter<void>();
 
-  isVisible = false;
+  private _isVisible$ = new BehaviorSubject<boolean>(false);
+  isVisible$ = this._isVisible$.asObservable().pipe(distinctUntilChanged());
 
   hide() {
-    this.isVisible = false;
+    this._isVisible$.next(false);
   }
 
   show() {
-    this.isVisible = true;
+    this._isVisible$.next(true);
     this.select.next();
+  }
+
+  get isVisible() {
+    return this._isVisible$.value;
   }
 }

@@ -33,10 +33,10 @@ export const FOREST_OPTIONS: Option[] = [
 ];
 
 export const RIVER_OPTIONS: Option[] = [
-  { label: 'NW', value: TileDirection.TOP_LEFT },
-  { label: 'NE', value: TileDirection.TOP_RIGHT },
-  { label: 'E', value: TileDirection.RIGHT },
-  { label: 'SE', value: TileDirection.BOTTOM_RIGHT },
-  { label: 'SW', value: TileDirection.BOTTOM_LEFT },
-  { label: 'W', value: TileDirection.LEFT },
+  { label: 'NW', value: TileDirection.NW },
+  { label: 'NE', value: TileDirection.NE },
+  { label: 'E', value: TileDirection.E },
+  { label: 'SE', value: TileDirection.SE },
+  { label: 'SW', value: TileDirection.SW },
+  { label: 'W', value: TileDirection.W },
 ];

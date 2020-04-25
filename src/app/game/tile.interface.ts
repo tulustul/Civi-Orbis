@@ -45,10 +45,10 @@ export interface Tile {
 
 export enum TileDirection {
   NONE,
-  TOP_LEFT,
-  TOP_RIGHT,
-  RIGHT,
-  BOTTOM_RIGHT,
-  BOTTOM_LEFT,
-  LEFT,
+  NW,
+  NE,
+  E,
+  SE,
+  SW,
+  W,
 }

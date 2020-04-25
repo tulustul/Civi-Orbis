@@ -3,7 +3,7 @@ import {
   Climate,
   Landform,
   SeaLevel,
-  TileDirection
+  TileDirection,
 } from '../game/tile.interface';
 import { getTileDirection, getTileNeighbours } from '../game/hex-math';
 
@@ -23,7 +23,7 @@ export function makeEmptyTile(x: number, y: number): Tile {
     units: [],
     height: 0,
     humidity: 0,
-    temperature: 0
+    temperature: 0,
   };
 }
 
@@ -55,7 +55,7 @@ export function findCoastline(tiles: Tile[][]): Tile[] {
       if (tile.seaLevel !== SeaLevel.none) {
         continue;
       }
-      if (tile.neighbours.find(t => t.seaLevel !== SeaLevel.none)) {
+      if (tile.neighbours.find((t) => t.seaLevel !== SeaLevel.none)) {
         coastline.push(tile);
       }
     }
@@ -78,16 +78,13 @@ export const POSSIBLE_RIVER_DIRECTION_FROM_WATER_TILE: Record<
   TileDirection,
   [TileDirection, TileDirection]
 > = {
-  [TileDirection.TOP_LEFT]: [TileDirection.TOP_RIGHT, TileDirection.LEFT],
-  [TileDirection.TOP_RIGHT]: [TileDirection.RIGHT, TileDirection.TOP_LEFT],
-  [TileDirection.RIGHT]: [TileDirection.BOTTOM_RIGHT, TileDirection.TOP_RIGHT],
-  [TileDirection.BOTTOM_RIGHT]: [
-    TileDirection.BOTTOM_LEFT,
-    TileDirection.RIGHT
-  ],
-  [TileDirection.BOTTOM_LEFT]: [TileDirection.LEFT, TileDirection.BOTTOM_RIGHT],
-  [TileDirection.LEFT]: [TileDirection.TOP_LEFT, TileDirection.BOTTOM_LEFT],
-  [TileDirection.NONE]: [TileDirection.NONE, TileDirection.NONE]
+  [TileDirection.NW]: [TileDirection.NE, TileDirection.W],
+  [TileDirection.NE]: [TileDirection.E, TileDirection.NW],
+  [TileDirection.E]: [TileDirection.SE, TileDirection.NE],
+  [TileDirection.SE]: [TileDirection.SW, TileDirection.E],
+  [TileDirection.SW]: [TileDirection.W, TileDirection.SE],
+  [TileDirection.W]: [TileDirection.NW, TileDirection.SW],
+  [TileDirection.NONE]: [TileDirection.NONE, TileDirection.NONE],
 };
 
 // flow is clockwise for first tile
@@ -95,42 +92,42 @@ export const POSSIBLE_RIVER_PATHS: Record<
   TileDirection,
   [[TileDirection, TileDirection], [TileDirection, TileDirection]]
 > = {
-  [TileDirection.TOP_LEFT]: [
-    [TileDirection.TOP_RIGHT, TileDirection.TOP_LEFT],
-    [TileDirection.NONE, TileDirection.TOP_RIGHT]
+  [TileDirection.NW]: [
+    [TileDirection.NE, TileDirection.NW],
+    [TileDirection.NONE, TileDirection.NE],
   ],
-  [TileDirection.TOP_RIGHT]: [
-    [TileDirection.RIGHT, TileDirection.TOP_RIGHT],
-    [TileDirection.NONE, TileDirection.RIGHT]
+  [TileDirection.NE]: [
+    [TileDirection.E, TileDirection.NE],
+    [TileDirection.NONE, TileDirection.E],
   ],
-  [TileDirection.RIGHT]: [
-    [TileDirection.BOTTOM_RIGHT, TileDirection.RIGHT],
-    [TileDirection.NONE, TileDirection.BOTTOM_RIGHT]
+  [TileDirection.E]: [
+    [TileDirection.SE, TileDirection.E],
+    [TileDirection.NONE, TileDirection.SE],
   ],
-  [TileDirection.BOTTOM_RIGHT]: [
-    [TileDirection.BOTTOM_LEFT, TileDirection.BOTTOM_RIGHT],
-    [TileDirection.NONE, TileDirection.BOTTOM_LEFT]
+  [TileDirection.SE]: [
+    [TileDirection.SW, TileDirection.SE],
+    [TileDirection.NONE, TileDirection.SW],
   ],
-  [TileDirection.BOTTOM_LEFT]: [
-    [TileDirection.LEFT, TileDirection.BOTTOM_LEFT],
-    [TileDirection.NONE, TileDirection.LEFT]
+  [TileDirection.SW]: [
+    [TileDirection.W, TileDirection.SW],
+    [TileDirection.NONE, TileDirection.W],
   ],
-  [TileDirection.LEFT]: [
-    [TileDirection.TOP_LEFT, TileDirection.LEFT],
-    [TileDirection.NONE, TileDirection.TOP_LEFT]
+  [TileDirection.W]: [
+    [TileDirection.NW, TileDirection.W],
+    [TileDirection.NONE, TileDirection.NW],
   ],
   [TileDirection.NONE]: [
     [TileDirection.NONE, TileDirection.NONE],
-    [TileDirection.NONE, TileDirection.NONE]
-  ]
+    [TileDirection.NONE, TileDirection.NONE],
+  ],
 };
 
 export const OPPOSITE_DIRECTIONS: Record<TileDirection, TileDirection> = {
-  [TileDirection.TOP_LEFT]: TileDirection.BOTTOM_RIGHT,
-  [TileDirection.TOP_RIGHT]: TileDirection.BOTTOM_LEFT,
-  [TileDirection.RIGHT]: TileDirection.LEFT,
-  [TileDirection.BOTTOM_RIGHT]: TileDirection.TOP_LEFT,
-  [TileDirection.BOTTOM_LEFT]: TileDirection.TOP_RIGHT,
-  [TileDirection.LEFT]: TileDirection.RIGHT,
-  [TileDirection.NONE]: TileDirection.NONE
+  [TileDirection.NW]: TileDirection.SE,
+  [TileDirection.NE]: TileDirection.SW,
+  [TileDirection.E]: TileDirection.W,
+  [TileDirection.SE]: TileDirection.NW,
+  [TileDirection.SW]: TileDirection.NE,
+  [TileDirection.W]: TileDirection.E,
+  [TileDirection.NONE]: TileDirection.NONE,
 };

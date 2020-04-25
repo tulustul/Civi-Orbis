@@ -7,7 +7,6 @@ import { drawHex } from './utils';
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x4169e1,
   [SeaLevel.shallow]: 0x1e90ff,
-  [SeaLevel.flood]: 0xff0000,
   [SeaLevel.none]: 0x000000,
 };
 
@@ -74,32 +73,32 @@ export class TerrainRenderer {
     graphics.lineStyle(0.15, SEA_COLORS[SeaLevel.deep]);
 
     for (const river of tile.riverParts) {
-      if (river === TileDirection.TOP_LEFT) {
+      if (river === TileDirection.NW) {
         graphics.moveTo(0, 0.25);
         graphics.lineTo(0.5, 0);
       }
 
-      if (river === TileDirection.TOP_RIGHT) {
+      if (river === TileDirection.NE) {
         graphics.moveTo(0.5, 0);
         graphics.lineTo(1, 0.25);
       }
 
-      if (river === TileDirection.RIGHT) {
+      if (river === TileDirection.E) {
         graphics.moveTo(1, 0.25);
         graphics.lineTo(1, 0.75);
       }
 
-      if (river === TileDirection.BOTTOM_RIGHT) {
+      if (river === TileDirection.SE) {
         graphics.moveTo(1, 0.75);
         graphics.lineTo(0.5, 1);
       }
 
-      if (river === TileDirection.BOTTOM_LEFT) {
+      if (river === TileDirection.SW) {
         graphics.moveTo(0.5, 1);
         graphics.lineTo(0, 0.75);
       }
 
-      if (river === TileDirection.LEFT) {
+      if (river === TileDirection.W) {
         graphics.moveTo(0, 0.75);
         graphics.lineTo(0, 0.25);
       }

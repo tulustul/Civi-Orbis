@@ -23,11 +23,7 @@ export class OverlaysRenderer {
     );
 
     game.tilesManager.selectedTile$.subscribe((tile) => {
-      if (game.editorMode) {
-        this.displayAtTile(this.selectedTileGraphics, tile);
-      } else {
-        this.selectedTileGraphics.visible = false;
-      }
+      this.displayAtTile(this.selectedTileGraphics, tile);
     });
   }
 

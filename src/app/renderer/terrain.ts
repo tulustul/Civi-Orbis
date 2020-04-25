@@ -165,32 +165,32 @@ export class TerrainRenderer {
     graphics.lineStyle(0.15, 0x4169e1);
 
     for (const river of tile.riverParts) {
-      if (river === TileDirection.TOP_LEFT) {
+      if (river === TileDirection.NW) {
         graphics.moveTo(0, 0.25);
         graphics.lineTo(0.5, 0);
       }
 
-      if (river === TileDirection.TOP_RIGHT) {
+      if (river === TileDirection.NE) {
         graphics.moveTo(0.5, 0);
         graphics.lineTo(1, 0.25);
       }
 
-      if (river === TileDirection.RIGHT) {
+      if (river === TileDirection.E) {
         graphics.moveTo(1, 0.25);
         graphics.lineTo(1, 0.75);
       }
 
-      if (river === TileDirection.BOTTOM_RIGHT) {
+      if (river === TileDirection.SE) {
         graphics.moveTo(1, 0.75);
         graphics.lineTo(0.5, 1);
       }
 
-      if (river === TileDirection.BOTTOM_LEFT) {
+      if (river === TileDirection.SW) {
         graphics.moveTo(0.5, 1);
         graphics.lineTo(0, 0.75);
       }
 
-      if (river === TileDirection.LEFT) {
+      if (river === TileDirection.W) {
         graphics.moveTo(0, 0.75);
         graphics.lineTo(0, 0.25);
       }

@@ -111,27 +111,27 @@ describe('hex-math:utils', () => {
     const startEven = makeEmptyTile(2, 2);
 
     expect(getTileDirection(startEven, makeEmptyTile(1, 1))).toBe(
-      TileDirection.TOP_LEFT
+      TileDirection.NW
     );
 
     expect(getTileDirection(startEven, makeEmptyTile(2, 1))).toBe(
-      TileDirection.TOP_RIGHT
+      TileDirection.NE
     );
 
     expect(getTileDirection(startEven, makeEmptyTile(3, 2))).toBe(
-      TileDirection.RIGHT
+      TileDirection.E
     );
 
     expect(getTileDirection(startEven, makeEmptyTile(2, 3))).toBe(
-      TileDirection.BOTTOM_RIGHT
+      TileDirection.SE
     );
 
     expect(getTileDirection(startEven, makeEmptyTile(1, 3))).toBe(
-      TileDirection.BOTTOM_LEFT
+      TileDirection.SW
     );
 
     expect(getTileDirection(startEven, makeEmptyTile(1, 2))).toBe(
-      TileDirection.LEFT
+      TileDirection.W
     );
 
     expect(getTileDirection(startEven, makeEmptyTile(2, 2))).toBe(
@@ -146,27 +146,27 @@ describe('hex-math:utils', () => {
     const startOdd = makeEmptyTile(2, 3);
 
     expect(getTileDirection(startOdd, makeEmptyTile(2, 2))).toBe(
-      TileDirection.TOP_LEFT
+      TileDirection.NW
     );
 
     expect(getTileDirection(startOdd, makeEmptyTile(3, 2))).toBe(
-      TileDirection.TOP_RIGHT
+      TileDirection.NE
     );
 
     expect(getTileDirection(startOdd, makeEmptyTile(3, 3))).toBe(
-      TileDirection.RIGHT
+      TileDirection.E
     );
 
     expect(getTileDirection(startOdd, makeEmptyTile(3, 4))).toBe(
-      TileDirection.BOTTOM_RIGHT
+      TileDirection.SE
     );
 
     expect(getTileDirection(startOdd, makeEmptyTile(2, 4))).toBe(
-      TileDirection.BOTTOM_LEFT
+      TileDirection.SW
     );
 
     expect(getTileDirection(startOdd, makeEmptyTile(1, 3))).toBe(
-      TileDirection.LEFT
+      TileDirection.W
     );
 
     expect(getTileDirection(startOdd, makeEmptyTile(2, 3))).toBe(

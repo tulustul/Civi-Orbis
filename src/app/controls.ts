@@ -7,7 +7,8 @@ import { Tile } from './game/tile.interface';
 export class Controls {
   isMousePressed = false;
 
-  mouseButton: number | null = null;
+  private _mouseButton$ = new BehaviorSubject<number | null>(null);
+  mouseButton$ = this._mouseButton$.asObservable();
 
   private _activePath$ = new BehaviorSubject<Tile[][] | null>(null);
   activePath$ = this._activePath$.asObservable();
@@ -16,7 +17,7 @@ export class Controls {
 
   onMouseDown(event: MouseEvent) {
     this.isMousePressed = true;
-    this.mouseButton = event.button;
+    this._mouseButton$.next(event.button);
     event.preventDefault();
     event.stopPropagation();
 
@@ -35,9 +36,9 @@ export class Controls {
     event.preventDefault();
     event.stopPropagation();
 
-    const activeTile = this.game.tilesManager.hoveredTile;
-    this.game.tilesManager.selectedTile$.next(activeTile);
-    const newActiveUnit = activeTile?.units[0] || null;
+    const hoveredTile = this.game.tilesManager.hoveredTile;
+    this.game.tilesManager.selectTile(hoveredTile);
+    const newActiveUnit = hoveredTile?.units[0] || null;
     if (newActiveUnit !== this.game.unitsManager.activeUnit) {
       this.game.unitsManager.activeUnit$.next(newActiveUnit);
       this._activePath$.next(newActiveUnit?.path || null);
@@ -59,7 +60,7 @@ export class Controls {
     }
 
     this.isMousePressed = false;
-    this.mouseButton = null;
+    this._mouseButton$.next(null);
   }
 
   onMouseMove(event: MouseEvent) {
@@ -108,5 +109,9 @@ export class Controls {
 
   get activeUnit() {
     return this.game.unitsManager.activeUnit;
+  }
+
+  get mouseButton() {
+    return this._mouseButton$.value;
   }
 }

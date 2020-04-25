@@ -11,14 +11,9 @@ import { Game } from 'src/app/game/game';
 export class EditorComponent implements OnInit, OnDestroy {
   constructor(private game: Game, private uiState: UIStateService) {}
 
-  ngOnInit(): void {
-    this.game.editorMode = true;
-  }
+  ngOnInit(): void {}
 
-  ngOnDestroy() {
-    this.game.editorMode = false;
-    this.game.tilesManager.selectedTile$.next(null);
-  }
+  ngOnDestroy() {}
 
   close() {
     this.uiState.editorEnabled$.next(false);
