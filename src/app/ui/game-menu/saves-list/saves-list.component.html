@@ -4,7 +4,8 @@
   [class.selected]="save === selectedSave"
   (click)="change.next(save)"
 >
-  {{ save }}
+  <span>{{ save }}</span>
+  <button (click)="delete(save)">delete</button>
 </div>
 
 <div *ngIf="!saves.length">

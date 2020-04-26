@@ -33,12 +33,14 @@ export class Camera {
     const t = this.transform$.value;
 
     const [x1, y1] = this.screenToCanvas(screenPivotX, screenPivotY);
-    const [x2, y2] = this.screenToCanvas(screenPivotX, screenPivotY);
 
     t.scale = Math.max(
       this.MIN_ZOOM,
       Math.min(this.MAX_ZOOM, t.scale * scaleFactor)
     );
+
+    const [x2, y2] = this.screenToCanvas(screenPivotX, screenPivotY);
+
     t.x += x1 - x2;
     t.y += y1 - y2;
 
