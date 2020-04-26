@@ -87,7 +87,7 @@ export class SimplexMapGenerator implements MapGenerator {
           tile.climate = Climate.desert;
         } else if (metadata.humidity < 0.3) {
           tile.climate = Climate.savanna;
-        } else if (metadata.humidity < 0.7) {
+        } else if (metadata.humidity < 0.7 && metadata.temperature < 0.5) {
           tile.climate = Climate.continental;
         } else {
           tile.climate =
@@ -99,16 +99,9 @@ export class SimplexMapGenerator implements MapGenerator {
     for (const [tile, value, _] of this.getNoisedTiles(
       new ComplexNoise([0.015, 0.06, 0.3])
     )) {
-      if (value > 0.2 && isTileForestable(tile)) {
+      const bonus = tile.climate === Climate.tropical ? 0.3 : 0;
+      if (value + bonus > 0.2 && isTileForestable(tile)) {
         tile.forest = true;
-      }
-    }
-
-    for (const [tile, value, _] of this.getNoisedTiles(
-      new ComplexNoise([0.021, 0.08, 0.2])
-    )) {
-      if (value > 0.4 && areWetlandsPossible(tile)) {
-        tile.wetlands = true;
       }
     }
 
@@ -117,6 +110,8 @@ export class SimplexMapGenerator implements MapGenerator {
     this.adjustHeightmap();
 
     this.placeRivers();
+
+    this.placeWetlands();
 
     this.findStartingPositions();
 
@@ -292,6 +287,16 @@ export class SimplexMapGenerator implements MapGenerator {
     }
   }
 
+  placeWetlands() {
+    for (const [tile, value, _] of this.getNoisedTiles(
+      new ComplexNoise([0.021, 0.08, 0.2])
+    )) {
+      if (value > 0.1 && areWetlandsPossible(tile)) {
+        tile.wetlands = true;
+      }
+    }
+  }
+
   private findStartingPositions() {
     while (this.startingLocations.length < this.startingLocationsCount) {
       const x = Math.floor(Math.random() * this.width);
@@ -312,7 +317,7 @@ class ComplexNoise {
   private noises: SimplexNoise[];
 
   constructor(private scales: number[]) {
-    this.noises = scales.map(() => new SimplexNoise('1'));
+    this.noises = scales.map(() => new SimplexNoise());
   }
 
   at(x: number, y: number) {
