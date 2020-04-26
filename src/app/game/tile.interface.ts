@@ -7,6 +7,7 @@ export enum Climate {
   continental,
   oceanic,
   tundra,
+  arctic,
 }
 
 export enum Landform {
@@ -30,6 +31,7 @@ export interface Tile {
   seaLevel: SeaLevel;
   riverParts: TileDirection[];
   forest: boolean;
+  wetlands: boolean;
 
   units: Unit[];
 

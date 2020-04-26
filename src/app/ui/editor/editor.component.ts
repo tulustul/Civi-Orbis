@@ -13,7 +13,10 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {}
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    this.game.tilesManager.highlightTiles(new Set());
+    this.game.tilesManager.enableSelectingTile(false);
+  }
 
   close() {
     this.uiState.editorEnabled$.next(false);

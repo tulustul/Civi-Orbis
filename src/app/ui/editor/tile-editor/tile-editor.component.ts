@@ -11,10 +11,11 @@ import {
   LAND_FORM_OPTIONS,
   RIVER_OPTIONS,
   SEA_LEVEL_OPTIONS,
+  WETLANDS_OPTIONS,
 } from '../constants';
 import { getTileDirection } from 'src/app/game/hex-math';
 import { OPPOSITE_DIRECTIONS } from 'src/app/map-generators/utils';
-import { isTileForestable } from '../utils';
+import { isTileForestable, areWetlandsPossible } from '../utils';
 
 @Component({
   selector: 'app-tile-editor',
@@ -31,6 +32,7 @@ export class TileEditorComponent implements OnInit {
   CLIMATE_OPTIONS = CLIMATE_OPTIONS;
   FOREST_OPTIONS = FOREST_OPTIONS;
   RIVER_OPTIONS = RIVER_OPTIONS;
+  WETLANDS_OPTIONS = WETLANDS_OPTIONS;
 
   constructor(private game: Game) {}
 
@@ -57,6 +59,13 @@ export class TileEditorComponent implements OnInit {
   updateForest(forest: boolean) {
     if (this.tile) {
       this.tile.forest = forest && isTileForestable(this.tile);
+      this.update();
+    }
+  }
+
+  updateWetlands(wetlands: boolean) {
+    if (this.tile) {
+      this.tile.wetlands = wetlands && areWetlandsPossible(this.tile);
       this.update();
     }
   }

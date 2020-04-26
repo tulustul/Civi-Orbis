@@ -15,6 +15,7 @@ export function makeEmptyTile(x: number, y: number): Tile {
     landForm: Landform.plains,
     seaLevel: SeaLevel.deep,
     forest: false,
+    wetlands: false,
     riverParts: [],
     neighbours: [],
     neighboursCosts: new Map(),

@@ -36,6 +36,15 @@
   </div>
 
   <div>
+    <h4>Wetlands</h4>
+    <app-radio
+      [options]="WETLANDS_OPTIONS"
+      [value]="tile.wetlands"
+      (changed)="updateWetlands($event)"
+    ></app-radio>
+  </div>
+
+  <div>
     <h4>River</h4>
     <app-multiselect
       [options]="RIVER_OPTIONS"

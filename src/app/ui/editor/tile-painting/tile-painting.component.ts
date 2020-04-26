@@ -5,6 +5,7 @@ import {
   FOREST_OPTIONS,
   LAND_FORM_OPTIONS,
   SEA_LEVEL_OPTIONS,
+  WETLANDS_OPTIONS,
 } from '../constants';
 import { Option } from '../../widgets/option.interface';
 import { SeaLevel, Landform, Climate } from 'src/app/game/tile.interface';
@@ -12,7 +13,7 @@ import { Game } from 'src/app/game/game';
 import { Observable } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { getTilesInRange } from 'src/app/game/hex-math';
-import { isTileForestable } from '../utils';
+import { isTileForestable, areWetlandsPossible } from '../utils';
 
 const IGNORE_OPTION: Option = { label: 'ignore', value: null };
 
@@ -20,6 +21,7 @@ interface PaintData {
   size: number;
   climate: Climate | null;
   forest: boolean | null;
+  wetlands: boolean | null;
   landForm: Landform | null;
   seaLevel: SeaLevel | null;
 }
@@ -44,6 +46,7 @@ export class TilePaintingComponent implements OnInit {
   LAND_FORM_OPTIONS: Option[] = [IGNORE_OPTION, ...LAND_FORM_OPTIONS];
   CLIMATE_OPTIONS: Option[] = [IGNORE_OPTION, ...CLIMATE_OPTIONS];
   FOREST_OPTIONS: Option[] = [IGNORE_OPTION, ...FOREST_OPTIONS];
+  WETLANDS_OPTIONS: Option[] = [IGNORE_OPTION, ...WETLANDS_OPTIONS];
 
   DEFAULT_PAINT_DATA: PaintData = {
     size: 1,
@@ -51,6 +54,7 @@ export class TilePaintingComponent implements OnInit {
     forest: null,
     landForm: null,
     seaLevel: null,
+    wetlands: null,
   };
 
   @Input() isVisible$: Observable<boolean>;
@@ -110,8 +114,12 @@ export class TilePaintingComponent implements OnInit {
       if (this.paintData.forest !== null) {
         tile.forest = this.paintData.forest;
       }
+      if (this.paintData.wetlands !== null) {
+        tile.wetlands = this.paintData.wetlands;
+      }
 
       tile.forest = tile.forest && isTileForestable(tile);
+      tile.wetlands = tile.wetlands && areWetlandsPossible(tile);
 
       this.game.tilesManager.updatedTile$.next(tile);
     }

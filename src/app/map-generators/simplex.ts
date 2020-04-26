@@ -15,6 +15,7 @@ import {
   Landform,
 } from '../game/tile.interface';
 import { getTileInDirection, getTileDirection } from '../game/hex-math';
+import { areWetlandsPossible, isTileForestable } from '../ui/editor/utils';
 
 interface TileMetadata {
   height: number;
@@ -73,8 +74,12 @@ export class SimplexMapGenerator implements MapGenerator {
           tile.landForm = Landform.hills;
         }
 
-        if (metadata.temperature < 0.05) {
-          tile.climate = Climate.tundra;
+        if (metadata.temperature < 0.2) {
+          if (metadata.temperature < 0.07) {
+            tile.climate = Climate.arctic;
+          } else {
+            tile.climate = Climate.tundra;
+          }
           continue;
         }
 
@@ -94,15 +99,16 @@ export class SimplexMapGenerator implements MapGenerator {
     for (const [tile, value, _] of this.getNoisedTiles(
       new ComplexNoise([0.015, 0.06, 0.3])
     )) {
-      if (value > 0.5) {
-        if (
-          tile.seaLevel === SeaLevel.none &&
-          tile.landForm === Landform.plains &&
-          tile.climate !== Climate.desert &&
-          tile.climate !== Climate.savanna
-        ) {
-          tile.forest = true;
-        }
+      if (value > 0.2 && isTileForestable(tile)) {
+        tile.forest = true;
+      }
+    }
+
+    for (const [tile, value, _] of this.getNoisedTiles(
+      new ComplexNoise([0.021, 0.08, 0.2])
+    )) {
+      if (value > 0.4 && areWetlandsPossible(tile)) {
+        tile.wetlands = true;
       }
     }
 
@@ -136,7 +142,7 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private generateTemperature() {
     for (const [tile, value, longitude] of this.getNoisedTiles(
-      new ComplexNoise([0.012, 0.07, 0.2, 0.05])
+      new ComplexNoise([0.012, 0.07])
     )) {
       const base = (1 - longitude) / 2;
       const noise = ((value + 1) / 2) * (1 - longitude);

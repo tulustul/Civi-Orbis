@@ -51,6 +51,11 @@ const CLIMATE_TEXTURES: Record<Climate, Record<Landform, string[]>> = {
     [Landform.mountains]: getTileVariants('hexMountain', 4),
   },
   [Climate.tundra]: {
+    [Landform.plains]: getTileVariants('hexPlainsColdSnowTransition', 4),
+    [Landform.hills]: getTileVariants('hexHillsColdSnowTransition', 4),
+    [Landform.mountains]: getTileVariants('hexMountainSnow', 4),
+  },
+  [Climate.arctic]: {
     [Landform.plains]: getTileVariants('hexPlainsColdSnowCovered', 4),
     [Landform.hills]: getTileVariants('hexHillsColdSnowCovered', 4),
     [Landform.mountains]: getTileVariants('hexMountainSnow', 4),
@@ -61,10 +66,15 @@ const FOREST_TEXTURES: Record<Climate, string[]> = {
   [Climate.continental]: getTileVariants('hexForestPine', 4),
   [Climate.oceanic]: getTileVariants('hexForestBroadleaf', 4),
   [Climate.tropical]: getTileVariants('hexJungle', 4),
-  [Climate.tundra]: getTileVariants('hexForestPineSnowCovered', 4),
+  [Climate.tundra]: getTileVariants('hexForestPineSnowTransition', 4),
   [Climate.savanna]: [],
   [Climate.desert]: [],
+  [Climate.arctic]: [],
 };
+
+const WETLANDS_TEXTURES = getTileVariants('hexMarsh', 4);
+const WETLANDS_FOREST_TEXTURES = getTileVariants('hexSwamp', 4);
+const DESERT_FLOOD_PLAINS_TEXTURES = getTileVariants('hexGrassySand', 4);
 
 export class TerrainRenderer {
   container = new PIXIE.Container();
@@ -122,10 +132,25 @@ export class TerrainRenderer {
 
   private drawTile(tile: Tile) {
     let variants: string[];
-    if (tile.forest) {
+
+    if (tile.wetlands) {
+      if (tile.forest) {
+        variants = WETLANDS_FOREST_TEXTURES;
+      } else {
+        variants = WETLANDS_TEXTURES;
+      }
+    } else if (tile.forest) {
       variants = FOREST_TEXTURES[tile.climate];
     } else if (tile.seaLevel === SeaLevel.none) {
-      variants = CLIMATE_TEXTURES[tile.climate][tile.landForm];
+      if (
+        tile.climate === Climate.desert &&
+        tile.landForm === Landform.plains &&
+        tile.riverParts.length
+      ) {
+        variants = DESERT_FLOOD_PLAINS_TEXTURES;
+      } else {
+        variants = CLIMATE_TEXTURES[tile.climate][tile.landForm];
+      }
     } else {
       variants = SEA_TEXTURES[tile.seaLevel];
     }

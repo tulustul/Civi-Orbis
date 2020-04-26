@@ -43,4 +43,13 @@
   ></app-radio>
 </div>
 
+<div>
+  <h4>Wetlands</h4>
+  <app-radio
+    [options]="WETLANDS_OPTIONS"
+    [value]="paintData.wetlands"
+    (changed)="paintData.wetlands = $event"
+  ></app-radio>
+</div>
+
 <button (click)="reset()">Reset</button>

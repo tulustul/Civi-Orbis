@@ -25,11 +25,17 @@ export const CLIMATE_OPTIONS: Option[] = [
   { label: 'continental', value: Climate.continental },
   { label: 'oceanic', value: Climate.oceanic },
   { label: 'tundra', value: Climate.tundra },
+  { label: 'arctic', value: Climate.arctic },
 ];
 
 export const FOREST_OPTIONS: Option[] = [
   { label: 'no forest', value: false },
   { label: 'forest', value: true },
+];
+
+export const WETLANDS_OPTIONS: Option[] = [
+  { label: 'no wetlands', value: false },
+  { label: 'wetlands', value: true },
 ];
 
 export const RIVER_OPTIONS: Option[] = [
