@@ -1,8 +1,8 @@
 <app-game-menu *ngIf="uiState.menuVisible$ | async"></app-game-menu>
 
-<ng-container *ngIf="game.started$ | async">
-  <app-game-canvas></app-game-canvas>
+<app-game-canvas></app-game-canvas>
 
+<ng-container *ngIf="game.started$ | async">
   <app-editor
     *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
   ></app-editor>

@@ -34,6 +34,16 @@ export class Renderer {
 
     this.canvas = canvas;
 
+    this.terrain = new TerrainRenderer(this.game);
+    this.units = new UnitsRenderer(this.game);
+    this.overlays = new OverlaysRenderer(this.game);
+    this.path = new PathRenderer(this.game);
+
+    this.app.stage.addChild(this.terrain.container);
+    this.app.stage.addChild(this.overlays.container);
+    this.app.stage.addChild(this.units.container);
+    this.app.stage.addChild(this.path.container);
+
     if (this.isLoaded) {
       this.onReady();
     }
@@ -48,16 +58,6 @@ export class Renderer {
   }
 
   onReady() {
-    this.terrain = new TerrainRenderer(this.game);
-    this.units = new UnitsRenderer(this.game);
-    this.overlays = new OverlaysRenderer(this.game);
-    this.path = new PathRenderer(this.game);
-
-    this.app.stage.addChild(this.terrain.container);
-    this.app.stage.addChild(this.overlays.container);
-    this.app.stage.addChild(this.units.container);
-    this.app.stage.addChild(this.path.container);
-
     this.game.camera.transform$.subscribe((t) => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
@@ -74,7 +74,12 @@ export class Renderer {
     }
   }
 
-  clear() {}
+  clear() {
+    this.terrain.clear();
+    this.units.clear();
+    this.path.clear();
+    this.overlays.clear();
+  }
 
   get isLoaded() {
     return !!this.textures;

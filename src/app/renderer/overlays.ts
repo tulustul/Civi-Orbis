@@ -2,18 +2,7 @@ import * as PIXIE from 'pixi.js';
 
 import { Game } from '../game/game';
 import { drawClosedHex, getTileCoords, drawHex } from './utils';
-import { Tile, TileDirection } from '../game/tile.interface';
-import { getTileDirection } from '../game/hex-math';
-
-const HEX_VERTICES: Record<TileDirection, [number, number]> = {
-  [TileDirection.NW]: [0.5, 0],
-  [TileDirection.NE]: [1, 0.25],
-  [TileDirection.E]: [1, 0.75],
-  [TileDirection.SE]: [0.5, 1],
-  [TileDirection.SW]: [0, 0.75],
-  [TileDirection.W]: [0, 0.25],
-  [TileDirection.NONE]: [0, 0],
-};
+import { Tile } from '../game/tile.interface';
 
 export class OverlaysRenderer {
   container = new PIXIE.Container();
@@ -86,5 +75,11 @@ export class OverlaysRenderer {
     }
 
     this.container.addChild(g);
+  }
+
+  clear() {
+    this.highlightedTilesGraphics.clear();
+    this.hoveredTileGraphics.visible = false;
+    this.selectedTileGraphics.visible = false;
   }
 }

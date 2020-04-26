@@ -15,12 +15,7 @@ export class Camera {
 
   transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 130 });
 
-  constructor(private game: Game) {
-    const unit = game.activePlayer$.value?.units[0];
-    if (unit) {
-      this.moveToTile(unit.tile);
-    }
-  }
+  constructor(private game: Game) {}
 
   moveBy(x: number, y: number) {
     this.transform$.value.x -= x / this.transform$.value.scale;

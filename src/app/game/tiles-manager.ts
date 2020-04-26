@@ -2,7 +2,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 
 import { distinctUntilChanged } from 'rxjs/operators';
 
-import { Tile, Climate } from './tile.interface';
+import { Tile } from './tile.interface';
 import { Game } from './game';
 
 export class TilesManager {
@@ -63,5 +63,12 @@ export class TilesManager {
 
   hoverTile(tile: Tile | null) {
     this._hoveredTile$.next(tile);
+  }
+
+  clear() {
+    this.selectingTileEnabled = false;
+    this._hoveredTile$.next(null);
+    this._selectedTile$.next(null);
+    this._highlightedTiles$.next(new Set());
   }
 }

@@ -23,3 +23,9 @@ export function drawClosedHex(graphics: PIXIE.Graphics) {
   drawHex(graphics);
   graphics.lineTo(0, 0.25);
 }
+
+export function clearContainer(container: PIXIE.Container) {
+  while (container.children.length) {
+    container.removeChildAt(0).destroy();
+  }
+}

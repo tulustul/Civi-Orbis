@@ -1,6 +1,6 @@
 import { Component, OnInit, HostBinding } from '@angular/core';
 
-import { tap, skip } from 'rxjs/operators';
+import { tap, skip, filter } from 'rxjs/operators';
 
 import { Game } from 'src/app/game/game';
 
@@ -18,7 +18,7 @@ export class TurnCounterComponent implements OnInit {
   constructor(public game: Game) {}
 
   ngOnInit(): void {
-    this.game.turn$.pipe(skip(1)).subscribe(() => {
+    this.game.turn$.pipe(filter((turn) => turn > 1)).subscribe(() => {
       this.isVisible = true;
       if (this.timeout) {
         clearTimeout(this.timeout);

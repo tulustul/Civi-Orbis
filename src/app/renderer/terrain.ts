@@ -8,6 +8,7 @@ import {
   Landform,
 } from '../game/tile.interface';
 import { Game } from '../game/game';
+import { clearContainer } from './utils';
 
 function getTileVariants(tileName: string, variants: number): string[] {
   const result: string[] = [];
@@ -71,8 +72,6 @@ export class TerrainRenderer {
   private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   constructor(private game: Game) {
-    this.buildContainer();
-
     this.game.tilesManager.revealedTiles$.subscribe((tiles) => {
       for (const tile of tiles) {
         const displayObjects = this.tilesMap.get(tile);
@@ -87,18 +86,20 @@ export class TerrainRenderer {
     this.game.tilesManager.updatedTile$.subscribe((tile) =>
       this.updateTile(tile)
     );
+
+    this.game.started$.subscribe(() => this.build());
   }
 
-  private get textures() {
-    return this.game.renderer.textures;
-  }
-
-  private buildContainer() {
+  private build() {
     for (let y = 0; y < this.game.map.height; y++) {
       for (let x = 0; x < this.game.map.width; x++) {
         this.drawTile(this.game.map.tiles[x][y]);
       }
     }
+  }
+
+  private get textures() {
+    return this.game.renderer.textures;
   }
 
   private clearTile(tile: Tile) {
@@ -197,5 +198,10 @@ export class TerrainRenderer {
     }
 
     return graphics;
+  }
+
+  clear() {
+    clearContainer(this.container);
+    this.tilesMap.clear();
   }
 }

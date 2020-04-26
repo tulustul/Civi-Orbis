@@ -9,6 +9,7 @@ import { TilesManager } from './tiles-manager';
 import { Debug } from './debug';
 import { UIState } from '../ui/ui-state';
 import { UnitSerialized } from './unit';
+import { filter } from 'rxjs/operators';
 
 interface GameSerialized {
   turn: number;
@@ -44,15 +45,16 @@ export class Game {
 
   tilesManager = new TilesManager(this);
 
-  private _started$ = new BehaviorSubject<boolean>(false);
-  started$ = this._started$.asObservable();
+  private _isStarted$ = new BehaviorSubject<boolean>(false);
+  isStarted$ = this._isStarted$.asObservable();
+
+  started$ = this.isStarted$.pipe(filter((s) => s));
 
   uiState: UIState;
 
-  start(map: TilesMap) {
-    this.map = map;
+  start() {
     this.nextPlayer();
-    this._started$.next(true);
+    this._isStarted$.next(true);
   }
 
   addPlayer(player: Player) {
@@ -84,10 +86,10 @@ export class Game {
     this.activeHumanPlayer = null;
     this.activePlayerIndex = -1;
     this.activePlayer$.next(null);
-    this.turn$.next(0);
+    this.turn$.next(1);
     this.renderer.clear();
-    this.unitsManager = new UnitsManager(this);
-    this.tilesManager = new TilesManager(this);
+    this.unitsManager.clear();
+    this.tilesManager.clear();
   }
 
   serialize(): GameSerialized {

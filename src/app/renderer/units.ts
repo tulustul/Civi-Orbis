@@ -2,26 +2,17 @@ import * as PIXIE from 'pixi.js';
 
 import { Unit } from '../game/unit';
 import { Game } from '../game/game';
-import { getTileCoords } from './utils';
+import { getTileCoords, clearContainer } from './utils';
 
 export class UnitsRenderer {
   container = new PIXIE.Container();
 
   unitGraphics = new Map<Unit, PIXIE.Graphics>();
 
-  constructor(private game: Game) {
-    this.buildContainer();
-
+  constructor(game: Game) {
     game.unitsManager.updated$.subscribe((unit) => this.update(unit));
-
     game.unitsManager.spawned$.subscribe((unit) => this.spawn(unit));
     game.unitsManager.destroyed$.subscribe((unit) => this.destroy(unit));
-  }
-
-  buildContainer() {
-    for (const unit of this.game.unitsManager.units) {
-      this.spawn(unit);
-    }
   }
 
   spawn(unit: Unit) {
@@ -50,5 +41,10 @@ export class UnitsRenderer {
     const [x, y] = getTileCoords(unit.tile);
     g.position.x = x;
     g.position.y = y;
+  }
+
+  clear() {
+    clearContainer(this.container);
+    this.unitGraphics.clear();
   }
 }

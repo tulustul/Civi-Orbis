@@ -111,7 +111,10 @@ export class UnitsManager {
     return unit.tile.neighboursCosts.get(target) || Infinity;
   }
 
-  clear() {}
+  clear() {
+    this.activeUnit$.next(null);
+    this.units = [];
+  }
 
   nextTurn() {
     for (const unit of this.units) {

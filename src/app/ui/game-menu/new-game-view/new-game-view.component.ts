@@ -24,20 +24,30 @@ export class NewGameViewComponent implements OnInit {
   ngOnInit(): void {}
 
   start() {
-    const generator = new SimplexMapGenerator(1);
-    const map = generator.generate(this.width, this.height, this.seed);
-    map.precomputeMovementCosts();
+    this.game.clear();
 
     const humanPlayer = new Player(this.game, PlayerType.human);
     this.game.addPlayer(humanPlayer);
 
-    this.game.unitsManager.spawn(
-      'scout',
-      generator.getStartingLocations()[0],
-      humanPlayer
-    );
+    const generator = new SimplexMapGenerator(this.game.players.length);
+    this.game.map = generator.generate(this.width, this.height, this.seed);
+    this.game.map.precomputeMovementCosts();
 
-    this.game.start(map);
+    for (let i = 0; i < this.game.players.length; i++) {
+      this.game.unitsManager.spawn(
+        'scout',
+        generator.getStartingLocations()[i],
+        this.game.players[i]
+      );
+    }
+
+    this.game.start();
+
+    const unit = this.game.activePlayer$.value?.units[0];
+    if (unit) {
+      this.game.camera.moveToTile(unit.tile);
+    }
+
     this.uiState.menuVisible$.next(false);
   }
 }

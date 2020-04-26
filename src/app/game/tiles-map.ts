@@ -112,11 +112,21 @@ export class TilesMap {
         const tileData = mapData.tiles[index];
         const tile = map.tiles[x][y];
 
-        tile.climate = tileData.climate || lastTile.climate;
-        tile.seaLevel = tileData.seaLevel || lastTile.seaLevel;
-        tile.landForm = tileData.landForm || lastTile.landForm;
-        tile.forest = tileData.forest || lastTile.forest;
-        tile.riverParts = tileData.riverParts || [];
+        tile.climate =
+          tileData.climate !== undefined ? tileData.climate! : lastTile.climate;
+
+        tile.seaLevel =
+          tileData.seaLevel !== undefined
+            ? tileData.seaLevel!
+            : lastTile.seaLevel;
+
+        tile.landForm =
+          tileData.landForm !== undefined
+            ? tileData.landForm!
+            : lastTile.landForm;
+
+        tile.forest =
+          tileData.forest !== undefined ? tileData.forest! : lastTile.forest;
 
         lastTile = tile;
         index++;

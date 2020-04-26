@@ -25,8 +25,7 @@ export class GameCanvasComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.game.camera = new Camera(this.game);
-
+    this.game.camera = new Camera(this.game); //TODO move to more appriopriate place
     this.game.renderer.setCanvas(this.canvas.nativeElement);
   }
 

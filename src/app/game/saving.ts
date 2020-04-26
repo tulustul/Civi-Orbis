@@ -5,6 +5,8 @@ const listKey = 'savesList';
 
 export function saveGame(game: Game, saveName: string) {
   const data = game.serialize();
+
+  // TODO we might compress the save
   localStorage.setItem(`${savesKeyPrefix}${saveName}`, JSON.stringify(data));
   const saveGames = listSaveGames();
   if (!saveGames.includes(saveName)) {
@@ -20,7 +22,8 @@ export function loadGame(game: Game, saveName: string) {
     return;
   }
   game.clear();
-  return game.deserialize(JSON.parse(data));
+  game.deserialize(JSON.parse(data));
+  game.start();
 }
 
 export function deleteSaveGame(saveName: string) {
