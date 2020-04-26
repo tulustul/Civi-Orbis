@@ -291,7 +291,7 @@ export class SimplexMapGenerator implements MapGenerator {
     for (const [tile, value, _] of this.getNoisedTiles(
       new ComplexNoise([0.021, 0.08, 0.2])
     )) {
-      if (value > 0.1 && areWetlandsPossible(tile)) {
+      if (value > 0 && areWetlandsPossible(tile)) {
         tile.wetlands = true;
       }
     }
