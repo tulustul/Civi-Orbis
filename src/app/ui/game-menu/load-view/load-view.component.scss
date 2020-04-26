@@ -1,6 +1,9 @@
 :host {
   display: block;
   padding: 15px;
+  input {
+    display: none;
+  }
   .actions {
     display: flex;
     justify-content: space-between;

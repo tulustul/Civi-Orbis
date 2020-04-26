@@ -5,7 +5,10 @@
   (click)="change.next(save)"
 >
   <span>{{ save }}</span>
-  <button (click)="delete(save)">delete</button>
+  <div>
+    <button (click)="export(save)">export</button>
+    <button (click)="delete(save)">delete</button>
+  </div>
 </div>
 
 <div *ngIf="!saves.length">

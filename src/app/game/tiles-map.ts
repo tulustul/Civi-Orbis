@@ -125,6 +125,8 @@ export class TilesMap {
             ? tileData.landForm!
             : lastTile.landForm;
 
+        tile.riverParts = tileData.riverParts || [];
+
         tile.forest =
           tileData.forest !== undefined ? tileData.forest! : lastTile.forest;
 

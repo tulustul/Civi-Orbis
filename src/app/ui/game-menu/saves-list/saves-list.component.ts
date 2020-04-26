@@ -1,6 +1,10 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-import { listSaveGames, deleteSaveGame } from '../../../game/saving';
+import {
+  listSaveGames,
+  deleteSaveGame,
+  exportSave,
+} from '../../../game/saving';
 
 @Component({
   selector: 'app-saves-list',
@@ -12,14 +16,27 @@ export class SavesListComponent implements OnInit {
 
   @Output() change = new EventEmitter<string>();
 
-  saves = listSaveGames();
+  saves: string[];
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.refresh();
+  }
 
   delete(save: string) {
     deleteSaveGame(save);
+    this.refresh();
+    if (this.selectedSave === save) {
+      this.change.next('');
+    }
+  }
+
+  export(save: string) {
+    exportSave(save);
+  }
+
+  refresh() {
     this.saves = listSaveGames();
   }
 }

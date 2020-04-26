@@ -1,8 +1,15 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  ViewChild,
+} from '@angular/core';
 
 import { Game } from 'src/app/game/game';
 import { UIState } from '../../ui-state';
-import { loadGame } from 'src/app/game/saving';
+import { loadGame, importSave } from 'src/app/game/saving';
+import { SavesListComponent } from '../saves-list/saves-list.component';
 
 @Component({
   selector: 'app-load-view',
@@ -11,6 +18,8 @@ import { loadGame } from 'src/app/game/saving';
 })
 export class LoadViewComponent implements OnInit {
   @Output() return = new EventEmitter<void>();
+
+  @ViewChild(SavesListComponent) savesListComponent: SavesListComponent;
 
   saveName = '';
 
@@ -23,5 +32,18 @@ export class LoadViewComponent implements OnInit {
       loadGame(this.game, this.saveName);
       this.uiState.menuVisible$.next(false);
     }
+  }
+
+  async import(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
+
+    if (!files) {
+      return;
+    }
+
+    await importSave(files[0]);
+
+    this.savesListComponent.refresh();
   }
 }

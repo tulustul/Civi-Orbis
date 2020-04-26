@@ -5,18 +5,11 @@ const listKey = 'savesList';
 
 export function saveGame(game: Game, saveName: string) {
   const data = game.serialize();
-
-  // TODO we might compress the save
-  localStorage.setItem(`${savesKeyPrefix}${saveName}`, JSON.stringify(data));
-  const saveGames = listSaveGames();
-  if (!saveGames.includes(saveName)) {
-    saveGames.push(saveName);
-  }
-  saveList(saveGames);
+  storeData(saveName, JSON.stringify(data));
 }
 
 export function loadGame(game: Game, saveName: string) {
-  const data = localStorage.getItem(`${savesKeyPrefix}${saveName}`);
+  const data = getSave(saveName);
   if (!data) {
     console.error(`No save with name ${saveName}`);
     return;
@@ -46,6 +39,71 @@ export function listSaveGames(): string[] {
     return [];
   }
   return JSON.parse(data) || [];
+}
+
+export function exportSave(saveName: string) {
+  const data = getSave(saveName);
+  if (!data) {
+    return;
+  }
+  const blob = new Blob([data], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${saveName}.json`;
+  a.click();
+}
+
+export async function importSave(file: File) {
+  const extension = '.json';
+  let filename = file.name;
+
+  if (!filename.endsWith(extension)) {
+    return;
+  }
+
+  const originalName = filename.slice(0, -extension.length);
+  let name = originalName;
+
+  const saves = listSaveGames();
+
+  let i = 1;
+  while (saves.includes(name)) {
+    name = `${originalName}_${i++}`;
+  }
+
+  const data = await readFile(file);
+  storeData(name, data);
+}
+
+// private functions below
+
+async function readFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = () => {
+      if (reader.result) {
+        resolve(reader.result as string);
+      } else {
+        reject();
+      }
+    };
+  });
+}
+
+function storeData(saveName: string, data: string) {
+  // TODO we might compress the save
+  localStorage.setItem(`${savesKeyPrefix}${saveName}`, data);
+  const saveGames = listSaveGames();
+  if (!saveGames.includes(saveName)) {
+    saveGames.push(saveName);
+  }
+  saveList(saveGames);
+}
+
+function getSave(saveName: string): string | null {
+  return localStorage.getItem(`${savesKeyPrefix}${saveName}`);
 }
 
 function saveList(saveGames: string[]) {

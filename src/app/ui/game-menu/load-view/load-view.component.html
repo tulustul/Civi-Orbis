@@ -1,3 +1,5 @@
+<input #uploader type="file" (change)="import($event)" />
+
 <h3>Load the game</h3>
 
 <app-saves-list
@@ -7,5 +9,6 @@
 
 <div class="actions">
   <button (click)="return.next()">Back</button>
+  <button (click)="uploader.click()">Import</button>
   <button [disabled]="!saveName" (click)="load()">Load</button>
 </div>
