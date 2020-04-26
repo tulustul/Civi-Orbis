@@ -26,7 +26,7 @@ const SEA_TEXTURES: Record<SeaLevel, string[]> = {
 
 const CLIMATE_TEXTURES: Record<Climate, Record<Landform, string[]>> = {
   [Climate.continental]: {
-    [Landform.plains]: getTileVariants('hexPlains', 4),
+    [Landform.plains]: getTileVariants('hexPlainsCold', 4),
     [Landform.hills]: getTileVariants('hexHillsCold', 4),
     [Landform.mountains]: getTileVariants('hexMountain', 4),
   },
@@ -36,7 +36,7 @@ const CLIMATE_TEXTURES: Record<Climate, Record<Landform, string[]>> = {
     [Landform.mountains]: getTileVariants('hexMountainDesert', 4),
   },
   [Climate.oceanic]: {
-    [Landform.plains]: getTileVariants('hexWoodlands', 4),
+    [Landform.plains]: getTileVariants('hexPlains', 4),
     [Landform.hills]: getTileVariants('hexHighlands', 4),
     [Landform.mountains]: getTileVariants('hexMountain', 4),
   },
