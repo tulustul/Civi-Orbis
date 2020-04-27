@@ -193,9 +193,10 @@ export class TerrainRenderer {
     }
     this.tilesMap.set(tile, displayObjects);
 
-    if (tile.seaLevel === SeaLevel.none) {
-      this.renderCoastline(tile, sprite, displayObjects);
-    }
+    // disabled for now, it's ugly as hell
+    // if (tile.seaLevel === SeaLevel.none) {
+    //   this.renderCoastline(tile, sprite, displayObjects);
+    // }
 
     if (!this.game.activeHumanPlayer?.exploredTiles.has(tile)) {
       for (const obj of displayObjects) {
