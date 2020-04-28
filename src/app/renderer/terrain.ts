@@ -80,6 +80,8 @@ export class TerrainRenderer {
 
   coastlinesContainer = new PIXIE.Container();
 
+  riverContainer = new PIXIE.Container();
+
   private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   constructor(private game: Game) {
@@ -90,6 +92,7 @@ export class TerrainRenderer {
     this.container.addChild(this.waterContainer);
     this.container.addChild(this.coastlinesContainer);
     this.container.addChild(this.terrainContainer);
+    this.container.addChild(this.riverContainer);
 
     this.game.tilesManager.revealedTiles$.subscribe((tiles) => {
       for (const tile of tiles) {
@@ -202,46 +205,46 @@ export class TerrainRenderer {
       return;
     }
 
-    const graphics = new PIXIE.Graphics();
-    graphics.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
-    graphics.position.y = tile.y * 0.75;
-    this.container.addChild(graphics);
+    const g = new PIXIE.Graphics();
+    g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+    g.position.y = tile.y * 0.75;
+    this.riverContainer.addChild(g);
 
-    graphics.lineStyle(0.15, 0x4169e1);
+    g.lineStyle(0.15, 0x4169e1);
 
     for (const river of tile.riverParts) {
       if (river === TileDirection.NW) {
-        graphics.moveTo(0, 0.25);
-        graphics.lineTo(0.5, 0);
+        g.moveTo(0, 0.25);
+        g.lineTo(0.5, 0);
       }
 
       if (river === TileDirection.NE) {
-        graphics.moveTo(0.5, 0);
-        graphics.lineTo(1, 0.25);
+        g.moveTo(0.5, 0);
+        g.lineTo(1, 0.25);
       }
 
       if (river === TileDirection.E) {
-        graphics.moveTo(1, 0.25);
-        graphics.lineTo(1, 0.75);
+        g.moveTo(1, 0.25);
+        g.lineTo(1, 0.75);
       }
 
       if (river === TileDirection.SE) {
-        graphics.moveTo(1, 0.75);
-        graphics.lineTo(0.5, 1);
+        g.moveTo(1, 0.75);
+        g.lineTo(0.5, 1);
       }
 
       if (river === TileDirection.SW) {
-        graphics.moveTo(0.5, 1);
-        graphics.lineTo(0, 0.75);
+        g.moveTo(0.5, 1);
+        g.lineTo(0, 0.75);
       }
 
       if (river === TileDirection.W) {
-        graphics.moveTo(0, 0.75);
-        graphics.lineTo(0, 0.25);
+        g.moveTo(0, 0.75);
+        g.lineTo(0, 0.25);
       }
     }
 
-    return graphics;
+    return g;
   }
 
   renderCoastline(
@@ -289,6 +292,7 @@ export class TerrainRenderer {
     clearContainer(this.terrainContainer);
     clearContainer(this.waterContainer);
     clearContainer(this.coastlinesContainer);
+    clearContainer(this.riverContainer);
     this.tilesMap.clear();
   }
 }
