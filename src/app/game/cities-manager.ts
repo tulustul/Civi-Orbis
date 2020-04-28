@@ -2,7 +2,7 @@ import { City, CitySerialized } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
-import { Tile } from "./tile.interface";
+import { Tile, Landform, SeaLevel } from "./tile.interface";
 import { Subject } from "rxjs";
 
 export class CitiesManager {
@@ -12,21 +12,57 @@ export class CitiesManager {
   private _updated$ = new Subject<City>();
   updated$ = this._updated$.asObservable();
 
+  private _destroyed$ = new Subject<City>();
+  destroyed$ = this._destroyed$.asObservable();
+
   cities: City[] = [];
 
   constructor(private game: Game) {}
 
   spawn(tile: Tile, player: Player) {
+    if (tile.city) {
+      return null;
+    }
+
+    if (
+      tile.landForm === Landform.mountains ||
+      tile.seaLevel !== SeaLevel.none
+    ) {
+      return null;
+    }
+
     const city = new City(tile, player);
     city.size = 1;
     city.name = `City ${this.cities.length + 1}`;
+    city.tile = tile;
 
     player.cities.push(city);
+
     tile.city = city;
+    tile.forest = false;
+    tile.wetlands = false;
+    this.game.tilesManager.updatedTile$.next(tile);
 
     this._spawned$.next(city);
 
     return city;
+  }
+
+  destroy(city: City) {
+    // TODO rewrite to sets for better performance?
+    let index = this.cities.indexOf(city);
+    if (index !== -1) {
+      this.cities.splice(index, 1);
+    }
+
+    index = city.player.cities.indexOf(city);
+    if (index !== -1) {
+      city.player.cities.splice(index, 1);
+    }
+
+    city.tile.city = null;
+
+    this._destroyed$.next(city);
   }
 
   clear() {
@@ -42,8 +78,10 @@ export class CitiesManager {
       const tile = getTileFromIndex(this.game.map, cityData.tile);
       const player = this.game.players[cityData.player];
       const city = this.spawn(tile, player);
-      city.name = cityData.name;
-      city.size = cityData.size;
+      if (city) {
+        city.name = cityData.name;
+        city.size = cityData.size;
+      }
     }
   }
 }

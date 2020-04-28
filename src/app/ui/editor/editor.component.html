@@ -7,7 +7,12 @@
       [isVisible$]="tilePaintingTab.isVisible$"
     ></app-tile-painting
   ></app-tab>
-  <app-tab tabTitle="units">3</app-tab>
+  <app-tab #unitTab tabTitle="units">
+    <app-unit-editor [isVisible$]="unitTab.isVisible$"></app-unit-editor>
+  </app-tab>
+  <app-tab #cityTab tabTitle="cities">
+    <app-city-editor [isVisible$]="cityTab.isVisible$"></app-city-editor>
+  </app-tab>
 </app-tabs>
 
 <div>

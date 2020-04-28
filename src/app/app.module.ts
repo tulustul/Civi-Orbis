@@ -16,6 +16,7 @@ import { TabsComponent, TabComponent } from "./ui/widgets/tabs";
 import { TileEditorComponent } from "./ui/editor/tile-editor/tile-editor.component";
 import { RadioComponent } from "./ui/widgets/radio/radio.component";
 import { MultiselectComponent } from "./ui/widgets/multiselect/multiselect.component";
+import { ToggleComponent } from "./ui/widgets/toggle/toggle.component";
 import { TilePaintingComponent } from "./ui/editor/tile-painting/tile-painting.component";
 import { GameMenuComponent } from "./ui/game-menu/game-menu.component";
 import { SavesListComponent } from "./ui/game-menu/saves-list/saves-list.component";
@@ -23,6 +24,8 @@ import { SaveViewComponent } from "./ui/game-menu/save-view/save-view.component"
 import { LoadViewComponent } from "./ui/game-menu/load-view/load-view.component";
 import { MainMenuViewComponent } from "./ui/game-menu/main-menu-view/main-menu-view.component";
 import { NewGameViewComponent } from "./ui/game-menu/new-game-view/new-game-view.component";
+import { UnitEditorComponent } from "./ui/editor/unit-editor/unit-editor.component";
+import { CityEditorComponent } from "./ui/editor/city-editor/city-editor.component";
 
 @NgModule({
   declarations: [
@@ -39,6 +42,7 @@ import { NewGameViewComponent } from "./ui/game-menu/new-game-view/new-game-view
     TileEditorComponent,
     RadioComponent,
     MultiselectComponent,
+    ToggleComponent,
     TilePaintingComponent,
     GameMenuComponent,
     SavesListComponent,
@@ -46,6 +50,8 @@ import { NewGameViewComponent } from "./ui/game-menu/new-game-view/new-game-view
     LoadViewComponent,
     MainMenuViewComponent,
     NewGameViewComponent,
+    UnitEditorComponent,
+    CityEditorComponent,
   ],
   imports: [BrowserModule, FormsModule],
   providers: [Game, UIState],

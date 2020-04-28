@@ -124,8 +124,8 @@ export class Game {
 
     this.camera.transform$.next(data.camera);
 
-    this.unitsManager.deserialize(data.units);
-    this.citiesManager.deserialize(data.cities);
+    this.unitsManager.deserialize(data.units || []);
+    this.citiesManager.deserialize(data.cities || []);
 
     this.activePlayerIndex = data.activePlayerIndex;
     if (this.activePlayer$.value?.type === PlayerType.human) {

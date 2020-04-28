@@ -13,6 +13,8 @@ export class CitiesRenderer {
 
   constructor(private game: Game) {
     game.citiesManager.spawned$.subscribe((city) => this.spawn(city));
+
+    game.citiesManager.destroyed$.subscribe((city) => this.destroy(city));
   }
 
   spawn(city: City) {
@@ -24,8 +26,9 @@ export class CitiesRenderer {
     this.citiesGraphics.set(city, g);
 
     const [x, y] = getTileCoords(city.tile);
-    g.position.x = x;
-    g.position.y = y;
+    g.position.x = city.tile.x + (city.tile.y % 2 ? 0.5 : 0);
+    g.position.y = city.tile.y * 0.75 - 0.5;
+    g.scale.set(1 / g.width, 1 / g.width);
   }
 
   destroy(city: City) {
