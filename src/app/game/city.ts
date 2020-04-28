@@ -3,6 +3,7 @@ import { Player } from "./player";
 import { getTileIndex } from "./serialization";
 
 export interface CitySerialized {
+  id: number;
   name: string;
   size: number;
   tile: number;
@@ -10,6 +11,7 @@ export interface CitySerialized {
 }
 
 export class City {
+  id: number;
   name: string;
   size: number;
 
@@ -17,6 +19,7 @@ export class City {
 
   serialize() {
     return {
+      id: this.id,
       name: this.name,
       size: this.size,
       player: this.player.id,

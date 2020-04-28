@@ -26,6 +26,8 @@ import { MainMenuViewComponent } from "./ui/game-menu/main-menu-view/main-menu-v
 import { NewGameViewComponent } from "./ui/game-menu/new-game-view/new-game-view.component";
 import { UnitEditorComponent } from "./ui/editor/unit-editor/unit-editor.component";
 import { CityEditorComponent } from "./ui/editor/city-editor/city-editor.component";
+import { CitiesLayerComponent } from './ui/cities-layer/cities-layer.component';
+import { CityInfoComponent } from './ui/cities-layer/city-info/city-info.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +54,8 @@ import { CityEditorComponent } from "./ui/editor/city-editor/city-editor.compone
     NewGameViewComponent,
     UnitEditorComponent,
     CityEditorComponent,
+    CitiesLayerComponent,
+    CityInfoComponent,
   ],
   imports: [BrowserModule, FormsModule],
   providers: [Game, UIState],

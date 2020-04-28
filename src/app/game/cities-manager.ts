@@ -32,9 +32,11 @@ export class CitiesManager {
     }
 
     const city = new City(tile, player);
+    city.id = this.cities.length;
     city.size = 1;
     city.name = `City ${this.cities.length + 1}`;
     city.tile = tile;
+    this.cities.push(city);
 
     player.cities.push(city);
 
