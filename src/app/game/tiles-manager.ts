@@ -1,9 +1,9 @@
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from "rxjs";
 
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged } from "rxjs/operators";
 
-import { Tile } from './tile.interface';
-import { Game } from './game';
+import { Tile } from "./tile.interface";
+import { Game } from "./game";
 
 export class TilesManager {
   private _hoveredTile$ = new BehaviorSubject<Tile | null>(null);

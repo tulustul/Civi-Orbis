@@ -1,9 +1,9 @@
-import { Tile, TileDirection } from '../game/tile.interface';
-import { getTileNeighbours, getTileDirection } from '../game/hex-math';
-import { fillWithEmptyTiles, makeEmptyTile } from '../map-generators/utils';
+import { Tile, TileDirection } from "../game/tile.interface";
+import { getTileNeighbours, getTileDirection } from "../game/hex-math";
+import { fillWithEmptyTiles, makeEmptyTile } from "../map-generators/utils";
 
-describe('hex-math:utils', () => {
-  it('#getTileNeighbours', () => {
+describe("hex-math:utils", () => {
+  it("#getTileNeighbours", () => {
     function toCoords(tiles: Iterable<Tile>) {
       return Array.from(tiles).map((tile) => [tile.x, tile.y]);
     }
@@ -106,7 +106,7 @@ describe('hex-math:utils', () => {
     ]);
   });
 
-  it('#getTileDirection', () => {
+  it("#getTileDirection", () => {
     // EVEN row
     const startEven = makeEmptyTile(2, 2);
 

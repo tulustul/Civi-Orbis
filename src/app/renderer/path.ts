@@ -1,8 +1,8 @@
-import * as PIXIE from 'pixi.js';
+import * as PIXIE from "pixi.js";
 
-import { Game } from '../game/game';
-import { Tile } from '../game/tile.interface';
-import { getTileCenter } from './utils';
+import { Game } from "../game/game";
+import { Tile } from "../game/tile.interface";
+import { getTileCenter } from "./utils";
 
 export class PathRenderer {
   container = new PIXIE.Container();
@@ -55,8 +55,8 @@ export class PathRenderer {
         const scale = this.game.camera.transform$.value.scale;
 
         const label = new PIXIE.Text(turn.toString(), {
-          align: 'center',
-          fill: 'white',
+          align: "center",
+          fill: "white",
           dropShadow: true,
           dropShadowBlur: 5,
           dropShadowDistance: 0,

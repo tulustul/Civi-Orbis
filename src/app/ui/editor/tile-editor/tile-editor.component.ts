@@ -1,10 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from "@angular/core";
 
-import { Observable } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
+import { Observable } from "rxjs";
+import { takeUntil, filter } from "rxjs/operators";
 
-import { Game } from 'src/app/game/game';
-import { Tile, TileDirection } from 'src/app/game/tile.interface';
+import { Game } from "src/app/game/game";
+import { Tile, TileDirection } from "src/app/game/tile.interface";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,
@@ -12,15 +12,15 @@ import {
   RIVER_OPTIONS,
   SEA_LEVEL_OPTIONS,
   WETLANDS_OPTIONS,
-} from '../constants';
-import { getTileDirection } from 'src/app/game/hex-math';
-import { OPPOSITE_DIRECTIONS } from 'src/app/map-generators/utils';
-import { isTileForestable, areWetlandsPossible } from '../utils';
+} from "../constants";
+import { getTileDirection } from "src/app/game/hex-math";
+import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
+import { isTileForestable, areWetlandsPossible } from "../utils";
 
 @Component({
-  selector: 'app-tile-editor',
-  templateUrl: './tile-editor.component.html',
-  styleUrls: ['./tile-editor.component.scss'],
+  selector: "app-tile-editor",
+  templateUrl: "./tile-editor.component.html",
+  styleUrls: ["./tile-editor.component.scss"],
 })
 export class TileEditorComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;

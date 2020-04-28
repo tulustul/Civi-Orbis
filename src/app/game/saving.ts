@@ -1,7 +1,7 @@
-import { Game } from './game';
+import { Game } from "./game";
 
-const savesKeyPrefix = 'saves:';
-const listKey = 'savesList';
+const savesKeyPrefix = "saves:";
+const listKey = "savesList";
 
 export function saveGame(game: Game, saveName: string) {
   const data = game.serialize();
@@ -46,16 +46,16 @@ export function exportSave(saveName: string) {
   if (!data) {
     return;
   }
-  const blob = new Blob([data], { type: 'text/plain' });
+  const blob = new Blob([data], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `${saveName}.json`;
   a.click();
 }
 
 export async function importSave(file: File) {
-  const extension = '.json';
+  const extension = ".json";
   let filename = file.name;
 
   if (!filename.endsWith(extension)) {

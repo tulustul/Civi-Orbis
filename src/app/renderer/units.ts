@@ -1,8 +1,8 @@
-import * as PIXIE from 'pixi.js';
+import * as PIXIE from "pixi.js";
 
-import { Unit } from '../game/unit';
-import { Game } from '../game/game';
-import { getTileCoords, clearContainer } from './utils';
+import { Unit } from "../game/unit";
+import { Game } from "../game/game";
+import { getTileCoords, clearContainer } from "./utils";
 
 export class UnitsRenderer {
   container = new PIXIE.Container();

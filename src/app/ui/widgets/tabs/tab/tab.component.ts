@@ -4,15 +4,15 @@ import {
   Output,
   EventEmitter,
   OnDestroy,
-} from '@angular/core';
+} from "@angular/core";
 
-import { BehaviorSubject } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { BehaviorSubject } from "rxjs";
+import { distinctUntilChanged } from "rxjs/operators";
 
 @Component({
-  selector: 'app-tab',
-  templateUrl: './tab.component.html',
-  styleUrls: ['./tab.component.scss'],
+  selector: "app-tab",
+  templateUrl: "./tab.component.html",
+  styleUrls: ["./tab.component.scss"],
 })
 export class TabComponent implements OnDestroy {
   @Input() tabTitle: string;

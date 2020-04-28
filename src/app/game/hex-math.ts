@@ -1,4 +1,4 @@
-import { TileDirection, Tile } from './tile.interface';
+import { TileDirection, Tile } from "./tile.interface";
 
 export function getTileNeighbours(
   tiles: Tile[][],

@@ -1,15 +1,15 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 
 import {
   listSaveGames,
   deleteSaveGame,
   exportSave,
-} from '../../../game/saving';
+} from "../../../game/saving";
 
 @Component({
-  selector: 'app-saves-list',
-  templateUrl: './saves-list.component.html',
-  styleUrls: ['./saves-list.component.scss'],
+  selector: "app-saves-list",
+  templateUrl: "./saves-list.component.html",
+  styleUrls: ["./saves-list.component.scss"],
 })
 export class SavesListComponent implements OnInit {
   @Input() selectedSave: string;
@@ -28,7 +28,7 @@ export class SavesListComponent implements OnInit {
     deleteSaveGame(save);
     this.refresh();
     if (this.selectedSave === save) {
-      this.change.next('');
+      this.change.next("");
     }
   }
 

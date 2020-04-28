@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from "@angular/core";
 
 import {
   CLIMATE_OPTIONS,
@@ -6,16 +6,16 @@ import {
   LAND_FORM_OPTIONS,
   SEA_LEVEL_OPTIONS,
   WETLANDS_OPTIONS,
-} from '../constants';
-import { Option } from '../../widgets/option.interface';
-import { SeaLevel, Landform, Climate } from 'src/app/game/tile.interface';
-import { Game } from 'src/app/game/game';
-import { Observable } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
-import { getTilesInRange } from 'src/app/game/hex-math';
-import { isTileForestable, areWetlandsPossible } from '../utils';
+} from "../constants";
+import { Option } from "../../widgets/option.interface";
+import { SeaLevel, Landform, Climate } from "src/app/game/tile.interface";
+import { Game } from "src/app/game/game";
+import { Observable } from "rxjs";
+import { takeUntil, filter } from "rxjs/operators";
+import { getTilesInRange } from "src/app/game/hex-math";
+import { isTileForestable, areWetlandsPossible } from "../utils";
 
-const IGNORE_OPTION: Option = { label: 'ignore', value: null };
+const IGNORE_OPTION: Option = { label: "ignore", value: null };
 
 interface PaintData {
   size: number;
@@ -27,19 +27,19 @@ interface PaintData {
 }
 
 @Component({
-  selector: 'app-tile-painting',
-  templateUrl: './tile-painting.component.html',
-  styleUrls: ['./tile-painting.component.scss'],
+  selector: "app-tile-painting",
+  templateUrl: "./tile-painting.component.html",
+  styleUrls: ["./tile-painting.component.scss"],
 })
 export class TilePaintingComponent implements OnInit {
   SIZE_OPTIONS: Option[] = [
-    { label: '1x1', value: 1 },
-    { label: '2x2', value: 2 },
-    { label: '3x3', value: 3 },
-    { label: '5x5', value: 5 },
-    { label: '7x7', value: 7 },
-    { label: '10x10', value: 10 },
-    { label: '15x15', value: 15 },
+    { label: "1x1", value: 1 },
+    { label: "2x2", value: 2 },
+    { label: "3x3", value: 3 },
+    { label: "5x5", value: 5 },
+    { label: "7x7", value: 7 },
+    { label: "10x10", value: 10 },
+    { label: "15x15", value: 15 },
   ];
 
   SEA_LEVEL_OPTIONS: Option[] = [IGNORE_OPTION, ...SEA_LEVEL_OPTIONS];

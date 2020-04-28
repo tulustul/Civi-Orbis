@@ -1,7 +1,7 @@
-import { Tile } from './tile.interface';
-import { UnitDefinition } from './unit.interface';
-import { Player } from './player';
-import { getTileIndex } from './serialization';
+import { Tile } from "./tile.interface";
+import { UnitDefinition } from "./unit.interface";
+import { Player } from "./player";
+import { getTileIndex } from "./serialization";
 
 export interface UnitSerialized {
   tile: number;

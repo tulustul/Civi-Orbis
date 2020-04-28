@@ -1,7 +1,7 @@
-import { Tile } from './tile.interface';
-import { Unit } from './unit';
-import { getTileIndex, getTileFromIndex } from './serialization';
-import { Game } from './game';
+import { Tile } from "./tile.interface";
+import { Unit } from "./unit";
+import { getTileIndex, getTileFromIndex } from "./serialization";
+import { Game } from "./game";
 
 export enum PlayerType {
   human,

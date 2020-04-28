@@ -4,8 +4,8 @@ import {
   Landform,
   SeaLevel,
   TileDirection,
-} from '../game/tile.interface';
-import { getTileDirection } from '../game/hex-math';
+} from "../game/tile.interface";
+import { getTileDirection } from "../game/hex-math";
 
 export function makeEmptyTile(x: number, y: number): Tile {
   return {

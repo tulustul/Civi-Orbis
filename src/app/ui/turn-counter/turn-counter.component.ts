@@ -1,16 +1,16 @@
-import { Component, OnInit, HostBinding } from '@angular/core';
+import { Component, OnInit, HostBinding } from "@angular/core";
 
-import { tap, skip, filter } from 'rxjs/operators';
+import { tap, skip, filter } from "rxjs/operators";
 
-import { Game } from 'src/app/game/game';
+import { Game } from "src/app/game/game";
 
 @Component({
-  selector: 'app-turn-counter',
-  templateUrl: './turn-counter.component.html',
-  styleUrls: ['./turn-counter.component.scss'],
+  selector: "app-turn-counter",
+  templateUrl: "./turn-counter.component.html",
+  styleUrls: ["./turn-counter.component.scss"],
 })
 export class TurnCounterComponent implements OnInit {
-  @HostBinding('class.is-visible')
+  @HostBinding("class.is-visible")
   isVisible = false;
 
   timeout: number;

@@ -1,4 +1,4 @@
-import * as PIXIE from 'pixi.js';
+import * as PIXIE from "pixi.js";
 
 import {
   Tile,
@@ -6,78 +6,78 @@ import {
   Climate,
   TileDirection,
   Landform,
-} from '../game/tile.interface';
-import { Game } from '../game/game';
-import { clearContainer } from './utils';
-import { getTileDirection } from '../game/hex-math';
+} from "../game/tile.interface";
+import { Game } from "../game/game";
+import { clearContainer } from "./utils";
+import { getTileDirection } from "../game/hex-math";
 
 function getTileVariants(tileName: string, variants: number): string[] {
   const result: string[] = [];
   for (let i = 0; i < variants; i++) {
-    result.push(`${tileName}${i.toString().padStart(2, '0')}.png`);
+    result.push(`${tileName}${i.toString().padStart(2, "0")}.png`);
   }
   return result;
 }
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
-  [SeaLevel.deep]: getTileVariants('hexOcean', 4),
-  [SeaLevel.shallow]: getTileVariants('hexShallowWater', 4),
+  [SeaLevel.deep]: getTileVariants("hexOcean", 4),
+  [SeaLevel.shallow]: getTileVariants("hexShallowWater", 4),
   [SeaLevel.none]: [],
 };
 
 const CLIMATE_TEXTURES: Record<Climate, Record<Landform, string[]>> = {
   [Climate.continental]: {
-    [Landform.plains]: getTileVariants('hexPlainsCold', 4),
-    [Landform.hills]: getTileVariants('hexHillsCold', 4),
-    [Landform.mountains]: getTileVariants('hexMountain', 4),
+    [Landform.plains]: getTileVariants("hexPlainsCold", 4),
+    [Landform.hills]: getTileVariants("hexHillsCold", 4),
+    [Landform.mountains]: getTileVariants("hexMountain", 4),
   },
   [Climate.desert]: {
-    [Landform.plains]: getTileVariants('hexSand', 4),
-    [Landform.hills]: getTileVariants('hexHillsDesert', 4),
-    [Landform.mountains]: getTileVariants('hexMountainDesert', 4),
+    [Landform.plains]: getTileVariants("hexSand", 4),
+    [Landform.hills]: getTileVariants("hexHillsDesert", 4),
+    [Landform.mountains]: getTileVariants("hexMountainDesert", 4),
   },
   [Climate.oceanic]: {
-    [Landform.plains]: getTileVariants('hexPlains', 4),
-    [Landform.hills]: getTileVariants('hexHighlands', 4),
-    [Landform.mountains]: getTileVariants('hexMountain', 4),
+    [Landform.plains]: getTileVariants("hexPlains", 4),
+    [Landform.hills]: getTileVariants("hexHighlands", 4),
+    [Landform.mountains]: getTileVariants("hexMountain", 4),
   },
   [Climate.savanna]: {
-    [Landform.plains]: getTileVariants('hexScrublands', 4),
-    [Landform.hills]: getTileVariants('hexHillsSavanna', 4),
-    [Landform.mountains]: getTileVariants('hexMountainDesert', 4),
+    [Landform.plains]: getTileVariants("hexScrublands", 4),
+    [Landform.hills]: getTileVariants("hexHillsSavanna", 4),
+    [Landform.mountains]: getTileVariants("hexMountainDesert", 4),
   },
   [Climate.tropical]: {
-    [Landform.plains]: getTileVariants('hexTropicalPlains', 4),
-    [Landform.hills]: getTileVariants('hexHills', 4),
-    [Landform.mountains]: getTileVariants('hexMountain', 4),
+    [Landform.plains]: getTileVariants("hexTropicalPlains", 4),
+    [Landform.hills]: getTileVariants("hexHills", 4),
+    [Landform.mountains]: getTileVariants("hexMountain", 4),
   },
   [Climate.tundra]: {
-    [Landform.plains]: getTileVariants('hexPlainsColdSnowTransition', 4),
-    [Landform.hills]: getTileVariants('hexHillsColdSnowTransition', 4),
-    [Landform.mountains]: getTileVariants('hexMountainSnow', 4),
+    [Landform.plains]: getTileVariants("hexPlainsColdSnowTransition", 4),
+    [Landform.hills]: getTileVariants("hexHillsColdSnowTransition", 4),
+    [Landform.mountains]: getTileVariants("hexMountainSnow", 4),
   },
   [Climate.arctic]: {
-    [Landform.plains]: getTileVariants('hexPlainsColdSnowCovered', 4),
-    [Landform.hills]: getTileVariants('hexHillsColdSnowCovered', 4),
-    [Landform.mountains]: getTileVariants('hexMountainSnow', 4),
+    [Landform.plains]: getTileVariants("hexPlainsColdSnowCovered", 4),
+    [Landform.hills]: getTileVariants("hexHillsColdSnowCovered", 4),
+    [Landform.mountains]: getTileVariants("hexMountainSnow", 4),
   },
 };
 
 const FOREST_TEXTURES: Record<Climate, string[]> = {
-  [Climate.continental]: getTileVariants('hexForestPine', 4),
-  [Climate.oceanic]: getTileVariants('hexForestBroadleaf', 4),
-  [Climate.tropical]: getTileVariants('hexJungle', 4),
-  [Climate.tundra]: getTileVariants('hexForestPineSnowTransition', 4),
+  [Climate.continental]: getTileVariants("hexForestPine", 4),
+  [Climate.oceanic]: getTileVariants("hexForestBroadleaf", 4),
+  [Climate.tropical]: getTileVariants("hexJungle", 4),
+  [Climate.tundra]: getTileVariants("hexForestPineSnowTransition", 4),
   [Climate.savanna]: [],
   [Climate.desert]: [],
   [Climate.arctic]: [],
 };
 
-const WETLANDS_TEXTURES = getTileVariants('hexMarsh', 4);
-const WETLANDS_FOREST_TEXTURES = getTileVariants('hexSwamp', 4);
-const DESERT_FLOOD_PLAINS_TEXTURES = getTileVariants('hexGrassySand', 4);
+const WETLANDS_TEXTURES = getTileVariants("hexMarsh", 4);
+const WETLANDS_FOREST_TEXTURES = getTileVariants("hexSwamp", 4);
+const DESERT_FLOOD_PLAINS_TEXTURES = getTileVariants("hexGrassySand", 4);
 
-const COASTLINE_TEXTURES = getTileVariants('coastline', 4);
+const COASTLINE_TEXTURES = getTileVariants("coastline", 4);
 
 export class TerrainRenderer {
   container = new PIXIE.Container();

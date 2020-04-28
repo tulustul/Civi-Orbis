@@ -1,15 +1,15 @@
-import { Renderer } from '../renderer';
-import { Camera, Transform } from '../renderer/camera';
-import { Controls } from '../controls';
-import { Player, PlayerType, PlayerSerialized } from './player';
-import { TilesMap, MapSerialized } from './tiles-map';
-import { BehaviorSubject } from 'rxjs';
-import { UnitsManager } from './unit-manager';
-import { TilesManager } from './tiles-manager';
-import { Debug } from './debug';
-import { UIState } from '../ui/ui-state';
-import { UnitSerialized } from './unit';
-import { filter } from 'rxjs/operators';
+import { Renderer } from "../renderer";
+import { Camera, Transform } from "../renderer/camera";
+import { Controls } from "../controls";
+import { Player, PlayerType, PlayerSerialized } from "./player";
+import { TilesMap, MapSerialized } from "./tiles-map";
+import { BehaviorSubject } from "rxjs";
+import { UnitsManager } from "./unit-manager";
+import { TilesManager } from "./tiles-manager";
+import { Debug } from "./debug";
+import { UIState } from "../ui/ui-state";
+import { UnitSerialized } from "./unit";
+import { filter } from "rxjs/operators";
 
 interface GameSerialized {
   turn: number;

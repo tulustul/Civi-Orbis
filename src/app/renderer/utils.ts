@@ -1,6 +1,6 @@
-import * as PIXIE from 'pixi.js';
+import * as PIXIE from "pixi.js";
 
-import { Tile } from '../game/tile.interface';
+import { Tile } from "../game/tile.interface";
 
 export function getTileCenter(tile: Tile): [number, number] {
   return [0.5 + tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75 + 0.5];

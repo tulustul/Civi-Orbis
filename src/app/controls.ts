@@ -1,8 +1,8 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from "rxjs";
 
-import { Game } from './game/game';
-import { findPath } from './game/pathfinding';
-import { Tile } from './game/tile.interface';
+import { Game } from "./game/game";
+import { findPath } from "./game/pathfinding";
+import { Tile } from "./game/tile.interface";
 
 export class Controls {
   isMousePressed = false;
@@ -91,9 +91,9 @@ export class Controls {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       this.game.nextTurn();
-    } else if (event.key === 'Escape') {
+    } else if (event.key === "Escape") {
       this.game.uiState.menuVisible$.next(true);
     }
   }

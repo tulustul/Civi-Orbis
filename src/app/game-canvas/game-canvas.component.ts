@@ -4,19 +4,19 @@ import {
   ViewChild,
   AfterViewInit,
   HostListener,
-} from '@angular/core';
+} from "@angular/core";
 
-import { Game } from '../game/game';
-import { Camera } from '../renderer/camera';
-import { UIState } from '../ui/ui-state';
+import { Game } from "../game/game";
+import { Camera } from "../renderer/camera";
+import { UIState } from "../ui/ui-state";
 
 @Component({
-  selector: 'app-game-canvas',
-  templateUrl: './game-canvas.component.html',
-  styleUrls: ['./game-canvas.component.scss'],
+  selector: "app-game-canvas",
+  templateUrl: "./game-canvas.component.html",
+  styleUrls: ["./game-canvas.component.scss"],
 })
 export class GameCanvasComponent implements AfterViewInit {
-  @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;
 
   constructor(public game: Game, private uiState: UIState) {}
 
@@ -33,17 +33,17 @@ export class GameCanvasComponent implements AfterViewInit {
     event.preventDefault();
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener("window:resize", ["$event"])
   onResize(event: Event) {
     this.game.renderer.resize(window.innerWidth, window.innerHeight);
   }
 
-  @HostListener('window:keydown', ['$event'])
+  @HostListener("window:keydown", ["$event"])
   onKeyDown(event: KeyboardEvent) {
     this.game.controls.onKeyDown(event);
   }
 
-  @HostListener('window:keyup', ['$event'])
+  @HostListener("window:keyup", ["$event"])
   onKeyUp(event: KeyboardEvent) {
     this.game.controls.onKeyUp(event);
   }

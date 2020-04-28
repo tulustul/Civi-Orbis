@@ -1,8 +1,8 @@
-import * as PIXIE from 'pixi.js';
+import * as PIXIE from "pixi.js";
 
-import { Tile, SeaLevel, Climate, TileDirection } from '../game/tile.interface';
-import { Game } from '../game/game';
-import { drawHex } from './utils';
+import { Tile, SeaLevel, Climate, TileDirection } from "../game/tile.interface";
+import { Game } from "../game/game";
+import { drawHex } from "./utils";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x4169e1,
@@ -17,6 +17,7 @@ const CLIMATE_COLORS: Record<Climate, number> = {
   [Climate.savanna]: 0xffe4c4,
   [Climate.tropical]: 0x00ff00,
   [Climate.tundra]: 0xf5f5f5,
+  [Climate.arctic]: 0xffffff,
 };
 
 export class TerrainRenderer {

@@ -1,6 +1,6 @@
-import { Tile, SeaLevel, Landform, TileSerialized } from './tile.interface';
-import { getTileDirection, getTileNeighbours } from './hex-math';
-import { makeEmptyTile } from '../map-generators/utils';
+import { Tile, SeaLevel, Landform, TileSerialized } from "./tile.interface";
+import { getTileDirection, getTileNeighbours } from "./hex-math";
+import { makeEmptyTile } from "../map-generators/utils";
 
 export interface MapSerialized {
   width: number;

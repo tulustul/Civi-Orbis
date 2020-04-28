@@ -1,12 +1,12 @@
-import { UnitDefinition } from './unit.interface';
-import { Unit, UnitSerialized } from './unit';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { UNITS_DEFINITIONS } from '../data/units';
-import { Player } from './player';
-import { Tile } from './tile.interface';
-import { getTilesInRange } from './hex-math';
-import { Game } from './game';
-import { getTileFromIndex } from './serialization';
+import { UnitDefinition } from "./unit.interface";
+import { Unit, UnitSerialized } from "./unit";
+import { BehaviorSubject, Subject } from "rxjs";
+import { UNITS_DEFINITIONS } from "../data/units";
+import { Player } from "./player";
+import { Tile } from "./tile.interface";
+import { getTilesInRange } from "./hex-math";
+import { Game } from "./game";
+import { getTileFromIndex } from "./serialization";
 
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();

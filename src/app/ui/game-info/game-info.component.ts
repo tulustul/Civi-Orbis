@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
-import { Game } from 'src/app/game/game';
-import { UIState } from '../ui-state';
+import { Game } from "src/app/game/game";
+import { UIState } from "../ui-state";
 
 @Component({
-  selector: 'app-game-info',
-  templateUrl: './game-info.component.html',
-  styleUrls: ['./game-info.component.scss'],
+  selector: "app-game-info",
+  templateUrl: "./game-info.component.html",
+  styleUrls: ["./game-info.component.scss"],
 })
 export class GameInfoComponent implements OnInit {
   debugModalVisible = false;

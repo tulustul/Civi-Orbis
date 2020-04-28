@@ -1,5 +1,5 @@
-import { TilesMap } from './tiles-map';
-import { Tile } from './tile.interface';
+import { TilesMap } from "./tiles-map";
+import { Tile } from "./tile.interface";
 
 export function getTileIndex(map: TilesMap, tile: Tile) {
   return tile.y * map.width + tile.x;

@@ -1,11 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from "@angular/core";
 
-import { Option } from '../option.interface';
+import { Option } from "../option.interface";
 
 @Component({
-  selector: 'app-multiselect',
-  templateUrl: './multiselect.component.html',
-  styleUrls: ['./multiselect.component.scss'],
+  selector: "app-multiselect",
+  templateUrl: "./multiselect.component.html",
+  styleUrls: ["./multiselect.component.scss"],
 })
 export class MultiselectComponent {
   @Input() options: Option[];

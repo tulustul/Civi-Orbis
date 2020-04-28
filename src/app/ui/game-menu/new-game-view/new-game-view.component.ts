@@ -1,14 +1,14 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 
-import { Game } from 'src/app/game/game';
-import { SimplexMapGenerator } from 'src/app/map-generators/simplex';
-import { Player, PlayerType } from 'src/app/game/player';
-import { UIState } from '../../ui-state';
+import { Game } from "src/app/game/game";
+import { SimplexMapGenerator } from "src/app/map-generators/simplex";
+import { Player, PlayerType } from "src/app/game/player";
+import { UIState } from "../../ui-state";
 
 @Component({
-  selector: 'app-new-game-view',
-  templateUrl: './new-game-view.component.html',
-  styleUrls: ['./new-game-view.component.scss'],
+  selector: "app-new-game-view",
+  templateUrl: "./new-game-view.component.html",
+  styleUrls: ["./new-game-view.component.scss"],
 })
 export class NewGameViewComponent implements OnInit {
   @Output() return = new EventEmitter<void>();
@@ -35,7 +35,7 @@ export class NewGameViewComponent implements OnInit {
 
     for (let i = 0; i < this.game.players.length; i++) {
       this.game.unitsManager.spawn(
-        'scout',
+        "scout",
         generator.getStartingLocations()[i],
         this.game.players[i]
       );

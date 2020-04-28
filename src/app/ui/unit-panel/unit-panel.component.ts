@@ -1,15 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from "@angular/core";
 
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
-import { Game } from 'src/app/game/game';
-import { Unit } from 'src/app/game/unit';
+import { Game } from "src/app/game/game";
+import { Unit } from "src/app/game/unit";
 
 @Component({
-  selector: 'app-unit-panel',
-  templateUrl: './unit-panel.component.html',
-  styleUrls: ['./unit-panel.component.scss'],
+  selector: "app-unit-panel",
+  templateUrl: "./unit-panel.component.html",
+  styleUrls: ["./unit-panel.component.scss"],
 })
 export class UnitPanelComponent implements OnInit, OnDestroy {
   unit: Unit | null = null;

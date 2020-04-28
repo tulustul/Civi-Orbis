@@ -1,15 +1,15 @@
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 
-import { UIState } from './ui/ui-state';
-import { Game } from './game/game';
+import { UIState } from "./ui/ui-state";
+import { Game } from "./game/game";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"],
 })
 export class AppComponent {
-  title = 'civ';
+  title = "civ";
 
   constructor(public game: Game, public uiState: UIState) {}
 }

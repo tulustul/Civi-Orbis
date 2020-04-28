@@ -1,10 +1,10 @@
-import * as PIXIE from 'pixi.js';
+import * as PIXIE from "pixi.js";
 
-import { Game } from '../game/game';
-import { TerrainRenderer } from './terrain';
-import { UnitsRenderer } from './units';
-import { OverlaysRenderer } from './overlays';
-import { PathRenderer } from './path';
+import { Game } from "../game/game";
+import { TerrainRenderer } from "./terrain";
+import { UnitsRenderer } from "./units";
+import { OverlaysRenderer } from "./overlays";
+import { PathRenderer } from "./path";
 
 export class Renderer {
   app: PIXIE.Application;
@@ -21,7 +21,7 @@ export class Renderer {
 
   loader = new PIXIE.Loader();
 
-  atlas = this.loader.add('assets/atlas.json').load(() => this.onLoad());
+  atlas = this.loader.add("assets/atlas.json").load(() => this.onLoad());
 
   textures: PIXIE.ITextureDictionary;
 
@@ -66,7 +66,7 @@ export class Renderer {
   }
 
   onLoad() {
-    const atlas = this.atlas.resources['assets/atlas.json'];
+    const atlas = this.atlas.resources["assets/atlas.json"];
     atlas.spritesheet!.baseTexture.mipmap = PIXIE.MIPMAP_MODES.POW2;
     this.textures = atlas.textures!;
     if (this.canvas) {
