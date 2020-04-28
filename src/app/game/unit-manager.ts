@@ -55,6 +55,26 @@ export class UnitsManager {
     return unit;
   }
 
+  destroy(unit: Unit) {
+    // TODO rewrite to sets for better performance?
+    let index = this.units.indexOf(unit);
+    if (index !== -1) {
+      this.units.splice(index, 1);
+    }
+
+    index = unit.player.units.indexOf(unit);
+    if (index !== -1) {
+      unit.player.units.splice(index, 1);
+    }
+
+    index = unit.tile.units.indexOf(unit);
+    if (index !== -1) {
+      unit.tile.units.splice(index, 1);
+    }
+
+    this._destroyed$.next(unit);
+  }
+
   move(unit: Unit, tile: Tile) {
     if (!unit.actionPointsLeft) {
       return;

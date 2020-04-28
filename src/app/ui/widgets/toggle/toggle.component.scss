@@ -1,0 +1,8 @@
+:host {
+  padding: 5px 10px;
+  cursor: pointer;
+  &.enabled {
+    background-color: royalblue;
+    color: white;
+  }
+}
