@@ -5,6 +5,7 @@ import { TerrainRenderer } from "./terrain";
 import { UnitsRenderer } from "./units";
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
+import { CitiesRenderer } from "./cities";
 
 export class Renderer {
   app: PIXIE.Application;
@@ -18,6 +19,8 @@ export class Renderer {
   overlays: OverlaysRenderer;
 
   path: PathRenderer;
+
+  city: CitiesRenderer;
 
   loader = new PIXIE.Loader();
 
@@ -38,9 +41,11 @@ export class Renderer {
     this.units = new UnitsRenderer(this.game);
     this.overlays = new OverlaysRenderer(this.game);
     this.path = new PathRenderer(this.game);
+    this.city = new CitiesRenderer(this.game);
 
     this.app.stage.addChild(this.terrain.container);
     this.app.stage.addChild(this.overlays.container);
+    this.app.stage.addChild(this.city.container);
     this.app.stage.addChild(this.units.container);
     this.app.stage.addChild(this.path.container);
 
@@ -77,6 +82,7 @@ export class Renderer {
   clear() {
     this.terrain.clear();
     this.units.clear();
+    this.city.clear();
     this.path.clear();
     this.overlays.clear();
   }

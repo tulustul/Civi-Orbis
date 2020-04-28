@@ -2,6 +2,7 @@ import { Tile } from "./tile.interface";
 import { Unit } from "./unit";
 import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";
+import { City } from "./city";
 
 export enum PlayerType {
   human,
@@ -21,6 +22,8 @@ export class Player {
   visibleTiles = new Set<Tile>();
 
   units: Unit[] = [];
+
+  cities: City[] = [];
 
   constructor(public game: Game, public type: PlayerType) {}
 

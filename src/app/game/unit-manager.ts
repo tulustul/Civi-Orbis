@@ -133,7 +133,11 @@ export class UnitsManager {
     for (const unitData of data) {
       const tile = getTileFromIndex(this.game.map, unitData.tile);
       const player = this.game.players[unitData.player];
-      this.spawn(unitData.definition, tile, player);
+      const unit = this.spawn(unitData.definition, tile, player);
+      unit.actionPointsLeft = unitData.actionPointsLeft;
+
+      // TODO path deserialization
+      // unit.path = unitData.path;
     }
   }
 }

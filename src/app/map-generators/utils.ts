@@ -20,6 +20,7 @@ export function makeEmptyTile(x: number, y: number): Tile {
     neighbours: [],
     neighboursCosts: new Map(),
     units: [],
+    city: null,
   };
 }
 

@@ -8,16 +8,8 @@ import {
   Landform,
 } from "../game/tile.interface";
 import { Game } from "../game/game";
-import { clearContainer } from "./utils";
+import { clearContainer, getTileVariants } from "./utils";
 import { getTileDirection } from "../game/hex-math";
-
-function getTileVariants(tileName: string, variants: number): string[] {
-  const result: string[] = [];
-  for (let i = 0; i < variants; i++) {
-    result.push(`${tileName}${i.toString().padStart(2, "0")}.png`);
-  }
-  return result;
-}
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),

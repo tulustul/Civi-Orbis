@@ -10,6 +10,8 @@ import { Debug } from "./debug";
 import { UIState } from "../ui/ui-state";
 import { UnitSerialized } from "./unit";
 import { filter } from "rxjs/operators";
+import { CitiesManager } from "./cities-manager";
+import { CitySerialized } from "./city";
 
 interface GameSerialized {
   turn: number;
@@ -17,6 +19,7 @@ interface GameSerialized {
   players: PlayerSerialized[];
   activePlayerIndex: number;
   units: UnitSerialized[];
+  cities: CitySerialized[];
   camera: Transform;
 }
 
@@ -44,6 +47,8 @@ export class Game {
   unitsManager = new UnitsManager(this);
 
   tilesManager = new TilesManager(this);
+
+  citiesManager = new CitiesManager(this);
 
   private _isStarted$ = new BehaviorSubject<boolean>(false);
   isStarted$ = this._isStarted$.asObservable();
@@ -90,6 +95,7 @@ export class Game {
     this.renderer.clear();
     this.unitsManager.clear();
     this.tilesManager.clear();
+    this.citiesManager.clear();
   }
 
   serialize(): GameSerialized {
@@ -99,6 +105,7 @@ export class Game {
       players: this.players.map((p) => p.serialize()),
       activePlayerIndex: this.activePlayerIndex,
       units: this.unitsManager.serialize(),
+      cities: this.citiesManager.serialize(),
       camera: this.camera.serialize(),
     };
   }
@@ -118,6 +125,7 @@ export class Game {
     this.camera.transform$.next(data.camera);
 
     this.unitsManager.deserialize(data.units);
+    this.citiesManager.deserialize(data.cities);
 
     this.activePlayerIndex = data.activePlayerIndex;
     if (this.activePlayer$.value?.type === PlayerType.human) {

@@ -1,4 +1,5 @@
 import { Unit } from "./unit";
+import { City } from "./city";
 
 export enum Climate {
   tropical,
@@ -34,6 +35,7 @@ export interface Tile {
   wetlands: boolean;
 
   units: Unit[];
+  city: City | null;
 
   // cached data
   neighbours: Tile[];
