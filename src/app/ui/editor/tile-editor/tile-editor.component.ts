@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
 import { Game } from "src/app/game/game";
-import { Tile, TileDirection } from "src/app/game/tile.interface";
+import { Tile, TileDirection } from "src/app/game/tile";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,
@@ -13,7 +13,6 @@ import {
   SEA_LEVEL_OPTIONS,
   WETLANDS_OPTIONS,
 } from "../constants";
-import { getTileDirection } from "src/app/game/hex-math";
 import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
 import { isTileForestable, areWetlandsPossible } from "../utils";
 
@@ -52,7 +51,7 @@ export class TileEditorComponent implements OnInit {
 
   update() {
     if (this.tile) {
-      this.game.tilesManager.updatedTile$.next(this.tile);
+      this.game.tilesManager.updateTile(this.tile);
     }
   }
 
@@ -77,7 +76,7 @@ export class TileEditorComponent implements OnInit {
 
     this.tile.riverParts = riverParts;
     for (const neighbour of this.tile.neighbours) {
-      const dir = getTileDirection(this.tile, neighbour);
+      const dir = this.tile.getDirectionTo(neighbour);
       const hasRiver = riverParts.includes(dir);
       const oppositeDir = OPPOSITE_DIRECTIONS[dir];
       const neighbourRiverParts = new Set(neighbour.riverParts);
@@ -87,7 +86,7 @@ export class TileEditorComponent implements OnInit {
         neighbourRiverParts.delete(oppositeDir);
       }
       neighbour.riverParts = Array.from(neighbourRiverParts);
-      this.game.tilesManager.updatedTile$.next(neighbour);
+      this.game.tilesManager.updateTile(neighbour);
     }
     this.update();
   }

@@ -1,7 +1,7 @@
 import { BehaviorSubject } from "rxjs";
 import { Game } from "../game/game";
 import { getTileCoords } from "./utils";
-import { Tile } from "../game/tile.interface";
+import { Tile } from "../game/tile";
 
 export interface Transform {
   x: number;

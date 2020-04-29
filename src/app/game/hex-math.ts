@@ -1,4 +1,4 @@
-import { TileDirection, Tile } from "./tile.interface";
+import { TileDirection, Tile } from "./tile";
 
 export function getTileNeighbours(
   tiles: Tile[][],
@@ -64,28 +64,6 @@ export function getTileInDirection(
       return tiles[tile.x - 1][tile.y];
   }
   return null;
-}
-
-export function getTileDirection(start: Tile, end: Tile): TileDirection {
-  if (end.x === start.x - (start.y % 2 ? 0 : 1) && end.y === start.y - 1) {
-    return TileDirection.NW;
-  }
-  if (end.x === start.x + (start.y % 2 ? 1 : 0) && end.y === start.y - 1) {
-    return TileDirection.NE;
-  }
-  if (end.x === start.x + 1 && end.y === start.y) {
-    return TileDirection.E;
-  }
-  if (end.x === start.x + (start.y % 2 ? 1 : 0) && end.y === start.y + 1) {
-    return TileDirection.SE;
-  }
-  if (end.x === start.x - (start.y % 2 ? 0 : 1) && end.y === start.y + 1) {
-    return TileDirection.SW;
-  }
-  if (end.x === start.x - 1 && end.y === start.y) {
-    return TileDirection.W;
-  }
-  return TileDirection.NONE;
 }
 
 export function getDistance(start: Tile, end: Tile): number {

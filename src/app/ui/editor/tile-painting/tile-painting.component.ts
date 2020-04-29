@@ -8,7 +8,7 @@ import {
   WETLANDS_OPTIONS,
 } from "../constants";
 import { Option } from "../../widgets/option.interface";
-import { SeaLevel, Landform, Climate } from "src/app/game/tile.interface";
+import { SeaLevel, LandForm, Climate } from "src/app/game/tile";
 import { Game } from "src/app/game/game";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
@@ -22,7 +22,7 @@ interface PaintData {
   climate: Climate | null;
   forest: boolean | null;
   wetlands: boolean | null;
-  landForm: Landform | null;
+  landForm: LandForm | null;
   seaLevel: SeaLevel | null;
 }
 
@@ -121,7 +121,7 @@ export class TilePaintingComponent implements OnInit {
       tile.forest = tile.forest && isTileForestable(tile);
       tile.wetlands = tile.wetlands && areWetlandsPossible(tile);
 
-      this.game.tilesManager.updatedTile$.next(tile);
+      this.game.tilesManager.updateTile(tile);
     }
   }
 

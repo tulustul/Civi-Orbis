@@ -7,14 +7,8 @@ import {
   placeRiverBetweenTiles,
   POSSIBLE_RIVER_PATHS,
 } from "./utils";
-import {
-  SeaLevel,
-  Tile,
-  Climate,
-  TileDirection,
-  Landform,
-} from "../game/tile.interface";
-import { getTileInDirection, getTileDirection } from "../game/hex-math";
+import { SeaLevel, Tile, Climate, TileDirection, LandForm } from "../game/tile";
+import { getTileInDirection } from "../game/hex-math";
 import { areWetlandsPossible, isTileForestable } from "../ui/editor/utils";
 
 interface TileMetadata {
@@ -69,9 +63,9 @@ export class SimplexMapGenerator implements MapGenerator {
         const tile = this.map.tiles[x][y];
         const metadata = this.metadata.get(tile)!;
         if (metadata.height > 1.9) {
-          tile.landForm = Landform.mountains;
+          tile.landForm = LandForm.mountains;
         } else if (metadata.height > 1.3) {
-          tile.landForm = Landform.hills;
+          tile.landForm = LandForm.hills;
         }
 
         if (metadata.temperature < 0.2) {
@@ -282,7 +276,7 @@ export class SimplexMapGenerator implements MapGenerator {
     if (placeRiverBetweenTiles(...pairToPlace)) {
       this.buildRiverPath(
         pairToPlace[0],
-        getTileDirection(pairToPlace[0], pairToPlace[1])
+        pairToPlace[0].getDirectionTo(pairToPlace[1])
       );
     }
   }
@@ -304,7 +298,7 @@ export class SimplexMapGenerator implements MapGenerator {
       const tile = this.map.tiles[x][y];
       if (
         tile.seaLevel === SeaLevel.none &&
-        tile.landForm !== Landform.mountains &&
+        tile.landForm !== LandForm.mountains &&
         !this.startingLocations.includes(tile)
       ) {
         this.startingLocations.push(tile);

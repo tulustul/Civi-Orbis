@@ -1,4 +1,4 @@
-import { Tile } from "./tile.interface";
+import { Tile } from "./tile";
 import { Unit } from "./unit";
 import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";

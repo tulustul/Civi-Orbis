@@ -1,6 +1,6 @@
 import * as PIXIE from "pixi.js";
 
-import { Tile, SeaLevel, Climate, TileDirection } from "../game/tile.interface";
+import { Tile, SeaLevel, Climate, TileDirection } from "../game/tile";
 import { Game } from "../game/game";
 import { drawHex } from "./utils";
 

@@ -1,4 +1,4 @@
-import { Tile } from "./tile.interface";
+import { Tile } from "./tile";
 import { Unit } from "./unit";
 
 export function findPath(unit: Unit, end: Tile): Tile[][] | null {

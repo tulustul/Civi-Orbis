@@ -1,28 +1,4 @@
-import {
-  Tile,
-  Climate,
-  Landform,
-  SeaLevel,
-  TileDirection,
-} from "../game/tile.interface";
-import { getTileDirection } from "../game/hex-math";
-
-export function makeEmptyTile(x: number, y: number): Tile {
-  return {
-    x,
-    y,
-    climate: Climate.continental,
-    landForm: Landform.plains,
-    seaLevel: SeaLevel.deep,
-    forest: false,
-    wetlands: false,
-    riverParts: [],
-    neighbours: [],
-    neighboursCosts: new Map(),
-    units: [],
-    city: null,
-  };
-}
+import { Tile, SeaLevel, TileDirection } from "../game/tile";
 
 export function findCoastline(tiles: Tile[][]): Tile[] {
   const coastline: Tile[] = [];
@@ -41,7 +17,7 @@ export function findCoastline(tiles: Tile[][]): Tile[] {
 }
 
 export function placeRiverBetweenTiles(tileA: Tile, tileB: Tile) {
-  const direction = getTileDirection(tileA, tileB);
+  const direction = tileA.getDirectionTo(tileB);
   if (tileA.riverParts.includes(direction)) {
     return false;
   }

@@ -1,6 +1,5 @@
-import { Tile, SeaLevel, Landform, TileSerialized } from "./tile.interface";
-import { getTileDirection, getTileNeighbours } from "./hex-math";
-import { makeEmptyTile } from "../map-generators/utils";
+import { Tile, TileSerialized } from "./tile";
+import { getTileNeighbours } from "./hex-math";
 
 export interface MapSerialized {
   width: number;
@@ -16,7 +15,7 @@ export class TilesMap {
       const row: Tile[] = [];
       this.tiles.push(row);
       for (let y = 0; y < height; y++) {
-        row.push(makeEmptyTile(x, y));
+        row.push(new Tile(x, y));
       }
     }
 
@@ -30,25 +29,7 @@ export class TilesMap {
   precomputeMovementCosts() {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        const tile = this.tiles[x][y];
-        for (const neighbour of tile.neighbours) {
-          const dir = getTileDirection(tile, neighbour);
-          let cost = 1;
-          if (neighbour.seaLevel !== SeaLevel.none) {
-            cost = Infinity;
-          } else if (neighbour.landForm === Landform.mountains) {
-            cost = Infinity;
-          } else if (neighbour.landForm === Landform.hills) {
-            cost = 2;
-          } else {
-            if (tile.riverParts.includes(dir)) {
-              cost = 3;
-            } else if (tile.riverParts.length && neighbour.riverParts.length) {
-              cost = 0.5;
-            }
-          }
-          tile.neighboursCosts.set(neighbour, cost);
-        }
+        this.tiles[x][y].computeMovementCosts();
       }
     }
   }

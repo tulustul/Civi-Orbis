@@ -3,7 +3,7 @@ import { Unit, UnitSerialized } from "./unit";
 import { BehaviorSubject, Subject } from "rxjs";
 import { UNITS_DEFINITIONS } from "../data/units";
 import { Player } from "./player";
-import { Tile } from "./tile.interface";
+import { Tile } from "./tile";
 import { getTilesInRange } from "./hex-math";
 import { Game } from "./game";
 import { getTileFromIndex } from "./serialization";

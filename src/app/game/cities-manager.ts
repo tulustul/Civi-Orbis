@@ -2,7 +2,7 @@ import { City, CitySerialized } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
-import { Tile, Landform, SeaLevel } from "./tile.interface";
+import { Tile, LandForm, SeaLevel } from "./tile";
 import { Subject } from "rxjs";
 
 export class CitiesManager {
@@ -25,7 +25,7 @@ export class CitiesManager {
     }
 
     if (
-      tile.landForm === Landform.mountains ||
+      tile.landForm === LandForm.mountains ||
       tile.seaLevel !== SeaLevel.none
     ) {
       return null;
@@ -43,7 +43,7 @@ export class CitiesManager {
     tile.city = city;
     tile.forest = false;
     tile.wetlands = false;
-    this.game.tilesManager.updatedTile$.next(tile);
+    this.game.tilesManager.updateTile(tile);
 
     this._spawned$.next(city);
 

@@ -1,9 +1,4 @@
-import {
-  TileDirection,
-  Climate,
-  Landform,
-  SeaLevel,
-} from "src/app/game/tile.interface";
+import { TileDirection, Climate, LandForm, SeaLevel } from "src/app/game/tile";
 import { Option } from "../widgets/option.interface";
 
 export const SEA_LEVEL_OPTIONS: Option[] = [
@@ -13,9 +8,9 @@ export const SEA_LEVEL_OPTIONS: Option[] = [
 ];
 
 export const LAND_FORM_OPTIONS: Option[] = [
-  { label: "plains", value: Landform.plains },
-  { label: "hills", value: Landform.hills },
-  { label: "mountains", value: Landform.mountains },
+  { label: "plains", value: LandForm.plains },
+  { label: "hills", value: LandForm.hills },
+  { label: "mountains", value: LandForm.mountains },
 ];
 
 export const CLIMATE_OPTIONS: Option[] = [

@@ -1,4 +1,4 @@
-import { Tile, Climate, Landform, SeaLevel } from "src/app/game/tile.interface";
+import { Tile, Climate, LandForm, SeaLevel } from "src/app/game/tile";
 
 export const FORESTABLE_CLIMATES = new Set<Climate>([
   Climate.continental,
@@ -16,7 +16,7 @@ export const WETLANDS_CLIMATES = new Set<Climate>([
 export function isTileForestable(tile: Tile): boolean {
   return (
     tile.seaLevel === SeaLevel.none &&
-    tile.landForm === Landform.plains &&
+    tile.landForm === LandForm.plains &&
     FORESTABLE_CLIMATES.has(tile.climate)
   );
 }
@@ -24,7 +24,7 @@ export function isTileForestable(tile: Tile): boolean {
 export function areWetlandsPossible(tile: Tile): boolean {
   return !!(
     tile.seaLevel === SeaLevel.none &&
-    tile.landForm === Landform.plains &&
+    tile.landForm === LandForm.plains &&
     tile.riverParts.length &&
     WETLANDS_CLIMATES.has(tile.climate)
   );

@@ -2,7 +2,7 @@ import { BehaviorSubject, Subject } from "rxjs";
 
 import { distinctUntilChanged } from "rxjs/operators";
 
-import { Tile } from "./tile.interface";
+import { Tile } from "./tile";
 import { Game } from "./game";
 
 export class TilesManager {
@@ -15,7 +15,8 @@ export class TilesManager {
   private _highlightedTiles$ = new BehaviorSubject<Set<Tile>>(new Set());
   highlightedTiles$ = this._highlightedTiles$.asObservable();
 
-  updatedTile$ = new Subject<Tile>();
+  private _updatedTile$ = new Subject<Tile>();
+  updatedTile$ = this._updatedTile$.asObservable();
 
   private _revealedTiles$ = new Subject<Tile[]>();
   revealedTiles$ = this._revealedTiles$.asObservable();
@@ -38,6 +39,10 @@ export class TilesManager {
       }
     }
     this.reveal(tiles);
+  }
+
+  updateTile(tile: Tile) {
+    this._updatedTile$.next(tile);
   }
 
   get hoveredTile() {

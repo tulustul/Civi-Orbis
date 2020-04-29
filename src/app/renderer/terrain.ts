@@ -1,15 +1,8 @@
 import * as PIXIE from "pixi.js";
 
-import {
-  Tile,
-  SeaLevel,
-  Climate,
-  TileDirection,
-  Landform,
-} from "../game/tile.interface";
+import { Tile, SeaLevel, Climate, TileDirection, LandForm } from "../game/tile";
 import { Game } from "../game/game";
 import { clearContainer, getTileVariants } from "./utils";
-import { getTileDirection } from "../game/hex-math";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),
@@ -17,41 +10,41 @@ const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.none]: [],
 };
 
-const CLIMATE_TEXTURES: Record<Climate, Record<Landform, string[]>> = {
+const CLIMATE_TEXTURES: Record<Climate, Record<LandForm, string[]>> = {
   [Climate.continental]: {
-    [Landform.plains]: getTileVariants("hexPlainsCold", 4),
-    [Landform.hills]: getTileVariants("hexHillsCold", 4),
-    [Landform.mountains]: getTileVariants("hexMountain", 4),
+    [LandForm.plains]: getTileVariants("hexPlainsCold", 4),
+    [LandForm.hills]: getTileVariants("hexHillsCold", 4),
+    [LandForm.mountains]: getTileVariants("hexMountain", 4),
   },
   [Climate.desert]: {
-    [Landform.plains]: getTileVariants("hexSand", 4),
-    [Landform.hills]: getTileVariants("hexHillsDesert", 4),
-    [Landform.mountains]: getTileVariants("hexMountainDesert", 4),
+    [LandForm.plains]: getTileVariants("hexSand", 4),
+    [LandForm.hills]: getTileVariants("hexHillsDesert", 4),
+    [LandForm.mountains]: getTileVariants("hexMountainDesert", 4),
   },
   [Climate.oceanic]: {
-    [Landform.plains]: getTileVariants("hexPlains", 4),
-    [Landform.hills]: getTileVariants("hexHighlands", 4),
-    [Landform.mountains]: getTileVariants("hexMountain", 4),
+    [LandForm.plains]: getTileVariants("hexPlains", 4),
+    [LandForm.hills]: getTileVariants("hexHighlands", 4),
+    [LandForm.mountains]: getTileVariants("hexMountain", 4),
   },
   [Climate.savanna]: {
-    [Landform.plains]: getTileVariants("hexScrublands", 4),
-    [Landform.hills]: getTileVariants("hexHillsSavanna", 4),
-    [Landform.mountains]: getTileVariants("hexMountainDesert", 4),
+    [LandForm.plains]: getTileVariants("hexScrublands", 4),
+    [LandForm.hills]: getTileVariants("hexHillsSavanna", 4),
+    [LandForm.mountains]: getTileVariants("hexMountainDesert", 4),
   },
   [Climate.tropical]: {
-    [Landform.plains]: getTileVariants("hexTropicalPlains", 4),
-    [Landform.hills]: getTileVariants("hexHills", 4),
-    [Landform.mountains]: getTileVariants("hexMountain", 4),
+    [LandForm.plains]: getTileVariants("hexTropicalPlains", 4),
+    [LandForm.hills]: getTileVariants("hexHills", 4),
+    [LandForm.mountains]: getTileVariants("hexMountain", 4),
   },
   [Climate.tundra]: {
-    [Landform.plains]: getTileVariants("hexPlainsColdSnowTransition", 4),
-    [Landform.hills]: getTileVariants("hexHillsColdSnowTransition", 4),
-    [Landform.mountains]: getTileVariants("hexMountainSnow", 4),
+    [LandForm.plains]: getTileVariants("hexPlainsColdSnowTransition", 4),
+    [LandForm.hills]: getTileVariants("hexHillsColdSnowTransition", 4),
+    [LandForm.mountains]: getTileVariants("hexMountainSnow", 4),
   },
   [Climate.arctic]: {
-    [Landform.plains]: getTileVariants("hexPlainsColdSnowCovered", 4),
-    [Landform.hills]: getTileVariants("hexHillsColdSnowCovered", 4),
-    [Landform.mountains]: getTileVariants("hexMountainSnow", 4),
+    [LandForm.plains]: getTileVariants("hexPlainsColdSnowCovered", 4),
+    [LandForm.hills]: getTileVariants("hexHillsColdSnowCovered", 4),
+    [LandForm.mountains]: getTileVariants("hexMountainSnow", 4),
   },
 };
 
@@ -156,7 +149,7 @@ export class TerrainRenderer {
     } else if (tile.seaLevel === SeaLevel.none) {
       if (
         tile.climate === Climate.desert &&
-        tile.landForm === Landform.plains &&
+        tile.landForm === LandForm.plains &&
         tile.riverParts.length
       ) {
         variants = DESERT_FLOOD_PLAINS_TEXTURES;
@@ -254,7 +247,7 @@ export class TerrainRenderer {
   ) {
     for (const neighbour of tile.neighbours) {
       if (neighbour.seaLevel !== SeaLevel.none) {
-        const dir = getTileDirection(tile, neighbour);
+        const dir = tile.getDirectionTo(neighbour);
         const textureName =
           COASTLINE_TEXTURES[
             Math.floor(Math.random() * COASTLINE_TEXTURES.length)

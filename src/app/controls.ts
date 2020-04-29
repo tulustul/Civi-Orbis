@@ -2,7 +2,7 @@ import { BehaviorSubject } from "rxjs";
 
 import { Game } from "./game/game";
 import { findPath } from "./game/pathfinding";
-import { Tile } from "./game/tile.interface";
+import { Tile } from "./game/tile";
 
 export class Controls {
   isMousePressed = false;
