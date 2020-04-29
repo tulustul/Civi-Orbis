@@ -22,7 +22,7 @@ import { getTileCoords } from "src/app/renderer/utils";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CityInfoComponent implements OnInit, OnDestroy {
-  @Input() city: City;
+  private _city: City;
 
   ngUnsubscribe = new Subject<void>();
 
@@ -42,11 +42,18 @@ export class CityInfoComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
+  @Input() set city(city: City) {
+    this._city = city;
+  }
+  get city() {
+    return this._city;
+  }
+
   @HostBinding("style.transform")
   get transform() {
+    // FIXME: This migth lead to performance issues. It is calculated for every city every time camera transform changes.
     let [x, y] = getTileCoords(this.city.tile);
-    // return `translate(${x}px, ${y}px)`;
-    [x, y] = this.game.camera.canvasToScreen(x, y);
+    [x, y] = this.game.camera.canvasToScreen(x + 0.5, y + 0.8);
     return `translate(${x}px, ${y}px) scale(1)`;
   }
 }

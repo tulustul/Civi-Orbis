@@ -3,6 +3,7 @@ import {
   OnInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  ElementRef,
   HostBinding,
 } from "@angular/core";
 
@@ -40,19 +41,16 @@ export class CitiesLayerComponent implements OnInit {
     this.ngUnsubscribe.complete();
   }
 
-  trackBycityId(index: number, city: City) {
+  trackByCityId(index: number, city: City) {
     return city.id;
-  }
-
-  @HostBinding("style.transform")
-  get transform() {
-    // const t = this.game.camera.transform$.value;
-    // const [x, y] = this.game.camera.canvasToScreen(0, 0);
-    // return `translate(${x}px, ${y}px) scale(1)`;
-    return "";
   }
 
   get cities() {
     return this.game.citiesManager.cities;
+  }
+
+  @HostBinding("class.hidden")
+  get isHidden() {
+    return this.game.camera.transform$.value.scale < 20;
   }
 }
