@@ -91,7 +91,7 @@ export class SimplexMapGenerator implements MapGenerator {
     }
 
     for (const [tile, value, _] of this.getNoisedTiles(
-      new ComplexNoise([0.015, 0.06, 0.3])
+      new ComplexNoise([0.015, 0.06, 0.3]),
     )) {
       const bonus = tile.climate === Climate.tropical ? 0.3 : 0;
       if (value + bonus > 0.2 && isTileForestable(tile)) {
@@ -131,7 +131,7 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private generateTemperature() {
     for (const [tile, value, longitude] of this.getNoisedTiles(
-      new ComplexNoise([0.012, 0.07])
+      new ComplexNoise([0.012, 0.07]),
     )) {
       const base = (1 - longitude) / 2;
       const noise = ((value + 1) / 2) * (1 - longitude);
@@ -142,7 +142,7 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private generateHumidity() {
     for (const [tile, value, longitude] of this.getNoisedTiles(
-      new ComplexNoise([0.025, 0.2])
+      new ComplexNoise([0.025, 0.2]),
     )) {
       const x = longitude * 10;
       const base = x < Math.PI * 1.5 ? (Math.cos(x) + 1) / 2 - 0.5 : 0;
@@ -153,7 +153,7 @@ export class SimplexMapGenerator implements MapGenerator {
   }
 
   private *getNoisedTiles(
-    noise: ComplexNoise
+    noise: ComplexNoise,
   ): Iterable<[Tile, number, number]> {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
@@ -232,8 +232,8 @@ export class SimplexMapGenerator implements MapGenerator {
     const possibleNeighboursDirections = POSSIBLE_RIVER_PATHS[direction];
 
     const pairs = possibleNeighboursDirections
-      .map((pair) => {
-        return pair.map((dir) => {
+      .map(pair => {
+        return pair.map(dir => {
           if (dir === TileDirection.NONE) {
             return tile;
           }
@@ -241,13 +241,13 @@ export class SimplexMapGenerator implements MapGenerator {
         });
       })
       .filter(
-        (pair) =>
+        pair =>
           pair[0] &&
           pair[1] &&
           pair[0].seaLevel === SeaLevel.none &&
           pair[1].seaLevel === SeaLevel.none &&
           pair[0].riverParts.length < 4 && // small loops prevention, big loops are still an issue
-          pair[1].riverParts.length < 4
+          pair[1].riverParts.length < 4,
       ) as [Tile, Tile][];
 
     if (pairs.length === 0) {
@@ -276,14 +276,14 @@ export class SimplexMapGenerator implements MapGenerator {
     if (placeRiverBetweenTiles(...pairToPlace)) {
       this.buildRiverPath(
         pairToPlace[0],
-        pairToPlace[0].getDirectionTo(pairToPlace[1])
+        pairToPlace[0].getDirectionTo(pairToPlace[1]),
       );
     }
   }
 
   placeWetlands() {
     for (const [tile, value, _] of this.getNoisedTiles(
-      new ComplexNoise([0.021, 0.08, 0.2])
+      new ComplexNoise([0.021, 0.08, 0.2]),
     )) {
       if (value > 0 && areWetlandsPossible(tile)) {
         tile.wetlands = true;
@@ -319,7 +319,7 @@ class ComplexNoise {
     for (let i = 0; i < this.noises.length; i++) {
       noiseValue += this.noises[i].noise2D(
         x * this.scales[i],
-        y * this.scales[i]
+        y * this.scales[i],
       );
     }
     return noiseValue;
