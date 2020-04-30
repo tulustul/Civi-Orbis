@@ -10,11 +10,22 @@
   {{ height }}
 </label>
 
-<!-- TODO -->
-<!-- <label>
+<label>
+  Sea level:
+  <input type="range" [(ngModel)]="seaLevel" min="-2" max="2" step="0.1" />
+  {{ seaLevel }}
+</label>
+
+<label>
+  Uniformity:
+  <input type="range" [(ngModel)]="uniformity" min="0" max="10" step="0.05" />
+  {{ uniformity }}
+</label>
+
+<label>
   Seed:
   <input type="text" [(ngModel)]="seed" />
-</label> -->
+</label>
 
 <div class="actions">
   <button (click)="return.next()">Return</button>

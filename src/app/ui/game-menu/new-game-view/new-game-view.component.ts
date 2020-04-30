@@ -17,6 +17,10 @@ export class NewGameViewComponent implements OnInit {
 
   height = 40;
 
+  uniformity = 0.5;
+
+  seaLevel = 0.2;
+
   seed: number | null = null;
 
   constructor(private game: Game, private uiState: UIState) {}
@@ -30,14 +34,20 @@ export class NewGameViewComponent implements OnInit {
     this.game.addPlayer(humanPlayer);
 
     const generator = new SimplexMapGenerator(this.game.players.length);
-    this.game.map = generator.generate(this.width, this.height, this.seed);
+    this.game.map = generator.generate(
+      this.width,
+      this.height,
+      this.seed ? this.seed?.toString() : undefined,
+      this.uniformity,
+      this.seaLevel,
+    );
     this.game.map.precomputeMovementCosts();
 
     for (let i = 0; i < this.game.players.length; i++) {
       this.game.unitsManager.spawn(
         "scout",
         generator.getStartingLocations()[i],
-        this.game.players[i]
+        this.game.players[i],
       );
     }
 

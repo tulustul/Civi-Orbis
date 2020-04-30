@@ -12,7 +12,8 @@ import { getTileInDirection } from "../game/hex-math";
 import { areWetlandsPossible, isTileForestable } from "../ui/editor/utils";
 
 interface TileMetadata {
-  height: number;
+  heightForLandForm: number;
+  heightForSeaLevel: number;
   humidity: number;
   temperature: number;
 }
@@ -23,6 +24,12 @@ export class SimplexMapGenerator implements MapGenerator {
   private width: number;
 
   private height: number;
+
+  private seed: string | undefined;
+
+  private uniformity: number;
+
+  private seaLevel: number;
 
   private startingLocations: Tile[] = [];
 
@@ -36,15 +43,25 @@ export class SimplexMapGenerator implements MapGenerator {
     return this.startingLocations;
   }
 
-  generate(width: number, height: number, seed: number | null = null) {
+  generate(
+    width: number,
+    height: number,
+    seed: string | undefined = undefined,
+    uniformity: number = 0.5,
+    seaLevel = 0.2,
+  ) {
     this.map = new TilesMap(width, height);
     this.width = width;
     this.height = height;
+    this.seed = seed;
+    this.uniformity = uniformity;
+    this.seaLevel = seaLevel;
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         const metadata: TileMetadata = {
-          height: 0,
+          heightForLandForm: 0,
+          heightForSeaLevel: 0,
           humidity: 0,
           temperature: 0,
         };
@@ -52,7 +69,9 @@ export class SimplexMapGenerator implements MapGenerator {
       }
     }
 
-    this.generateHeightmap();
+    this.generateHeightmapForSeaLevel();
+
+    this.generateHeightmapForLandForm();
 
     this.generateTemperature();
 
@@ -62,9 +81,9 @@ export class SimplexMapGenerator implements MapGenerator {
       for (let y = 0; y < this.height; y++) {
         const tile = this.map.tiles[x][y];
         const metadata = this.metadata.get(tile)!;
-        if (metadata.height > 1.9) {
+        if (metadata.heightForLandForm > 1) {
           tile.landForm = LandForm.mountains;
-        } else if (metadata.height > 1.3) {
+        } else if (metadata.heightForLandForm > 0.25) {
           tile.landForm = LandForm.hills;
         }
 
@@ -91,7 +110,14 @@ export class SimplexMapGenerator implements MapGenerator {
     }
 
     for (const [tile, value, _] of this.getNoisedTiles(
-      new ComplexNoise([0.015, 0.06, 0.3]),
+      new ComplexNoise(
+        [
+          [0.015, 1],
+          [0.06, 1],
+          [0.3, 1],
+        ],
+        this.seed,
+      ),
     )) {
       const bonus = tile.climate === Climate.tropical ? 0.3 : 0;
       if (value + bonus > 0.2 && isTileForestable(tile)) {
@@ -112,17 +138,39 @@ export class SimplexMapGenerator implements MapGenerator {
     return this.map;
   }
 
-  private generateHeightmap() {
-    const heightmapNoise = new ComplexNoise([0.05, 0.01, 0.03, 0.08, 0.11]);
+  private generateHeightmapForLandForm() {
+    const heightmapNoise = new ComplexNoise(
+      [
+        [0.015, 1],
+        [0.06, 1],
+        [0.3, 1],
+      ],
+      this.seed,
+    );
 
     for (const [tile, value] of this.getNoisedTiles(heightmapNoise)) {
-      this.metadata.get(tile)!.height = value;
+      this.metadata.get(tile)!.heightForLandForm = value;
+    }
+  }
+
+  private generateHeightmapForSeaLevel() {
+    const size = Math.max(this.width, this.height);
+    const noiseLayersCount = Math.floor(Math.pow(size, 0.4));
+
+    const noiseScales: number[][] = [];
+    for (let i = 0; i < noiseLayersCount; i++) {
+      noiseScales.push([Math.pow(0.6, i + 4), 1 + this.uniformity * i]);
+    }
+    const heightmapNoise = new ComplexNoise(noiseScales, this.seed);
+
+    for (const [tile, value] of this.getNoisedTiles(heightmapNoise)) {
+      this.metadata.get(tile)!.heightForSeaLevel = value;
     }
 
     for (const [tile, value, _] of this.getNoisedTiles(heightmapNoise)) {
-      if (value > 0.2) {
+      if (value > this.seaLevel) {
         tile.seaLevel = SeaLevel.none;
-        if (value > 0.05 && Math.random() > 0.9) {
+        if (value > 0.1 && Math.random() > 0.9) {
           this.riversSources.push(tile);
         }
       }
@@ -131,7 +179,13 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private generateTemperature() {
     for (const [tile, value, longitude] of this.getNoisedTiles(
-      new ComplexNoise([0.012, 0.07]),
+      new ComplexNoise(
+        [
+          [0.012, 1],
+          [0.07, 1],
+        ],
+        this.seed,
+      ),
     )) {
       const base = (1 - longitude) / 2;
       const noise = ((value + 1) / 2) * (1 - longitude);
@@ -142,7 +196,13 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private generateHumidity() {
     for (const [tile, value, longitude] of this.getNoisedTiles(
-      new ComplexNoise([0.025, 0.2]),
+      new ComplexNoise(
+        [
+          [0.025, 1],
+          [0.2, 1],
+        ],
+        this.seed,
+      ),
     )) {
       const x = longitude * 10;
       const base = x < Math.PI * 1.5 ? (Math.cos(x) + 1) / 2 - 0.5 : 0;
@@ -196,7 +256,7 @@ export class SimplexMapGenerator implements MapGenerator {
           ) {
             visitedTiles.add(neighbour);
             nextTiles.add(neighbour);
-            this.metadata.get(neighbour)!.height += offset;
+            this.metadata.get(neighbour)!.heightForSeaLevel += offset;
           }
         }
       }
@@ -262,12 +322,12 @@ export class SimplexMapGenerator implements MapGenerator {
       const [pairA, pairB] = pairs;
 
       const heightA =
-        (this.metadata.get(pairA[0])!.height +
-          this.metadata.get(pairA[1])!.height) /
+        (this.metadata.get(pairA[0])!.heightForSeaLevel +
+          this.metadata.get(pairA[1])!.heightForSeaLevel) /
         2;
       const heightB =
-        (this.metadata.get(pairB[0])!.height +
-          this.metadata.get(pairB[1])!.height) /
+        (this.metadata.get(pairB[0])!.heightForSeaLevel +
+          this.metadata.get(pairB[1])!.heightForSeaLevel) /
         2;
 
       pairToPlace = heightA < heightB ? pairA : pairB;
@@ -283,7 +343,14 @@ export class SimplexMapGenerator implements MapGenerator {
 
   placeWetlands() {
     for (const [tile, value, _] of this.getNoisedTiles(
-      new ComplexNoise([0.021, 0.08, 0.2]),
+      new ComplexNoise(
+        [
+          [0.021, 1],
+          [0.08, 1],
+          [0.2, 1],
+        ],
+        this.seed,
+      ),
     )) {
       if (value > 0 && areWetlandsPossible(tile)) {
         tile.wetlands = true;
@@ -310,17 +377,15 @@ export class SimplexMapGenerator implements MapGenerator {
 class ComplexNoise {
   private noises: SimplexNoise[];
 
-  constructor(private scales: number[]) {
-    this.noises = scales.map(() => new SimplexNoise());
+  constructor(private scales: number[][], seed: string | undefined) {
+    this.noises = scales.map(() => new SimplexNoise(seed));
   }
 
   at(x: number, y: number) {
     let noiseValue = 0;
     for (let i = 0; i < this.noises.length; i++) {
-      noiseValue += this.noises[i].noise2D(
-        x * this.scales[i],
-        y * this.scales[i],
-      );
+      const [scale, intensity] = this.scales[i];
+      noiseValue += this.noises[i].noise2D(x * scale, y * scale) * intensity;
     }
     return noiseValue;
   }
