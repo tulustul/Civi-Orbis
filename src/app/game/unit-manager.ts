@@ -73,6 +73,10 @@ export class UnitsManager {
     }
 
     this._destroyed$.next(unit);
+
+    if (unit === this.activeUnit) {
+      this.activeUnit$.next(null);
+    }
   }
 
   move(unit: Unit, tile: Tile) {

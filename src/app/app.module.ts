@@ -28,6 +28,7 @@ import { UnitEditorComponent } from "./ui/editor/unit-editor/unit-editor.compone
 import { CityEditorComponent } from "./ui/editor/city-editor/city-editor.component";
 import { CitiesLayerComponent } from './ui/cities-layer/cities-layer.component';
 import { CityInfoComponent } from './ui/cities-layer/city-info/city-info.component';
+import { CityViewComponent } from './ui/city-view/city-view.component';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { CityInfoComponent } from './ui/cities-layer/city-info/city-info.compone
     CityEditorComponent,
     CitiesLayerComponent,
     CityInfoComponent,
+    CityViewComponent,
   ],
   imports: [BrowserModule, FormsModule],
   providers: [Game, UIState],

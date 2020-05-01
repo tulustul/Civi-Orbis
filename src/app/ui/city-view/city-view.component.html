@@ -1,0 +1,30 @@
+<div class="top">
+  <h2>{{ city.name }}</h2>
+  <button (click)="quit()">Return</button>
+</div>
+
+<div class="production">
+  <div>
+    <h3>In production:</h3>
+    <div>
+      <span class="name">
+        {{ city.inProduction?.name || "-" }}
+      </span>
+      <span class="turns" *ngIf="city.inProduction">
+        {{ city.turnsToProductionEnd }} turns
+      </span>
+    </div>
+  </div>
+
+  <h3>Produce:</h3>
+  <div
+    class="unit"
+    *ngFor="let unitDef of UNITS"
+    (click)="city.startProducing(unitDef)"
+  >
+    <span class="name">
+      {{ unitDef.name }}
+    </span>
+    <span class="turns"> {{ city.getTurnsToProduce(unitDef) }} turns </span>
+  </div>
+</div>

@@ -2,4 +2,10 @@
   <h3>{{ unit.definition.name }}</h3>
   <p>Moves: {{ unit.actionPointsLeft }}</p>
   <p>Power: {{ unit.definition.power }}</p>
+  <button
+    *ngFor="let action of unit.definition.actions"
+    (click)="unit.doAction(action)"
+  >
+    {{ getActionName(action) }}
+  </button>
 </div>

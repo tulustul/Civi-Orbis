@@ -8,12 +8,13 @@ import {
   HostBinding,
 } from "@angular/core";
 
-import { Subject } from "rxjs";
+import { Subject, merge } from "rxjs";
 
 import { City } from "src/app/game/city";
 import { Game } from "src/app/game/game";
 import { filter, takeUntil } from "rxjs/operators";
 import { getTileCoords } from "src/app/renderer/utils";
+import { UIState } from "../../ui-state";
 
 @Component({
   selector: "app-city-info",
@@ -26,14 +27,19 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
   ngUnsubscribe = new Subject<void>();
 
-  constructor(private cdr: ChangeDetectorRef, private game: Game) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private game: Game,
+    private ui: UIState,
+  ) {}
 
   ngOnInit(): void {
-    this.game.citiesManager.updated$
-      .pipe(
-        filter((c) => c.id === this.city.id),
-        takeUntil(this.ngUnsubscribe)
-      )
+    const thisCity = this.game.citiesManager.updated$.pipe(
+      filter((c) => c.id === this.city.id),
+    );
+
+    merge(this.game.turn$, thisCity)
+      .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => this.cdr.markForCheck());
   }
 
@@ -55,5 +61,9 @@ export class CityInfoComponent implements OnInit, OnDestroy {
     let [x, y] = getTileCoords(this.city.tile);
     [x, y] = this.game.camera.canvasToScreen(x + 0.5, y + 0.8);
     return `translate(${x}px, ${y}px) scale(1)`;
+  }
+
+  selectCity() {
+    this.ui.selectedCity$.next(this.city);
   }
 }

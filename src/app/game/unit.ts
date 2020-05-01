@@ -2,6 +2,7 @@ import { Tile } from "./tile";
 import { UnitDefinition } from "./unit.interface";
 import { Player } from "./player";
 import { getTileIndex } from "./serialization";
+import { UnitAction, ACTIONS } from "./unit-actions";
 
 export interface UnitSerialized {
   tile: number;
@@ -18,7 +19,7 @@ export class Unit {
   constructor(
     public tile: Tile,
     public definition: UnitDefinition,
-    public player: Player
+    public player: Player,
   ) {
     this.actionPointsLeft = definition.actionPoints;
   }
@@ -31,8 +32,16 @@ export class Unit {
       player: this.player.id,
       path:
         this.path?.map((row) =>
-          row.map((tile) => getTileIndex(this.player.game.map, tile))
+          row.map((tile) => getTileIndex(this.player.game.map, tile)),
         ) || null,
     };
+  }
+
+  doAction(action: UnitAction) {
+    if (!this.definition.actions.includes(action)) {
+      return;
+    }
+
+    ACTIONS[action].fn(this.player.game, this);
   }
 }

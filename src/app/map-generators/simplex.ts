@@ -167,7 +167,8 @@ export class SimplexMapGenerator implements MapGenerator {
       const edgeThrehold = this.width * 0.1;
       if (distanceToEdge < edgeThrehold) {
         value -=
-          maxValue/2 * Math.cos((Math.PI / 2 / edgeThrehold) * distanceToEdge);
+          (maxValue / 2) *
+          Math.cos((Math.PI / 2 / edgeThrehold) * distanceToEdge);
       }
 
       if (value > seaLevel) {
@@ -252,7 +253,7 @@ export class SimplexMapGenerator implements MapGenerator {
     const visitedTiles = new Set<Tile>(currentTiles);
     let offset = 0;
     while (currentTiles.length) {
-      offset += 1.4;
+      offset += 0.7;
       for (const tile of currentTiles) {
         for (const neighbour of tile.neighbours) {
           if (

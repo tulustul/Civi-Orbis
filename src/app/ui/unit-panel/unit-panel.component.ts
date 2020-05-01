@@ -5,6 +5,7 @@ import { takeUntil } from "rxjs/operators";
 
 import { Game } from "src/app/game/game";
 import { Unit } from "src/app/game/unit";
+import { UnitAction, ACTIONS } from "src/app/game/unit-actions";
 
 @Component({
   selector: "app-unit-panel",
@@ -30,5 +31,9 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
 
   get unit$() {
     return this.game.unitsManager;
+  }
+
+  getActionName(action: UnitAction) {
+    return ACTIONS[action].name;
   }
 }

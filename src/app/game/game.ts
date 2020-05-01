@@ -82,6 +82,7 @@ export class Game {
 
   nextTurn() {
     this.unitsManager.nextTurn();
+    this.citiesManager.nextTurn();
     this.turn$.next(this.turn$.value + 1);
     this.controls.nextTurn();
   }

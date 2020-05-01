@@ -45,7 +45,7 @@ export class NewGameViewComponent implements OnInit {
 
     for (let i = 0; i < this.game.players.length; i++) {
       this.game.unitsManager.spawn(
-        "scout",
+        "settler",
         generator.getStartingLocations()[i],
         this.game.players[i],
       );

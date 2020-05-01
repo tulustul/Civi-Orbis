@@ -5,10 +5,28 @@
   width: 300px;
   margin-left: -150px;
   .info {
-    padding: 5px 10px;
     border-radius: 5px;
     background-color: royalblue;
     color: white;
     box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.3);
+    display: flex;
+    pointer-events: all;
+    cursor: pointer;
+    .size {
+      font-size: 26px;
+      padding: 0 5px;
+      min-width: 30px;
+      text-align: center;
+    }
+    .bar {
+      height: 20px;
+      padding: 0 5px;
+    }
+    .growth {
+      background-color: green;
+    }
+    .production {
+      background-color: orange;
+    }
   }
 }

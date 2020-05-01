@@ -1,3 +1,11 @@
-<div class="info">
-  {{ city.name }}
+<div class="info" (click)="selectCity()">
+  <div class="size">{{ city.size }}</div>
+  <div>
+    <div class="growth bar">{{ city.name }} ({{ city.turnsToGrow }})</div>
+    <div class="production bar">
+      <ng-container *ngIf="city.inProduction">
+        {{ city.inProduction.name }} ({{ city.turnsToProductionEnd || "-" }})
+      </ng-container>
+    </div>
+  </div>
 </div>

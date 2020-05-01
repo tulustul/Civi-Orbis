@@ -1,9 +1,10 @@
+import { Subject, BehaviorSubject } from "rxjs";
+
 import { City, CitySerialized } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
 import { Tile, LandForm, SeaLevel } from "./tile";
-import { Subject } from "rxjs";
 
 export class CitiesManager {
   private _spawned$ = new Subject<City>();
@@ -67,6 +68,10 @@ export class CitiesManager {
     this._destroyed$.next(city);
   }
 
+  update(city: City) {
+    this._updated$.next(city);
+  }
+
   clear() {
     this.cities = [];
   }
@@ -84,6 +89,12 @@ export class CitiesManager {
         city.name = cityData.name;
         city.size = cityData.size;
       }
+    }
+  }
+
+  nextTurn() {
+    for (const city of this.cities) {
+      city.nextTurn();
     }
   }
 }
