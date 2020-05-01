@@ -19,6 +19,11 @@ export class CityViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.game.camera.moveToTileWithEasing(this.city.tile);
+    const [x, y] = this.game.camera.canvasToScreen(
+      this.city.tile.x,
+      this.city.tile.y,
+    );
+    this.game.camera.scaleToWithEasing(130, x, y);
   }
 
   quit() {

@@ -29,7 +29,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private game: Game,
+    public game: Game,
     private ui: UIState,
   ) {}
 
@@ -65,5 +65,40 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
   selectCity() {
     this.ui.selectedCity$.next(this.city);
+  }
+
+  onContextMenu(event: Event) {
+    event.preventDefault();
+  }
+
+  get growthPercent() {
+    return (this.city.totalFood / this.city.foodToGrow) * 100;
+  }
+
+  get nextGrowthPercent() {
+    return (
+      ((this.city.totalFood + this.city.yields.food) / this.city.foodToGrow) *
+      100
+    );
+  }
+
+  get productionPercent() {
+    if (!this.city.inProduction) {
+      return 0;
+    }
+    return (
+      (this.city.totalProduction / this.city.inProduction?.productionCost) * 100
+    );
+  }
+
+  get nextProductionPercent() {
+    if (!this.city.inProduction) {
+      return 0;
+    }
+    return (
+      ((this.city.totalProduction + this.city.yields.production) /
+        this.city.inProduction?.productionCost) *
+      100
+    );
   }
 }

@@ -1,10 +1,32 @@
-<div class="info" (click)="selectCity()">
+<div
+  class="info"
+  (click)="selectCity()"
+  (click)="game.controls.onClick($event)"
+  (mousedown)="game.controls.onMouseDown($event)"
+  (mouseup)="game.controls.onMouseUp($event)"
+  (mousemove)="game.controls.onMouseMove($event)"
+  (wheel)="game.controls.onWheel($event)"
+  (contextmenu)="onContextMenu($event)"
+>
   <div class="size">{{ city.size }}</div>
   <div>
-    <div class="growth bar">{{ city.name }} ({{ city.turnsToGrow }})</div>
+    <div class="growth bar">
+      <div class="progress next" [style.width.%]="nextGrowthPercent"></div>
+      <div class="progress" [style.width.%]="growthPercent"></div>
+      <span class="value"> {{ city.name }} </span>
+      <span class="turns">({{ city.turnsToGrow }})</span>
+    </div>
     <div class="production bar">
       <ng-container *ngIf="city.inProduction">
-        {{ city.inProduction.name }} ({{ city.turnsToProductionEnd || "-" }})
+        <div
+          class="progress next"
+          [style.width.%]="nextProductionPercent"
+        ></div>
+        <div class="progress" [style.width.%]="productionPercent"></div>
+        <span class="value">
+          {{ city.inProduction.name }}
+        </span>
+        <span class="turns">({{ city.turnsToProductionEnd || "-" }})</span>
       </ng-container>
     </div>
   </div>
