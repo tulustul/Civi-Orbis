@@ -19,7 +19,7 @@ export class NewGameViewComponent implements OnInit {
 
   uniformity = 0.5;
 
-  seaLevel = 0.2;
+  seaLevel = 0;
 
   seed: number | null = null;
 
