@@ -52,6 +52,8 @@ export class Renderer {
     if (this.isLoaded) {
       this.onReady();
     }
+
+    this.app.ticker.add(() => this.game.camera.update());
   }
 
   resize(width: number, height: number) {

@@ -2,6 +2,11 @@ import { BehaviorSubject } from "rxjs";
 import { Game } from "../game/game";
 import { getTileCoords } from "./utils";
 import { Tile } from "../game/tile";
+import {
+  AnimationEaseOutCubic,
+  AnimationEaseOutQuad,
+  Animation,
+} from "../game/animation";
 
 export interface Transform {
   x: number;
@@ -14,6 +19,13 @@ export class Camera {
   MIN_ZOOM = 5;
 
   transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 130 });
+
+  private scalePivotX: number;
+  private scalePivotY: number;
+
+  private scaleAnimation: Animation | null = null;
+  private moveXAnimation: Animation | null = null;
+  private moveYAnimation: Animation | null = null;
 
   constructor(private game: Game) {}
 
@@ -29,15 +41,33 @@ export class Camera {
     this.transform$.next(this.transform$.value);
   }
 
-  scaleBy(scaleFactor: number, screenPivotX: number, screenPivotY: number) {
+  moveToTileWithEasing(tile: Tile) {
     const t = this.transform$.value;
+    const [x, y] = getTileCoords(tile);
+    this.moveXAnimation = new AnimationEaseOutCubic(t.x, x, 600);
+    this.moveYAnimation = new AnimationEaseOutCubic(t.y, y, 600);
+    this.scaleAnimation = new AnimationEaseOutQuad(t.scale, 130, 800);
+  }
 
+  scaleByWithEasing(
+    scaleFactor: number,
+    screenPivotX: number,
+    screenPivotY: number,
+  ) {
+    const t = this.transform$.value;
+    const currentScale = this.scaleAnimation?.end || t.scale;
+    const newScale = currentScale * scaleFactor;
+
+    this.scaleAnimation = new AnimationEaseOutCubic(t.scale, newScale, 300);
+    this.scalePivotX = screenPivotX;
+    this.scalePivotY = screenPivotY;
+  }
+
+  scaleTo(scale: number, screenPivotX: number, screenPivotY: number) {
+    const t = this.transform$.value;
     const [x1, y1] = this.screenToCanvas(screenPivotX, screenPivotY);
 
-    t.scale = Math.max(
-      this.MIN_ZOOM,
-      Math.min(this.MAX_ZOOM, t.scale * scaleFactor)
-    );
+    t.scale = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, scale));
 
     const [x2, y2] = this.screenToCanvas(screenPivotX, screenPivotY);
 
@@ -81,5 +111,42 @@ export class Camera {
 
   serialize(): Transform {
     return this.transform$.value;
+  }
+
+  update() {
+    const elapsedMS = this.game.renderer.app.ticker.elapsedMS;
+
+    if (this.scaleAnimation) {
+      const newScale = this.scaleAnimation.step(elapsedMS);
+      if (newScale === null) {
+        this.scaleAnimation = null;
+      } else {
+        this.scaleTo(newScale, this.scalePivotX, this.scalePivotY);
+      }
+    }
+
+    if (this.moveXAnimation || this.moveYAnimation) {
+      const t = this.transform$.value;
+      let [x, y] = [t.x, t.y];
+      if (this.moveXAnimation) {
+        const newX = this.moveXAnimation.step(elapsedMS);
+        if (newX === null) {
+          this.moveXAnimation = null;
+        } else {
+          x = newX;
+        }
+      }
+
+      if (this.moveYAnimation) {
+        const newY = this.moveYAnimation.step(elapsedMS);
+        if (newY === null) {
+          this.moveYAnimation = null;
+        } else {
+          y = newY;
+        }
+      }
+
+      this.moveTo(x, y);
+    }
   }
 }

@@ -3,6 +3,7 @@ import { Component, OnInit, Input } from "@angular/core";
 import { City } from "src/app/game/city";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
 import { UIState } from "../ui-state";
+import { Game } from "src/app/game/game";
 
 @Component({
   selector: "app-city-view",
@@ -14,9 +15,11 @@ export class CityViewComponent implements OnInit {
 
   @Input() city: City;
 
-  constructor(private uiState: UIState) {}
+  constructor(private game: Game, private uiState: UIState) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.game.camera.moveToTileWithEasing(this.city.tile);
+  }
 
   quit() {
     this.uiState.selectedCity$.next(null);

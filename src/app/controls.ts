@@ -83,10 +83,10 @@ export class Controls {
   }
 
   onWheel(event: WheelEvent) {
-    this.game.camera.scaleBy(
-      1 + (event.deltaY > 0 ? -0.2 : 0.2),
+    this.game.camera.scaleByWithEasing(
+      1 + (event.deltaY > 0 ? -0.3 : 0.3),
       event.clientX,
-      event.clientY
+      event.clientY,
     );
   }
 
