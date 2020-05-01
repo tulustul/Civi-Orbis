@@ -5,6 +5,7 @@ import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
 import { Tile, LandForm, SeaLevel } from "./tile";
+import { UNITS_DEFINITIONS } from "../data/units";
 
 export class CitiesManager {
   private _spawned$ = new Subject<City>();
@@ -88,6 +89,13 @@ export class CitiesManager {
       if (city) {
         city.name = cityData.name;
         city.size = cityData.size;
+        city.totalFood = cityData.totalFood;
+        city.totalProduction = cityData.totalProduction;
+        if (cityData.inProduction) {
+          city.inProduction =
+            this.game.unitsManager.definitions.get(cityData.inProduction) ||
+            null;
+        }
       }
     }
   }

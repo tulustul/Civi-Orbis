@@ -9,6 +9,9 @@ export interface CitySerialized {
   size: number;
   tile: number;
   player: number;
+  totalFood: number;
+  totalProduction: number;
+  inProduction: string | null;
 }
 
 export interface Yields {
@@ -31,13 +34,16 @@ export class City {
 
   constructor(public tile: Tile, public player: Player) {}
 
-  serialize() {
+  serialize(): CitySerialized {
     return {
       id: this.id,
       name: this.name,
       size: this.size,
       player: this.player.id,
       tile: getTileIndex(this.player.game.map, this.tile),
+      totalFood: this.totalFood,
+      totalProduction: this.totalProduction,
+      inProduction: this.inProduction?.id || null,
     };
   }
 

@@ -58,6 +58,7 @@ export class Game {
   uiState: UIState;
 
   start() {
+    this.activePlayerIndex = -1;
     this.nextPlayer();
     this._isStarted$.next(true);
   }
