@@ -87,6 +87,7 @@ export class Controls {
       1 + (event.deltaY > 0 ? -0.3 : 0.3),
       event.clientX,
       event.clientY,
+      300,
     );
   }
 

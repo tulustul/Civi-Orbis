@@ -46,21 +46,34 @@ export class Camera {
     const [x, y] = getTileCoords(tile);
     this.moveXAnimation = new AnimationEaseOutCubic(t.x, x, 600);
     this.moveYAnimation = new AnimationEaseOutCubic(t.y, y, 600);
-    this.scaleAnimation = new AnimationEaseOutQuad(t.scale, 130, 800);
+  }
+
+  scaleToWithEasing(
+    newScale: number,
+    screenPivotX: number,
+    screenPivotY: number,
+    duration = 600,
+  ) {
+    const t = this.transform$.value;
+    this.scalePivotX = screenPivotX;
+    this.scalePivotY = screenPivotY;
+    this.scaleAnimation = new AnimationEaseOutCubic(
+      t.scale,
+      newScale,
+      duration,
+    );
   }
 
   scaleByWithEasing(
     scaleFactor: number,
     screenPivotX: number,
     screenPivotY: number,
+    duration = 600,
   ) {
     const t = this.transform$.value;
     const currentScale = this.scaleAnimation?.end || t.scale;
     const newScale = currentScale * scaleFactor;
-
-    this.scaleAnimation = new AnimationEaseOutCubic(t.scale, newScale, 300);
-    this.scalePivotX = screenPivotX;
-    this.scalePivotY = screenPivotY;
+    this.scaleToWithEasing(newScale, screenPivotX, screenPivotY, duration);
   }
 
   scaleTo(scale: number, screenPivotX: number, screenPivotY: number) {
