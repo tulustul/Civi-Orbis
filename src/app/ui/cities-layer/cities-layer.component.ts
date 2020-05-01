@@ -49,8 +49,12 @@ export class CitiesLayerComponent implements OnInit {
     return this.game.citiesManager.cities;
   }
 
-  @HostBinding("class.hidden")
-  get isHidden() {
-    return this.game.camera.transform$.value.scale < 20;
+  @HostBinding("style.opacity")
+  get opacity() {
+    const scale = this.game.camera.transform$.value.scale;
+    if (scale > 20) {
+      return 1;
+    }
+    return Math.max(0, 1 - (20 - scale) / 8);
   }
 }

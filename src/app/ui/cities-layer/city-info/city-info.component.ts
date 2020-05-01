@@ -58,9 +58,11 @@ export class CityInfoComponent implements OnInit, OnDestroy {
   @HostBinding("style.transform")
   get transform() {
     // FIXME: This migth lead to performance issues. It is calculated for every city every time camera transform changes.
+    let scale = this.game.camera.transform$.value.scale;
+    scale = Math.pow(scale / 70, 0.4);
     let [x, y] = getTileCoords(this.city.tile);
     [x, y] = this.game.camera.canvasToScreen(x + 0.5, y + 0.8);
-    return `translate(${x}px, ${y}px) scale(1)`;
+    return `translate(${x}px, ${y}px) scale(${scale})`;
   }
 
   selectCity() {
