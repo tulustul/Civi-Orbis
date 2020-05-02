@@ -26,9 +26,10 @@ export class TilesMap {
     }
   }
 
-  precomputeMovementCosts() {
+  precompute() {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
+        this.tiles[x][y].computeYields();
         this.tiles[x][y].computeMovementCosts();
       }
     }
@@ -116,7 +117,7 @@ export class TilesMap {
       }
     }
 
-    map.precomputeMovementCosts();
+    map.precompute();
 
     return map;
   }

@@ -41,7 +41,7 @@ export class NewGameViewComponent implements OnInit {
       this.uniformity,
       this.seaLevel,
     );
-    this.game.map.precomputeMovementCosts();
+    this.game.map.precompute();
 
     for (let i = 0; i < this.game.players.length; i++) {
       this.game.unitsManager.spawn(

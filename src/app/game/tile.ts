@@ -1,5 +1,5 @@
 import { Unit } from "./unit";
-import { City } from "./city";
+import { City, Yields } from "./city";
 
 export enum Climate {
   tropical,
@@ -23,6 +23,52 @@ export enum SeaLevel {
   deep,
 }
 
+const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
+  [Climate.arctic]: {
+    food: 0,
+    production: 0,
+  },
+  [Climate.continental]: {
+    food: 1,
+    production: 1,
+  },
+  [Climate.desert]: {
+    food: 0,
+    production: 0,
+  },
+  [Climate.oceanic]: {
+    food: 2,
+    production: 1,
+  },
+  [Climate.savanna]: {
+    food: 1,
+    production: 1,
+  },
+  [Climate.tropical]: {
+    food: 1,
+    production: 0,
+  },
+  [Climate.tundra]: {
+    food: 0,
+    production: 1,
+  },
+};
+
+const BASE_LAND_FORM_YIELDS: Record<LandForm, Yields> = {
+  [LandForm.plains]: {
+    food: 0,
+    production: 0,
+  },
+  [LandForm.hills]: {
+    food: -1,
+    production: 0,
+  },
+  [LandForm.mountains]: {
+    food: -Infinity,
+    production: -5,
+  },
+};
+
 export class Tile {
   climate = Climate.continental;
   landForm = LandForm.plains;
@@ -38,12 +84,10 @@ export class Tile {
   neighbours: Tile[] = [];
   neighboursCosts = new Map<Tile, number>();
 
-  // debug staff
-  // height?: number;
-  // temperature?: number;
-  // humidity?: number;
-  // riverSource?: boolean;
-  // riverMouth?: boolean;
+  yields: Yields = {
+    food: 0,
+    production: 0,
+  };
 
   constructor(public x: number, public y: number) {}
 
@@ -88,6 +132,39 @@ export class Tile {
       return TileDirection.W;
     }
     return TileDirection.NONE;
+  }
+
+  computeYields() {
+    if (this.seaLevel === SeaLevel.deep) {
+      this.yields.food = 1;
+      this.yields.production = 0;
+    } else if (this.seaLevel === SeaLevel.shallow) {
+      this.yields.food = 2;
+      this.yields.production = 0;
+    } else {
+      const climateYields = BASE_CLIMATE_YIELDS[this.climate];
+      const landFormYields = BASE_LAND_FORM_YIELDS[this.landForm];
+      this.yields.food = climateYields.food + landFormYields.food;
+      this.yields.production =
+        climateYields.production + landFormYields.production;
+
+      if (this.forest) {
+        this.yields.food--;
+        this.yields.production++;
+      }
+
+      if (this.wetlands) {
+        this.yields.food--;
+        this.yields.production--;
+      }
+
+      if (this.riverParts.length) {
+        this.yields.food += this.climate === Climate.desert ? 3 : 1;
+      }
+
+      this.yields.food = Math.max(0, this.yields.food);
+      this.yields.production = Math.max(0, this.yields.production);
+    }
   }
 }
 

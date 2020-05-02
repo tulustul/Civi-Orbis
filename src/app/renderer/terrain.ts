@@ -75,17 +75,16 @@ export class TerrainRenderer {
 
   riverContainer = new PIXIE.Container();
 
+  yieldsContainer = new PIXIE.Container();
+
   private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   constructor(private game: Game) {
-    // this.waterContainer.zIndex = 3;
-    // this.coastlinesContainer.zIndex = 2;
-    // this.terrainContainer.zIndex = 0;
-
     this.container.addChild(this.waterContainer);
     this.container.addChild(this.coastlinesContainer);
     this.container.addChild(this.terrainContainer);
     this.container.addChild(this.riverContainer);
+    this.container.addChild(this.yieldsContainer);
 
     this.game.tilesManager.revealedTiles$.subscribe((tiles) => {
       for (const tile of tiles) {
@@ -99,7 +98,7 @@ export class TerrainRenderer {
     });
 
     this.game.tilesManager.updatedTile$.subscribe((tile) =>
-      this.updateTile(tile)
+      this.updateTile(tile),
     );
 
     this.game.started$.subscribe(() => this.build());
@@ -186,6 +185,8 @@ export class TerrainRenderer {
     //   this.renderCoastline(tile, sprite, displayObjects);
     // }
 
+    this.drawYields(tile, displayObjects);
+
     if (!this.game.activeHumanPlayer?.exploredTiles.has(tile)) {
       for (const obj of displayObjects) {
         obj.visible = false;
@@ -243,7 +244,7 @@ export class TerrainRenderer {
   renderCoastline(
     tile: Tile,
     tileSprite: PIXIE.Sprite,
-    displayObjects: PIXIE.DisplayObject[]
+    displayObjects: PIXIE.DisplayObject[],
   ) {
     for (const neighbour of tile.neighbours) {
       if (neighbour.seaLevel !== SeaLevel.none) {
@@ -281,11 +282,34 @@ export class TerrainRenderer {
     }
   }
 
+  drawYields(tile: Tile, displayObjects: PIXIE.DisplayObject[]) {
+    const g = new PIXIE.Graphics();
+
+    g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+    g.position.y = tile.y * 0.75;
+
+    this.drawYield(g, 0.4, tile.yields.food, 0x00ff00);
+    this.drawYield(g, 0.6, tile.yields.production, 0xffaa00);
+
+    this.yieldsContainer.addChild(g);
+    displayObjects.push(g);
+  }
+
+  drawYield(g: PIXIE.Graphics, y: number, quantity: number, color: number) {
+    g.beginFill(color);
+    for (let i = 0; i < quantity; i++) {
+      const x = 0.5 - (quantity / 2) * 0.1 + 0.1 * i;
+      g.drawRect(x, y, 0.05, 0.05);
+    }
+    g.endFill();
+  }
+
   clear() {
     clearContainer(this.terrainContainer);
     clearContainer(this.waterContainer);
     clearContainer(this.coastlinesContainer);
     clearContainer(this.riverContainer);
+    clearContainer(this.yieldsContainer);
     this.tilesMap.clear();
   }
 }
