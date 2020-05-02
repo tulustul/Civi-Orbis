@@ -3,6 +3,7 @@ import * as PIXIE from "pixi.js";
 import { Tile, SeaLevel, Climate, TileDirection, LandForm } from "../game/tile";
 import { Game } from "../game/game";
 import { clearContainer, getTileVariants } from "./utils";
+import { GridContainer } from "./grid-container";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),
@@ -67,21 +68,21 @@ const COASTLINE_TEXTURES = getTileVariants("coastline", 4);
 export class TerrainRenderer {
   container = new PIXIE.Container();
 
-  terrainContainer = new PIXIE.Container();
+  terrainContainer = new GridContainer(this.game.camera.boundingBox);
 
-  waterContainer = new PIXIE.Container();
+  waterContainer = new GridContainer(this.game.camera.boundingBox);
 
   coastlinesContainer = new PIXIE.Container();
 
-  riverContainer = new PIXIE.Container();
+  riverContainer = new GridContainer(this.game.camera.boundingBox);
 
-  yieldsContainer = new PIXIE.Container();
+  yieldsContainer = new GridContainer(this.game.camera.boundingBox);
 
   private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   constructor(private game: Game) {
     this.container.addChild(this.waterContainer);
-    this.container.addChild(this.coastlinesContainer);
+    // this.container.addChild(this.coastlinesContainer);
     this.container.addChild(this.terrainContainer);
     this.container.addChild(this.riverContainer);
     this.container.addChild(this.yieldsContainer);
@@ -105,8 +106,16 @@ export class TerrainRenderer {
   }
 
   private build() {
-    for (let y = 0; y < this.game.map.height; y++) {
-      for (let x = 0; x < this.game.map.width; x++) {
+    this.terrainContainer.setGridSize(
+      this.game.map.width,
+      this.game.map.height,
+    );
+    this.waterContainer.setGridSize(this.game.map.width, this.game.map.height);
+    this.yieldsContainer.setGridSize(this.game.map.width, this.game.map.height);
+    this.riverContainer.setGridSize(this.game.map.width, this.game.map.height);
+
+    for (let x = 0; x < this.game.map.width; x++) {
+      for (let y = 0; y < this.game.map.height; y++) {
         this.drawTile(this.game.map.tiles[x][y]);
       }
     }
@@ -167,9 +176,9 @@ export class TerrainRenderer {
     sprite.scale.set(1 / sprite.width, 1 / sprite.width);
 
     if (tile.seaLevel === SeaLevel.none) {
-      this.terrainContainer.addChild(sprite);
+      this.terrainContainer.addChild(sprite, tile.x, tile.y);
     } else {
-      this.waterContainer.addChild(sprite);
+      this.waterContainer.addChild(sprite, tile.x, tile.y);
     }
 
     const riverGraphics = this.renderRivers(tile);
@@ -202,7 +211,7 @@ export class TerrainRenderer {
     const g = new PIXIE.Graphics();
     g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     g.position.y = tile.y * 0.75;
-    this.riverContainer.addChild(g);
+    this.riverContainer.addChild(g, tile.x, tile.y);
 
     g.lineStyle(0.15, 0x4169e1);
 
@@ -291,7 +300,7 @@ export class TerrainRenderer {
     this.drawYield(g, 0.4, tile.yields.food, 0x00ff00);
     this.drawYield(g, 0.6, tile.yields.production, 0xffaa00);
 
-    this.yieldsContainer.addChild(g);
+    this.yieldsContainer.addChild(g, tile.x, tile.y);
     displayObjects.push(g);
   }
 
@@ -305,11 +314,13 @@ export class TerrainRenderer {
   }
 
   clear() {
-    clearContainer(this.terrainContainer);
-    clearContainer(this.waterContainer);
     clearContainer(this.coastlinesContainer);
-    clearContainer(this.riverContainer);
-    clearContainer(this.yieldsContainer);
+
+    this.terrainContainer.destroyAllChildren();
+    this.waterContainer.destroyAllChildren();
+    this.yieldsContainer.destroyAllChildren();
+    this.riverContainer.destroyAllChildren();
+
     this.tilesMap.clear();
   }
 }

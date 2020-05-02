@@ -2,11 +2,7 @@ import { BehaviorSubject } from "rxjs";
 import { Game } from "../game/game";
 import { getTileCoords } from "./utils";
 import { Tile } from "../game/tile";
-import {
-  AnimationEaseOutCubic,
-  AnimationEaseOutQuad,
-  Animation,
-} from "../game/animation";
+import { AnimationEaseOutCubic, Animation } from "../game/animation";
 
 export interface Transform {
   x: number;
@@ -14,9 +10,16 @@ export interface Transform {
   scale: number;
 }
 
+export interface BoundingBox {
+  xStart: number;
+  yStart: number;
+  xEnd: number;
+  yEnd: number;
+}
+
 export class Camera {
   MAX_ZOOM = 256; // tile graphics width in pixels
-  MIN_ZOOM = 5;
+  MIN_ZOOM = 7;
 
   transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 130 });
 
@@ -26,6 +29,13 @@ export class Camera {
   private scaleAnimation: Animation | null = null;
   private moveXAnimation: Animation | null = null;
   private moveYAnimation: Animation | null = null;
+
+  public boundingBox: BoundingBox = {
+    xStart: 0,
+    yStart: 0,
+    xEnd: 0,
+    yEnd: 0,
+  };
 
   constructor(private game: Game) {}
 
@@ -161,5 +171,31 @@ export class Camera {
 
       this.moveTo(x, y);
     }
+
+    this.updateBoundingBox();
+
+    // TODO move to more appropriate place.
+    this.game.renderer.terrain.yieldsContainer.visible =
+      this.transform$.value.scale > 40;
+  }
+
+  updateBoundingBox() {
+    if (!this.game.map) {
+      return;
+    }
+
+    const t = this.transform$.value;
+    const width = Math.floor(this.game.renderer.canvas.width / t.scale);
+    const height = Math.floor(this.game.renderer.canvas.height / t.scale);
+
+    const map = this.game.map;
+
+    const xStart = Math.floor(t.x - width / 2 - 1);
+    const yStart = Math.floor(t.y - height / 2);
+
+    this.boundingBox.xStart = Math.max(0, Math.min(map.width, xStart));
+    this.boundingBox.yStart = Math.max(0, Math.min(map.height, yStart));
+    this.boundingBox.xEnd = Math.min(map.width, xStart + width + 3);
+    this.boundingBox.yEnd = Math.min(map.height, (yStart + height + 2) / 0.75);
   }
 }

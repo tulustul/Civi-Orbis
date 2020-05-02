@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from "@angular/core";
   name: "turns",
 })
 export class TurnsPipe implements PipeTransform {
-  transform(value: number): string {
+  transform(value: number | null): string {
     if (value === null) {
       return "";
     }
