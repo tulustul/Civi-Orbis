@@ -79,9 +79,13 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
   get nextGrowthPercent() {
     return (
-      ((this.city.totalFood + this.city.yields.food) / this.city.foodToGrow) *
+      ((this.city.totalFood + this.city.perTurn.food) / this.city.foodToGrow) *
       100
     );
+  }
+
+  get perTurnFoodPercent() {
+    return (this.city.perTurn.food / this.city.foodToGrow) * 100;
   }
 
   get productionPercent() {
@@ -98,7 +102,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
       return 0;
     }
     return (
-      ((this.city.totalProduction + this.city.yields.production) /
+      ((this.city.totalProduction + this.city.perTurn.production) /
         this.city.inProduction?.productionCost) *
       100
     );

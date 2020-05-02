@@ -47,6 +47,8 @@ export class CitiesManager {
     tile.wetlands = false;
     this.game.tilesManager.updateTile(tile);
 
+    city.updatePerTurnYields();
+
     this._spawned$.next(city);
 
     return city;
@@ -96,6 +98,7 @@ export class CitiesManager {
             this.game.unitsManager.definitions.get(cityData.inProduction) ||
             null;
         }
+        city.updatePerTurnYields();
       }
     }
   }

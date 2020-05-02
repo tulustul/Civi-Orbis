@@ -25,9 +25,14 @@ export class City {
   size: number;
   totalFood = 0;
   foodToGrow = 20;
+  foodConsumed = 1;
   yields: Yields = {
     food: 5,
     production: 5,
+  };
+  perTurn: Yields = {
+    food: 0,
+    production: 0,
   };
   inProduction: UnitDefinition | null = null;
   totalProduction = 0;
@@ -50,6 +55,7 @@ export class City {
   nextTurn() {
     this.progressProduction();
     this.progressGrowth();
+    this.updatePerTurnYields();
   }
 
   progressProduction() {
@@ -71,7 +77,7 @@ export class City {
   }
 
   progressGrowth() {
-    this.totalFood += this.yields.food;
+    this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
       this.totalFood -= this.foodToGrow;
@@ -88,8 +94,12 @@ export class City {
   }
 
   get turnsToGrow() {
-    const remainingFood = this.foodToGrow - this.totalFood;
-    return Math.ceil(remainingFood / this.yields.food);
+    if (this.perTurn.food >= 0) {
+      const remainingFood = this.foodToGrow - this.totalFood;
+      return Math.ceil(remainingFood / this.perTurn.food);
+    } else {
+      return Math.ceil(this.totalFood / this.perTurn.food) - 1;
+    }
   }
 
   get turnsToProductionEnd() {
@@ -104,5 +114,11 @@ export class City {
 
   getTurnsToProduce(unit: UnitDefinition) {
     return Math.ceil(unit.productionCost / this.yields.production);
+  }
+
+  updatePerTurnYields() {
+    this.foodConsumed = this.size;
+    this.perTurn.food = this.yields.food - this.foodConsumed;
+    this.perTurn.production = this.yields.production;
   }
 }
