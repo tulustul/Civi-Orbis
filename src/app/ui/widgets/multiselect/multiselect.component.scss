@@ -3,11 +3,10 @@
     cursor: pointer;
     padding: 3px 10px;
     &:not(.selected):hover {
-      background-color: lightblue;
+      background-color: grey;
     }
     &.selected {
-      background-color: royalblue;
-      color: white;
+      background-color: var(--secondary-color);
     }
   }
 }

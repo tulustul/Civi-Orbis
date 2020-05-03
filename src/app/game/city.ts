@@ -241,7 +241,7 @@ export class City {
     while (this.freeTileWorkers && this.notWorkedTiles.size) {
       const tile = this.pickBestTile(this.notWorkedTiles);
       if (!tile) {
-        return;
+        break;
       }
       this.workTile(tile, false);
     }

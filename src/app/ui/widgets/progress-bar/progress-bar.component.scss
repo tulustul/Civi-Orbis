@@ -1,0 +1,28 @@
+:root {
+  --progress-bar-color: royalblue;
+}
+
+:host {
+  position: relative;
+  z-index: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  .progress {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    background-color: var(--progress-bar-color);
+    &.next {
+      opacity: 0.5;
+    }
+    &.negative {
+      background-color: #c22929;
+    }
+  }
+}

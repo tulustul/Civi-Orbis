@@ -3,8 +3,7 @@
     padding: 20px 200px;
     cursor: pointer;
     &:hover {
-      background-color: royalblue;
-      color: white;
+      background-color: var(--secondary-color);
     }
   }
 }

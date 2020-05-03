@@ -18,36 +18,81 @@
     pointer-events: all;
   }
   .yields {
-    background-color: rgba(150, 150, 150, 0.8);
+    background-color: var(--primary-color);
     grid-area: yields;
     padding: 15px;
     justify-self: flex-start;
     align-self: flex-start;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    button {
+      margin-top: 15px;
+    }
+    .size-and-growth {
+      --progress-bar-color: var(--growth-color);
+      display: flex;
+      align-items: stretch;
+      .size {
+        font-size: 35px;
+        margin-right: 15px;
+      }
+    }
+
     .yield {
       display: flex;
       justify-content: space-between;
+      padding: 3px 0;
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--secondary-color);
+      }
       .label {
         font-weight: bold;
         margin-right: 15px;
       }
     }
   }
+
   .city-name {
     grid-area: city-name;
     justify-self: center;
     align-self: flex-start;
     text-align: center;
     h2 {
-      background-color: rgba(150, 150, 150, 0.8);
+      background-color: var(--primary-color);
       padding: 8px 100px;
       border-radius: 30px;
     }
   }
+
   .production {
-    background-color: rgba(150, 150, 150, 0.8);
+    --progress-bar-color: var(--production-color);
+    background-color: var(--primary-color);
     grid-area: production;
-    padding: 15px;
     justify-self: flex-start;
     align-self: flex-end;
+    h3 {
+      margin: 0;
+    }
+    app-progress-bar {
+      height: 30px;
+      margin-bottom: 15px;
+    }
+    .production-top {
+      padding: 15px;
+    }
+    .product {
+      padding: 5px 15px;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid var(--secondary-color);
+      cursor: pointer;
+      &:hover {
+        background-color: var(--secondary-color);
+      }
+      .turns {
+        margin-left: 15px;
+      }
+    }
   }
 }

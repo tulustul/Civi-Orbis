@@ -1,0 +1,18 @@
+<ng-container *ngIf="total">
+  <div
+    class="progress next"
+    *ngIf="nextProgress > progress"
+    [style.width.%]="nextProgressPercent"
+  ></div>
+
+  <div class="progress" [style.width.%]="progressPercent"></div>
+
+  <div
+    class="progress negative"
+    *ngIf="nextProgress < progress"
+    [style.width.%]="progressPercent - nextProgressPercent"
+    [style.left.%]="nextProgressPercent"
+  ></div>
+
+  <ng-content></ng-content>
+</ng-container>

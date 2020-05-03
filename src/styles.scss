@@ -1,5 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+  --primary-color: #656565;
+  --secondary-color: #484848;
+  --growth-color: #4c9f3b;
+  --production-color: #f0a00d;
+}
+
 body {
   width: 100vw;
   height: 100vh;
@@ -7,7 +14,45 @@ body {
   overflow: hidden;
 }
 
+h3 {
+  font-weight: 300;
+  text-align: center;
+  margin: 0;
+  margin-top: 15px;
+}
+
 h4 {
   margin: 0;
   margin-bottom: 10px;
+}
+
+button {
+  border: 0;
+  padding: 5px 15px;
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: var(--secondary-color);
+  color: white;
+  outline: none;
+  &:hover {
+    background-color: #545454;
+  }
+  &.btn-primary {
+    padding: 8px 35px;
+    font-size: 18px;
+  }
+}
+
+.small {
+  font-size: 14px;
+}
+
+.box-shadowed {
+  box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.8);
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
 }

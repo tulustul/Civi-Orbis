@@ -11,6 +11,7 @@
   z-index: 10;
   .menu {
     min-width: 400px;
-    background-color: lightgrey;
+    background-color: var(--primary-color);
+    color: white;
   }
 }

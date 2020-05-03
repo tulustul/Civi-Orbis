@@ -1,46 +1,77 @@
-<div class="yields">
+<div class="yields box-shadowed">
+  <div class="size-and-growth">
+    <span class="size">{{ city.size }}</span>
+
+    <app-progress-bar
+      [progress]="city.totalFood"
+      [nextProgress]="city.totalFood + city.perTurn.food"
+      [total]="city.foodToGrow"
+    >
+      <span class="turns" *ngIf="city.perTurn.food > 0"
+        >will grow in {{ city.turnsToGrow | turns }} turns</span
+      >
+      <span class="turns" *ngIf="city.perTurn.food < 0"
+        >will shrink in {{ -city.turnsToGrow | turns }} turns</span
+      >
+      <span class="turns" *ngIf="city.perTurn.food === 0">growth stalled</span>
+    </app-progress-bar>
+  </div>
+
   <h3>Yields</h3>
 
-  <div class="yield">
-    <div class="label">Food</div>
-    <div class="value">{{ city.perTurn.food }}</div>
-  </div>
-  <div class="yield">
-    <div class="label">Production</div>
-    <div class="value">{{ city.perTurn.production }}</div>
+  <div>
+    <div class="yield">
+      <div class="label">Food</div>
+      <div class="value">{{ city.perTurn.food }}</div>
+    </div>
+    <div class="yield">
+      <div class="label">Production</div>
+      <div class="value">{{ city.perTurn.production }}</div>
+    </div>
   </div>
 
   <button (click)="city.optimizeYields()">Optimize yields</button>
 </div>
 
 <div class="city-name">
-  <h2>{{ city.name }}</h2>
-  <button (click)="quit()">Return</button>
+  <h2 class="box-shadowed">{{ city.name }}</h2>
+  <button class="btn-primary box-shadowed" (click)="quit()">Return</button>
 </div>
 
-<div class="production">
-  <div>
-    <h3>In production:</h3>
+<div class="production box-shadowed">
+  <div class="production-top">
     <div>
-      <span class="name">
-        {{ city.inProduction?.name || "-" }}
-      </span>
-      <span class="turns" *ngIf="city.inProduction">
-        {{ city.turnsToProductionEnd }} turns
-      </span>
+      <ng-container *ngIf="city.inProduction">
+        <app-progress-bar
+          [progress]="city.totalProduction"
+          [nextProgress]="city.totalProduction + city.perTurn.production"
+          [total]="city.inProduction?.productionCost"
+        >
+          <div>
+            <span class="name">
+              {{ city.inProduction?.name || "-" }}
+            </span>
+            <span class="turns" *ngIf="city.inProduction">
+              {{ city.turnsToProductionEnd }} turns
+            </span>
+          </div>
+        </app-progress-bar>
+      </ng-container>
     </div>
+    <h3>Produce:</h3>
   </div>
 
-  <h3>Produce:</h3>
   <div
-    class="unit"
+    class="product"
     *ngFor="let unitDef of UNITS"
     (click)="city.startProducing(unitDef)"
   >
     <span class="name">
       {{ unitDef.name }}
     </span>
-    <span class="turns"> {{ city.getTurnsToProduce(unitDef) }} turns </span>
+    <span class="turns small">
+      {{ city.getTurnsToProduce(unitDef) }} turns
+    </span>
   </div>
 </div>
 

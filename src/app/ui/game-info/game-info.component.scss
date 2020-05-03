@@ -2,7 +2,8 @@
   position: absolute;
   top: 0;
   right: 0;
-  background-color: lightgrey;
+  background-color: var(--primary-color);
+  color: white;
   padding: 5px 20px;
   .bar > *:not(:last-child) {
     margin-right: 15px;

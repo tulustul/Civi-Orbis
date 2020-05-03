@@ -23,41 +23,16 @@
       justify-content: center;
       background-color: royalblue;
     }
-    .bar {
+    app-progress-bar {
       height: 20px;
-      padding: 0 15px;
-      position: relative;
-      z-index: 0;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      overflow: hidden;
       .turns {
-        margin-left: 10px;
+        margin-left: 15px;
       }
-      .progress {
-        position: absolute;
-        height: 100%;
-        top: 0;
-        left: 0;
-        z-index: -1;
-        &.next {
-          opacity: 0.5;
-        }
-        &.negative {
-          background-color: #c22929;
-        }
+      &.growth {
+        --progress-bar-color: var(--growth-color);
       }
-    }
-    .growth {
-      .progress {
-        background-color: #4c9f3b;
-      }
-    }
-    .production {
-      .progress {
-        background-color: #f0a00d;
+      &.production {
+        --progress-bar-color: var(--production-color);
       }
     }
   }

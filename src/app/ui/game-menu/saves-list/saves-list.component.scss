@@ -4,9 +4,13 @@
     padding: 10px 0;
     display: flex;
     justify-content: space-between;
+    .save-actions {
+      > * {
+        margin-left: 10px;
+      }
+    }
     &.selected {
-      background-color: royalblue;
-      color: white;
+      background-color: grey;
     }
   }
 }

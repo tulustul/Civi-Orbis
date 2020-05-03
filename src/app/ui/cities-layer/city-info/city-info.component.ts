@@ -9,10 +9,10 @@ import {
 } from "@angular/core";
 
 import { Subject, merge } from "rxjs";
+import { filter, takeUntil } from "rxjs/operators";
 
 import { City } from "src/app/game/city";
 import { Game } from "src/app/game/game";
-import { filter, takeUntil } from "rxjs/operators";
 import { getTileCoords } from "src/app/renderer/utils";
 import { UIState } from "../../ui-state";
 
@@ -71,40 +71,5 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
   onContextMenu(event: Event) {
     event.preventDefault();
-  }
-
-  get growthPercent() {
-    return (this.city.totalFood / this.city.foodToGrow) * 100;
-  }
-
-  get nextGrowthPercent() {
-    return (
-      ((this.city.totalFood + this.city.perTurn.food) / this.city.foodToGrow) *
-      100
-    );
-  }
-
-  get perTurnFoodPercent() {
-    return (this.city.perTurn.food / this.city.foodToGrow) * 100;
-  }
-
-  get productionPercent() {
-    if (!this.city.inProduction) {
-      return 0;
-    }
-    return (
-      (this.city.totalProduction / this.city.inProduction?.productionCost) * 100
-    );
-  }
-
-  get nextProductionPercent() {
-    if (!this.city.inProduction) {
-      return 0;
-    }
-    return (
-      ((this.city.totalProduction + this.city.perTurn.production) /
-        this.city.inProduction?.productionCost) *
-      100
-    );
   }
 }

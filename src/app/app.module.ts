@@ -31,6 +31,7 @@ import { CityInfoComponent } from './ui/cities-layer/city-info/city-info.compone
 import { CityViewComponent } from './ui/city-view/city-view.component';
 import { TurnsPipe } from './ui/turns.pipe';
 import { WorkTilesComponent } from './ui/city-view/work-tiles/work-tiles.component';
+import { ProgressBarComponent } from './ui/widgets/progress-bar/progress-bar.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { WorkTilesComponent } from './ui/city-view/work-tiles/work-tiles.compone
     CityViewComponent,
     TurnsPipe,
     WorkTilesComponent,
+    ProgressBarComponent,
   ],
   imports: [BrowserModule, FormsModule],
   providers: [Game, UIState],

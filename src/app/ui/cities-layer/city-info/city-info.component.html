@@ -10,37 +10,26 @@
 >
   <div class="size">{{ city.size }}</div>
   <div>
-    <div class="growth bar">
-      <div
-        class="progress next"
-        *ngIf="city.perTurn.food >= 0"
-        [style.width.%]="nextGrowthPercent"
-      ></div>
-
-      <div class="progress" [style.width.%]="growthPercent"></div>
-
-      <div
-        class="progress negative"
-        *ngIf="city.perTurn.food < 0"
-        [style.width.%]="-perTurnFoodPercent"
-        [style.left.%]="growthPercent + perTurnFoodPercent"
-      ></div>
-
-      <span class="value"> {{ city.name }} </span>
+    <app-progress-bar
+      class="growth"
+      [progress]="city.totalFood"
+      [nextProgress]="city.totalFood + city.perTurn.food"
+      [total]="city.foodToGrow"
+    >
+      <span> {{ city.name }} </span>
       <span class="turns">({{ city.turnsToGrow | turns }})</span>
-    </div>
-    <div class="production bar">
-      <ng-container *ngIf="city.inProduction">
-        <div
-          class="progress next"
-          [style.width.%]="nextProductionPercent"
-        ></div>
-        <div class="progress" [style.width.%]="productionPercent"></div>
-        <span class="value">
-          {{ city.inProduction.name }}
-        </span>
-        <span class="turns">({{ city.turnsToProductionEnd | turns }})</span>
-      </ng-container>
-    </div>
+    </app-progress-bar>
+
+    <app-progress-bar
+      class="production"
+      [progress]="city.totalProduction"
+      [nextProgress]="city.totalProduction + city.perTurn.production"
+      [total]="city.inProduction?.productionCost || 0"
+    >
+      <span>
+        {{ city.inProduction?.name }}
+      </span>
+      <span class="turns">({{ city.turnsToProductionEnd | turns }})</span>
+    </app-progress-bar>
   </div>
 </div>
