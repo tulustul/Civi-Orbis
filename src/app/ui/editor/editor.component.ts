@@ -14,8 +14,8 @@ export class EditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {}
 
   ngOnDestroy() {
-    this.game.tilesManager.highlightTiles(new Set());
-    this.game.tilesManager.enableSelectingTile(false);
+    this.game.mapUi.highlightTiles(null);
+    this.game.mapUi.enableSelectingTile(false);
   }
 
   close() {

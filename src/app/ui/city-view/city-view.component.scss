@@ -9,16 +9,45 @@
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
   grid-template-areas:
-    "top top top top"
+    "yields city-name city-name top"
     "production . . ."
     "production . . ."
     "production . . .";
-  .top {
+  pointer-events: none;
+  > div {
+    pointer-events: all;
+  }
+  .yields {
     background-color: rgba(150, 150, 150, 0.8);
-    grid-area: top;
+    grid-area: yields;
+    padding: 15px;
+    justify-self: flex-start;
+    align-self: flex-start;
+    .yield {
+      display: flex;
+      justify-content: space-between;
+      .label {
+        font-weight: bold;
+        margin-right: 15px;
+      }
+    }
+  }
+  .city-name {
+    grid-area: city-name;
+    justify-self: center;
+    align-self: flex-start;
+    text-align: center;
+    h2 {
+      background-color: rgba(150, 150, 150, 0.8);
+      padding: 8px 100px;
+      border-radius: 30px;
+    }
   }
   .production {
     background-color: rgba(150, 150, 150, 0.8);
     grid-area: production;
+    padding: 15px;
+    justify-self: flex-start;
+    align-self: flex-end;
   }
 }

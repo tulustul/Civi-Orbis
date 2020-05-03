@@ -21,7 +21,7 @@ export class CitiesManager {
 
   constructor(private game: Game) {}
 
-  spawn(tile: Tile, player: Player) {
+  spawn(tile: Tile, player: Player, isNew = true) {
     if (tile.city) {
       return null;
     }
@@ -40,6 +40,10 @@ export class CitiesManager {
     city.tile = tile;
     this.cities.push(city);
 
+    for (const neighbour of tile.neighbours) {
+      city.addTile(neighbour);
+    }
+
     player.cities.push(city);
 
     tile.city = city;
@@ -47,7 +51,9 @@ export class CitiesManager {
     tile.wetlands = false;
     this.game.tilesManager.updateTile(tile);
 
-    city.updatePerTurnYields();
+    if (isNew) {
+      city.optimizeYields();
+    }
 
     this._spawned$.next(city);
 
@@ -68,6 +74,10 @@ export class CitiesManager {
 
     city.tile.city = null;
 
+    for (const tile of city.tiles) {
+      city.removeTile(tile);
+    }
+
     this._destroyed$.next(city);
   }
 
@@ -87,18 +97,24 @@ export class CitiesManager {
     for (const cityData of data) {
       const tile = getTileFromIndex(this.game.map, cityData.tile);
       const player = this.game.players[cityData.player];
-      const city = this.spawn(tile, player);
+      const city = this.spawn(tile, player, false);
       if (city) {
         city.name = cityData.name;
         city.size = cityData.size;
         city.totalFood = cityData.totalFood;
         city.totalProduction = cityData.totalProduction;
+        for (const tileIndex of cityData.tiles) {
+          city.addTile(getTileFromIndex(this.game.map, tileIndex));
+        }
+        for (const tileIndex of cityData.workedTiles) {
+          city.workTile(getTileFromIndex(this.game.map, tileIndex));
+        }
         if (cityData.inProduction) {
           city.inProduction =
             this.game.unitsManager.definitions.get(cityData.inProduction) ||
             null;
         }
-        city.updatePerTurnYields();
+        city.updateYields();
       }
     }
   }

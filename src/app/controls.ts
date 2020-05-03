@@ -36,8 +36,10 @@ export class Controls {
     event.preventDefault();
     event.stopPropagation();
 
-    const hoveredTile = this.game.tilesManager.hoveredTile;
-    this.game.tilesManager.selectTile(hoveredTile);
+    const hoveredTile = this.game.mapUi.hoveredTile;
+    if (hoveredTile) {
+      this.game.mapUi.clickTile(hoveredTile);
+    }
     const newActiveUnit = hoveredTile?.units[0] || null;
     if (newActiveUnit !== this.game.unitsManager.activeUnit) {
       this.game.unitsManager.activeUnit$.next(newActiveUnit);
@@ -66,8 +68,8 @@ export class Controls {
   onMouseMove(event: MouseEvent) {
     const tile = this.getTileFromMouseEvent(event);
 
-    if (tile !== this.game.tilesManager.hoveredTile) {
-      this.game.tilesManager.hoverTile(tile);
+    if (tile !== this.game.mapUi.hoveredTile) {
+      this.game.mapUi.hoverTile(tile);
 
       if (tile && this.activeUnit && this.mouseButton === 2) {
         this.activeUnit.path = findPath(this.activeUnit, tile);
@@ -75,7 +77,7 @@ export class Controls {
       }
     }
 
-    if (this.isMousePressed) {
+    if (this.game.mapUi.allowMapPanning && this.isMousePressed) {
       if (this.mouseButton === 1) {
         this.game.camera.moveBy(event.movementX, event.movementY);
       }

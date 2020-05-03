@@ -24,8 +24,8 @@ export class CityEditorComponent implements OnInit {
     const hidden = this.isVisible$.pipe(filter((v) => !v));
 
     shown.subscribe(() => {
-      this.game.tilesManager.enableSelectingTile(true);
-      this.game.tilesManager.selectedTile$
+      this.game.mapUi.enableSelectingTile(true);
+      this.game.mapUi.selectedTile$
         .pipe(takeUntil(hidden))
         .subscribe((tile) => {
           if (!tile) {
@@ -39,7 +39,7 @@ export class CityEditorComponent implements OnInit {
         });
     });
 
-    hidden.subscribe(() => this.game.tilesManager.enableSelectingTile(false));
+    hidden.subscribe(() => this.game.mapUi.enableSelectingTile(false));
   }
 
   spawn(tile: Tile) {

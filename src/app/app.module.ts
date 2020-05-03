@@ -30,6 +30,7 @@ import { CitiesLayerComponent } from './ui/cities-layer/cities-layer.component';
 import { CityInfoComponent } from './ui/cities-layer/city-info/city-info.component';
 import { CityViewComponent } from './ui/city-view/city-view.component';
 import { TurnsPipe } from './ui/turns.pipe';
+import { WorkTilesComponent } from './ui/city-view/work-tiles/work-tiles.component';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { TurnsPipe } from './ui/turns.pipe';
     CityInfoComponent,
     CityViewComponent,
     TurnsPipe,
+    WorkTilesComponent,
   ],
   imports: [BrowserModule, FormsModule],
   providers: [Game, UIState],

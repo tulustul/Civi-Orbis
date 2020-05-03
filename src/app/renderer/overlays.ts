@@ -20,15 +20,15 @@ export class OverlaysRenderer {
     this.buildHoveredTileGraphics();
     this.buildSelectedTileGraphics();
 
-    game.tilesManager.hoveredTile$.subscribe((tile) =>
-      this.displayAtTile(this.hoveredTileGraphics, tile)
+    game.mapUi.hoveredTile$.subscribe((tile) =>
+      this.displayAtTile(this.hoveredTileGraphics, tile),
     );
 
-    game.tilesManager.selectedTile$.subscribe((tile) => {
+    game.mapUi.selectedTile$.subscribe((tile) => {
       this.displayAtTile(this.selectedTileGraphics, tile);
     });
 
-    game.tilesManager.highlightedTiles$.subscribe((tiles) => {
+    game.mapUi.highlightedTiles$.subscribe((tiles) => {
       this.buildHighlightedTiles(tiles);
     });
   }

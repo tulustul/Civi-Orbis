@@ -53,7 +53,10 @@ export class Renderer {
       this.onReady();
     }
 
-    this.app.ticker.add(() => this.game.camera.update());
+    this.app.ticker.add(() => {
+      this.game.camera.update();
+      this.game.mapUi.update();
+    });
   }
 
   resize(width: number, height: number) {

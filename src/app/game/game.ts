@@ -12,6 +12,7 @@ import { UnitSerialized } from "./unit";
 import { filter } from "rxjs/operators";
 import { CitiesManager } from "./cities-manager";
 import { CitySerialized } from "./city";
+import { MapUi } from "./map-ui";
 
 interface GameSerialized {
   turn: number;
@@ -27,6 +28,8 @@ export class Game {
   debug = new Debug();
 
   map: TilesMap;
+
+  mapUi = new MapUi(this);
 
   camera: Camera;
 
@@ -96,7 +99,7 @@ export class Game {
     this.turn$.next(1);
     this.renderer.clear();
     this.unitsManager.clear();
-    this.tilesManager.clear();
+    this.mapUi.clear();
     this.citiesManager.clear();
   }
 

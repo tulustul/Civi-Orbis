@@ -79,6 +79,7 @@ export class Tile {
 
   units: Unit[] = [];
   city: City | null = null;
+  areaOf: City | null = null;
 
   // cached data
   neighbours: Tile[] = [];
@@ -165,6 +166,10 @@ export class Tile {
       this.yields.food = Math.max(0, this.yields.food);
       this.yields.production = Math.max(0, this.yields.production);
     }
+  }
+
+  get totalYields(): number {
+    return this.yields.food + this.yields.production;
   }
 }
 

@@ -12,6 +12,8 @@ export interface CitySerialized {
   totalFood: number;
   totalProduction: number;
   inProduction: string | null;
+  tiles: number[];
+  workedTiles: number[];
 }
 
 export interface Yields {
@@ -23,9 +25,11 @@ export class City {
   id: number;
   name: string;
   size: number;
+
   totalFood = 0;
   foodToGrow = 20;
   foodConsumed = 1;
+
   yields: Yields = {
     food: 5,
     production: 5,
@@ -34,10 +38,19 @@ export class City {
     food: 0,
     production: 0,
   };
+
   inProduction: UnitDefinition | null = null;
   totalProduction = 0;
 
-  constructor(public tile: Tile, public player: Player) {}
+  tiles = new Set<Tile>();
+
+  workedTiles = new Set<Tile>();
+
+  notWorkedTiles = new Set<Tile>();
+
+  constructor(public tile: Tile, public player: Player) {
+    this.addTile(tile);
+  }
 
   serialize(): CitySerialized {
     return {
@@ -49,13 +62,19 @@ export class City {
       totalFood: this.totalFood,
       totalProduction: this.totalProduction,
       inProduction: this.inProduction?.id || null,
+      tiles: Array.from(this.tiles).map((tile) =>
+        getTileIndex(this.player.game.map, tile),
+      ),
+      workedTiles: Array.from(this.workedTiles).map((tile) =>
+        getTileIndex(this.player.game.map, tile),
+      ),
     };
   }
 
   nextTurn() {
     this.progressProduction();
     this.progressGrowth();
-    this.updatePerTurnYields();
+    this.updateYields();
   }
 
   progressProduction() {
@@ -80,10 +99,24 @@ export class City {
     this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
+      const bestWorkableTile = this.pickBestTile(this.notWorkedTiles);
+      if (bestWorkableTile) {
+        this.workTile(bestWorkableTile);
+      }
+      if (this.size % 2 === 0) {
+        const tile = this.pickBestTile(this.getAvailableTiles());
+        if (tile) {
+          this.addTile(tile);
+        }
+      }
       this.totalFood -= this.foodToGrow;
     } else if (this.totalFood < 0) {
-      this.size--;
-      this.totalFood += this.foodToGrow;
+      if (this.size > 1) {
+        this.size--;
+        this.totalFood += this.foodToGrow;
+      } else {
+        this.totalFood = 0;
+      }
     }
   }
 
@@ -116,9 +149,97 @@ export class City {
     return Math.ceil(unit.productionCost / this.yields.production);
   }
 
-  updatePerTurnYields() {
+  updateYields() {
+    this.yields.food = 0;
+    this.yields.production = 0;
+    for (const tile of this.workedTiles) {
+      this.yields.food += tile.yields.food;
+      this.yields.production += tile.yields.production;
+    }
+
+    this.yields.production += this.freeTileWorkers;
+
     this.foodConsumed = this.size;
     this.perTurn.food = this.yields.food - this.foodConsumed;
     this.perTurn.production = this.yields.production;
+  }
+
+  addTile(tile: Tile) {
+    if (!tile.areaOf) {
+      this.tiles.add(tile);
+      this.notWorkedTiles.add(tile);
+      tile.areaOf = this;
+      if (!this.player.exploredTiles.has(tile)) {
+        this.player.exploredTiles.add(tile);
+        this.player.game.tilesManager.reveal([tile]);
+      }
+    }
+  }
+
+  removeTile(tile: Tile) {
+    if (this.tiles.has(tile)) {
+      this.tiles.delete(tile);
+      tile.areaOf = null;
+    }
+  }
+
+  workTile(tile: Tile, updateYields = true) {
+    if (this.freeTileWorkers && this.tiles.has(tile)) {
+      this.workedTiles.add(tile);
+      this.notWorkedTiles.delete(tile);
+      if (updateYields) {
+        this.updateYields();
+      }
+    }
+  }
+
+  unworkTile(tile: Tile, updateYields = true) {
+    this.workedTiles.delete(tile);
+    this.notWorkedTiles.add(tile);
+    if (updateYields) {
+      this.updateYields();
+    }
+  }
+
+  getAvailableTiles(): Set<Tile> {
+    const availableTiles = new Set<Tile>();
+    for (const tile of this.tiles) {
+      for (const neighbour of tile.neighbours) {
+        if (!neighbour.areaOf) {
+          availableTiles.add(neighbour);
+        }
+      }
+    }
+    return availableTiles;
+  }
+
+  pickBestTile(tiles: Set<Tile>): Tile | null {
+    let bestTile: Tile | null = null;
+    let bestYields = 0;
+
+    for (const tile of tiles) {
+      const yields = tile.totalYields;
+      if (yields > bestYields) {
+        bestYields = yields;
+        bestTile = tile;
+      }
+    }
+
+    return bestTile;
+  }
+
+  get freeTileWorkers() {
+    return this.size - this.workedTiles.size;
+  }
+
+  optimizeYields() {
+    while (this.freeTileWorkers && this.notWorkedTiles.size) {
+      const tile = this.pickBestTile(this.notWorkedTiles);
+      if (!tile) {
+        return;
+      }
+      this.workTile(tile, false);
+    }
+    this.updateYields();
   }
 }

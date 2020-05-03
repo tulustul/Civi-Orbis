@@ -294,11 +294,11 @@ export class TerrainRenderer {
   drawYields(tile: Tile, displayObjects: PIXIE.DisplayObject[]) {
     const g = new PIXIE.Graphics();
 
-    g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+    g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
     g.position.y = tile.y * 0.75;
 
-    this.drawYield(g, 0.4, tile.yields.food, 0x00ff00);
-    this.drawYield(g, 0.6, tile.yields.production, 0xffaa00);
+    this.drawYield(g, 0.55, tile.yields.food, 0x00ff00);
+    this.drawYield(g, 0.65, tile.yields.production, 0xffaa00);
 
     this.yieldsContainer.addChild(g, tile.x, tile.y);
     displayObjects.push(g);

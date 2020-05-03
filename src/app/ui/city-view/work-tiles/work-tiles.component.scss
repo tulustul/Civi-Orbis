@@ -1,0 +1,20 @@
+:host {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  .tile {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    margin-left: -15px;
+    border-radius: 50%;
+    border: 3px solid black;
+    background-color: rgba(0, 0, 0, 0.3);
+    transform-origin: top;
+    &.worked {
+      background-color: green;
+    }
+  }
+}

@@ -76,26 +76,24 @@ export class TilePaintingComponent implements OnInit {
           }
         });
 
-      this.game.tilesManager.hoveredTile$
-        .pipe(takeUntil(hidden))
-        .subscribe((tile) => {
-          if (tile) {
-            const tiles = getTilesInRange(tile, this.paintData.size - 1);
-            this.game.tilesManager.highlightTiles(tiles);
-            if (this.game.controls.mouseButton === 0) {
-              this.paint();
-            }
-          } else {
-            this.game.tilesManager.highlightTiles(new Set());
+      this.game.mapUi.hoveredTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
+        if (tile) {
+          const tiles = getTilesInRange(tile, this.paintData.size - 1);
+          this.game.mapUi.highlightTiles(tiles);
+          if (this.game.controls.mouseButton === 0) {
+            this.paint();
           }
-        });
+        } else {
+          this.game.mapUi.highlightTiles(null);
+        }
+      });
     });
 
-    hidden.subscribe(() => this.game.tilesManager.highlightTiles(new Set()));
+    hidden.subscribe(() => this.game.mapUi.highlightTiles(null));
   }
 
   private paint() {
-    const pivotTile = this.game.tilesManager.hoveredTile;
+    const pivotTile = this.game.mapUi.hoveredTile;
     if (!pivotTile) {
       return;
     }

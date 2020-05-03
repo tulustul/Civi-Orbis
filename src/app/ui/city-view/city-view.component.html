@@ -1,4 +1,19 @@
-<div class="top">
+<div class="yields">
+  <h3>Yields</h3>
+
+  <div class="yield">
+    <div class="label">Food</div>
+    <div class="value">{{ city.perTurn.food }}</div>
+  </div>
+  <div class="yield">
+    <div class="label">Production</div>
+    <div class="value">{{ city.perTurn.production }}</div>
+  </div>
+
+  <button (click)="city.optimizeYields()">Optimize yields</button>
+</div>
+
+<div class="city-name">
   <h2>{{ city.name }}</h2>
   <button (click)="quit()">Return</button>
 </div>
@@ -28,3 +43,5 @@
     <span class="turns"> {{ city.getTurnsToProduce(unitDef) }} turns </span>
   </div>
 </div>
+
+<app-work-tiles [city]="city"></app-work-tiles>

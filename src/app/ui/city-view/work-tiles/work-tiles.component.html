@@ -1,0 +1,6 @@
+<div
+  class="tile"
+  *ngFor="let tile of city.tiles"
+  [class.worked]="city.workedTiles.has(tile)"
+  [style.transform]="getTransform(tile)"
+></div>

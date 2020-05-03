@@ -128,6 +128,13 @@ export class Camera {
     ];
   }
 
+  gameToScreen(gameX: number, gameY: number): [number, number] {
+    if (Math.floor(gameY) % 2) {
+      gameX += 0.5;
+    }
+    return this.canvasToScreen(gameX, gameY * 0.75);
+  }
+
   get canvas() {
     return this.game.renderer.canvas;
   }
@@ -173,10 +180,6 @@ export class Camera {
     }
 
     this.updateBoundingBox();
-
-    // TODO move to more appropriate place.
-    this.game.renderer.terrain.yieldsContainer.visible =
-      this.transform$.value.scale > 40;
   }
 
   updateBoundingBox() {

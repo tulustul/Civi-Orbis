@@ -9,7 +9,7 @@
 </ng-container>
 
 <ng-template #gameUiTmpl>
-  <app-cities-layer></app-cities-layer>
+  <app-cities-layer *ngIf="game.mapUi.cityLabelsVisible"></app-cities-layer>
   <app-turn-counter></app-turn-counter>
 
   <app-city-view
