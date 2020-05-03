@@ -3,6 +3,7 @@ import { Unit } from "./unit";
 import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { City } from "./city";
+import { Area } from "./area";
 
 export enum PlayerType {
   human,
@@ -25,13 +26,15 @@ export class Player {
 
   cities: City[] = [];
 
+  area = this.game.areasManager.make(0xff0000);
+
   constructor(public game: Game, public type: PlayerType) {}
 
   serialize(): PlayerSerialized {
     return {
       type: this.type,
       exploredTiles: Array.from(this.exploredTiles).map((tile) =>
-        getTileIndex(this.game.map, tile)
+        getTileIndex(this.game.map, tile),
       ),
     };
   }

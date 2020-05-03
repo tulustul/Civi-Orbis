@@ -85,6 +85,10 @@ export class GridContainer extends PIXIE.DisplayObject {
   }
 
   updateTransform() {
+    if (!this.grid.length) {
+      return;
+    }
+
     (this as any)._boundsID++;
 
     this.transform.updateTransform(this.parent.transform);

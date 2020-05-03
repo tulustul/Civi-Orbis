@@ -4,6 +4,8 @@ import { City } from "src/app/game/city";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
 import { UIState } from "../ui-state";
 import { Game } from "src/app/game/game";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: "app-city-view",
@@ -12,6 +14,8 @@ import { Game } from "src/app/game/game";
 })
 export class CityViewComponent implements OnInit {
   UNITS = UNITS_DEFINITIONS;
+
+  private quit$ = new Subject<void>();
 
   private _city: City;
 
@@ -32,6 +36,14 @@ export class CityViewComponent implements OnInit {
     );
     this.game.camera.scaleToWithEasing(130, x, y);
     this.game.mapUi.highlightTiles(this.city.tiles);
+
+    this.game.mapUi.clickedTile$
+      .pipe(takeUntil(this.quit$))
+      .subscribe((tile) => {
+        if (!this.city.tiles.has(tile)) {
+          this.quit();
+        }
+      });
   }
 
   get city() {
@@ -43,5 +55,6 @@ export class CityViewComponent implements OnInit {
     this.game.mapUi.highlightTiles(null);
     this.game.mapUi.cityLabelsVisible = true;
     this.game.mapUi.allowMapPanning = true;
+    this.quit$.next();
   }
 }

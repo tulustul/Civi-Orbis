@@ -13,6 +13,7 @@ import { filter } from "rxjs/operators";
 import { CitiesManager } from "./cities-manager";
 import { CitySerialized } from "./city";
 import { MapUi } from "./map-ui";
+import { AreasManager } from "./areas-manager";
 
 interface GameSerialized {
   turn: number;
@@ -36,6 +37,8 @@ export class Game {
   renderer = new Renderer(this);
 
   controls = new Controls(this);
+
+  areasManager = new AreasManager();
 
   players: Player[] = [];
 
@@ -101,6 +104,7 @@ export class Game {
     this.unitsManager.clear();
     this.mapUi.clear();
     this.citiesManager.clear();
+    this.areasManager.clear();
   }
 
   serialize(): GameSerialized {
@@ -135,6 +139,10 @@ export class Game {
     this.activePlayerIndex = data.activePlayerIndex;
     if (this.activePlayer$.value?.type === PlayerType.human) {
       this.activeHumanPlayer = this.activePlayer$.value;
+    }
+
+    for (const player of this.players) {
+      player.area.computeBorders();
     }
 
     return this;

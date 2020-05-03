@@ -31,6 +31,14 @@ export class MapUi {
         this.game.uiState.selectedCity$.next(tile.city);
       }
     });
+
+    this.hoveredTile$.subscribe((tile) => {
+      if (tile?.city) {
+        this.highlightTiles(tile.city.tiles);
+      } else {
+        this.highlightTiles(null);
+      }
+    });
   }
 
   update() {

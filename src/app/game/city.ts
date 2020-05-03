@@ -150,8 +150,8 @@ export class City {
   }
 
   updateYields() {
-    this.yields.food = 0;
-    this.yields.production = 0;
+    this.yields.food = 2;
+    this.yields.production = 1;
     for (const tile of this.workedTiles) {
       this.yields.food += tile.yields.food;
       this.yields.production += tile.yields.production;
@@ -164,22 +164,27 @@ export class City {
     this.perTurn.production = this.yields.production;
   }
 
-  addTile(tile: Tile) {
+  addTile(tile: Tile, emitEvent = true) {
     if (!tile.areaOf) {
       this.tiles.add(tile);
       this.notWorkedTiles.add(tile);
       tile.areaOf = this;
-      if (!this.player.exploredTiles.has(tile)) {
-        this.player.exploredTiles.add(tile);
-        this.player.game.tilesManager.reveal([tile]);
+      this.player.area.add(tile, emitEvent);
+      const newTiles = [tile, ...tile.neighbours].filter(
+        (t) => !this.player.exploredTiles.has(t),
+      );
+      for (const newTile of newTiles) {
+        this.player.exploredTiles.add(newTile);
       }
+      this.player.game.tilesManager.reveal(newTiles);
     }
   }
 
-  removeTile(tile: Tile) {
+  removeTile(tile: Tile, emitEvent = true) {
     if (this.tiles.has(tile)) {
       this.tiles.delete(tile);
       tile.areaOf = null;
+      this.player.area.remove(tile, emitEvent);
     }
   }
 
