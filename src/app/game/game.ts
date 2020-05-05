@@ -9,7 +9,7 @@ import { TilesManager } from "./tiles-manager";
 import { Debug } from "./debug";
 import { UIState } from "../ui/ui-state";
 import { UnitSerialized } from "./unit";
-import { filter } from "rxjs/operators";
+import { filter, distinctUntilChanged } from "rxjs/operators";
 import { CitiesManager } from "./cities-manager";
 import { CitySerialized } from "./city";
 import { MapUi } from "./map-ui";
@@ -42,11 +42,16 @@ export class Game {
 
   players: Player[] = [];
 
-  activeHumanPlayer: Player | null;
-
   activePlayerIndex = -1;
 
   activePlayer$ = new BehaviorSubject<Player | null>(null);
+
+  humanPlayer$ = this.activePlayer$.pipe(
+    filter((p) => p?.type === PlayerType.human),
+    distinctUntilChanged(),
+  );
+
+  humanPlayer: Player | null = null;
 
   turn$ = new BehaviorSubject<number>(1);
 
@@ -62,6 +67,10 @@ export class Game {
   started$ = this.isStarted$.pipe(filter((s) => s));
 
   uiState: UIState;
+
+  constructor() {
+    this.humanPlayer$.subscribe((player) => (this.humanPlayer = player));
+  }
 
   start() {
     this.activePlayerIndex = -1;
@@ -81,10 +90,6 @@ export class Game {
       this.activePlayerIndex = 0;
     }
     this.activePlayer$.next(this.players[this.activePlayerIndex]);
-
-    if (this.activePlayer$.value?.type === PlayerType.human) {
-      this.activeHumanPlayer = this.activePlayer$.value;
-    }
   }
 
   nextTurn() {
@@ -96,7 +101,6 @@ export class Game {
 
   clear() {
     this.players = [];
-    this.activeHumanPlayer = null;
     this.activePlayerIndex = -1;
     this.activePlayer$.next(null);
     this.turn$.next(1);
@@ -137,9 +141,7 @@ export class Game {
     this.citiesManager.deserialize(data.cities || []);
 
     this.activePlayerIndex = data.activePlayerIndex;
-    if (this.activePlayer$.value?.type === PlayerType.human) {
-      this.activeHumanPlayer = this.activePlayer$.value;
-    }
+    this.activePlayer$.next(this.players[this.activePlayerIndex]);
 
     for (const player of this.players) {
       player.area.computeBorders();

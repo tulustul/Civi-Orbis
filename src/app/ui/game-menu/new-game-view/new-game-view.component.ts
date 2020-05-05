@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 
 import { Game } from "src/app/game/game";
 import { SimplexMapGenerator } from "src/app/map-generators/simplex";
-import { Player, PlayerType } from "src/app/game/player";
+import { Player, PlayerType, PLAYER_COLORS } from "src/app/game/player";
 import { UIState } from "../../ui-state";
 
 @Component({
@@ -21,6 +21,8 @@ export class NewGameViewComponent implements OnInit {
 
   seaLevel = 0;
 
+  playersCount = 1;
+
   seed: number | null = null;
 
   constructor(private game: Game, private uiState: UIState) {}
@@ -30,8 +32,11 @@ export class NewGameViewComponent implements OnInit {
   start() {
     this.game.clear();
 
-    const humanPlayer = new Player(this.game, PlayerType.human);
-    this.game.addPlayer(humanPlayer);
+    for (let i = 0; i < this.playersCount; i++) {
+      const color = PLAYER_COLORS[i];
+      const humanPlayer = new Player(this.game, PlayerType.human, color);
+      this.game.addPlayer(humanPlayer);
+    }
 
     const generator = new SimplexMapGenerator(this.game.players.length);
     this.game.map = generator.generate(

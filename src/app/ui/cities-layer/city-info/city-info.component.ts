@@ -6,6 +6,7 @@ import {
   ChangeDetectorRef,
   OnDestroy,
   HostBinding,
+  ElementRef,
 } from "@angular/core";
 
 import { Subject, merge } from "rxjs";
@@ -29,11 +30,16 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private cdr: ChangeDetectorRef,
+    private elementRef: ElementRef<HTMLElement>,
     public game: Game,
     private ui: UIState,
   ) {}
 
   ngOnInit(): void {
+    const color = this.city.player.color.toString(16).padStart(6, "0");
+    const el = this.elementRef.nativeElement;
+    el.style.setProperty("--player-color", "#" + color);
+
     const thisCity = this.game.citiesManager.updated$.pipe(
       filter((c) => c.id === this.city.id),
     );

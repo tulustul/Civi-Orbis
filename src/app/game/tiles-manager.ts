@@ -10,7 +10,16 @@ export class TilesManager {
   private _revealedTiles$ = new Subject<Tile[]>();
   revealedTiles$ = this._revealedTiles$.asObservable();
 
-  constructor(private game: Game) {}
+  private _resetTilesVisibility$ = new Subject<Tile[]>();
+  resetTilesVisibility$ = this._resetTilesVisibility$.asObservable();
+
+  constructor(private game: Game) {
+    this.game.humanPlayer$.subscribe((player) => {
+      if (player) {
+        this._resetTilesVisibility$.next(Array.from(player.exploredTiles));
+      }
+    });
+  }
 
   reveal(tiles: Tile[]) {
     this._revealedTiles$.next(tiles);
@@ -21,7 +30,7 @@ export class TilesManager {
     for (let x = 0; x < this.game.map.width; x++) {
       for (let y = 0; y < this.game.map.height; y++) {
         const tile = this.game.map.tiles[x][y];
-        this.game.activeHumanPlayer?.exploredTiles.add(tile);
+        this.game.humanPlayer?.exploredTiles.add(tile);
         tiles.push(tile);
       }
     }

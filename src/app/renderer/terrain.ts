@@ -87,22 +87,36 @@ export class TerrainRenderer {
     this.container.addChild(this.riverContainer);
     this.container.addChild(this.yieldsContainer);
 
-    this.game.tilesManager.revealedTiles$.subscribe((tiles) => {
-      for (const tile of tiles) {
-        const displayObjects = this.tilesMap.get(tile);
-        if (displayObjects) {
-          for (const obj of displayObjects) {
-            obj.visible = true;
-          }
-        }
-      }
+    const tilesManager = this.game.tilesManager;
+    tilesManager.revealedTiles$.subscribe((tiles) => this.reveal(tiles));
+
+    tilesManager.updatedTile$.subscribe((tile) => this.updateTile(tile));
+
+    tilesManager.resetTilesVisibility$.subscribe((tiles) => {
+      this.hideAllTiles();
+      this.reveal(tiles);
     });
 
-    this.game.tilesManager.updatedTile$.subscribe((tile) =>
-      this.updateTile(tile),
-    );
-
     this.game.started$.subscribe(() => this.build());
+  }
+
+  hideAllTiles() {
+    for (const objects of this.tilesMap.values()) {
+      for (const obj of objects) {
+        obj.visible = false;
+      }
+    }
+  }
+
+  reveal(tiles: Tile[]) {
+    for (const tile of tiles) {
+      const displayObjects = this.tilesMap.get(tile);
+      if (displayObjects) {
+        for (const obj of displayObjects) {
+          obj.visible = true;
+        }
+      }
+    }
   }
 
   private build() {
@@ -196,11 +210,11 @@ export class TerrainRenderer {
 
     this.drawYields(tile, displayObjects);
 
-    if (!this.game.activeHumanPlayer?.exploredTiles.has(tile)) {
-      for (const obj of displayObjects) {
-        obj.visible = false;
-      }
-    }
+    // if (!this.game.activeHumanPlayer?.exploredTiles.has(tile)) {
+    //   for (const obj of displayObjects) {
+    //     obj.visible = false;
+    //   }
+    // }
   }
 
   private renderRivers(tile: Tile) {

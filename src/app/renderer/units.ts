@@ -24,7 +24,7 @@ export class UnitsRenderer {
     g.position.x = x;
     g.position.y = y;
 
-    g.beginFill(0x0000ff);
+    g.beginFill(unit.player.color);
     g.drawCircle(0.5, 0.5, 0.2);
     g.endFill();
   }
