@@ -53,10 +53,6 @@ export class Renderer {
     this.app.renderer.resize(width, height);
   }
 
-  render() {
-    this.app.render();
-  }
-
   onReady() {
     this.game.camera.transform$.subscribe((t) => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
