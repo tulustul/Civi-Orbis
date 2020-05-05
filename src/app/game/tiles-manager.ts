@@ -10,13 +10,13 @@ export class TilesManager {
   private _revealedTiles$ = new Subject<Tile[]>();
   revealedTiles$ = this._revealedTiles$.asObservable();
 
-  private _resetTilesVisibility$ = new Subject<Tile[]>();
+  private _resetTilesVisibility$ = new Subject<Set<Tile>>();
   resetTilesVisibility$ = this._resetTilesVisibility$.asObservable();
 
   constructor(private game: Game) {
     this.game.humanPlayer$.subscribe((player) => {
       if (player) {
-        this._resetTilesVisibility$.next(Array.from(player.exploredTiles));
+        this._resetTilesVisibility$.next(player.exploredTiles);
       }
     });
   }

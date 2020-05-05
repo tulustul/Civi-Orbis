@@ -42,7 +42,7 @@ export class MapUi {
   }
 
   update() {
-    this.game.renderer.terrain.yieldsContainer.visible =
+    this.game.renderer.mapDrawer.yieldsContainer.visible =
       this.game.camera.transform$.value.scale > 40;
   }
 

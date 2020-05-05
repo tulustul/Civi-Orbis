@@ -1,29 +1,20 @@
 import * as PIXIE from "pixi.js";
 
 import { Game } from "../game/game";
-import { TerrainRenderer } from "./terrain";
-import { UnitsRenderer } from "./units";
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
-import { CitiesRenderer } from "./cities";
-import { AreasRenderer } from "./areas";
+import { MapDrawer } from "./map";
 
 export class Renderer {
   app: PIXIE.Application;
 
   canvas: HTMLCanvasElement;
 
-  terrain: TerrainRenderer;
-
-  units: UnitsRenderer;
+  mapDrawer: MapDrawer;
 
   overlays: OverlaysRenderer;
 
   path: PathRenderer;
-
-  city: CitiesRenderer;
-
-  areas: AreasRenderer;
 
   loader = new PIXIE.Loader();
 
@@ -40,19 +31,13 @@ export class Renderer {
 
     this.canvas = canvas;
 
-    this.terrain = new TerrainRenderer(this.game);
-    this.units = new UnitsRenderer(this.game);
+    this.mapDrawer = new MapDrawer(this.game);
     this.overlays = new OverlaysRenderer(this.game);
     this.path = new PathRenderer(this.game);
-    this.city = new CitiesRenderer(this.game);
-    this.areas = new AreasRenderer(this.game);
 
-    this.app.stage.addChild(this.terrain.container);
+    this.app.stage.addChild(this.mapDrawer.container);
     this.app.stage.addChild(this.overlays.container);
-    this.app.stage.addChild(this.city.container);
-    this.app.stage.addChild(this.units.container);
     this.app.stage.addChild(this.path.container);
-    this.app.stage.addChild(this.areas.container);
 
     if (this.isLoaded) {
       this.onReady();
@@ -90,9 +75,7 @@ export class Renderer {
   }
 
   clear() {
-    this.terrain.clear();
-    this.units.clear();
-    this.city.clear();
+    this.mapDrawer.clear();
     this.path.clear();
     this.overlays.clear();
   }

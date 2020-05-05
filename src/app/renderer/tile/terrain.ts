@@ -1,9 +1,15 @@
 import * as PIXIE from "pixi.js";
 
 import { getTileVariants } from "../utils";
-import { Tile, Climate, LandForm, SeaLevel } from "src/app/game/tile";
+import {
+  Tile,
+  Climate,
+  LandForm,
+  SeaLevel,
+  TileDirection,
+} from "src/app/game/tile";
 import { Game } from "src/app/game/game";
-import { TileDrawer } from "./tile-drawer";
+import { TileContainer } from "../tile-container";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),
@@ -63,18 +69,14 @@ const WETLANDS_TEXTURES = getTileVariants("hexMarsh", 4);
 const WETLANDS_FOREST_TEXTURES = getTileVariants("hexSwamp", 4);
 const DESERT_FLOOD_PLAINS_TEXTURES = getTileVariants("hexGrassySand", 4);
 
-export class TerrainRenderer extends TileDrawer {
-  constructor(protected game: Game) {
-    super(game);
-
+export class TerrainDrawer {
+  constructor(private game: Game, private container: TileContainer) {
     const tilesManager = this.game.tilesManager;
 
     tilesManager.updatedTile$.subscribe((tile) => this.updateTile(tile));
   }
 
   public drawTile(tile: Tile) {
-    const displayObjects: PIXIE.DisplayObject[] = [];
-
     let variants: string[];
 
     if (tile.wetlands) {
@@ -102,13 +104,70 @@ export class TerrainRenderer extends TileDrawer {
     const textureName = variants[Math.floor(Math.random() * variants.length)];
 
     const sprite = new PIXIE.Sprite(this.textures[textureName]);
-    displayObjects.push(sprite);
     sprite.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     sprite.position.y = tile.y * 0.75 - 0.5;
     sprite.scale.set(1 / sprite.width, 1 / sprite.width);
 
-    this.tilesMap.set(tile, displayObjects);
+    this.container.addChild(sprite, tile);
 
-    return displayObjects;
+    this.renderRivers(tile);
+  }
+
+  private renderRivers(tile: Tile) {
+    if (!tile.riverParts.length) {
+      return;
+    }
+
+    const g = new PIXIE.Graphics();
+    g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+    g.position.y = tile.y * 0.75;
+    this.container.addChild(g, tile);
+
+    g.lineStyle(0.15, 0x4169e1);
+
+    for (const river of tile.riverParts) {
+      if (river === TileDirection.NW) {
+        g.moveTo(0, 0.25);
+        g.lineTo(0.5, 0);
+      }
+
+      if (river === TileDirection.NE) {
+        g.moveTo(0.5, 0);
+        g.lineTo(1, 0.25);
+      }
+
+      if (river === TileDirection.E) {
+        g.moveTo(1, 0.25);
+        g.lineTo(1, 0.75);
+      }
+
+      if (river === TileDirection.SE) {
+        g.moveTo(1, 0.75);
+        g.lineTo(0.5, 1);
+      }
+
+      if (river === TileDirection.SW) {
+        g.moveTo(0.5, 1);
+        g.lineTo(0, 0.75);
+      }
+
+      if (river === TileDirection.W) {
+        g.moveTo(0, 0.75);
+        g.lineTo(0, 0.25);
+      }
+    }
+  }
+
+  private updateTile(tile: Tile) {
+    this.container.clearTile(tile);
+    this.drawTile(tile);
+  }
+
+  clear() {
+    this.container.destroyAllChildren();
+  }
+
+  protected get textures() {
+    return this.game.renderer.textures;
   }
 }

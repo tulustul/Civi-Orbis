@@ -22,13 +22,20 @@ import { City } from "src/app/game/city";
 export class CitiesLayerComponent implements OnInit {
   ngUnsubscribe = new Subject<void>();
 
+  cities: City[];
+
   constructor(private cdr: ChangeDetectorRef, private game: Game) {}
 
   ngOnInit(): void {
-    merge(this.game.citiesManager.spawned$, this.game.citiesManager.destroyed$)
+    merge(
+      this.game.citiesManager.spawned$,
+      this.game.citiesManager.destroyed$,
+      this.game.humanPlayer$,
+      this.game.tilesManager.revealedTiles$,
+    )
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => {
-        this.cdr.markForCheck();
+        this.updateCities();
       });
 
     this.game.camera.transform$
@@ -41,12 +48,16 @@ export class CitiesLayerComponent implements OnInit {
     this.ngUnsubscribe.complete();
   }
 
-  trackByCityId(index: number, city: City) {
-    return city.id;
+  updateCities() {
+    const player = this.game.humanPlayer;
+    this.cities = this.game.citiesManager.cities.filter((city) =>
+      player?.exploredTiles.has(city.tile),
+    );
+    this.cdr.markForCheck();
   }
 
-  get cities() {
-    return this.game.citiesManager.cities;
+  trackByCityId(index: number, city: City) {
+    return city.id;
   }
 
   @HostBinding("style.opacity")
