@@ -14,7 +14,7 @@ export class PathRenderer {
   constructor(private game: Game) {
     this.container.addChild(this.pathGraphics);
 
-    game.controls.activePath$.subscribe((path) => this.buildPath(path));
+    game.mapUi.activePath$.subscribe((path) => this.buildPath(path));
   }
 
   clear() {
@@ -70,7 +70,7 @@ export class PathRenderer {
 
         const metrics = PIXIE.TextMetrics.measureText(
           turn.toString(),
-          label.style
+          label.style,
         );
         const [x, y] = getTileCenter(path[turn][0]);
         label.position.x = x - metrics.width / 2 / scale;

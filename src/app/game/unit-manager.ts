@@ -107,8 +107,9 @@ export class UnitsManager {
       }
     }
 
-    // TODO temporary solution, doesn't support multiple players.
-    this.game.tilesManager.reveal(exploredTiles);
+    if (unit.player === this.game.activePlayer$.value) {
+      this.game.tilesManager.reveal(exploredTiles);
+    }
 
     this._updated$.next(unit);
   }

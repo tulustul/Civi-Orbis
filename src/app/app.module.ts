@@ -32,6 +32,7 @@ import { CityViewComponent } from './ui/city-view/city-view.component';
 import { TurnsPipe } from './ui/turns.pipe';
 import { WorkTilesComponent } from './ui/city-view/work-tiles/work-tiles.component';
 import { ProgressBarComponent } from './ui/widgets/progress-bar/progress-bar.component';
+import { ButtonDirective } from './ui/button.directive';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { ProgressBarComponent } from './ui/widgets/progress-bar/progress-bar.com
     TurnsPipe,
     WorkTilesComponent,
     ProgressBarComponent,
+    ButtonDirective,
   ],
   imports: [BrowserModule, FormsModule],
   providers: [Game, UIState],

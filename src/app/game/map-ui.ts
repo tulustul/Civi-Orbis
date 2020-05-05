@@ -3,6 +3,7 @@ import { distinctUntilChanged } from "rxjs/operators";
 
 import { Game } from "./game";
 import { Tile } from "./tile";
+import { Unit } from "./unit";
 
 export class MapUi {
   private _hoveredTile$ = new BehaviorSubject<Tile | null>(null);
@@ -17,6 +18,9 @@ export class MapUi {
   private _highlightedTiles$ = new BehaviorSubject<Set<Tile>>(new Set());
   highlightedTiles$ = this._highlightedTiles$.asObservable();
 
+  private _activePath$ = new BehaviorSubject<Tile[][] | null>(null);
+  activePath$ = this._activePath$.asObservable();
+
   private selectingTileEnabled = false;
 
   cityLabelsVisible = true;
@@ -27,8 +31,18 @@ export class MapUi {
     this.clickedTile$.subscribe((tile) => {
       if (this.selectingTileEnabled) {
         this._selectedTile$.next(tile);
-      } else if (tile?.city && !tile.units.length) {
+      } else if (tile.units.length) {
+        let unit: Unit | null = tile.units[0];
+        if (unit.player !== this.game.humanPlayer) {
+          unit = null;
+        }
+        this.game.unitsManager.activeUnit$.next(unit);
+        this.setPath(unit?.path || null);
+      } else if (tile?.city) {
         this.game.uiState.selectedCity$.next(tile.city);
+      } else {
+        this.game.unitsManager.activeUnit$.next(null);
+        this.setPath(null);
       }
     });
 
@@ -38,6 +52,18 @@ export class MapUi {
       } else {
         this.highlightTiles(null);
       }
+    });
+
+    this.game.activePlayer$.subscribe((player) => {
+      this.game.unitsManager.activeUnit$.next(null);
+    });
+
+    this.game.humanPlayer$.subscribe((player) => {
+      const tileOfInterest = player?.units[0]?.tile || player?.cities[0]?.tile;
+      if (tileOfInterest) {
+        this.game.camera.moveToTile(tileOfInterest);
+      }
+      this.setPath(null);
     });
   }
 
@@ -68,6 +94,10 @@ export class MapUi {
 
   hoverTile(tile: Tile | null) {
     this._hoveredTile$.next(tile);
+  }
+
+  setPath(path: Tile[][] | null) {
+    this._activePath$.next(path);
   }
 
   clear() {

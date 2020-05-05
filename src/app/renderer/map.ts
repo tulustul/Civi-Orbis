@@ -11,6 +11,8 @@ import { AreaDrawer } from "./tile/area";
 export class MapDrawer {
   container = new TileWrapperContainer();
 
+  waterContainer = new TileContainer(this.game.camera.boundingBox);
+
   terrainContainer = new TileContainer(this.game.camera.boundingBox);
 
   riverContainer = new TileContainer(this.game.camera.boundingBox);
@@ -36,6 +38,7 @@ export class MapDrawer {
   areaDrawer: AreaDrawer;
 
   constructor(private game: Game) {
+    this.container.addChild(this.waterContainer);
     this.container.addChild(this.terrainContainer);
     this.container.addChild(this.riverContainer);
     this.container.addChild(this.cityContainer);
@@ -85,7 +88,11 @@ export class MapDrawer {
   }
 
   private build() {
-    this.terrainDrawer = new TerrainDrawer(this.game, this.terrainContainer);
+    this.terrainDrawer = new TerrainDrawer(
+      this.game,
+      this.terrainContainer,
+      this.waterContainer,
+    );
     this.unitsDrawer = new UnitsDrawer(this.game, this.unitsContainer);
     this.yieldsDrawer = new YiedsDrawer(this.yieldsContainer);
     this.riverDrawer = new RiverDrawer(this.game, this.riverContainer);
@@ -94,6 +101,7 @@ export class MapDrawer {
 
     this.container.bindToMap(this.game.map);
 
+    this.waterContainer.bindToMap(this.game.map);
     this.terrainContainer.bindToMap(this.game.map);
     this.cityContainer.bindToMap(this.game.map);
     this.yieldsContainer.bindToMap(this.game.map);

@@ -30,16 +30,6 @@ export class Game {
 
   map: TilesMap;
 
-  mapUi = new MapUi(this);
-
-  camera: Camera;
-
-  renderer = new Renderer(this);
-
-  controls = new Controls(this);
-
-  areasManager = new AreasManager();
-
   players: Player[] = [];
 
   activePlayerIndex = -1;
@@ -53,7 +43,15 @@ export class Game {
 
   humanPlayer: Player | null = null;
 
+  camera: Camera;
+
   turn$ = new BehaviorSubject<number>(1);
+
+  renderer = new Renderer(this);
+
+  controls = new Controls(this);
+
+  areasManager = new AreasManager();
 
   unitsManager = new UnitsManager(this);
 
@@ -67,6 +65,8 @@ export class Game {
   started$ = this.isStarted$.pipe(filter((s) => s));
 
   uiState: UIState;
+
+  mapUi = new MapUi(this);
 
   constructor() {
     this.humanPlayer$.subscribe((player) => (this.humanPlayer = player));
