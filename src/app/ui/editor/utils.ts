@@ -1,4 +1,4 @@
-import { Tile, Climate, LandForm, SeaLevel } from "src/app/game/tile";
+import { Tile, Climate, LandForm, SeaLevel } from "src/app/core/tile";
 
 export const FORESTABLE_CLIMATES = new Set<Climate>([
   Climate.continental,

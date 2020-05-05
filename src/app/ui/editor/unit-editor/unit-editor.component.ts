@@ -3,10 +3,10 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Observable } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
-import { UnitDefinition } from "src/app/game/unit.interface";
-import { Unit } from "src/app/game/unit";
-import { Game } from "src/app/game/game";
-import { Tile } from "src/app/game/tile";
+import { UnitDefinition } from "src/app/core/unit.interface";
+import { Unit } from "src/app/core/unit";
+import { Game } from "src/app/core/game";
+import { Tile } from "src/app/core/tile";
 import { Option } from "../../widgets/option.interface";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
 

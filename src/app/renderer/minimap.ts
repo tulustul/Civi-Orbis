@@ -1,7 +1,7 @@
 import * as PIXIE from "pixi.js";
 
-import { Tile, SeaLevel, Climate, TileDirection } from "../game/tile";
-import { Game } from "../game/game";
+import { Tile, SeaLevel, Climate, TileDirection } from "../core/tile";
+import { Game } from "../core/game";
 import { drawHex } from "./utils";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
@@ -38,7 +38,7 @@ export class TerrainRenderer {
   drawTile(tile: Tile) {
     if (
       !this.game.debug.revealMap &&
-      !this.game.activeHumanPlayer?.exploredTiles.has(tile)
+      !this.game.humanPlayer?.exploredTiles.has(tile)
     ) {
       return;
     }

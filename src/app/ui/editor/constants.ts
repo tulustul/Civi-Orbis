@@ -1,4 +1,4 @@
-import { TileDirection, Climate, LandForm, SeaLevel } from "src/app/game/tile";
+import { TileDirection, Climate, LandForm, SeaLevel } from "src/app/core/tile";
 import { Option } from "../widgets/option.interface";
 
 export const SEA_LEVEL_OPTIONS: Option[] = [

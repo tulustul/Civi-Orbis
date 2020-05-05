@@ -3,9 +3,9 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Game } from "src/app/game/game";
-import { Unit } from "src/app/game/unit";
-import { UnitAction, ACTIONS } from "src/app/game/unit-actions";
+import { Game } from "src/app/core/game";
+import { Unit } from "src/app/core/unit";
+import { UnitAction, ACTIONS } from "src/app/core/unit-actions";
 
 @Component({
   selector: "app-unit-panel",

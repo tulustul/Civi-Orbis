@@ -1,7 +1,7 @@
 import * as PIXIE from "pixi.js";
 
-import { Game } from "../game/game";
-import { Tile } from "../game/tile";
+import { Game } from "../core/game";
+import { Tile } from "../core/tile";
 import { getTileCenter } from "./utils";
 
 export class PathRenderer {

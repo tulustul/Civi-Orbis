@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 
-import { Game } from "src/app/game/game";
-import { saveGame } from "src/app/game/saving";
+import { Game } from "src/app/core/game";
+import { saveGame } from "src/app/core/saving";
 import { MenuView } from "../menu-view";
 
 @Component({

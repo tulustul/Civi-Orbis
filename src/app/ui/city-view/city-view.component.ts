@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, OnDestroy } from "@angular/core";
 
-import { City } from "src/app/game/city";
+import { City } from "src/app/core/city";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
 import { UIState } from "../ui-state";
-import { Game } from "src/app/game/game";
+import { Game } from "src/app/core/game";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 

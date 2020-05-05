@@ -3,8 +3,8 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
-import { Game } from "src/app/game/game";
-import { Tile, TileDirection } from "src/app/game/tile";
+import { Game } from "src/app/core/game";
+import { Tile, TileDirection } from "src/app/core/tile";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,

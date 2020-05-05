@@ -8,11 +8,11 @@ import {
   WETLANDS_OPTIONS,
 } from "../constants";
 import { Option } from "../../widgets/option.interface";
-import { SeaLevel, LandForm, Climate } from "src/app/game/tile";
-import { Game } from "src/app/game/game";
+import { SeaLevel, LandForm, Climate } from "src/app/core/tile";
+import { Game } from "src/app/core/game";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
-import { getTilesInRange } from "src/app/game/hex-math";
+import { getTilesInRange } from "src/app/core/hex-math";
 import { isTileForestable, areWetlandsPossible } from "../utils";
 
 const IGNORE_OPTION: Option = { label: "ignore", value: null };

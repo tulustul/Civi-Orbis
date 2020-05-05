@@ -6,9 +6,9 @@ import {
   ViewChild,
 } from "@angular/core";
 
-import { Game } from "src/app/game/game";
+import { Game } from "src/app/core/game";
 import { UIState } from "../../ui-state";
-import { loadGame, importSave } from "src/app/game/saving";
+import { loadGame, importSave } from "src/app/core/saving";
 import { SavesListComponent } from "../saves-list/saves-list.component";
 
 @Component({

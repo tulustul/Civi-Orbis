@@ -1,8 +1,8 @@
 import { BehaviorSubject } from "rxjs";
-import { Game } from "../game/game";
+import { Game } from "../core/game";
 import { getTileCoords } from "./utils";
-import { Tile } from "../game/tile";
-import { AnimationEaseOutCubic, Animation } from "../game/animation";
+import { Tile } from "../core/tile";
+import { AnimationEaseOutCubic, Animation } from "../core/animation";
 
 export interface Transform {
   x: number;

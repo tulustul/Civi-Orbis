@@ -1,8 +1,8 @@
 import * as PIXIE from "pixi.js";
 
 import { getTileVariants } from "../utils";
-import { City } from "src/app/game/city";
-import { Game } from "src/app/game/game";
+import { City } from "src/app/core/city";
+import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
 
 const CITY_TEXTURES = getTileVariants("villageSmall", 4);

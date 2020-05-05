@@ -5,7 +5,7 @@ import { FormsModule } from "@angular/forms";
 import { AppComponent } from "./app.component";
 import { GameCanvasComponent } from "./game-canvas/game-canvas.component";
 import { UnitPanelComponent } from "./ui/unit-panel/unit-panel.component";
-import { Game } from "./game/game";
+import { Game } from "./core/game";
 import { NextTurnButtonComponent } from "./ui/next-turn-button/next-turn-button.component";
 import { GameInfoComponent } from "./ui/game-info/game-info.component";
 import { DebugComponent } from "./ui/debug/debug.component";
@@ -26,13 +26,13 @@ import { MainMenuViewComponent } from "./ui/game-menu/main-menu-view/main-menu-v
 import { NewGameViewComponent } from "./ui/game-menu/new-game-view/new-game-view.component";
 import { UnitEditorComponent } from "./ui/editor/unit-editor/unit-editor.component";
 import { CityEditorComponent } from "./ui/editor/city-editor/city-editor.component";
-import { CitiesLayerComponent } from './ui/cities-layer/cities-layer.component';
-import { CityInfoComponent } from './ui/cities-layer/city-info/city-info.component';
-import { CityViewComponent } from './ui/city-view/city-view.component';
-import { TurnsPipe } from './ui/turns.pipe';
-import { WorkTilesComponent } from './ui/city-view/work-tiles/work-tiles.component';
-import { ProgressBarComponent } from './ui/widgets/progress-bar/progress-bar.component';
-import { ButtonDirective } from './ui/button.directive';
+import { CitiesLayerComponent } from "./ui/cities-layer/cities-layer.component";
+import { CityInfoComponent } from "./ui/cities-layer/city-info/city-info.component";
+import { CityViewComponent } from "./ui/city-view/city-view.component";
+import { TurnsPipe } from "./ui/turns.pipe";
+import { WorkTilesComponent } from "./ui/city-view/work-tiles/work-tiles.component";
+import { ProgressBarComponent } from "./ui/widgets/progress-bar/progress-bar.component";
+import { ButtonDirective } from "./ui/button.directive";
 
 @NgModule({
   declarations: [

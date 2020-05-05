@@ -12,8 +12,8 @@ import {
 import { Subject, merge } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
-import { City } from "src/app/game/city";
-import { Game } from "src/app/game/game";
+import { City } from "src/app/core/city";
+import { Game } from "src/app/core/game";
 import { getTileCoords } from "src/app/renderer/utils";
 import { UIState } from "../../ui-state";
 

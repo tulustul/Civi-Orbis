@@ -3,9 +3,9 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Observable } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
-import { City } from "src/app/game/city";
-import { Game } from "src/app/game/game";
-import { Tile } from "src/app/game/tile";
+import { City } from "src/app/core/city";
+import { Game } from "src/app/core/game";
+import { Tile } from "src/app/core/tile";
 
 @Component({
   selector: "app-city-editor",

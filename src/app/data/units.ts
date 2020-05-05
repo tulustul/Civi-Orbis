@@ -1,5 +1,5 @@
-import { UnitDefinition } from "../game/unit.interface";
-import { UnitAction } from "../game/unit-actions";
+import { UnitDefinition } from "../core/unit.interface";
+import { UnitAction } from "../core/unit-actions";
 
 export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {

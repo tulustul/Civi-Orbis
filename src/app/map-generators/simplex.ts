@@ -1,14 +1,14 @@
 import * as SimplexNoise from "simplex-noise";
 
 import { MapGenerator } from "./map-generator.interface";
-import { TilesMap } from "../game/tiles-map";
+import { TilesMap } from "../core/tiles-map";
 import {
   findCoastline,
   placeRiverBetweenTiles,
   POSSIBLE_RIVER_PATHS,
 } from "./utils";
-import { SeaLevel, Tile, Climate, TileDirection, LandForm } from "../game/tile";
-import { getTileInDirection } from "../game/hex-math";
+import { SeaLevel, Tile, Climate, TileDirection, LandForm } from "../core/tile";
+import { getTileInDirection } from "../core/hex-math";
 import { areWetlandsPossible, isTileForestable } from "../ui/editor/utils";
 
 interface TileMetadata {

@@ -1,6 +1,6 @@
 import * as PIXIE from "pixi.js";
 
-import { Game } from "../game/game";
+import { Game } from "../core/game";
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
 import { MapDrawer } from "./map";

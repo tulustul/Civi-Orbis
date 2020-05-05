@@ -1,8 +1,8 @@
 import { Component, OnInit, HostBinding } from "@angular/core";
 
-import { tap, skip, filter } from "rxjs/operators";
+import { filter } from "rxjs/operators";
 
-import { Game } from "src/app/game/game";
+import { Game } from "src/app/core/game";
 
 @Component({
   selector: "app-turn-counter",

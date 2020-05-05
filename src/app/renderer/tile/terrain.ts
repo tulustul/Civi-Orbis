@@ -1,14 +1,8 @@
 import * as PIXIE from "pixi.js";
 
 import { getTileVariants } from "../utils";
-import {
-  Tile,
-  Climate,
-  LandForm,
-  SeaLevel,
-  TileDirection,
-} from "src/app/game/tile";
-import { Game } from "src/app/game/game";
+import { Tile, Climate, LandForm, SeaLevel } from "src/app/core/tile";
+import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {

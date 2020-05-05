@@ -1,7 +1,7 @@
 import * as PIXIE from "pixi.js";
 
-import { Unit } from "src/app/game/unit";
-import { Game } from "src/app/game/game";
+import { Unit } from "src/app/core/unit";
+import { Game } from "src/app/core/game";
 
 import { getTileCoords } from "../utils";
 import { TileContainer } from "../tile-container";

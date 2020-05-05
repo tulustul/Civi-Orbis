@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 
-import { Game } from "src/app/game/game";
+import { Game } from "src/app/core/game";
 
 @Component({
   selector: "app-debug",

@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, OnDestroy } from "@angular/core";
 
-import { City } from "src/app/game/city";
-import { Tile } from "src/app/game/tile";
-import { Game } from "src/app/game/game";
+import { City } from "src/app/core/city";
+import { Tile } from "src/app/core/tile";
+import { Game } from "src/app/core/game";
 import { DomSanitizer } from "@angular/platform-browser";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";

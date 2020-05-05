@@ -1,7 +1,7 @@
 import * as PIXIE from "pixi.js";
 
-import { Tile, TileDirection } from "src/app/game/tile";
-import { Game } from "src/app/game/game";
+import { Tile, TileDirection } from "src/app/core/tile";
+import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
 
 export class RiverDrawer {

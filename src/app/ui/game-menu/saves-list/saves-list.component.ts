@@ -4,7 +4,7 @@ import {
   listSaveGames,
   deleteSaveGame,
   exportSave,
-} from "../../../game/saving";
+} from "../../../core/saving";
 
 @Component({
   selector: "app-saves-list",

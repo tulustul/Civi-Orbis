@@ -1,4 +1,4 @@
-import { Tile, SeaLevel, TileDirection } from "../game/tile";
+import { Tile, SeaLevel, TileDirection } from "../core/tile";
 
 export function findCoastline(tiles: Tile[][]): Tile[] {
   const coastline: Tile[] = [];

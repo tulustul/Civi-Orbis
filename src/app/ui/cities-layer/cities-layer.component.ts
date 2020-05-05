@@ -10,8 +10,8 @@ import {
 import { Subject, merge } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Game } from "src/app/game/game";
-import { City } from "src/app/game/city";
+import { Game } from "src/app/core/game";
+import { City } from "src/app/core/city";
 
 @Component({
   selector: "app-cities-layer",

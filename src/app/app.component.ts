@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 
 import { UIState } from "./ui/ui-state";
-import { Game } from "./game/game";
+import { Game } from "./core/game";
 
 @Component({
   selector: "app-root",

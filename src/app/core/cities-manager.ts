@@ -1,11 +1,10 @@
-import { Subject, BehaviorSubject } from "rxjs";
+import { Subject } from "rxjs";
 
 import { City, CitySerialized } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
 import { Tile, LandForm, SeaLevel } from "./tile";
-import { UNITS_DEFINITIONS } from "../data/units";
 
 export class CitiesManager {
   private _spawned$ = new Subject<City>();

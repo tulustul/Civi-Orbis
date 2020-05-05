@@ -1,5 +1,5 @@
 import { BehaviorSubject } from "rxjs";
-import { City } from "../game/city";
+import { City } from "../core/city";
 
 export class UIState {
   editorEnabled$ = new BehaviorSubject<boolean>(false);

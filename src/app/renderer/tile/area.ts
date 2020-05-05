@@ -1,10 +1,10 @@
 import * as PIXIE from "pixi.js";
 
 import { takeUntil, filter } from "rxjs/operators";
-import { TileDirection } from "src/app/game/tile";
+import { TileDirection } from "src/app/core/tile";
 import { TileContainer } from "../tile-container";
-import { Game } from "src/app/game/game";
-import { Area } from "src/app/game/area";
+import { Game } from "src/app/core/game";
+import { Area } from "src/app/core/area";
 
 const BORDERS_VERTICES: Record<
   TileDirection,

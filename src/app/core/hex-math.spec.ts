@@ -1,5 +1,5 @@
-import { Tile, TileDirection } from "../game/tile";
-import { getTileNeighbours } from "../game/hex-math";
+import { Tile, TileDirection } from "../core/tile";
+import { getTileNeighbours } from "../core/hex-math";
 import { TilesMap } from "./tiles-map";
 
 describe("hex-math:utils", () => {

@@ -1,8 +1,8 @@
 import * as PIXIE from "pixi.js";
 
-import { Game } from "../game/game";
+import { Game } from "../core/game";
+import { Tile } from "../core/tile";
 import { drawClosedHex, getTileCoords, drawHex } from "./utils";
-import { Tile } from "../game/tile";
 
 export class OverlaysRenderer {
   container = new PIXIE.Container();

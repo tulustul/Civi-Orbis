@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 
 import { UIState } from "../ui-state";
-import { Game } from "src/app/game/game";
+import { Game } from "src/app/core/game";
 
 @Component({
   selector: "app-editor",

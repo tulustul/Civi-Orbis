@@ -1,7 +1,7 @@
 import * as PIXIE from "pixi.js";
 
 import { TileContainer } from "../tile-container";
-import { Tile } from "src/app/game/tile";
+import { Tile } from "src/app/core/tile";
 
 export class YiedsDrawer {
   constructor(private container: TileContainer) {}

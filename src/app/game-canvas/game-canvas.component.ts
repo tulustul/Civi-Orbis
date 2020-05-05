@@ -6,7 +6,7 @@ import {
   HostListener,
 } from "@angular/core";
 
-import { Game } from "../game/game";
+import { Game } from "../core/game";
 import { Camera } from "../renderer/camera";
 import { UIState } from "../ui/ui-state";
 

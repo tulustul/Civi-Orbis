@@ -1,8 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 
-import { Game } from "src/app/game/game";
+import { Game } from "src/app/core/game";
 import { SimplexMapGenerator } from "src/app/map-generators/simplex";
-import { Player, PlayerType, PLAYER_COLORS } from "src/app/game/player";
+import { Player, PlayerType, PLAYER_COLORS } from "src/app/core/player";
 import { UIState } from "../../ui-state";
 
 @Component({

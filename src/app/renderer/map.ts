@@ -1,5 +1,5 @@
-import { Tile } from "../game/tile";
-import { Game } from "../game/game";
+import { Tile } from "../core/tile";
+import { Game } from "../core/game";
 import { TileWrapperContainer, TileContainer } from "./tile-container";
 import { TerrainDrawer } from "./tile/terrain";
 import { UnitsDrawer } from "./tile/unit";
