@@ -1,6 +1,7 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { OverlayModule } from "@angular/cdk/overlay";
 
 import { AppComponent } from "./app.component";
 import { GameCanvasComponent } from "./game-canvas/game-canvas.component";
@@ -33,7 +34,11 @@ import { TurnsPipe } from "./ui/turns.pipe";
 import { WorkTilesComponent } from "./ui/city-view/work-tiles/work-tiles.component";
 import { ProgressBarComponent } from "./ui/widgets/progress-bar/progress-bar.component";
 import { ButtonDirective } from "./ui/button.directive";
-import { MinimapComponent } from './ui/minimap/minimap.component';
+import { MinimapComponent } from "./ui/minimap/minimap.component";
+import { TooltipDirective } from "./ui/widgets/tooltip.directive";
+import { TooltipComponent } from './ui/widgets/tooltip/tooltip.component';
+import { BonusesComponent } from './ui/bonuses/bonuses.component';
+import { PercentBonusPipe } from './ui/percent-bonus.pipe';
 
 @NgModule({
   declarations: [
@@ -68,8 +73,12 @@ import { MinimapComponent } from './ui/minimap/minimap.component';
     ProgressBarComponent,
     ButtonDirective,
     MinimapComponent,
+    TooltipDirective,
+    TooltipComponent,
+    BonusesComponent,
+    PercentBonusPipe,
   ],
-  imports: [BrowserModule, FormsModule],
+  imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [Game, UIState],
   bootstrap: [AppComponent],
 })

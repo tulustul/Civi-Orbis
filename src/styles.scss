@@ -1,9 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import "~@angular/cdk/overlay-prebuilt.css";
+
 :root {
   --primary-color: #656565;
   --primary-dark-color: #484848;
-  --growth-color: #4c9f3b;
+  --growth-color: #44c72a;
   --production-color: #f0a00d;
 }
 
@@ -55,4 +57,12 @@ button {
   margin-top: 20px;
   display: flex;
   justify-content: space-between;
+}
+
+.growth-color {
+  color: var(--growth-color);
+}
+
+.production-color {
+  color: var(--production-color);
 }

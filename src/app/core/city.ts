@@ -3,6 +3,7 @@ import { Player } from "./player";
 import { getTileIndex } from "./serialization";
 import { UnitDefinition } from "./unit.interface";
 import { Building } from "./buildings";
+import { VirtualTimeScheduler } from "rxjs";
 
 export type ProductType = "unit" | "building" | "work";
 
@@ -162,13 +163,15 @@ export class City {
   }
 
   produceBuilding(building: Building) {
-    this.startProducing({
-      type: "unit",
-      name: building.name,
-      productionCost: building.productionCost,
-      unit: null,
-      building,
-    });
+    if (this.canConstruct(building)) {
+      this.startProducing({
+        type: "unit",
+        name: building.name,
+        productionCost: building.productionCost,
+        unit: null,
+        building,
+      });
+    }
   }
 
   startProducing(product: Product) {
@@ -308,5 +311,9 @@ export class City {
       this.workTile(tile, false);
     }
     this.updateYields();
+  }
+
+  canConstruct(building: Building) {
+    return !this.buildings.includes(building);
   }
 }

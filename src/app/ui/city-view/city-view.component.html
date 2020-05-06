@@ -45,6 +45,8 @@
   <app-progress-bar
     class="production-bar margin"
     *ngIf="city.currentProduct"
+    [appTooltip]="testTmpl"
+    [tooltipContext]="{ building: city.currentProduct.building }"
     [progress]="city.totalProduction"
     [nextProgress]="city.totalProduction + city.perTurn.production"
     [total]="city.currentProduct?.productionCost"
@@ -78,14 +80,16 @@
     <app-tab class="no-padding" tabTitle="construct">
       <div
         class="product"
-        *ngFor="let buildingDef of buildings"
-        (click)="city.produceBuilding(buildingDef)"
+        *ngFor="let building of buildings"
+        [appTooltip]="testTmpl"
+        [tooltipContext]="{ building: building }"
+        (click)="city.produceBuilding(building)"
       >
         <span class="name">
-          {{ buildingDef.name }}
+          {{ building.name }}
         </span>
         <span class="turns small">
-          {{ city.getTurnsToProduce(buildingDef) }} turns
+          {{ city.getTurnsToProduce(building) }} turns
         </span>
       </div>
     </app-tab>
@@ -100,11 +104,21 @@
 </div>
 
 <div class="panel box-shadowed right">
-  <h3>Buildings</h3>
+  <h3 class="margin">Buildings</h3>
 
-  <div class="building" *ngFor="let building of city.buildings">
+  <div
+    class="building"
+    *ngFor="let building of city.buildings"
+    [appTooltip]="testTmpl"
+    [tooltipContext]="{ building: building }"
+  >
     {{ building.name }}
   </div>
 </div>
 
 <app-work-tiles [city]="city"></app-work-tiles>
+
+<ng-template #testTmpl let-building="building">
+  <app-bonuses [bonuses]="building.bonuses"></app-bonuses>
+  <div>Cost: {{ building.productionCost }}</div>
+</ng-template>
