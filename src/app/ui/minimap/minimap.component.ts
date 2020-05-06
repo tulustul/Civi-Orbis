@@ -34,8 +34,16 @@ export class MinimapComponent implements AfterViewInit {
       autoStart: false,
     });
 
-    this.app.stage.addChild(this.minimapRenderer.sprite);
-
     this.minimapRenderer.create(this.app);
+  }
+
+  onMouseMove(event: MouseEvent) {
+    const canvasRect = this.canvas.nativeElement.getBoundingClientRect();
+    if (event.buttons === 1) {
+      this.game.camera.moveTo(
+        (event.clientX - canvasRect.x) / this.minimapRenderer.scale,
+        (event.clientY - canvasRect.y) / this.minimapRenderer.scale,
+      );
+    }
   }
 }

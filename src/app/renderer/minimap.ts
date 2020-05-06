@@ -2,8 +2,8 @@ import * as PIXIE from "pixi.js";
 
 import { Tile, SeaLevel, Climate, TileDirection } from "../core/tile";
 import { Game } from "../core/game";
+import { Transform } from "../renderer/camera";
 import { drawHex } from "./utils";
-import { takeUntil, filter } from "rxjs/operators";
 import { merge } from "rxjs";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
@@ -25,15 +25,19 @@ const CLIMATE_COLORS: Record<Climate, number> = {
 const maxSize = 300;
 
 export class MinimapRenderer {
-  sprite = new PIXIE.Sprite();
-
   width = 0;
   height = 0;
   scale = 1;
 
-  private scene = new PIXIE.Container();
+  public container = new PIXIE.Container();
 
-  private texture: PIXIE.RenderTexture;
+  private mapScene = new PIXIE.Container();
+
+  private cameraGraphics = new PIXIE.Graphics();
+
+  private mapSprite = new PIXIE.Sprite();
+
+  private mapTexture: PIXIE.RenderTexture;
 
   private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
@@ -43,14 +47,17 @@ export class MinimapRenderer {
     const tilesManager = this.game.tilesManager;
     tilesManager.revealedTiles$.subscribe((tiles) => {
       this.reveal(tiles);
-      this.render();
+      this.updateMap();
     });
 
     tilesManager.resetTilesVisibility$.subscribe((tiles) => {
       this.hideAllTiles();
       this.reveal(tiles);
-      this.render();
+      this.updateMap();
     });
+
+    this.container.addChild(this.mapSprite);
+    this.container.addChild(this.cameraGraphics);
   }
 
   calculateSize() {
@@ -71,11 +78,11 @@ export class MinimapRenderer {
   create(app: PIXIE.Application) {
     this.app = app;
 
-    this.texture = PIXIE.RenderTexture.create({
+    this.mapTexture = PIXIE.RenderTexture.create({
       width: this.width,
       height: this.height,
     });
-    this.sprite.texture = this.texture;
+    this.mapSprite.texture = this.mapTexture;
 
     this.drawMap();
 
@@ -86,21 +93,27 @@ export class MinimapRenderer {
       this.reveal(this.game.humanPlayer.exploredTiles);
     }
 
-    this.render();
+    this.app.stage.addChild(this.container);
+
+    // TODO unsubscribing
+    this.game.camera.transform$.subscribe((transform) => {
+      this.updateCamera(transform);
+    });
+
+    this.updateMap();
   }
 
   private listenPlayerAreas() {
     for (const player of this.game.players) {
       merge(player.area.added$, player.area.removed$).subscribe((tile) => {
-        console.log(tile);
         this.drawTile(tile);
-        this.render();
+        this.updateMap();
       });
     }
   }
 
   private hideAllTiles() {
-    for (const obj of this.scene.children) {
+    for (const obj of this.mapScene.children) {
       obj.visible = false;
     }
   }
@@ -116,17 +129,39 @@ export class MinimapRenderer {
     }
   }
 
+  private updateCamera(t: Transform) {
+    let width = this.game.renderer.canvas.width / t.scale;
+    let height = this.game.renderer.canvas.height / t.scale;
+
+    const xStart = (t.x - width / 2) * this.scale;
+    const yStart = (t.y - height / 2) * this.scale;
+
+    this.cameraGraphics.clear();
+
+    this.cameraGraphics.lineStyle(1, 0xffffff);
+    this.cameraGraphics.drawRect(
+      xStart,
+      yStart,
+      width * this.scale,
+      height * this.scale,
+    );
+
+    if (this.app) {
+      this.app.render();
+    }
+  }
+
+  private updateMap() {
+    this.app.renderer.render(this.mapScene, this.mapTexture);
+    this.app.render();
+  }
+
   private drawMap() {
     for (let y = 0; y < this.game.map.height; y++) {
       for (let x = 0; x < this.game.map.width; x++) {
         this.drawTile(this.game.map.tiles[x][y]);
       }
     }
-  }
-
-  private render() {
-    this.app.renderer.render(this.scene, this.texture);
-    this.app.render();
   }
 
   private drawTile(tile: Tile) {
@@ -149,7 +184,7 @@ export class MinimapRenderer {
     g.scale.x = this.scale;
     g.scale.y = this.scale;
 
-    this.scene.addChild(g);
+    this.mapScene.addChild(g);
     this.tilesMap.set(tile, [g]);
 
     this.renderRivers(tile, g);
@@ -160,7 +195,7 @@ export class MinimapRenderer {
       return;
     }
 
-    graphics.lineStyle(0.15, SEA_COLORS[SeaLevel.deep]);
+    graphics.lineStyle(0.3, SEA_COLORS[SeaLevel.deep]);
 
     for (const river of tile.riverParts) {
       if (river === TileDirection.NW) {

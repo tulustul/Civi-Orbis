@@ -30,7 +30,7 @@ export class Camera {
   private moveXAnimation: Animation | null = null;
   private moveYAnimation: Animation | null = null;
 
-  public boundingBox: BoundingBox = {
+  public tileBoundingBox: BoundingBox = {
     xStart: 0,
     yStart: 0,
     xEnd: 0,
@@ -196,9 +196,12 @@ export class Camera {
     const xStart = Math.floor(t.x - width / 2 - 1);
     const yStart = Math.floor(t.y - height / 2);
 
-    this.boundingBox.xStart = Math.max(0, Math.min(map.width, xStart));
-    this.boundingBox.yStart = Math.max(0, Math.min(map.height, yStart));
-    this.boundingBox.xEnd = Math.min(map.width, xStart + width + 3);
-    this.boundingBox.yEnd = Math.min(map.height, (yStart + height + 2) / 0.75);
+    this.tileBoundingBox.xStart = Math.max(0, Math.min(map.width, xStart));
+    this.tileBoundingBox.yStart = Math.max(0, Math.min(map.height, yStart));
+    this.tileBoundingBox.xEnd = Math.min(map.width, xStart + width + 3);
+    this.tileBoundingBox.yEnd = Math.min(
+      map.height,
+      (yStart + height + 2) / 0.75,
+    );
   }
 }

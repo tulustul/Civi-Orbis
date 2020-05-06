@@ -11,19 +11,19 @@ import { AreaDrawer } from "./tile/area";
 export class MapDrawer {
   container = new TileWrapperContainer();
 
-  waterContainer = new TileContainer(this.game.camera.boundingBox);
+  waterContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
-  terrainContainer = new TileContainer(this.game.camera.boundingBox);
+  terrainContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
-  riverContainer = new TileContainer(this.game.camera.boundingBox);
+  riverContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
-  cityContainer = new TileContainer(this.game.camera.boundingBox);
+  cityContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
-  yieldsContainer = new TileContainer(this.game.camera.boundingBox);
+  yieldsContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
-  unitsContainer = new TileContainer(this.game.camera.boundingBox);
+  unitsContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
-  overlaysContainer = new TileContainer(this.game.camera.boundingBox);
+  overlaysContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
   terrainDrawer: TerrainDrawer | undefined;
 
