@@ -3,6 +3,8 @@ import * as PIXIE from "pixi.js";
 import { Tile, SeaLevel, Climate, TileDirection } from "../core/tile";
 import { Game } from "../core/game";
 import { drawHex } from "./utils";
+import { takeUntil, filter } from "rxjs/operators";
+import { merge } from "rxjs";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,
@@ -77,12 +79,24 @@ export class MinimapRenderer {
 
     this.drawMap();
 
+    this.listenPlayerAreas();
+
     this.hideAllTiles();
     if (this.game.humanPlayer) {
       this.reveal(this.game.humanPlayer.exploredTiles);
     }
 
     this.render();
+  }
+
+  private listenPlayerAreas() {
+    for (const player of this.game.players) {
+      merge(player.area.added$, player.area.removed$).subscribe((tile) => {
+        console.log(tile);
+        this.drawTile(tile);
+        this.render();
+      });
+    }
   }
 
   private hideAllTiles() {
@@ -117,7 +131,9 @@ export class MinimapRenderer {
 
   private drawTile(tile: Tile) {
     let color: number;
-    if (tile.seaLevel === SeaLevel.none) {
+    if (tile.areaOf) {
+      color = tile.areaOf.player.color;
+    } else if (tile.seaLevel === SeaLevel.none) {
       color = CLIMATE_COLORS[tile.climate];
     } else {
       color = SEA_COLORS[tile.seaLevel];

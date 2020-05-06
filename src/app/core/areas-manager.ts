@@ -18,6 +18,7 @@ export class AreasManager {
   }
 
   destroy(area: Area) {
+    area.destroy();
     const index = this.areas.indexOf(area);
     if (index !== -1) {
       this.areas.splice(index, 1);

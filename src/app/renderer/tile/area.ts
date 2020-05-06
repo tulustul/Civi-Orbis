@@ -1,10 +1,10 @@
 import * as PIXIE from "pixi.js";
 
-import { takeUntil, filter } from "rxjs/operators";
 import { TileDirection } from "src/app/core/tile";
 import { TileContainer } from "../tile-container";
 import { Game } from "src/app/core/game";
 import { Area } from "src/app/core/area";
+import { merge } from "rxjs";
 
 const BORDERS_VERTICES: Record<
   TileDirection,
@@ -70,18 +70,12 @@ export class AreaDrawer {
   build() {
     for (const area of this.game.areasManager.areas) {
       this.drawArea(area);
-      area.changed$
-        .pipe(
-          takeUntil(
-            this.game.areasManager.destroyed$.pipe(
-              filter((destroyedArea) => destroyedArea === area),
-            ),
-          ),
-        )
-        .subscribe(() => {
-          this.clearArea(area);
-          this.drawArea(area);
-        });
+
+      // TODO we can update only single tiles here.
+      merge(area.added$, area.removed$).subscribe(() => {
+        this.clearArea(area);
+        this.drawArea(area);
+      });
     }
   }
 
@@ -99,19 +93,21 @@ export class AreaDrawer {
 
     const objs = this.areasMap.get(area)!;
 
-    for (const [tile, dir] of area.borders) {
-      const border = new PIXIE.Graphics();
-      border.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
-      border.position.y = tile.y * 0.75;
+    for (const [tile, dirs] of area.borders.entries()) {
+      for (const dir of dirs) {
+        const border = new PIXIE.Graphics();
+        border.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
+        border.position.y = tile.y * 0.75;
 
-      objs.push(border);
-      this.container.addChild(border, tile);
+        objs.push(border);
+        this.container.addChild(border, tile);
 
-      border.lineStyle(0.11, area.color);
-      border.alpha = 0.5;
-      const [p1, p2] = BORDERS_VERTICES[dir];
-      border.moveTo(p1[0], p1[1]);
-      border.lineTo(p2[0], p2[1]);
+        border.lineStyle(0.11, area.color);
+        border.alpha = 0.5;
+        const [p1, p2] = BORDERS_VERTICES[dir];
+        border.moveTo(p1[0], p1[1]);
+        border.lineTo(p2[0], p2[1]);
+      }
 
       // const background = new PIXIE.Graphics();
       // background.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;

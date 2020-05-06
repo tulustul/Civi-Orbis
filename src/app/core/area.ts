@@ -1,17 +1,23 @@
 import { Subject } from "rxjs";
-import { share } from "rxjs/operators";
+import { takeUntil } from "rxjs/operators";
 
 import { Tile, TileDirection } from "./tile";
 
 export class Area {
   tiles = new Set<Tile>();
 
-  borders: [Tile, TileDirection][] = [];
+  borders = new Map<Tile, TileDirection[]>();
 
   backgroundOpacity = 1;
 
-  private _changed$ = new Subject<void>();
-  changed$ = this._changed$.asObservable().pipe(share());
+  private _destroyed$ = new Subject<void>();
+  destroyed$ = this._destroyed$.asObservable();
+
+  private _added$ = new Subject<Tile>();
+  added$ = this._added$.asObservable().pipe(takeUntil(this.destroyed$));
+
+  private _removed$ = new Subject<Tile>();
+  removed$ = this._removed$.asObservable().pipe(takeUntil(this.destroyed$));
 
   constructor(public color: number) {}
 
@@ -20,7 +26,7 @@ export class Area {
     if (emitEvent) {
       // TODO make a local change and emit event instead of recomputing whole borders
       this.computeBorders();
-      // this._changed$.next();
+      this._added$.next(tile);
     }
   }
 
@@ -28,13 +34,17 @@ export class Area {
     this.tiles.delete(tile);
     if (emitEvent) {
       this.computeBorders();
-      // this._changed$.next();
+      this._removed$.next(tile);
     }
+  }
+
+  destroy() {
+    this._destroyed$.next();
   }
 
   computeBorders() {
     const visited = new Set<Tile>();
-    this.borders = [];
+    this.borders.clear();
     for (const tile of this.tiles) {
       visited.add(tile);
       for (const neighbour of tile.neighbours) {
@@ -42,10 +52,12 @@ export class Area {
           continue;
         }
         if (!this.tiles.has(neighbour)) {
-          this.borders.push([tile, tile.getDirectionTo(neighbour)]);
+          if (!this.borders.has(tile)) {
+            this.borders.set(tile, []);
+          }
+          this.borders.get(tile)!.push(tile.getDirectionTo(neighbour));
         }
       }
     }
-    this._changed$.next();
   }
 }
