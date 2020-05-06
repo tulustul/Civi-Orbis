@@ -37,9 +37,9 @@ export class MinimapComponent implements AfterViewInit {
     this.minimapRenderer.create(this.app);
   }
 
-  onMouseMove(event: MouseEvent) {
-    const canvasRect = this.canvas.nativeElement.getBoundingClientRect();
+  moveViewport(event: MouseEvent) {
     if (event.buttons === 1) {
+      const canvasRect = this.canvas.nativeElement.getBoundingClientRect();
       this.game.camera.moveTo(
         (event.clientX - canvasRect.x) / this.minimapRenderer.scale,
         (event.clientY - canvasRect.y) / this.minimapRenderer.scale,

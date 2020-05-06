@@ -20,6 +20,7 @@ export const PLAYER_COLORS: number[] = [
   0x7457bb,
   0xab57bb,
   0x79583c,
+  0xb6bbe6,
 ];
 
 export enum PlayerType {

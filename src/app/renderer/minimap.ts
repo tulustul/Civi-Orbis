@@ -166,12 +166,13 @@ export class MinimapRenderer {
 
   private drawTile(tile: Tile) {
     let color: number;
-    if (tile.areaOf) {
-      color = tile.areaOf.player.color;
-    } else if (tile.seaLevel === SeaLevel.none) {
-      color = CLIMATE_COLORS[tile.climate];
-    } else {
+
+    if (tile.seaLevel !== SeaLevel.none) {
       color = SEA_COLORS[tile.seaLevel];
+    } else if (tile.areaOf) {
+      color = tile.areaOf.player.color;
+    } else {
+      color = CLIMATE_COLORS[tile.climate];
     }
 
     const g = new PIXIE.Graphics();
