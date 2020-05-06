@@ -4,6 +4,7 @@ import { distinctUntilChanged } from "rxjs/operators";
 import { Game } from "./game";
 import { Tile } from "./tile";
 import { Unit } from "./unit";
+import { City } from "./city";
 
 export class MapUi {
   private _hoveredTile$ = new BehaviorSubject<Tile | null>(null);
@@ -39,7 +40,7 @@ export class MapUi {
         this.game.unitsManager.activeUnit$.next(unit);
         this.setPath(unit?.path || null);
       } else if (tile?.city) {
-        this.game.uiState.selectedCity$.next(tile.city);
+        this.selectCity(tile.city);
       } else {
         this.game.unitsManager.activeUnit$.next(null);
         this.setPath(null);
@@ -54,7 +55,7 @@ export class MapUi {
       }
     });
 
-    this.game.activePlayer$.subscribe((player) => {
+    this.game.activePlayer$.subscribe(() => {
       this.game.unitsManager.activeUnit$.next(null);
     });
 
@@ -98,6 +99,12 @@ export class MapUi {
 
   setPath(path: Tile[][] | null) {
     this._activePath$.next(path);
+  }
+
+  selectCity(city: City) {
+    if (city.player === this.game.humanPlayer) {
+      this.game.uiState.selectedCity$.next(city);
+    }
   }
 
   clear() {

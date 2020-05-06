@@ -72,7 +72,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
   }
 
   selectCity() {
-    this.ui.selectedCity$.next(this.city);
+    this.game.mapUi.selectCity(this.city);
   }
 
   onContextMenu(event: Event) {
