@@ -4,7 +4,7 @@
 
 <ng-container *ngIf="game.started$ | async">
   <app-editor
-    class="box-shadowed"
+    class="panel"
     *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
   ></app-editor>
 </ng-container>
@@ -21,7 +21,7 @@
 
 <ng-template #standardUiTmpl>
   <app-unit-panel></app-unit-panel>
-  <app-game-info class="box-shadowed"></app-game-info>
-  <app-minimap></app-minimap>
+  <app-game-info class="panel panel-bottom-left-corner"></app-game-info>
+  <app-minimap class="panel panel-top-left-corner"></app-minimap>
   <app-next-turn-button></app-next-turn-button>
 </ng-template>

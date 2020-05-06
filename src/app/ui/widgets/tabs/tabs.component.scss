@@ -13,12 +13,12 @@
       text-align: center;
       padding: 10px 30px;
       cursor: pointer;
-      border-bottom: 3px solid var(--primary-dark-color);
+      border-bottom: 3px solid var(--color-secondary-1-4);
       &:hover {
-        border-color: transparentize(#48b7f4, 0.6);
+        border-color: var(--color-secondary-1-2);
       }
       &.active {
-        border-color: #48b7f4;
+        border-color: var(--color-secondary-1-0);
       }
     }
   }

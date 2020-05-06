@@ -1,7 +1,7 @@
 :host {
   .save {
     cursor: pointer;
-    padding: 10px 0;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     .save-actions {
@@ -9,8 +9,11 @@
         margin-left: 10px;
       }
     }
+    &:hover {
+      background-color: var(--color-primary-2);
+    }
     &.selected {
-      background-color: grey;
+      background-color: var(--color-primary-4);
     }
   }
 }
