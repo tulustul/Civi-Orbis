@@ -2,11 +2,12 @@ import { Component, OnInit, Input } from "@angular/core";
 
 import { City } from "src/app/core/city";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
-import { BUILDING_DEFINITIONS } from "src/app/data/buildings";
+import { BUILDINGS } from "src/app/data/buildings";
 import { UIState } from "../ui-state";
 import { Game } from "src/app/core/game";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { Building } from "src/app/core/buildings";
 
 @Component({
   selector: "app-city-view",
@@ -16,7 +17,7 @@ import { takeUntil } from "rxjs/operators";
 export class CityViewComponent implements OnInit {
   UNITS = UNITS_DEFINITIONS;
 
-  BUILDINGS = BUILDING_DEFINITIONS;
+  buildings: Building[] = [];
 
   private quit$ = new Subject<void>();
 
@@ -27,6 +28,8 @@ export class CityViewComponent implements OnInit {
   ngOnInit(): void {
     this.game.mapUi.cityLabelsVisible = false;
     this.game.mapUi.allowMapPanning = false;
+
+    this.buildings = BUILDINGS.filter((b) => !this.city.buildings.includes(b));
   }
 
   @Input() set city(city: City) {

@@ -1,10 +1,11 @@
 import { Subject } from "rxjs";
 
-import { City, CitySerialized } from "./city";
+import { City, CitySerialized, Product } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
 import { Tile, LandForm, SeaLevel } from "./tile";
+import { BUILDINGS_MAP } from "./buildings";
 
 export class CitiesManager {
   private _spawned$ = new Subject<City>();
@@ -108,11 +109,31 @@ export class CitiesManager {
         for (const tileIndex of cityData.workedTiles) {
           city.workTile(getTileFromIndex(this.game.map, tileIndex));
         }
-        if (cityData.inProduction) {
-          city.inProduction =
-            this.game.unitsManager.definitions.get(cityData.inProduction) ||
-            null;
+        if (cityData.currentProduct) {
+          const product: Product = {
+            type: cityData.currentProduct.type,
+            name: "string",
+            productionCost: 0,
+            building: null,
+            unit: null,
+          };
+          if (cityData.currentProduct.unit) {
+            product.unit =
+              this.game.unitsManager.definitions.get(
+                cityData.currentProduct.unit,
+              ) || null;
+            product.productionCost = product.unit!.productionCost;
+            product.name = product.unit!.name;
+          }
+          if (cityData.currentProduct.building) {
+            product.building =
+              BUILDINGS_MAP.get(cityData.currentProduct.building) || null;
+            product.productionCost = product.building!.productionCost;
+            product.name = product.building!.name;
+          }
+          city.currentProduct = product;
         }
+        city.buildings = cityData.buildings.map((b) => BUILDINGS_MAP.get(b)!);
         city.updateYields();
       }
     }

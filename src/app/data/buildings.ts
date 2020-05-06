@@ -1,16 +1,16 @@
-import { BuildingDefinition } from "../core/building.interface";
+import { Building } from "../core/buildings";
 
-export const BUILDING_DEFINITIONS: BuildingDefinition[] = [
+export const BUILDINGS: Building[] = [
   {
     id: "granary",
     name: "granary",
-    productionCost: 200,
+    productionCost: 40,
     bonuses: { yieldValue: { food: 3 } },
   },
   {
     id: "well",
     name: "well",
-    productionCost: 100,
+    productionCost: 20,
     bonuses: { yieldValue: { food: 1 } },
   },
   {
@@ -22,19 +22,19 @@ export const BUILDING_DEFINITIONS: BuildingDefinition[] = [
   {
     id: "workshop",
     name: "workshop",
-    productionCost: 300,
+    productionCost: 80,
     bonuses: { yieldValue: { production: 5 } },
   },
   {
     id: "bigWorkshop",
     name: "grand workshop",
-    productionCost: 600,
+    productionCost: 200,
     bonuses: { yieldFactor: { production: 1.2 } },
   },
   {
     id: "allDoingBuilding",
     name: "all doing building",
-    productionCost: 1000,
+    productionCost: 500,
     bonuses: {
       yieldValue: { food: 1, production: 1 },
       yieldFactor: { food: 1.1, production: 1.1 },

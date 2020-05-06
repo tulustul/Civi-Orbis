@@ -8,14 +8,13 @@
   pointer-events: none;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-areas: "panel city-name city-name city-name .";
+  grid-template-areas: "left city-name city-name city-name right";
   > div {
     pointer-events: all;
   }
 
   .panel {
     --margin: 15px;
-    grid-area: panel;
     justify-self: flex-start;
     align-self: flex-start;
     background-color: var(--primary-color);
@@ -39,6 +38,10 @@
       background-color: var(--primary-dark-color);
       margin: 15px 0;
     }
+  }
+
+  .left {
+    grid-area: left;
     app-progress-bar {
       min-height: 30px;
       height: 30px;
@@ -96,6 +99,16 @@
       background-color: var(--primary-color);
       padding: 8px 100px;
       border-radius: 30px;
+    }
+  }
+
+  .right {
+    grid-area: right;
+    justify-self: flex-end;
+
+    .building {
+      padding: 5px 15px;
+      border-top: 1px solid var(--primary-dark-color);
     }
   }
 }

@@ -1,4 +1,4 @@
-<div class="panel box-shadowed">
+<div class="panel box-shadowed left">
   <div class="size-and-growth margin">
     <span class="size">{{ city.size }}</span>
 
@@ -23,7 +23,10 @@
   <div class="margin-h">
     <div class="yield">
       <div class="label">Food</div>
-      <div class="value">{{ city.perTurn.food }}</div>
+      <div class="value">
+        {{ city.yields.food }} - {{ city.foodConsumed }} =
+        {{ city.perTurn.food }}
+      </div>
     </div>
     <div class="yield">
       <div class="label">Production</div>
@@ -41,16 +44,16 @@
 
   <app-progress-bar
     class="production-bar margin"
-    *ngIf="city.inProduction"
+    *ngIf="city.currentProduct"
     [progress]="city.totalProduction"
     [nextProgress]="city.totalProduction + city.perTurn.production"
-    [total]="city.inProduction?.productionCost"
+    [total]="city.currentProduct?.productionCost"
   >
     <div>
       <span class="name">
-        {{ city.inProduction?.name || "-" }}
+        {{ city.currentProduct?.name || "-" }}
       </span>
-      <span class="turns" *ngIf="city.inProduction">
+      <span class="turns" *ngIf="city.currentProduct">
         {{ city.turnsToProductionEnd }} turns
       </span>
     </div>
@@ -61,7 +64,7 @@
       <div
         class="product"
         *ngFor="let unitDef of UNITS"
-        (click)="city.startProducing(unitDef)"
+        (click)="city.produceUnit(unitDef)"
       >
         <span class="name">
           {{ unitDef.name }}
@@ -75,8 +78,8 @@
     <app-tab class="no-padding" tabTitle="construct">
       <div
         class="product"
-        *ngFor="let buildingDef of BUILDINGS"
-        (click)="city.startProducing(buildingDef)"
+        *ngFor="let buildingDef of buildings"
+        (click)="city.produceBuilding(buildingDef)"
       >
         <span class="name">
           {{ buildingDef.name }}
@@ -94,6 +97,14 @@
 <div class="city-name">
   <h2 class="box-shadowed">{{ city.name }}</h2>
   <button class="btn-primary box-shadowed" (click)="quit()">Return</button>
+</div>
+
+<div class="panel box-shadowed right">
+  <h3>Buildings</h3>
+
+  <div class="building" *ngFor="let building of city.buildings">
+    {{ building.name }}
+  </div>
 </div>
 
 <app-work-tiles [city]="city"></app-work-tiles>
