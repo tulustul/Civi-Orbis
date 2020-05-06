@@ -1,5 +1,7 @@
 :host {
   display: block;
-  padding: 0 20px;
   overflow-y: auto;
+  &:not(.no-padding) {
+    padding: 0 20px;
+  }
 }

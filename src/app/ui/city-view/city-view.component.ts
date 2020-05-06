@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, OnDestroy } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 
 import { City } from "src/app/core/city";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
+import { BUILDING_DEFINITIONS } from "src/app/data/buildings";
 import { UIState } from "../ui-state";
 import { Game } from "src/app/core/game";
 import { Subject } from "rxjs";
@@ -14,6 +15,8 @@ import { takeUntil } from "rxjs/operators";
 })
 export class CityViewComponent implements OnInit {
   UNITS = UNITS_DEFINITIONS;
+
+  BUILDINGS = BUILDING_DEFINITIONS;
 
   private quit$ = new Subject<void>();
 

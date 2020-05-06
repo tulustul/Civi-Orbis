@@ -2,7 +2,7 @@
 
 :root {
   --primary-color: #656565;
-  --secondary-color: #484848;
+  --primary-dark-color: #484848;
   --growth-color: #4c9f3b;
   --production-color: #f0a00d;
 }
@@ -31,7 +31,7 @@ button {
   padding: 5px 15px;
   cursor: pointer;
   border-radius: 4px;
-  background-color: var(--secondary-color);
+  background-color: var(--primary-dark-color);
   color: white;
   outline: none;
   &:hover {

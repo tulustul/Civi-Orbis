@@ -1,8 +1,9 @@
-<div class="yields box-shadowed">
-  <div class="size-and-growth">
+<div class="panel box-shadowed">
+  <div class="size-and-growth margin">
     <span class="size">{{ city.size }}</span>
 
     <app-progress-bar
+      class="growth-bar"
       [progress]="city.totalFood"
       [nextProgress]="city.totalFood + city.perTurn.food"
       [total]="city.foodToGrow"
@@ -19,7 +20,7 @@
 
   <h3>Yields</h3>
 
-  <div>
+  <div class="margin-h">
     <div class="yield">
       <div class="label">Food</div>
       <div class="value">{{ city.perTurn.food }}</div>
@@ -30,49 +31,69 @@
     </div>
   </div>
 
-  <button (click)="city.optimizeYields()">Optimize yields</button>
+  <button class="margin-h margin-top" (click)="city.optimizeYields()">
+    Optimize yields
+  </button>
+
+  <div class="separator"></div>
+
+  <h3>Production</h3>
+
+  <app-progress-bar
+    class="production-bar margin"
+    *ngIf="city.inProduction"
+    [progress]="city.totalProduction"
+    [nextProgress]="city.totalProduction + city.perTurn.production"
+    [total]="city.inProduction?.productionCost"
+  >
+    <div>
+      <span class="name">
+        {{ city.inProduction?.name || "-" }}
+      </span>
+      <span class="turns" *ngIf="city.inProduction">
+        {{ city.turnsToProductionEnd }} turns
+      </span>
+    </div>
+  </app-progress-bar>
+
+  <app-tabs class="grow-tabs">
+    <app-tab class="no-padding" tabTitle="recruit">
+      <div
+        class="product"
+        *ngFor="let unitDef of UNITS"
+        (click)="city.startProducing(unitDef)"
+      >
+        <span class="name">
+          {{ unitDef.name }}
+        </span>
+        <span class="turns small">
+          {{ city.getTurnsToProduce(unitDef) }} turns
+        </span>
+      </div>
+    </app-tab>
+
+    <app-tab class="no-padding" tabTitle="construct">
+      <div
+        class="product"
+        *ngFor="let buildingDef of BUILDINGS"
+        (click)="city.startProducing(buildingDef)"
+      >
+        <span class="name">
+          {{ buildingDef.name }}
+        </span>
+        <span class="turns small">
+          {{ city.getTurnsToProduce(buildingDef) }} turns
+        </span>
+      </div>
+    </app-tab>
+
+    <app-tab class="no-padding" tabTitle="work on"> </app-tab>
+  </app-tabs>
 </div>
 
 <div class="city-name">
   <h2 class="box-shadowed">{{ city.name }}</h2>
   <button class="btn-primary box-shadowed" (click)="quit()">Return</button>
-</div>
-
-<div class="production box-shadowed">
-  <div class="production-top">
-    <div>
-      <ng-container *ngIf="city.inProduction">
-        <app-progress-bar
-          [progress]="city.totalProduction"
-          [nextProgress]="city.totalProduction + city.perTurn.production"
-          [total]="city.inProduction?.productionCost"
-        >
-          <div>
-            <span class="name">
-              {{ city.inProduction?.name || "-" }}
-            </span>
-            <span class="turns" *ngIf="city.inProduction">
-              {{ city.turnsToProductionEnd }} turns
-            </span>
-          </div>
-        </app-progress-bar>
-      </ng-container>
-    </div>
-    <h3>Produce:</h3>
-  </div>
-
-  <div
-    class="product"
-    *ngFor="let unitDef of UNITS"
-    (click)="city.startProducing(unitDef)"
-  >
-    <span class="name">
-      {{ unitDef.name }}
-    </span>
-    <span class="turns small">
-      {{ city.getTurnsToProduce(unitDef) }} turns
-    </span>
-  </div>
 </div>
 
 <app-work-tiles [city]="city"></app-work-tiles>

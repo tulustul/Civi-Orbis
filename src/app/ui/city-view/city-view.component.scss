@@ -5,32 +5,52 @@
   top: 0;
   left: 0;
   color: white;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  grid-template-areas:
-    "yields city-name city-name top"
-    "production . . ."
-    "production . . ."
-    "production . . .";
   pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-areas: "panel city-name city-name city-name .";
   > div {
     pointer-events: all;
   }
-  .yields {
-    background-color: var(--primary-color);
-    grid-area: yields;
-    padding: 15px;
+
+  .panel {
+    --margin: 15px;
+    grid-area: panel;
     justify-self: flex-start;
     align-self: flex-start;
-    margin-bottom: 15px;
+    background-color: var(--primary-color);
     display: flex;
     flex-direction: column;
-    button {
-      margin-top: 15px;
+    width: 300px;
+    h3 {
+      margin: 0;
+    }
+    .margin {
+      margin: var(--margin);
+    }
+    .margin-h {
+      margin: 0 var(--margin);
+    }
+    .margin-top {
+      margin-top: var(--margin);
+    }
+    .separator {
+      height: 3px;
+      background-color: var(--primary-dark-color);
+      margin: 15px 0;
+    }
+    app-progress-bar {
+      min-height: 30px;
+      height: 30px;
+      flex: 1;
+      &.growth-bar {
+        --progress-bar-color: var(--growth-color);
+      }
+      &.production-bar {
+        --progress-bar-color: var(--production-color);
+      }
     }
     .size-and-growth {
-      --progress-bar-color: var(--growth-color);
       display: flex;
       align-items: stretch;
       .size {
@@ -42,13 +62,27 @@
     .yield {
       display: flex;
       justify-content: space-between;
-      padding: 3px 0;
+      padding: 5px 0;
       &:not(:last-child) {
-        border-bottom: 1px solid var(--secondary-color);
+        border-bottom: 1px solid var(--primary-dark-color);
       }
       .label {
         font-weight: bold;
         margin-right: 15px;
+      }
+    }
+
+    .product {
+      padding: 5px 15px;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid var(--primary-dark-color);
+      cursor: pointer;
+      &:hover {
+        background-color: var(--primary-dark-color);
+      }
+      .turns {
+        margin-left: 15px;
       }
     }
   }
@@ -62,37 +96,6 @@
       background-color: var(--primary-color);
       padding: 8px 100px;
       border-radius: 30px;
-    }
-  }
-
-  .production {
-    --progress-bar-color: var(--production-color);
-    background-color: var(--primary-color);
-    grid-area: production;
-    justify-self: flex-start;
-    align-self: flex-end;
-    h3 {
-      margin: 0;
-    }
-    app-progress-bar {
-      height: 30px;
-      margin-bottom: 15px;
-    }
-    .production-top {
-      padding: 15px;
-    }
-    .product {
-      padding: 5px 15px;
-      display: flex;
-      justify-content: space-between;
-      border-top: 1px solid var(--secondary-color);
-      cursor: pointer;
-      &:hover {
-        background-color: var(--secondary-color);
-      }
-      .turns {
-        margin-left: 15px;
-      }
     }
   }
 }

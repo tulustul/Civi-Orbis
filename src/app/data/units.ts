@@ -3,6 +3,14 @@ import { UnitAction } from "../core/unit-actions";
 
 export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
+    id: "settler",
+    name: "settler",
+    actionPoints: 2,
+    power: 0,
+    actions: [UnitAction.foundCity],
+    productionCost: 50,
+  },
+  {
     id: "scout",
     name: "scout",
     actionPoints: 2,
@@ -11,11 +19,11 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     productionCost: 10,
   },
   {
-    id: "settler",
-    name: "settler",
+    id: "warrior",
+    name: "warrior",
     actionPoints: 2,
-    power: 0,
-    actions: [UnitAction.foundCity],
-    productionCost: 50,
+    power: 5,
+    actions: [],
+    productionCost: 30,
   },
 ];
