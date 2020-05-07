@@ -4,6 +4,7 @@ import {
   TemplateRef,
   HostListener,
   ElementRef,
+  OnDestroy,
 } from "@angular/core";
 import {
   Overlay,
@@ -17,8 +18,8 @@ import { TooltipComponent } from "./tooltip/tooltip.component";
 @Directive({
   selector: "[appTooltip]",
 })
-export class TooltipDirective {
-  overlayRef: OverlayRef;
+export class TooltipDirective implements OnDestroy {
+  overlayRef: OverlayRef | null = null;
 
   @Input("appTooltip") templateRef: TemplateRef<any>;
 
@@ -28,6 +29,12 @@ export class TooltipDirective {
     private elementRef: ElementRef<HTMLElement>,
     private overlay: Overlay,
   ) {}
+
+  ngOnDestroy() {
+    if (this.overlayRef) {
+      this.overlayRef.dispose();
+    }
+  }
 
   @HostListener("mouseenter")
   showTooltip() {
@@ -48,7 +55,10 @@ export class TooltipDirective {
 
   @HostListener("mouseleave")
   hideTooltip() {
-    this.overlayRef.dispose();
+    if (this.overlayRef) {
+      this.overlayRef.dispose();
+      this.overlayRef = null;
+    }
   }
 
   private getPositions(): ConnectionPositionPair[] {
