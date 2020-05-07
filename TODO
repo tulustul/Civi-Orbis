@@ -1,0 +1,38 @@
+Bugs:
+  ☐ showing city's area should take player's explored tiles into account
+  ☐ next turn should hide city view
+  ☐ fix rivers placement - loops, dead ends etc.
+  ☐ unit path is showing wrong turns count
+  ☐ TileContainer raises exception when game is loaded
+  ☐ minimap doesn't fully fill it's viewport
+  ☐ selecting building to build should hide it from production list
+  ☐ ExpressionChangedAfterItHasBeenCheckedError when opening city view
+
+Minor features:
+  ☐ ESC for closing current view
+  ☐ closing city view should restore previous camera transform
+  ☐ nicer start game view
+  ☐ tooltips for more ui elements
+  ☐ block next turn until all units/buildings have orders (and jump to them)
+  ☐ hide city growth/production in foreign cities
+  ☐ when zoomed out display areas instead of borders
+  ☐ autosaving
+  ☐ better city expansion - distance to next tile should be limited basing on city's size
+  ☐ differentiate between different units on the map
+
+Major features:
+  ☐ implement `city work on` (how to call it properly?).
+    ☐ `food` transforms 25% of production into food
+    ☐ `public works` produces `public works points`
+  ☐ tile improvements:
+    ☐ `farm` +1 food
+    ☐ `workshop` +1 production
+    ☐ `road` 0.5 movement cost
+  ☐ resources - increase tile yields
+  ☐ `fog of war` - grey out tiles not visible by units and cities
+  ☐ AI :/
+  ☐ armies
+  ☐ city conquest
+  ☐ slavery
+
+Long term ideas:

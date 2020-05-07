@@ -6,4 +6,4 @@
 
 - Learn how to [build the project](wiki/development.md).
 
-- Track the [progress](wiki/progress.md).
+- Track the [progress](TODO).
