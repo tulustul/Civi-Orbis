@@ -5,7 +5,7 @@ Bugs:
   ☐ unit path is showing wrong turns count
   ☐ TileContainer raises exception when game is loaded
   ☐ minimap doesn't fully fill it's viewport
-  ☐ selecting building to build should hide it from production list
+  ✔ selecting building to build should hide it from production list @done(20-05-07 21:38)
   ☐ ExpressionChangedAfterItHasBeenCheckedError when opening city view
 
 Minor features:
@@ -20,6 +20,7 @@ Minor features:
   ☐ better city expansion - distance to next tile should be limited basing on city's size
   ☐ differentiate between different units on the map
   ✔ city products can have requirements @done(20-05-07 20:42)
+  ☐ city production queue
 
 Major features:
   ☐ implement `city work on` (how to call it properly?).

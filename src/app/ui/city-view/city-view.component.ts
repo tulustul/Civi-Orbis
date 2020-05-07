@@ -39,18 +39,7 @@ export class CityViewComponent implements OnInit {
     this.game.mapUi.cityLabelsVisible = false;
     this.game.mapUi.allowMapPanning = false;
 
-    const notBuildBuildings = BUILDINGS.filter(
-      (b) => !this.city.buildings.includes(b),
-    );
-
-    this.buildings = getAvailableProducts<Building>(
-      notBuildBuildings,
-      this.city,
-    );
-    this.disabledBuildings = getDisabledProducts<Building>(
-      this.buildings,
-      this.city,
-    );
+    this.buildBuildingsList();
 
     this.units = getAvailableProducts<UnitDefinition>(
       UNITS_DEFINITIONS,
@@ -80,6 +69,33 @@ export class CityViewComponent implements OnInit {
           this.quit();
         }
       });
+  }
+
+  private buildBuildingsList() {
+    const notBuildBuildings = BUILDINGS.filter(
+      (b) =>
+        this.city.currentProduct?.productDefinition !== b &&
+        !this.city.buildings.includes(b),
+    );
+
+    this.buildings = getAvailableProducts<Building>(
+      notBuildBuildings,
+      this.city,
+    );
+    this.disabledBuildings = getDisabledProducts<Building>(
+      this.buildings,
+      this.city,
+    );
+  }
+
+  produceBuilding(building: Building) {
+    this.city.produceBuilding(building);
+    this.buildBuildingsList();
+  }
+
+  produceUnit(unit: UnitDefinition) {
+    this.city.produceUnit(unit);
+    this.buildBuildingsList();
   }
 
   get city() {
