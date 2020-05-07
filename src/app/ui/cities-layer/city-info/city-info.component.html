@@ -24,10 +24,10 @@
       class="production"
       [progress]="city.totalProduction"
       [nextProgress]="city.totalProduction + city.perTurn.production"
-      [total]="city.currentProduct?.productionCost || 0"
+      [total]="city.currentProduct?.productDefinition.productionCost || 0"
     >
       <span>
-        {{ city.currentProduct?.name }}
+        {{ city.currentProduct?.productDefinition.name }}
       </span>
       <span class="turns">({{ city.turnsToProductionEnd | turns }})</span>
     </app-progress-bar>

@@ -45,15 +45,15 @@
   <app-progress-bar
     class="production-bar margin"
     *ngIf="city.currentProduct"
-    [appTooltip]="testTmpl"
-    [tooltipContext]="{ building: city.currentProduct.building }"
+    [appTooltip]="buildingTooltipTmpl"
+    [tooltipContext]="{ building: city.currentProduct.productDefinition }"
     [progress]="city.totalProduction"
     [nextProgress]="city.totalProduction + city.perTurn.production"
-    [total]="city.currentProduct?.productionCost"
+    [total]="city.currentProduct?.productDefinition.productionCost"
   >
     <div>
       <span class="name">
-        {{ city.currentProduct?.name || "-" }}
+        {{ city.currentProduct?.productDefinition.name || "-" }}
       </span>
       <span class="turns" *ngIf="city.currentProduct">
         {{ city.turnsToProductionEnd }} turns
@@ -65,14 +65,17 @@
     <app-tab class="no-padding" tabTitle="recruit">
       <div
         class="product"
-        *ngFor="let unitDef of UNITS"
-        (click)="city.produceUnit(unitDef)"
+        *ngFor="let unit of units"
+        [class.disabled]="disabledUnits.has(unit)"
+        [appTooltip]="unitTooltipTmpl"
+        [tooltipContext]="{ unit: unit }"
+        (click)="city.produceUnit(unit)"
       >
         <span class="name">
-          {{ unitDef.name }}
+          {{ unit.name }}
         </span>
         <span class="turns small">
-          {{ city.getTurnsToProduce(unitDef) }} turns
+          {{ city.getTurnsToProduce(unit) }} turns
         </span>
       </div>
     </app-tab>
@@ -81,7 +84,8 @@
       <div
         class="product"
         *ngFor="let building of buildings"
-        [appTooltip]="testTmpl"
+        [class.disabled]="disabledBuildings.has(building)"
+        [appTooltip]="buildingTooltipTmpl"
         [tooltipContext]="{ building: building }"
         (click)="city.produceBuilding(building)"
       >
@@ -109,7 +113,7 @@
   <div
     class="building"
     *ngFor="let building of city.buildings"
-    [appTooltip]="testTmpl"
+    [appTooltip]="buildingTooltipTmpl"
     [tooltipContext]="{ building: building }"
   >
     {{ building.name }}
@@ -118,7 +122,19 @@
 
 <app-work-tiles [city]="city"></app-work-tiles>
 
-<ng-template #testTmpl let-building="building">
+<ng-template #buildingTooltipTmpl let-building="building">
+  <app-product-requirements
+    [product]="building"
+    [city]="city"
+  ></app-product-requirements>
   <app-bonuses [bonuses]="building.bonuses"></app-bonuses>
   <div>Cost: {{ building.productionCost }}</div>
+</ng-template>
+
+<ng-template #unitTooltipTmpl let-unit="unit">
+  <app-product-requirements
+    [product]="unit"
+    [city]="city"
+  ></app-product-requirements>
+  <div>Cost: {{ unit.productionCost }}</div>
 </ng-template>

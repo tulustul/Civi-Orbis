@@ -1,10 +1,8 @@
 import { Bonuses } from "./bonus";
 import { BUILDINGS } from "../data/buildings";
+import { ProductDefinition } from "./product";
 
-export interface Building {
-  id: string;
-  name: string;
-  productionCost: number;
+export interface Building extends ProductDefinition {
   bonuses: Bonuses;
 }
 

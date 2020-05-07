@@ -1,10 +1,8 @@
 import { UnitAction } from "./unit-actions";
+import { ProductDefinition } from "./product";
 
-export interface UnitDefinition {
-  id: string;
-  name: string;
+export interface UnitDefinition extends ProductDefinition {
   actionPoints: number;
   power: number;
-  productionCost: number;
   actions: UnitAction[];
 }

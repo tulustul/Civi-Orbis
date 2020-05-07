@@ -39,6 +39,7 @@ import { TooltipDirective } from "./ui/widgets/tooltip.directive";
 import { TooltipComponent } from './ui/widgets/tooltip/tooltip.component';
 import { BonusesComponent } from './ui/bonuses/bonuses.component';
 import { PercentBonusPipe } from './ui/percent-bonus.pipe';
+import { ProductRequirementsComponent } from './ui/product-requirements/product-requirements.component';
 
 @NgModule({
   declarations: [
@@ -77,6 +78,7 @@ import { PercentBonusPipe } from './ui/percent-bonus.pipe';
     TooltipComponent,
     BonusesComponent,
     PercentBonusPipe,
+    ProductRequirementsComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [Game, UIState],

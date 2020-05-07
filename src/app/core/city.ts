@@ -3,22 +3,18 @@ import { Player } from "./player";
 import { getTileIndex } from "./serialization";
 import { UnitDefinition } from "./unit.interface";
 import { Building } from "./buildings";
-import { VirtualTimeScheduler } from "rxjs";
+import { ProductDefinition } from "./product";
 
 export type ProductType = "unit" | "building" | "work";
 
 export interface Product {
   type: ProductType;
-  name: string;
-  productionCost: number;
-  unit: UnitDefinition | null;
-  building: Building | null;
+  productDefinition: ProductDefinition;
 }
 
 export interface ProductSerialized {
   type: ProductType;
-  unit: string | null;
-  building: string | null;
+  id: string;
 }
 
 export interface CitySerialized {
@@ -50,8 +46,8 @@ export class City {
   foodConsumed = 1;
 
   yields: Yields = {
-    food: 5,
-    production: 5,
+    food: 0,
+    production: 0,
   };
   perTurn: Yields = {
     food: 0,
@@ -62,6 +58,7 @@ export class City {
   totalProduction = 0;
 
   buildings: Building[] = [];
+  buildingsIds = new Set<string>();
 
   tiles = new Set<Tile>();
 
@@ -85,8 +82,7 @@ export class City {
       currentProduct: this.currentProduct
         ? {
             type: this.currentProduct.type,
-            unit: this.currentProduct.unit?.id || null,
-            building: this.currentProduct.building?.id || null,
+            id: this.currentProduct.productDefinition.id,
           }
         : null,
       tiles: Array.from(this.tiles).map((tile) =>
@@ -112,15 +108,19 @@ export class City {
 
     this.totalProduction += this.yields.production;
 
-    if (this.totalProduction >= this.currentProduct.productionCost) {
-      if (this.currentProduct.unit) {
+    if (
+      this.totalProduction >=
+      this.currentProduct.productDefinition.productionCost
+    ) {
+      if (this.currentProduct.type === "unit") {
         this.player.game.unitsManager.spawn(
-          this.currentProduct.unit.id,
+          this.currentProduct.productDefinition.id,
           this.tile,
           this.player,
         );
-      } else if (this.currentProduct.building) {
-        this.buildings.push(this.currentProduct.building);
+      } else if (this.currentProduct.type === "building") {
+        this.buildings.push(this.currentProduct.productDefinition as Building);
+        this.buildingsIds.add(this.currentProduct.productDefinition.id);
       }
       this.totalProduction = 0;
       this.currentProduct = null;
@@ -155,26 +155,24 @@ export class City {
   produceUnit(unit: UnitDefinition) {
     this.startProducing({
       type: "unit",
-      name: unit.name,
-      productionCost: unit.productionCost,
-      building: null,
-      unit,
+      productDefinition: unit,
     });
   }
 
   produceBuilding(building: Building) {
     if (this.canConstruct(building)) {
       this.startProducing({
-        type: "unit",
-        name: building.name,
-        productionCost: building.productionCost,
-        unit: null,
-        building,
+        type: "building",
+        productDefinition: building,
       });
     }
   }
 
   startProducing(product: Product) {
+    if (!this.canProduce(product.productDefinition)) {
+      return;
+    }
+
     this.currentProduct = product;
     this.totalProduction = 0;
     this.player.game.citiesManager.update(this);
@@ -194,7 +192,8 @@ export class City {
       return null;
     }
     const remainingProduction =
-      this.currentProduct.productionCost - this.totalProduction;
+      this.currentProduct.productDefinition.productionCost -
+      this.totalProduction;
 
     return Math.ceil(remainingProduction / this.yields.production);
   }
@@ -315,5 +314,21 @@ export class City {
 
   canConstruct(building: Building) {
     return !this.buildings.includes(building);
+  }
+
+  canProduce(product: ProductDefinition): boolean {
+    for (const r of product.requirements) {
+      if (!r.check(this)) {
+        return false;
+      }
+    }
+
+    for (const r of product.weakRequirements) {
+      if (!r.check(this)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

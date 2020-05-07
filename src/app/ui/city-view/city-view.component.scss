@@ -78,9 +78,15 @@
       display: flex;
       justify-content: space-between;
       border-top: 1px solid var(--color-primary-3);
-      cursor: pointer;
-      &:hover {
-        background-color: var(--color-primary-3);
+      &:not(.disabled) {
+        cursor: pointer;
+        &:hover {
+          background-color: var(--color-primary-3);
+        }
+      }
+      &.disabled {
+        color: var(--color-secondary-text);
+        background-color: var(--color-primary-4);
       }
       .turns {
         margin-left: 15px;

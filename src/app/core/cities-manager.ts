@@ -6,6 +6,7 @@ import { Game } from "./game";
 import { Player } from "./player";
 import { Tile, LandForm, SeaLevel } from "./tile";
 import { BUILDINGS_MAP } from "./buildings";
+import { ProductDefinition } from "./product";
 
 export class CitiesManager {
   private _spawned$ = new Subject<City>();
@@ -110,30 +111,23 @@ export class CitiesManager {
           city.workTile(getTileFromIndex(this.game.map, tileIndex));
         }
         if (cityData.currentProduct) {
-          const product: Product = {
+          let productDefinition: ProductDefinition;
+
+          if (cityData.currentProduct.type === "unit") {
+            productDefinition = this.game.unitsManager.definitions.get(
+              cityData.currentProduct.id,
+            )!;
+          } else {
+            productDefinition = BUILDINGS_MAP.get(cityData.currentProduct.id)!;
+          }
+
+          city.currentProduct = {
             type: cityData.currentProduct.type,
-            name: "string",
-            productionCost: 0,
-            building: null,
-            unit: null,
+            productDefinition,
           };
-          if (cityData.currentProduct.unit) {
-            product.unit =
-              this.game.unitsManager.definitions.get(
-                cityData.currentProduct.unit,
-              ) || null;
-            product.productionCost = product.unit!.productionCost;
-            product.name = product.unit!.name;
-          }
-          if (cityData.currentProduct.building) {
-            product.building =
-              BUILDINGS_MAP.get(cityData.currentProduct.building) || null;
-            product.productionCost = product.building!.productionCost;
-            product.name = product.building!.name;
-          }
-          city.currentProduct = product;
         }
         city.buildings = cityData.buildings.map((b) => BUILDINGS_MAP.get(b)!);
+        city.buildingsIds = new Set(city.buildings.map((b) => b.id));
         city.updateYields();
       }
     }

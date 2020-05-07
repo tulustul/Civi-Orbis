@@ -1,43 +1,59 @@
 import { Building } from "../core/buildings";
+import { BuildingRequirement } from "../core/product";
 
 export const BUILDINGS: Building[] = [
   {
     id: "granary",
-    name: "granary",
+    name: "Granary",
     productionCost: 40,
     bonuses: { yieldValue: { food: 3 } },
+    requirements: [],
+    weakRequirements: [],
   },
   {
     id: "well",
-    name: "well",
+    name: "Well",
     productionCost: 20,
     bonuses: { yieldValue: { food: 1 } },
+    requirements: [],
+    weakRequirements: [],
   },
   {
     id: "bigGranary",
-    name: "grand granary",
+    name: "Grand granary",
     productionCost: 100,
     bonuses: { yieldFactor: { food: 1.2 } },
+    requirements: [new BuildingRequirement("granary")],
+    weakRequirements: [],
   },
   {
     id: "workshop",
-    name: "workshop",
+    name: "Workshop",
     productionCost: 80,
     bonuses: { yieldValue: { production: 5 } },
+    requirements: [],
+    weakRequirements: [],
   },
   {
     id: "bigWorkshop",
-    name: "grand workshop",
+    name: "Grand workshop",
     productionCost: 200,
     bonuses: { yieldFactor: { production: 1.2 } },
+    requirements: [new BuildingRequirement("workshop")],
+    weakRequirements: [],
   },
   {
     id: "allDoingBuilding",
-    name: "all doing building",
+    name: "All doing building",
     productionCost: 500,
     bonuses: {
       yieldValue: { food: 1, production: 1 },
       yieldFactor: { food: 1.1, production: 1.1 },
     },
+    requirements: [
+      new BuildingRequirement("bigGranary"),
+      new BuildingRequirement("bigWorkshop"),
+    ],
+    weakRequirements: [],
   },
 ];

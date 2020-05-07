@@ -19,6 +19,7 @@ Minor features:
   ☐ autosaving
   ☐ better city expansion - distance to next tile should be limited basing on city's size
   ☐ differentiate between different units on the map
+  ✔ city products can have requirements @done(20-05-07 20:42)
 
 Major features:
   ☐ implement `city work on` (how to call it properly?).

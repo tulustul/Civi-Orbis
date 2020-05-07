@@ -8,6 +8,12 @@ import { Game } from "src/app/core/game";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Building } from "src/app/core/buildings";
+import { UnitDefinition } from "src/app/core/unit.interface";
+import {
+  ProductDefinition,
+  getAvailableProducts,
+  getDisabledProducts,
+} from "src/app/core/product";
 
 @Component({
   selector: "app-city-view",
@@ -15,9 +21,13 @@ import { Building } from "src/app/core/buildings";
   styleUrls: ["./city-view.component.scss"],
 })
 export class CityViewComponent implements OnInit {
-  UNITS = UNITS_DEFINITIONS;
+  units: UnitDefinition[] = [];
 
   buildings: Building[] = [];
+
+  disabledUnits = new Set<UnitDefinition>();
+
+  disabledBuildings = new Set<Building>();
 
   private quit$ = new Subject<void>();
 
@@ -29,7 +39,27 @@ export class CityViewComponent implements OnInit {
     this.game.mapUi.cityLabelsVisible = false;
     this.game.mapUi.allowMapPanning = false;
 
-    this.buildings = BUILDINGS.filter((b) => !this.city.buildings.includes(b));
+    const notBuildBuildings = BUILDINGS.filter(
+      (b) => !this.city.buildings.includes(b),
+    );
+
+    this.buildings = getAvailableProducts<Building>(
+      notBuildBuildings,
+      this.city,
+    );
+    this.disabledBuildings = getDisabledProducts<Building>(
+      this.buildings,
+      this.city,
+    );
+
+    this.units = getAvailableProducts<UnitDefinition>(
+      UNITS_DEFINITIONS,
+      this.city,
+    );
+    this.disabledUnits = getDisabledProducts<UnitDefinition>(
+      this.units,
+      this.city,
+    );
   }
 
   @Input() set city(city: City) {
