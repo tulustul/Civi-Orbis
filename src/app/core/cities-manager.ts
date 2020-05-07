@@ -104,6 +104,7 @@ export class CitiesManager {
         city.size = cityData.size;
         city.totalFood = cityData.totalFood;
         city.totalProduction = cityData.totalProduction;
+        city.totalCulture = cityData.totalCulture;
         for (const tileIndex of cityData.tiles) {
           city.addTile(getTileFromIndex(this.game.map, tileIndex));
         }

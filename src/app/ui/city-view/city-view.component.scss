@@ -50,6 +50,9 @@
       &.production-bar {
         --progress-bar-color: var(--production-color);
       }
+      &.culture-bar {
+        --progress-bar-color: var(--culture-color);
+      }
     }
     .size-and-growth {
       display: flex;

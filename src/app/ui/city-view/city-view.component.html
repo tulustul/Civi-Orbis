@@ -32,11 +32,30 @@
       <div class="label">Production</div>
       <div class="value">{{ city.perTurn.production }}</div>
     </div>
+    <div class="yield">
+      <div class="label">Culture</div>
+      <div class="value">{{ city.perTurn.culture }}</div>
+    </div>
   </div>
 
   <button class="margin-h margin-top" (click)="city.optimizeYields()">
     Optimize yields
   </button>
+
+  <div class="separator"></div>
+
+  <h3>Expansion</h3>
+
+  <app-progress-bar
+    class="culture-bar margin"
+    [progress]="city.totalCulture"
+    [nextProgress]="city.totalCulture + city.perTurn.culture"
+    [total]="city.cultureToExpand"
+  >
+    <span class="turns">
+      borders will expand in {{ city.turnsToExpand | turns }} turns
+    </span>
+  </app-progress-bar>
 
   <div class="separator"></div>
 

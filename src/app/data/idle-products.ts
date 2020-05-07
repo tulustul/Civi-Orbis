@@ -9,4 +9,12 @@ export const IDLE_PRODUCTS: IdleProduct[] = [
     weakRequirements: [],
     bonuses: { transferProductionToFood: 0.25 },
   },
+  {
+    id: "culture",
+    name: "Culture",
+    productionCost: Infinity,
+    requirements: [],
+    weakRequirements: [],
+    bonuses: { transferProductionToCulture: 0.25 },
+  },
 ];

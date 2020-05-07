@@ -9,6 +9,10 @@
   + {{ production }} production
 </div>
 
+<div class="culture-color" *ngIf="bonuses?.yieldValue?.culture as culture">
+  + {{ culture }} culture
+</div>
+
 <div class="growth-color" *ngIf="bonuses?.yieldFactor?.food as food">
   + {{ food | percentBonus }} food
 </div>
@@ -18,6 +22,10 @@
   *ngIf="bonuses?.yieldFactor?.production as production"
 >
   + {{ production | percentBonus }} production
+</div>
+
+<div class="culture-color" *ngIf="bonuses?.yieldFactor?.culture as culture">
+  + {{ culture | percentBonus }} culture
 </div>
 
 <div class="growth-color" *ngIf="bonuses?.transferProductionToFood as transfer">

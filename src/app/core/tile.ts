@@ -27,30 +27,37 @@ const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: {
     food: 0,
     production: 0,
+    culture: 0,
   },
   [Climate.continental]: {
     food: 1,
     production: 1,
+    culture: 0,
   },
   [Climate.desert]: {
     food: 0,
     production: 0,
+    culture: 0,
   },
   [Climate.oceanic]: {
     food: 2,
     production: 1,
+    culture: 0,
   },
   [Climate.savanna]: {
     food: 1,
     production: 1,
+    culture: 0,
   },
   [Climate.tropical]: {
     food: 1,
     production: 0,
+    culture: 0,
   },
   [Climate.tundra]: {
     food: 0,
     production: 1,
+    culture: 0,
   },
 };
 
@@ -58,14 +65,17 @@ const BASE_LAND_FORM_YIELDS: Record<LandForm, Yields> = {
   [LandForm.plains]: {
     food: 0,
     production: 0,
+    culture: 0,
   },
   [LandForm.hills]: {
     food: -1,
     production: 0,
+    culture: 0,
   },
   [LandForm.mountains]: {
     food: -Infinity,
     production: -5,
+    culture: 0,
   },
 };
 
@@ -88,6 +98,7 @@ export class Tile {
   yields: Yields = {
     food: 0,
     production: 0,
+    culture: 0,
   };
 
   constructor(public x: number, public y: number) {}

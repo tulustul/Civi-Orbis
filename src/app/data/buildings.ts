@@ -43,6 +43,14 @@ export const BUILDINGS: Building[] = [
     weakRequirements: [],
   },
   {
+    id: "monument",
+    name: "Monument",
+    productionCost: 30,
+    bonuses: { yieldValue: { culture: 2 } },
+    requirements: [],
+    weakRequirements: [],
+  },
+  {
     id: "allDoingBuilding",
     name: "All doing building",
     productionCost: 500,

@@ -26,6 +26,7 @@ export interface CitySerialized {
   tile: number;
   player: number;
   totalFood: number;
+  totalCulture: number;
   totalProduction: number;
   currentProduct: ProductSerialized | null;
   tiles: number[];
@@ -36,6 +37,7 @@ export interface CitySerialized {
 export interface Yields {
   food: number;
   production: number;
+  culture: number;
 }
 
 export class City {
@@ -47,17 +49,23 @@ export class City {
   foodToGrow = 20;
   foodConsumed = 1;
 
+  totalCulture = 0;
+  cultureToExpand = 20;
+
   tileYields: Yields = {
     food: 0,
     production: 0,
+    culture: 0,
   };
   yields: Yields = {
     food: 0,
     production: 0,
+    culture: 0,
   };
   perTurn: Yields = {
     food: 0,
     production: 0,
+    culture: 0,
   };
 
   currentProduct: Product | null = null;
@@ -85,6 +93,7 @@ export class City {
       tile: getTileIndex(this.player.game.map, this.tile),
       totalFood: this.totalFood,
       totalProduction: this.totalProduction,
+      totalCulture: this.totalCulture,
       currentProduct: this.currentProduct
         ? {
             type: this.currentProduct.type,
@@ -102,6 +111,7 @@ export class City {
   }
 
   nextTurn() {
+    this.progressExpansion();
     this.progressProduction();
     this.progressGrowth();
     this.updateYields();
@@ -137,12 +147,6 @@ export class City {
     this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
-      if (this.size % 2 === 0) {
-        const tile = this.pickBestTile(this.getAvailableTiles());
-        if (tile) {
-          this.addTile(tile);
-        }
-      }
       const bestWorkableTile = this.pickBestTile(this.notWorkedTiles);
       if (bestWorkableTile) {
         this.workTile(bestWorkableTile);
@@ -154,6 +158,20 @@ export class City {
         this.totalFood += this.foodToGrow;
       } else {
         this.totalFood = 0;
+      }
+    }
+    this.foodToGrow = 15 * Math.pow(1.2, this.size);
+  }
+
+  progressExpansion() {
+    this.totalCulture += this.perTurn.culture;
+    if (this.totalCulture >= this.cultureToExpand) {
+      this.totalCulture -= this.cultureToExpand;
+      this.cultureToExpand = 5 * Math.pow(1.2, this.tiles.size);
+
+      const tile = this.pickBestTile(this.getAvailableTiles());
+      if (tile) {
+        this.addTile(tile);
       }
     }
   }
@@ -224,6 +242,11 @@ export class City {
     return Math.ceil(remainingProduction / this.yields.production);
   }
 
+  get turnsToExpand() {
+    const remainingCulture = this.cultureToExpand - this.totalCulture;
+    return Math.ceil(remainingCulture / this.perTurn.culture);
+  }
+
   getTurnsToProduce(unit: UnitDefinition) {
     return Math.ceil(unit.productionCost / this.yields.production);
   }
@@ -231,15 +254,18 @@ export class City {
   updateYields() {
     this.tileYields.food = 2;
     this.tileYields.production = 1;
+    this.tileYields.culture = 0;
     for (const tile of this.workedTiles) {
       this.tileYields.food += tile.yields.food;
       this.tileYields.production += tile.yields.production;
+      this.tileYields.culture += tile.yields.culture;
     }
 
     this.tileYields.production += this.freeTileWorkers;
 
     this.yields.food = this.tileYields.food;
     this.yields.production = this.tileYields.production;
+    this.yields.culture = this.tileYields.culture;
 
     for (const building of this.buildings) {
       this.applyBonuses(building.bonuses);
@@ -252,15 +278,18 @@ export class City {
 
     this.yields.food = Math.ceil(this.yields.food);
     this.yields.production = Math.ceil(this.yields.production);
+    this.yields.culture = Math.ceil(this.yields.culture);
 
     this.foodConsumed = this.size;
     this.perTurn.food = this.yields.food - this.foodConsumed;
     this.perTurn.production = this.yields.production;
+    this.perTurn.culture = this.yields.culture;
   }
 
   applyBonuses(bonuses: Bonuses) {
     this.yields.food += bonuses.yieldValue?.food || 0;
     this.yields.production += bonuses.yieldValue?.production || 0;
+    this.yields.culture += bonuses.yieldValue?.culture || 0;
 
     if (bonuses.yieldFactor?.food) {
       this.yields.food += this.tileYields.food * bonuses.yieldFactor.food;
@@ -269,10 +298,19 @@ export class City {
       this.yields.production +=
         this.tileYields.production * bonuses.yieldFactor.production;
     }
+    if (bonuses.yieldFactor?.culture) {
+      this.yields.culture +=
+        this.tileYields.culture * bonuses.yieldFactor.culture;
+    }
 
     if (bonuses.transferProductionToFood) {
       this.yields.food +=
         this.yields.production * bonuses.transferProductionToFood;
+    }
+
+    if (bonuses.transferProductionToCulture) {
+      this.yields.culture +=
+        this.yields.production * bonuses.transferProductionToCulture;
     }
   }
 

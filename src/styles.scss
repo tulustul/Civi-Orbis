@@ -23,6 +23,7 @@
 
   --growth-color: #4ea73d;
   --production-color: #f0a00d;
+  --culture-color: #ca57ff;
 
   --color-secondary-text: #5f5f5f;
   --color-danger-text: #ff2424;
@@ -86,6 +87,10 @@ button {
 
 .production-color {
   color: var(--production-color);
+}
+
+.culture-color {
+  color: var(--culture-color);
 }
 
 .panel {
