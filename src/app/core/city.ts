@@ -131,15 +131,15 @@ export class City {
     this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
-      const bestWorkableTile = this.pickBestTile(this.notWorkedTiles);
-      if (bestWorkableTile) {
-        this.workTile(bestWorkableTile);
-      }
       if (this.size % 2 === 0) {
         const tile = this.pickBestTile(this.getAvailableTiles());
         if (tile) {
           this.addTile(tile);
         }
+      }
+      const bestWorkableTile = this.pickBestTile(this.notWorkedTiles);
+      if (bestWorkableTile) {
+        this.workTile(bestWorkableTile);
       }
       this.totalFood -= this.foodToGrow;
     } else if (this.totalFood < 0) {
@@ -302,6 +302,8 @@ export class City {
   }
 
   optimizeYields() {
+    this.workedTiles.clear();
+    this.notWorkedTiles = new Set(this.tiles);
     while (this.freeTileWorkers && this.notWorkedTiles.size) {
       const tile = this.pickBestTile(this.notWorkedTiles);
       if (!tile) {
