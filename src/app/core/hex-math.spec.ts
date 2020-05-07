@@ -25,7 +25,6 @@ describe("hex-math:utils", () => {
     ]);
 
     // top right
-    console.log(toCoords(getTileNeighbours(map.tiles, 4, 0)));
     expect(toCoords(getTileNeighbours(map.tiles, 4, 0))).toEqual([
       [4, 1],
       [3, 1],

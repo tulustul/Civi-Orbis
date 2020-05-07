@@ -5,6 +5,6 @@ import { Pipe, PipeTransform } from "@angular/core";
 })
 export class PercentBonusPipe implements PipeTransform {
   transform(value: number): string {
-    return ((value - 1) * 100).toFixed(0) + "%";
+    return (value * 100).toFixed(0) + "%";
   }
 }

@@ -56,7 +56,7 @@
         {{ city.currentProduct?.productDefinition.name || "-" }}
       </span>
       <span class="turns" *ngIf="city.currentProduct">
-        {{ city.turnsToProductionEnd }} turns
+        {{ city.turnsToProductionEnd | turns }} turns
       </span>
     </div>
   </app-progress-bar>
@@ -98,7 +98,17 @@
       </div>
     </app-tab>
 
-    <app-tab class="no-padding" tabTitle="work on"> </app-tab>
+    <app-tab class="no-padding" tabTitle="work on">
+      <div
+        class="product"
+        *ngFor="let idleProduct of IDLE_PRODUCTS"
+        [appTooltip]="idleProductTooltipTmpl"
+        [tooltipContext]="{ idleProduct: idleProduct }"
+        (click)="workOnIdleProduct(idleProduct)"
+      >
+        {{ idleProduct.name }}
+      </div>
+    </app-tab>
   </app-tabs>
 </div>
 
@@ -139,4 +149,9 @@
     [city]="city"
   ></app-product-requirements>
   <div>Cost: {{ unit.productionCost }}</div>
+</ng-template>
+
+<ng-template #idleProductTooltipTmpl let-idleProduct="idleProduct">
+  <b>{{ idleProduct.name }}</b>
+  <app-bonuses [bonuses]="idleProduct.bonuses"></app-bonuses>
 </ng-template>

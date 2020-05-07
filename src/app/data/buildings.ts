@@ -22,7 +22,7 @@ export const BUILDINGS: Building[] = [
     id: "bigGranary",
     name: "Grand granary",
     productionCost: 100,
-    bonuses: { yieldFactor: { food: 1.2 } },
+    bonuses: { yieldFactor: { food: 0.2 } },
     requirements: [new BuildingRequirement("granary")],
     weakRequirements: [],
   },
@@ -38,7 +38,7 @@ export const BUILDINGS: Building[] = [
     id: "bigWorkshop",
     name: "Grand workshop",
     productionCost: 200,
-    bonuses: { yieldFactor: { production: 1.2 } },
+    bonuses: { yieldFactor: { production: 0.2 } },
     requirements: [new BuildingRequirement("workshop")],
     weakRequirements: [],
   },
@@ -48,7 +48,7 @@ export const BUILDINGS: Building[] = [
     productionCost: 500,
     bonuses: {
       yieldValue: { food: 1, production: 1 },
-      yieldFactor: { food: 1.1, production: 1.1 },
+      yieldFactor: { food: 0.1, production: 0.1 },
     },
     requirements: [
       new BuildingRequirement("bigGranary"),

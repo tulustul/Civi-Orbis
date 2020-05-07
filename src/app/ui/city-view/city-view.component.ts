@@ -1,19 +1,21 @@
 import { Component, OnInit, Input } from "@angular/core";
 
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+
 import { City } from "src/app/core/city";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
 import { BUILDINGS } from "src/app/data/buildings";
 import { UIState } from "../ui-state";
 import { Game } from "src/app/core/game";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
 import { Building } from "src/app/core/buildings";
 import { UnitDefinition } from "src/app/core/unit.interface";
 import {
-  ProductDefinition,
   getAvailableProducts,
   getDisabledProducts,
 } from "src/app/core/product";
+import { IDLE_PRODUCTS } from "src/app/data/idle-products";
+import { IdleProduct } from "src/app/core/idle-product";
 
 @Component({
   selector: "app-city-view",
@@ -21,6 +23,8 @@ import {
   styleUrls: ["./city-view.component.scss"],
 })
 export class CityViewComponent implements OnInit {
+  IDLE_PRODUCTS = IDLE_PRODUCTS;
+
   units: UnitDefinition[] = [];
 
   buildings: Building[] = [];
@@ -95,6 +99,11 @@ export class CityViewComponent implements OnInit {
 
   produceUnit(unit: UnitDefinition) {
     this.city.produceUnit(unit);
+    this.buildBuildingsList();
+  }
+
+  workOnIdleProduct(idleProduct: IdleProduct) {
+    this.city.workOnIdleProduct(idleProduct);
     this.buildBuildingsList();
   }
 

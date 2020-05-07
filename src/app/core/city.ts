@@ -4,8 +4,10 @@ import { getTileIndex } from "./serialization";
 import { UnitDefinition } from "./unit.interface";
 import { Building } from "./buildings";
 import { ProductDefinition } from "./product";
+import { IdleProduct } from "./idle-product";
+import { Bonuses } from "./bonus";
 
-export type ProductType = "unit" | "building" | "work";
+export type ProductType = "unit" | "building" | "idleProduct";
 
 export interface Product {
   type: ProductType;
@@ -45,6 +47,10 @@ export class City {
   foodToGrow = 20;
   foodConsumed = 1;
 
+  tileYields: Yields = {
+    food: 0,
+    production: 0,
+  };
   yields: Yields = {
     food: 0,
     production: 0,
@@ -168,10 +174,30 @@ export class City {
     }
   }
 
+  workOnIdleProduct(idleProduct: IdleProduct) {
+    this.startProducing({
+      type: "idleProduct",
+      productDefinition: idleProduct,
+    });
+    this.updateYields();
+  }
+
+  cancelProduction() {
+    if (this.currentProduct) {
+      const type = this.currentProduct.type;
+      this.currentProduct = null;
+      if (type === "idleProduct") {
+        this.updateYields();
+      }
+    }
+  }
+
   startProducing(product: Product) {
     if (!this.canProduce(product.productDefinition)) {
       return;
     }
+
+    this.cancelProduction();
 
     this.currentProduct = product;
     this.totalProduction = 0;
@@ -203,21 +229,25 @@ export class City {
   }
 
   updateYields() {
-    this.yields.food = 2;
-    this.yields.production = 1;
+    this.tileYields.food = 2;
+    this.tileYields.production = 1;
     for (const tile of this.workedTiles) {
-      this.yields.food += tile.yields.food;
-      this.yields.production += tile.yields.production;
+      this.tileYields.food += tile.yields.food;
+      this.tileYields.production += tile.yields.production;
     }
 
-    this.yields.production += this.freeTileWorkers;
+    this.tileYields.production += this.freeTileWorkers;
+
+    this.yields.food = this.tileYields.food;
+    this.yields.production = this.tileYields.production;
 
     for (const building of this.buildings) {
-      this.yields.food += building.bonuses.yieldValue?.food || 0;
-      this.yields.production += building.bonuses.yieldValue?.production || 0;
+      this.applyBonuses(building.bonuses);
+    }
 
-      this.yields.food *= building.bonuses.yieldFactor?.food || 1;
-      this.yields.production *= building.bonuses.yieldFactor?.production || 1;
+    if (this.currentProduct?.type === "idleProduct") {
+      const idleProduct = this.currentProduct.productDefinition as IdleProduct;
+      this.applyBonuses(idleProduct.bonuses);
     }
 
     this.yields.food = Math.ceil(this.yields.food);
@@ -226,6 +256,24 @@ export class City {
     this.foodConsumed = this.size;
     this.perTurn.food = this.yields.food - this.foodConsumed;
     this.perTurn.production = this.yields.production;
+  }
+
+  applyBonuses(bonuses: Bonuses) {
+    this.yields.food += bonuses.yieldValue?.food || 0;
+    this.yields.production += bonuses.yieldValue?.production || 0;
+
+    if (bonuses.yieldFactor?.food) {
+      this.yields.food += this.tileYields.food * bonuses.yieldFactor.food;
+    }
+    if (bonuses.yieldFactor?.production) {
+      this.yields.production +=
+        this.tileYields.production * bonuses.yieldFactor.production;
+    }
+
+    if (bonuses.transferProductionToFood) {
+      this.yields.food +=
+        this.yields.production * bonuses.transferProductionToFood;
+    }
   }
 
   addTile(tile: Tile, emitEvent = true) {

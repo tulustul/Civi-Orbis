@@ -23,8 +23,8 @@ Minor features:
   ☐ city production queue
 
 Major features:
-  ☐ implement `city work on` (how to call it properly?).
-    ☐ `food` transforms 25% of production into food
+  ✔ implement `city work on` (how to call it properly?). @done(20-05-07 22:31)
+    ✔ `food` transforms 25% of production into food @done(20-05-07 22:31)
     ☐ `public works` produces `public works points`
   ☐ tile improvements:
     ☐ `farm` +1 food

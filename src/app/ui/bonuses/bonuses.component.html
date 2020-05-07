@@ -19,3 +19,7 @@
 >
   + {{ production | percentBonus }} production
 </div>
+
+<div class="growth-color" *ngIf="bonuses?.transferProductionToFood as transfer">
+  {{ transfer | percentBonus }} production transfered into food
+</div>
