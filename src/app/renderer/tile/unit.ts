@@ -36,9 +36,11 @@ export class UnitsDrawer {
   }
 
   destroy(unit: Unit) {
-    const g = this.unitGraphics.get(unit)!;
-    this.unitGraphics.delete(unit);
-    g.destroy();
+    const g = this.unitGraphics.get(unit);
+    if (g) {
+      this.unitGraphics.delete(unit);
+      g.destroy();
+    }
   }
 
   update(unit: Unit) {
