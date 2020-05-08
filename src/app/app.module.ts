@@ -36,10 +36,11 @@ import { ProgressBarComponent } from "./ui/widgets/progress-bar/progress-bar.com
 import { ButtonDirective } from "./ui/button.directive";
 import { MinimapComponent } from "./ui/minimap/minimap.component";
 import { TooltipDirective } from "./ui/widgets/tooltip.directive";
-import { TooltipComponent } from './ui/widgets/tooltip/tooltip.component';
-import { BonusesComponent } from './ui/bonuses/bonuses.component';
-import { PercentBonusPipe } from './ui/percent-bonus.pipe';
-import { ProductRequirementsComponent } from './ui/product-requirements/product-requirements.component';
+import { TooltipComponent } from "./ui/widgets/tooltip/tooltip.component";
+import { BonusesComponent } from "./ui/bonuses/bonuses.component";
+import { PercentBonusPipe } from "./ui/percent-bonus.pipe";
+import { ProductRequirementsComponent } from "./ui/product-requirements/product-requirements.component";
+import { PlayerYieldsComponent } from "./ui/player-yields/player-yields.component";
 
 @NgModule({
   declarations: [
@@ -79,6 +80,7 @@ import { ProductRequirementsComponent } from './ui/product-requirements/product-
     BonusesComponent,
     PercentBonusPipe,
     ProductRequirementsComponent,
+    PlayerYieldsComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [Game, UIState],

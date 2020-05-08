@@ -36,6 +36,10 @@
       <div class="label">Culture</div>
       <div class="value">{{ city.perTurn.culture }}</div>
     </div>
+    <div class="yield">
+      <div class="label">Public works</div>
+      <div class="value">{{ city.perTurn.publicWorks }}</div>
+    </div>
   </div>
 
   <button class="margin-h margin-top" (click)="city.optimizeYields()">

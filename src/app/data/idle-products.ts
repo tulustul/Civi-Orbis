@@ -17,4 +17,12 @@ export const IDLE_PRODUCTS: IdleProduct[] = [
     weakRequirements: [],
     bonuses: { transferProductionToCulture: 0.25 },
   },
+  {
+    id: "public-works",
+    name: "Public works",
+    productionCost: Infinity,
+    requirements: [],
+    weakRequirements: [],
+    bonuses: { transferProductionToPublicWorks: 0.25 },
+  },
 ];

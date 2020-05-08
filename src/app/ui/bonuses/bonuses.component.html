@@ -31,3 +31,14 @@
 <div class="growth-color" *ngIf="bonuses?.transferProductionToFood as transfer">
   {{ transfer | percentBonus }} production transfered into food
 </div>
+
+<div
+  class="culture-color"
+  *ngIf="bonuses?.transferProductionToCulture as transfer"
+>
+  {{ transfer | percentBonus }} production transfered into culture
+</div>
+
+<div *ngIf="bonuses?.transferProductionToPublicWorks as transfer">
+  {{ transfer | percentBonus }} production transfered into public works
+</div>

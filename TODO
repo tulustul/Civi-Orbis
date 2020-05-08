@@ -21,11 +21,13 @@ Minor features:
   ☐ differentiate between different units on the map
   ✔ city products can have requirements @done(20-05-07 20:42)
   ☐ city production queue
+  ☐ previous/next city button in city view
+  ☐ cities overview panel
 
 Major features:
   ✔ implement `city work on` (how to call it properly?). @done(20-05-07 22:31)
     ✔ `food` transforms 25% of production into food @done(20-05-07 22:31)
-    ☐ `public works` produces `public works points`
+    ✔ `public works` produces `public works points` @done(20-05-08 16:32)
   ☐ tile improvements:
     ☐ `farm` +1 food
     ☐ `workshop` +1 production

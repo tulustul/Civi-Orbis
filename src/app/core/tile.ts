@@ -1,5 +1,6 @@
 import { Unit } from "./unit";
-import { City, Yields } from "./city";
+import { City } from "./city";
+import { Yields, EMPTY_YIELDS } from "./yields";
 
 export enum Climate {
   tropical,
@@ -24,59 +25,21 @@ export enum SeaLevel {
 }
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
-  [Climate.arctic]: {
-    food: 0,
-    production: 0,
-    culture: 0,
-  },
-  [Climate.continental]: {
-    food: 1,
-    production: 1,
-    culture: 0,
-  },
+  [Climate.arctic]: { ...EMPTY_YIELDS },
+  [Climate.continental]: { ...EMPTY_YIELDS, food: 1, production: 1 },
   [Climate.desert]: {
-    food: 0,
-    production: 0,
-    culture: 0,
+    ...EMPTY_YIELDS,
   },
-  [Climate.oceanic]: {
-    food: 2,
-    production: 1,
-    culture: 0,
-  },
-  [Climate.savanna]: {
-    food: 1,
-    production: 1,
-    culture: 0,
-  },
-  [Climate.tropical]: {
-    food: 1,
-    production: 0,
-    culture: 0,
-  },
-  [Climate.tundra]: {
-    food: 0,
-    production: 1,
-    culture: 0,
-  },
+  [Climate.oceanic]: { ...EMPTY_YIELDS, food: 2, production: 1 },
+  [Climate.savanna]: { ...EMPTY_YIELDS, food: 1, production: 1 },
+  [Climate.tropical]: { ...EMPTY_YIELDS, food: 1 },
+  [Climate.tundra]: { ...EMPTY_YIELDS, production: 1 },
 };
 
 const BASE_LAND_FORM_YIELDS: Record<LandForm, Yields> = {
-  [LandForm.plains]: {
-    food: 0,
-    production: 0,
-    culture: 0,
-  },
-  [LandForm.hills]: {
-    food: -1,
-    production: 0,
-    culture: 0,
-  },
-  [LandForm.mountains]: {
-    food: -Infinity,
-    production: -5,
-    culture: 0,
-  },
+  [LandForm.plains]: { ...EMPTY_YIELDS },
+  [LandForm.hills]: { ...EMPTY_YIELDS, food: -1 },
+  [LandForm.mountains]: { ...EMPTY_YIELDS, food: -Infinity, production: -5 },
 };
 
 export class Tile {
@@ -95,11 +58,7 @@ export class Tile {
   neighbours: Tile[] = [];
   neighboursCosts = new Map<Tile, number>();
 
-  yields: Yields = {
-    food: 0,
-    production: 0,
-    culture: 0,
-  };
+  yields: Yields = { ...EMPTY_YIELDS };
 
   constructor(public x: number, public y: number) {}
 

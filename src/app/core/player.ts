@@ -3,6 +3,7 @@ import { Unit } from "./unit";
 import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { City } from "./city";
+import { Yields, EMPTY_YIELDS, zeroYields, addToYields } from "./yields";
 
 export const PLAYER_COLORS: number[] = [
   0xff0000,
@@ -45,6 +46,10 @@ export class Player {
 
   cities: City[] = [];
 
+  yieldsPerTurn: Yields = { ...EMPTY_YIELDS };
+
+  yieldsTotal: Yields = { ...EMPTY_YIELDS };
+
   area = this.game.areasManager.make(this.color);
 
   constructor(
@@ -69,5 +74,13 @@ export class Player {
       player.exploredTiles.add(getTileFromIndex(game.map, tileIndex));
     }
     return player;
+  }
+
+  nextTurn() {
+    zeroYields(this.yieldsPerTurn);
+    for (const city of this.cities) {
+      addToYields(this.yieldsPerTurn, city.yields);
+    }
+    addToYields(this.yieldsTotal, this.yieldsPerTurn);
   }
 }

@@ -95,6 +95,9 @@ export class Game {
   nextTurn() {
     this.unitsManager.nextTurn();
     this.citiesManager.nextTurn();
+    for (const player of this.players) {
+      player.nextTurn();
+    }
     this.turn$.next(this.turn$.value + 1);
     this.controls.nextTurn();
   }
