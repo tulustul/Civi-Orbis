@@ -1,10 +1,12 @@
 import * as PIXIE from "pixi.js";
 
+import { merge, Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+
 import { Tile, SeaLevel, Climate, TileDirection } from "../core/tile";
 import { Game } from "../core/game";
 import { Transform } from "../renderer/camera";
 import { drawHex } from "./utils";
-import { merge } from "rxjs";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,
@@ -43,18 +45,24 @@ export class MinimapRenderer {
 
   private app: PIXIE.Application;
 
+  private destroyed$ = new Subject<void>();
+
   constructor(private game: Game) {
     const tilesManager = this.game.tilesManager;
-    tilesManager.revealedTiles$.subscribe((tiles) => {
-      this.reveal(tiles);
-      this.updateMap();
-    });
+    tilesManager.revealedTiles$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe((tiles) => {
+        this.reveal(tiles);
+        this.updateMap();
+      });
 
-    tilesManager.resetTilesVisibility$.subscribe((tiles) => {
-      this.hideAllTiles();
-      this.reveal(tiles);
-      this.updateMap();
-    });
+    tilesManager.resetTilesVisibility$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe((tiles) => {
+        this.hideAllTiles();
+        this.reveal(tiles);
+        this.updateMap();
+      });
 
     this.container.addChild(this.mapSprite);
     this.container.addChild(this.cameraGraphics);
@@ -95,12 +103,25 @@ export class MinimapRenderer {
 
     this.app.stage.addChild(this.container);
 
-    // TODO unsubscribing
-    this.game.camera.transform$.subscribe((transform) => {
-      this.updateCamera(transform);
-    });
+    this.game.camera.transform$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe((transform) => {
+        this.updateCamera(transform);
+      });
 
     this.updateMap();
+  }
+
+  destroy() {
+    this.mapTexture.destroy();
+    this.mapSprite.destroy();
+    for (const objects of this.tilesMap.values()) {
+      for (const obj of objects) {
+        obj.destroy();
+      }
+    }
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   private listenPlayerAreas() {

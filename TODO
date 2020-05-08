@@ -7,7 +7,7 @@ Bugs:
   ✔ minimap doesn't fully fill it's viewport @done(20-05-08 19:00)
   ✔ selecting building to build should hide it from production list @done(20-05-07 21:38)
   ☐ ExpressionChangedAfterItHasBeenCheckedError when opening city view
-  ☐ starting new game for the second time: WebGL: INVALID_OPERATION: uniformMatrix3fv: location is not from current program
+  ✔ starting new game for the second time: WebGL: INVALID_OPERATION: uniformMatrix3fv: location is not from current program @done(20-05-08 22:36)
   ☐ webgl fonts scaling
 
 Minor features:

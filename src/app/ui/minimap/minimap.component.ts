@@ -11,9 +11,9 @@ import { MinimapRenderer } from "src/app/renderer/minimap";
   styleUrls: ["./minimap.component.scss"],
 })
 export class MinimapComponent implements AfterViewInit {
-  app: PIXIE.Application;
+  app: PIXIE.Application | null = null;
 
-  minimapRenderer: MinimapRenderer;
+  minimapRenderer: MinimapRenderer | null = null;
 
   @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;
 
@@ -24,6 +24,13 @@ export class MinimapComponent implements AfterViewInit {
   }
 
   create() {
+    if (this.app) {
+      this.app.destroy();
+    }
+    if (this.minimapRenderer) {
+      this.minimapRenderer.destroy();
+    }
+
     this.minimapRenderer = new MinimapRenderer(this.game);
     this.minimapRenderer.calculateSize();
 
@@ -38,6 +45,10 @@ export class MinimapComponent implements AfterViewInit {
   }
 
   moveViewport(event: MouseEvent) {
+    if (!this.minimapRenderer) {
+      return;
+    }
+
     if (event.buttons === 1) {
       const canvasRect = this.canvas.nativeElement.getBoundingClientRect();
       this.game.camera.moveTo(
