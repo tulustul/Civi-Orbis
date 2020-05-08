@@ -1,14 +1,12 @@
-import { Component, OnInit } from "@angular/core";
+import { Component } from "@angular/core";
 
-import { Game } from "src/app/core/game";
+import { NextTurnService } from "../next-turn.service";
 
 @Component({
   selector: "app-next-turn-button",
   templateUrl: "./next-turn-button.component.html",
   styleUrls: ["./next-turn-button.component.scss"],
 })
-export class NextTurnButtonComponent implements OnInit {
-  constructor(public game: Game) {}
-
-  ngOnInit(): void {}
+export class NextTurnButtonComponent {
+  constructor(public nextTurnService: NextTurnService) {}
 }

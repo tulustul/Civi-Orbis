@@ -1,8 +1,6 @@
 :host {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  border-style: solid;
-  border-color: var(--color-primary-0);
-  border-width: 5px 0 0 5px;
+  display: flex;
+  canvas {
+    margin-left: -3px;
+  }
 }

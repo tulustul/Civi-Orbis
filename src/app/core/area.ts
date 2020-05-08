@@ -40,6 +40,7 @@ export class Area {
 
   destroy() {
     this._destroyed$.next();
+    this._destroyed$.complete();
   }
 
   computeBorders() {

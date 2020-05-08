@@ -3,4 +3,11 @@
     width: 100vw;
     height: 100vh;
   }
+  .panel {
+    position: absolute;
+    &.panel-top-left-corner {
+      right: 0;
+      bottom: 0;
+    }
+  }
 }

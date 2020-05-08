@@ -46,6 +46,8 @@ export class Player {
 
   cities: City[] = [];
 
+  cityWithoutProduction: City[] = [];
+
   yieldsPerTurn: Yields = { ...EMPTY_YIELDS };
 
   yieldsTotal: Yields = { ...EMPTY_YIELDS };
@@ -86,5 +88,15 @@ export class Player {
   nextTurn() {
     this.updateYields();
     addToYields(this.yieldsTotal, this.yieldsPerTurn);
+    this.updateCitiesWithoutProduction();
+  }
+
+  updateCitiesWithoutProduction() {
+    this.cityWithoutProduction = this.cities.filter((c) => !c.product);
+  }
+
+  addCity(city: City) {
+    this.cities.push(city);
+    city.product$.subscribe(() => this.updateCitiesWithoutProduction());
   }
 }

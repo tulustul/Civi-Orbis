@@ -15,7 +15,7 @@ import { filter, takeUntil } from "rxjs/operators";
 import { City } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { getTileCoords } from "src/app/renderer/utils";
-import { UIState } from "../../ui-state";
+import { Controls } from "src/app/controls";
 
 @Component({
   selector: "app-city-info",
@@ -31,8 +31,8 @@ export class CityInfoComponent implements OnInit, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef<HTMLElement>,
-    public game: Game,
-    private ui: UIState,
+    private game: Game,
+    public controls: Controls,
   ) {}
 
   ngOnInit(): void {

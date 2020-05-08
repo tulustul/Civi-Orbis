@@ -9,6 +9,7 @@ import {
 import { Game } from "../core/game";
 import { Camera } from "../renderer/camera";
 import { UIState } from "../ui/ui-state";
+import { Controls } from "../controls";
 
 @Component({
   selector: "app-game-canvas",
@@ -18,7 +19,11 @@ import { UIState } from "../ui/ui-state";
 export class GameCanvasComponent implements AfterViewInit {
   @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;
 
-  constructor(public game: Game, private uiState: UIState) {}
+  constructor(
+    public game: Game,
+    private uiState: UIState,
+    public controls: Controls,
+  ) {}
 
   ngOnInit(): void {
     this.game.uiState = this.uiState;
@@ -40,11 +45,11 @@ export class GameCanvasComponent implements AfterViewInit {
 
   @HostListener("window:keydown", ["$event"])
   onKeyDown(event: KeyboardEvent) {
-    this.game.controls.onKeyDown(event);
+    this.controls.onKeyDown(event);
   }
 
   @HostListener("window:keyup", ["$event"])
   onKeyUp(event: KeyboardEvent) {
-    this.game.controls.onKeyUp(event);
+    this.controls.onKeyUp(event);
   }
 }

@@ -67,18 +67,18 @@
 
   <app-progress-bar
     class="production-bar margin"
-    *ngIf="city.currentProduct"
+    *ngIf="city.product"
     [appTooltip]="buildingTooltipTmpl"
-    [tooltipContext]="{ building: city.currentProduct.productDefinition }"
+    [tooltipContext]="{ building: city.product.productDefinition }"
     [progress]="city.totalProduction"
     [nextProgress]="city.totalProduction + city.perTurn.production"
-    [total]="city.currentProduct?.productDefinition.productionCost"
+    [total]="city.product?.productDefinition.productionCost"
   >
     <div>
       <span class="name">
-        {{ city.currentProduct?.productDefinition.name || "-" }}
+        {{ city.product?.productDefinition.name || "-" }}
       </span>
-      <span class="turns" *ngIf="city.currentProduct">
+      <span class="turns" *ngIf="city.product">
         {{ city.turnsToProductionEnd | turns }} turns
       </span>
     </div>

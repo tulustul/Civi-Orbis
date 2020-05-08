@@ -1,15 +1,19 @@
+import { Injectable } from "@angular/core";
+
 import { BehaviorSubject } from "rxjs";
 
 import { Game } from "./core/game";
 import { findPath } from "./core/pathfinding";
+import { NextTurnService } from "./ui/next-turn.service";
 
+@Injectable()
 export class Controls {
   isMousePressed = false;
 
   private _mouseButton$ = new BehaviorSubject<number | null>(null);
   mouseButton$ = this._mouseButton$.asObservable();
 
-  constructor(private game: Game) {}
+  constructor(private game: Game, private nextTurnService: NextTurnService) {}
 
   onMouseDown(event: MouseEvent) {
     this.isMousePressed = true;
@@ -86,7 +90,7 @@ export class Controls {
 
   onKeyDown(event: KeyboardEvent) {
     if (event.key === "Enter") {
-      this.game.nextPlayer();
+      this.nextTurnService.next();
     } else if (event.key === "Escape") {
       this.game.uiState.menuVisible$.next(true);
     }

@@ -1,11 +1,11 @@
 <div
   class="info"
   (click)="selectCity()"
-  (click)="game.controls.onClick($event)"
-  (mousedown)="game.controls.onMouseDown($event)"
-  (mouseup)="game.controls.onMouseUp($event)"
-  (mousemove)="game.controls.onMouseMove($event)"
-  (wheel)="game.controls.onWheel($event)"
+  (click)="controls.onClick($event)"
+  (mousedown)="controls.onMouseDown($event)"
+  (mouseup)="controls.onMouseUp($event)"
+  (mousemove)="controls.onMouseMove($event)"
+  (wheel)="controls.onWheel($event)"
   (contextmenu)="onContextMenu($event)"
 >
   <div class="size">{{ city.size }}</div>
@@ -24,10 +24,10 @@
       class="production"
       [progress]="city.totalProduction"
       [nextProgress]="city.totalProduction + city.perTurn.production"
-      [total]="city.currentProduct?.productDefinition.productionCost || 0"
+      [total]="city.product?.productDefinition.productionCost || 0"
     >
       <span>
-        {{ city.currentProduct?.productDefinition.name }}
+        {{ city.product?.productDefinition.name }}
       </span>
       <span class="turns">({{ city.turnsToProductionEnd | turns }})</span>
     </app-progress-bar>

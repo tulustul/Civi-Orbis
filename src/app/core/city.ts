@@ -14,6 +14,8 @@ import {
   copyYields,
   roundYields,
 } from "./yields";
+import { BehaviorSubject, Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -36,7 +38,7 @@ export interface CitySerialized {
   totalFood: number;
   totalCulture: number;
   totalProduction: number;
-  currentProduct: ProductSerialized | null;
+  product: ProductSerialized | null;
   tiles: number[];
   workedTiles: number[];
   buildings: string[];
@@ -58,7 +60,7 @@ export class City {
   yields: Yields = { ...EMPTY_YIELDS };
   perTurn: Yields = { ...EMPTY_YIELDS };
 
-  currentProduct: Product | null = null;
+  product: Product | null = null;
   totalProduction = 0;
 
   buildings: Building[] = [];
@@ -69,6 +71,12 @@ export class City {
   workedTiles = new Set<Tile>();
 
   notWorkedTiles = new Set<Tile>();
+
+  private _destroyed$ = new Subject<void>();
+  destroyed$ = this._destroyed$.asObservable();
+
+  private _product$ = new BehaviorSubject<Product | null>(null);
+  product$ = this._product$.pipe(takeUntil(this.destroyed$));
 
   constructor(public tile: Tile, public player: Player) {
     this.addTile(tile);
@@ -84,10 +92,10 @@ export class City {
       totalFood: this.totalFood,
       totalProduction: this.totalProduction,
       totalCulture: this.totalCulture,
-      currentProduct: this.currentProduct
+      product: this.product
         ? {
-            type: this.currentProduct.type,
-            id: this.currentProduct.productDefinition.id,
+            type: this.product.type,
+            id: this.product.productDefinition.id,
           }
         : null,
       tiles: Array.from(this.tiles).map((tile) =>
@@ -108,28 +116,25 @@ export class City {
   }
 
   progressProduction() {
-    if (!this.currentProduct) {
+    if (!this.product) {
       return;
     }
 
     this.totalProduction += this.yields.production;
 
-    if (
-      this.totalProduction >=
-      this.currentProduct.productDefinition.productionCost
-    ) {
-      if (this.currentProduct.type === "unit") {
+    if (this.totalProduction >= this.product.productDefinition.productionCost) {
+      if (this.product.type === "unit") {
         this.player.game.unitsManager.spawn(
-          this.currentProduct.productDefinition.id,
+          this.product.productDefinition.id,
           this.tile,
           this.player,
         );
-      } else if (this.currentProduct.type === "building") {
-        this.buildings.push(this.currentProduct.productDefinition as Building);
-        this.buildingsIds.add(this.currentProduct.productDefinition.id);
+      } else if (this.product.type === "building") {
+        this.buildings.push(this.product.productDefinition as Building);
+        this.buildingsIds.add(this.product.productDefinition.id);
       }
       this.totalProduction = 0;
-      this.currentProduct = null;
+      this.product = null;
     }
   }
 
@@ -192,9 +197,10 @@ export class City {
   }
 
   cancelProduction() {
-    if (this.currentProduct) {
-      const type = this.currentProduct.type;
-      this.currentProduct = null;
+    if (this.product) {
+      const type = this.product.type;
+      this.product = null;
+      this._product$.next(null);
       if (type === "idleProduct") {
         this.updateYields();
         this.player.updateYields();
@@ -209,7 +215,8 @@ export class City {
 
     this.cancelProduction();
 
-    this.currentProduct = product;
+    this.product = product;
+    this._product$.next(product);
     this.totalProduction = 0;
     this.player.game.citiesManager.update(this);
   }
@@ -224,12 +231,11 @@ export class City {
   }
 
   get turnsToProductionEnd() {
-    if (!this.currentProduct) {
+    if (!this.product) {
       return null;
     }
     const remainingProduction =
-      this.currentProduct.productDefinition.productionCost -
-      this.totalProduction;
+      this.product.productDefinition.productionCost - this.totalProduction;
 
     return Math.ceil(remainingProduction / this.yields.production);
   }
@@ -261,8 +267,8 @@ export class City {
       this.applyBonuses(building.bonuses);
     }
 
-    if (this.currentProduct?.type === "idleProduct") {
-      const idleProduct = this.currentProduct.productDefinition as IdleProduct;
+    if (this.product?.type === "idleProduct") {
+      const idleProduct = this.product.productDefinition as IdleProduct;
       this.applyBonuses(idleProduct.bonuses);
     }
     roundYields(this.yields);
@@ -415,5 +421,10 @@ export class City {
     }
 
     return true;
+  }
+
+  destroy() {
+    this._destroyed$.next();
+    this._destroyed$.complete();
   }
 }

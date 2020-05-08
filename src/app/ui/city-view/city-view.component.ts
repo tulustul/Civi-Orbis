@@ -78,7 +78,7 @@ export class CityViewComponent implements OnInit {
   private buildBuildingsList() {
     const notBuildBuildings = BUILDINGS.filter(
       (b) =>
-        this.city.currentProduct?.productDefinition !== b &&
+        this.city.product?.productDefinition !== b &&
         !this.city.buildings.includes(b),
     );
 

@@ -41,6 +41,8 @@ import { BonusesComponent } from "./ui/bonuses/bonuses.component";
 import { PercentBonusPipe } from "./ui/percent-bonus.pipe";
 import { ProductRequirementsComponent } from "./ui/product-requirements/product-requirements.component";
 import { PlayerYieldsComponent } from "./ui/player-yields/player-yields.component";
+import { Controls } from "./controls";
+import { NextTurnService } from "./ui/next-turn.service";
 
 @NgModule({
   declarations: [
@@ -83,7 +85,7 @@ import { PlayerYieldsComponent } from "./ui/player-yields/player-yields.componen
     PlayerYieldsComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
-  providers: [Game, UIState],
+  providers: [Game, UIState, Controls, NextTurnService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

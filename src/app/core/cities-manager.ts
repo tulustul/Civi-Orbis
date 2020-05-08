@@ -45,7 +45,7 @@ export class CitiesManager {
       city.addTile(neighbour);
     }
 
-    player.cities.push(city);
+    player.addCity(city);
 
     tile.city = city;
     tile.forest = false;
@@ -79,6 +79,7 @@ export class CitiesManager {
       city.removeTile(tile);
     }
 
+    city.destroy();
     this._destroyed$.next(city);
   }
 
@@ -111,19 +112,19 @@ export class CitiesManager {
         for (const tileIndex of cityData.workedTiles) {
           city.workTile(getTileFromIndex(this.game.map, tileIndex));
         }
-        if (cityData.currentProduct) {
+        if (cityData.product) {
           let productDefinition: ProductDefinition;
 
-          if (cityData.currentProduct.type === "unit") {
+          if (cityData.product.type === "unit") {
             productDefinition = this.game.unitsManager.definitions.get(
-              cityData.currentProduct.id,
+              cityData.product.id,
             )!;
           } else {
-            productDefinition = BUILDINGS_MAP.get(cityData.currentProduct.id)!;
+            productDefinition = BUILDINGS_MAP.get(cityData.product.id)!;
           }
 
-          city.currentProduct = {
-            type: cityData.currentProduct.type,
+          city.product = {
+            type: cityData.product.type,
             productDefinition,
           };
         }

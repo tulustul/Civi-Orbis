@@ -1,3 +1,13 @@
-<button class="panel" (click)="game.nextPlayer()">
-  Next turn
+<button
+  class="production-color"
+  *ngIf="nextTurnService.nextCity; else nextTurnTmpl"
+  (click)="nextTurnService.next()"
+>
+  Choose production
 </button>
+
+<ng-template #nextTurnTmpl>
+  <button (click)="nextTurnService.next()">
+    Next turn
+  </button>
+</ng-template>

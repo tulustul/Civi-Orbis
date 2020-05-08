@@ -14,6 +14,7 @@ import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { getTilesInRange } from "src/app/core/hex-math";
 import { isTileForestable, areWetlandsPossible } from "../utils";
+import { Controls } from "src/app/controls";
 
 const IGNORE_OPTION: Option = { label: "ignore", value: null };
 
@@ -61,26 +62,24 @@ export class TilePaintingComponent implements OnInit {
 
   paintData = { ...this.DEFAULT_PAINT_DATA };
 
-  constructor(private game: Game) {}
+  constructor(private game: Game, private controls: Controls) {}
 
   ngOnInit(): void {
     const shown = this.isVisible$.pipe(filter((v) => v));
     const hidden = this.isVisible$.pipe(filter((v) => !v));
 
     shown.subscribe(() => {
-      this.game.controls.mouseButton$
-        .pipe(takeUntil(hidden))
-        .subscribe((button) => {
-          if (button === 0) {
-            this.paint();
-          }
-        });
+      this.controls.mouseButton$.pipe(takeUntil(hidden)).subscribe((button) => {
+        if (button === 0) {
+          this.paint();
+        }
+      });
 
       this.game.mapUi.hoveredTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
         if (tile) {
           const tiles = getTilesInRange(tile, this.paintData.size - 1);
           this.game.mapUi.highlightTiles(tiles);
-          if (this.game.controls.mouseButton === 0) {
+          if (this.controls.mouseButton === 0) {
             this.paint();
           }
         } else {

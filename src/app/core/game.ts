@@ -1,6 +1,5 @@
 import { Renderer } from "../renderer";
 import { Camera, Transform } from "../renderer/camera";
-import { Controls } from "../controls";
 import { Player, PlayerType, PlayerSerialized } from "./player";
 import { TilesMap, MapSerialized } from "./tiles-map";
 import { BehaviorSubject } from "rxjs";
@@ -48,8 +47,6 @@ export class Game {
   turn$ = new BehaviorSubject<number>(1);
 
   renderer = new Renderer(this);
-
-  controls = new Controls(this);
 
   areasManager = new AreasManager();
 
@@ -99,7 +96,6 @@ export class Game {
       player.nextTurn();
     }
     this.turn$.next(this.turn$.value + 1);
-    this.controls.nextTurn();
   }
 
   clear() {
