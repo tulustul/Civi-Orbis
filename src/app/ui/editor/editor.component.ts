@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 
 import { UIState } from "../ui-state";
-import { Game } from "src/app/core/game";
+import { MapUi } from "../map-ui";
 
 @Component({
   selector: "app-editor",
@@ -9,13 +9,13 @@ import { Game } from "src/app/core/game";
   styleUrls: ["./editor.component.scss"],
 })
 export class EditorComponent implements OnInit, OnDestroy {
-  constructor(private game: Game, private uiState: UIState) {}
+  constructor(private uiState: UIState, private mapUi: MapUi) {}
 
   ngOnInit(): void {}
 
   ngOnDestroy() {
-    this.game.mapUi.highlightTiles(null);
-    this.game.mapUi.enableSelectingTile(false);
+    this.mapUi.highlightTiles(null);
+    this.mapUi.enableSelectingTile(false);
   }
 
   close() {

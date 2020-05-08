@@ -1,11 +1,15 @@
 import * as PIXIE from "pixi.js";
 
+import { Injectable } from "@angular/core";
+
 import { Game } from "../core/game";
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
 import { MapDrawer } from "./map";
+import { MapUi } from "../ui/map-ui";
 
-export class Renderer {
+@Injectable()
+export class GameRenderer {
   app: PIXIE.Application;
 
   canvas: HTMLCanvasElement;
@@ -22,7 +26,9 @@ export class Renderer {
 
   textures: PIXIE.ITextureDictionary;
 
-  constructor(private game: Game) {}
+  constructor(private game: Game, public mapUi: MapUi) {
+    game.stopped$.subscribe(() => this.clear());
+  }
 
   setCanvas(canvas: HTMLCanvasElement) {
     const [width, height] = [window.innerWidth, window.innerHeight];
@@ -31,9 +37,9 @@ export class Renderer {
 
     this.canvas = canvas;
 
-    this.mapDrawer = new MapDrawer(this.game);
-    this.overlays = new OverlaysRenderer(this.game);
-    this.path = new PathRenderer(this.game);
+    this.mapDrawer = new MapDrawer(this.game, this);
+    this.overlays = new OverlaysRenderer(this.mapUi);
+    this.path = new PathRenderer(this.game, this.mapUi);
 
     this.app.stage.addChild(this.mapDrawer.container);
     this.app.stage.addChild(this.overlays.container);
@@ -45,7 +51,7 @@ export class Renderer {
 
     this.app.ticker.add(() => {
       this.game.camera.update();
-      this.game.mapUi.update();
+      this.mapUi.update();
     });
   }
 

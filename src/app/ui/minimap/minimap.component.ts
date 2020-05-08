@@ -4,6 +4,7 @@ import { Component, ViewChild, ElementRef, AfterViewInit } from "@angular/core";
 
 import { Game } from "src/app/core/game";
 import { MinimapRenderer } from "src/app/renderer/minimap";
+import { GameRenderer } from "src/app/renderer/renderer";
 
 @Component({
   selector: "app-minimap",
@@ -17,7 +18,7 @@ export class MinimapComponent implements AfterViewInit {
 
   @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;
 
-  constructor(private game: Game) {}
+  constructor(private game: Game, private renderer: GameRenderer) {}
 
   ngAfterViewInit(): void {
     this.game.started$.subscribe(() => this.create());
@@ -31,7 +32,7 @@ export class MinimapComponent implements AfterViewInit {
       this.minimapRenderer.destroy();
     }
 
-    this.minimapRenderer = new MinimapRenderer(this.game);
+    this.minimapRenderer = new MinimapRenderer(this.game, this.renderer);
     this.minimapRenderer.calculateSize();
 
     this.app = new PIXIE.Application({

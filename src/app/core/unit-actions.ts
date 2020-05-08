@@ -15,7 +15,6 @@ function foundCity(game: Game, unit: Unit) {
   const city = game.citiesManager.spawn(unit.tile, unit.player);
   if (city) {
     game.unitsManager.destroy(unit);
-    game.mapUi.selectCity(city);
   }
 }
 

@@ -5,6 +5,8 @@ import { BehaviorSubject } from "rxjs";
 import { Game } from "./core/game";
 import { findPath } from "./core/pathfinding";
 import { NextTurnService } from "./ui/next-turn.service";
+import { MapUi } from "./ui/map-ui";
+import { UIState } from "./ui/ui-state";
 
 @Injectable()
 export class Controls {
@@ -13,7 +15,12 @@ export class Controls {
   private _mouseButton$ = new BehaviorSubject<number | null>(null);
   mouseButton$ = this._mouseButton$.asObservable();
 
-  constructor(private game: Game, private nextTurnService: NextTurnService) {}
+  constructor(
+    private game: Game,
+    private nextTurnService: NextTurnService,
+    private mapUi: MapUi,
+    private uiState: UIState,
+  ) {}
 
   onMouseDown(event: MouseEvent) {
     this.isMousePressed = true;
@@ -25,7 +32,7 @@ export class Controls {
       const tile = this.getTileFromMouseEvent(event);
       if (tile) {
         this.activeUnit.path = findPath(this.activeUnit, tile);
-        this.game.mapUi.setPath(this.activeUnit.path);
+        this.mapUi.setPath(this.activeUnit.path);
       }
     }
 
@@ -36,9 +43,9 @@ export class Controls {
     event.preventDefault();
     event.stopPropagation();
 
-    const hoveredTile = this.game.mapUi.hoveredTile;
+    const hoveredTile = this.mapUi.hoveredTile;
     if (hoveredTile) {
-      this.game.mapUi.clickTile(hoveredTile);
+      this.mapUi.clickTile(hoveredTile);
     }
 
     return false;
@@ -52,7 +59,7 @@ export class Controls {
       const tile = this.game.map.get(x, y);
       if (tile) {
         this.game.unitsManager.moveAlongPath(activeUnit);
-        this.game.mapUi.setPath(activeUnit.path);
+        this.mapUi.setPath(activeUnit.path);
       }
     }
 
@@ -63,16 +70,16 @@ export class Controls {
   onMouseMove(event: MouseEvent) {
     const tile = this.getTileFromMouseEvent(event);
 
-    if (tile !== this.game.mapUi.hoveredTile) {
-      this.game.mapUi.hoverTile(tile);
+    if (tile !== this.mapUi.hoveredTile) {
+      this.mapUi.hoverTile(tile);
 
       if (tile && this.activeUnit && this.mouseButton === 2) {
         this.activeUnit.path = findPath(this.activeUnit, tile);
-        this.game.mapUi.setPath(this.activeUnit.path);
+        this.mapUi.setPath(this.activeUnit.path);
       }
     }
 
-    if (this.game.mapUi.allowMapPanning && this.isMousePressed) {
+    if (this.mapUi.allowMapPanning && this.isMousePressed) {
       if (this.mouseButton === 1) {
         this.game.camera.moveBy(event.movementX, event.movementY);
       }
@@ -92,7 +99,7 @@ export class Controls {
     if (event.key === "Enter") {
       this.nextTurnService.next();
     } else if (event.key === "Escape") {
-      this.game.uiState.menuVisible$.next(true);
+      this.uiState.menuVisible$.next(true);
     }
   }
 
@@ -104,7 +111,7 @@ export class Controls {
   }
 
   nextTurn() {
-    this.game.mapUi.setPath(this.activeUnit?.path || null);
+    this.mapUi.setPath(this.activeUnit?.path || null);
   }
 
   get activeUnit() {

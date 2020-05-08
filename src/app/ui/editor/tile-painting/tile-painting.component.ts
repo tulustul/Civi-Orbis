@@ -15,6 +15,7 @@ import { takeUntil, filter } from "rxjs/operators";
 import { getTilesInRange } from "src/app/core/hex-math";
 import { isTileForestable, areWetlandsPossible } from "../utils";
 import { Controls } from "src/app/controls";
+import { MapUi } from "../../map-ui";
 
 const IGNORE_OPTION: Option = { label: "ignore", value: null };
 
@@ -62,7 +63,11 @@ export class TilePaintingComponent implements OnInit {
 
   paintData = { ...this.DEFAULT_PAINT_DATA };
 
-  constructor(private game: Game, private controls: Controls) {}
+  constructor(
+    private game: Game,
+    private controls: Controls,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
     const shown = this.isVisible$.pipe(filter((v) => v));
@@ -75,24 +80,24 @@ export class TilePaintingComponent implements OnInit {
         }
       });
 
-      this.game.mapUi.hoveredTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
+      this.mapUi.hoveredTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
         if (tile) {
           const tiles = getTilesInRange(tile, this.paintData.size - 1);
-          this.game.mapUi.highlightTiles(tiles);
+          this.mapUi.highlightTiles(tiles);
           if (this.controls.mouseButton === 0) {
             this.paint();
           }
         } else {
-          this.game.mapUi.highlightTiles(null);
+          this.mapUi.highlightTiles(null);
         }
       });
     });
 
-    hidden.subscribe(() => this.game.mapUi.highlightTiles(null));
+    hidden.subscribe(() => this.mapUi.highlightTiles(null));
   }
 
   private paint() {
-    const pivotTile = this.game.mapUi.hoveredTile;
+    const pivotTile = this.mapUi.hoveredTile;
     if (!pivotTile) {
       return;
     }

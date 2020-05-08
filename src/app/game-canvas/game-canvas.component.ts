@@ -8,8 +8,8 @@ import {
 
 import { Game } from "../core/game";
 import { Camera } from "../renderer/camera";
-import { UIState } from "../ui/ui-state";
 import { Controls } from "../controls";
+import { GameRenderer } from "../renderer/renderer";
 
 @Component({
   selector: "app-game-canvas",
@@ -21,17 +21,13 @@ export class GameCanvasComponent implements AfterViewInit {
 
   constructor(
     public game: Game,
-    private uiState: UIState,
     public controls: Controls,
+    private renderer: GameRenderer,
   ) {}
 
-  ngOnInit(): void {
-    this.game.uiState = this.uiState;
-  }
-
   ngAfterViewInit() {
-    this.game.camera = new Camera(this.game); //TODO move to more appriopriate place
-    this.game.renderer.setCanvas(this.canvas.nativeElement);
+    this.game.camera = new Camera(this.game, this.renderer); //TODO move to more appriopriate place
+    this.renderer.setCanvas(this.canvas.nativeElement);
   }
 
   onContextMenu(event: Event) {
@@ -40,7 +36,7 @@ export class GameCanvasComponent implements AfterViewInit {
 
   @HostListener("window:resize", ["$event"])
   onResize(event: Event) {
-    this.game.renderer.resize(window.innerWidth, window.innerHeight);
+    this.renderer.resize(window.innerWidth, window.innerHeight);
   }
 
   @HostListener("window:keydown", ["$event"])

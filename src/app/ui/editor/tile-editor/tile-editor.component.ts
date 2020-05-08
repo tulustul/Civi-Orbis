@@ -15,6 +15,7 @@ import {
 } from "../constants";
 import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
 import { isTileForestable, areWetlandsPossible } from "../utils";
+import { MapUi } from "../../map-ui";
 
 @Component({
   selector: "app-tile-editor",
@@ -33,20 +34,20 @@ export class TileEditorComponent implements OnInit {
   RIVER_OPTIONS = RIVER_OPTIONS;
   WETLANDS_OPTIONS = WETLANDS_OPTIONS;
 
-  constructor(private game: Game) {}
+  constructor(private game: Game, private mapUi: MapUi) {}
 
   ngOnInit(): void {
     const shown = this.isVisible$.pipe(filter((v) => v));
     const hidden = this.isVisible$.pipe(filter((v) => !v));
 
     shown.subscribe(() => {
-      this.game.mapUi.enableSelectingTile(true);
-      this.game.mapUi.selectedTile$
+      this.mapUi.enableSelectingTile(true);
+      this.mapUi.selectedTile$
         .pipe(takeUntil(hidden))
         .subscribe((tile) => (this.tile = tile));
     });
 
-    hidden.subscribe(() => this.game.mapUi.enableSelectingTile(false));
+    hidden.subscribe(() => this.mapUi.enableSelectingTile(false));
   }
 
   update() {

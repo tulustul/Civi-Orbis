@@ -3,6 +3,7 @@ import { Game } from "../core/game";
 import { getTileCoords } from "./utils";
 import { Tile } from "../core/tile";
 import { AnimationEaseOutCubic, Animation } from "../core/animation";
+import { GameRenderer } from "./renderer";
 
 export interface Transform {
   x: number;
@@ -37,7 +38,7 @@ export class Camera {
     yEnd: 0,
   };
 
-  constructor(private game: Game) {}
+  constructor(private game: Game, private renderer: GameRenderer) {}
 
   moveBy(x: number, y: number) {
     this.transform$.value.x -= x / this.transform$.value.scale;
@@ -136,7 +137,7 @@ export class Camera {
   }
 
   get canvas() {
-    return this.game.renderer.canvas;
+    return this.renderer.canvas;
   }
 
   serialize(): Transform {
@@ -144,7 +145,7 @@ export class Camera {
   }
 
   update() {
-    const elapsedMS = this.game.renderer.app.ticker.elapsedMS;
+    const elapsedMS = this.renderer.app.ticker.elapsedMS;
 
     if (this.scaleAnimation) {
       const newScale = this.scaleAnimation.step(elapsedMS);
@@ -188,8 +189,8 @@ export class Camera {
     }
 
     const t = this.transform$.value;
-    const width = Math.floor(this.game.renderer.canvas.width / t.scale);
-    const height = Math.floor(this.game.renderer.canvas.height / t.scale);
+    const width = Math.floor(this.renderer.canvas.width / t.scale);
+    const height = Math.floor(this.renderer.canvas.height / t.scale);
 
     const map = this.game.map;
 

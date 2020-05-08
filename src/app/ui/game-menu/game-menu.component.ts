@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 
-import { Game } from "src/app/core/game";
 import { MenuView } from "./menu-view";
+import { UIState } from "../ui-state";
 
 @Component({
   selector: "app-game-menu",
@@ -11,11 +11,11 @@ import { MenuView } from "./menu-view";
 export class GameMenuComponent implements OnInit {
   view: MenuView = "main-menu-view";
 
-  constructor(private game: Game) {}
+  constructor(private uiState: UIState) {}
 
   ngOnInit(): void {}
 
   return() {
-    this.game.uiState.menuVisible$.next(false);
+    this.uiState.menuVisible$.next(false);
   }
 }

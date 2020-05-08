@@ -1,11 +1,15 @@
+import { Injectable } from "@angular/core";
+
 import { BehaviorSubject, Subject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
+7;
+import { Tile } from "../core/tile";
+import { Game } from "../core/game";
+import { UIState } from "./ui-state";
+import { City } from "../core/city";
+import { Unit } from "../core/unit";
 
-import { Game } from "./game";
-import { Tile } from "./tile";
-import { Unit } from "./unit";
-import { City } from "./city";
-
+@Injectable()
 export class MapUi {
   private _hoveredTile$ = new BehaviorSubject<Tile | null>(null);
   hoveredTile$ = this._hoveredTile$.asObservable().pipe(distinctUntilChanged());
@@ -22,13 +26,16 @@ export class MapUi {
   private _activePath$ = new BehaviorSubject<Tile[][] | null>(null);
   activePath$ = this._activePath$.asObservable();
 
+  private _yieldsVisible$ = new BehaviorSubject<boolean>(true);
+  yieldsVisible$ = this._yieldsVisible$.pipe(distinctUntilChanged());
+
   private selectingTileEnabled = false;
 
   cityLabelsVisible = true;
 
   allowMapPanning = true;
 
-  constructor(private game: Game) {
+  constructor(private game: Game, private uiState: UIState) {
     this.clickedTile$.subscribe((tile) => {
       if (this.selectingTileEnabled) {
         this._selectedTile$.next(tile);
@@ -43,10 +50,18 @@ export class MapUi {
     });
 
     this.hoveredTile$.subscribe((tile) => {
-      if (tile?.city) {
-        this.highlightTiles(tile.city.tiles);
-      } else {
-        this.highlightTiles(null);
+      if (!this.uiState.selectedCity$.value) {
+        if (tile?.city) {
+          this.highlightTiles(tile.city.tiles);
+        } else {
+          this.highlightTiles(null);
+        }
+      }
+    });
+
+    this.game.citiesManager.spawned$.subscribe((city) => {
+      if (city.player === this.game.humanPlayer) {
+        this.selectCity(city);
       }
     });
 
@@ -63,11 +78,12 @@ export class MapUi {
     });
 
     this.game.turn$.subscribe(() => this.setPath(null));
+
+    this.game.stopped$.subscribe(() => this.clear());
   }
 
   update() {
-    this.game.renderer.mapDrawer.yieldsContainer.visible =
-      this.game.camera.transform$.value.scale > 40;
+    this._yieldsVisible$.next(this.game.camera.transform$.value.scale > 40);
   }
 
   get hoveredTile() {
@@ -98,9 +114,22 @@ export class MapUi {
     this._activePath$.next(path);
   }
 
-  selectCity(city: City) {
+  selectCity(city: City | null) {
+    if (!city) {
+      this.uiState.selectedCity$.next(city);
+      this.highlightTiles(null);
+      this.cityLabelsVisible = true;
+      this.allowMapPanning = true;
+      return;
+    }
+
     if (city.player === this.game.humanPlayer) {
-      this.game.uiState.selectedCity$.next(city);
+      this.uiState.selectedCity$.next(city);
+      if (city) {
+        this.highlightTiles(city.tiles);
+        this.cityLabelsVisible = false;
+        this.allowMapPanning = false;
+      }
     }
   }
 

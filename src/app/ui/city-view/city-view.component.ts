@@ -16,6 +16,7 @@ import {
 } from "src/app/core/product";
 import { IDLE_PRODUCTS } from "src/app/data/idle-products";
 import { IdleProduct } from "src/app/core/idle-product";
+import { MapUi } from "../map-ui";
 
 @Component({
   selector: "app-city-view",
@@ -37,12 +38,13 @@ export class CityViewComponent implements OnInit {
 
   private _city: City;
 
-  constructor(private game: Game, private uiState: UIState) {}
+  constructor(
+    private game: Game,
+    private uiState: UIState,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
-    this.game.mapUi.cityLabelsVisible = false;
-    this.game.mapUi.allowMapPanning = false;
-
     this.buildBuildingsList();
 
     this.units = getAvailableProducts<UnitDefinition>(
@@ -64,15 +66,13 @@ export class CityViewComponent implements OnInit {
       this.city.tile.y,
     );
     this.game.camera.scaleToWithEasing(130, x, y);
-    this.game.mapUi.highlightTiles(this.city.tiles);
+    this.mapUi.highlightTiles(this.city.tiles);
 
-    this.game.mapUi.clickedTile$
-      .pipe(takeUntil(this.quit$))
-      .subscribe((tile) => {
-        if (!this.city.tiles.has(tile)) {
-          this.quit();
-        }
-      });
+    this.mapUi.clickedTile$.pipe(takeUntil(this.quit$)).subscribe((tile) => {
+      if (!this.city.tiles.has(tile)) {
+        this.quit();
+      }
+    });
   }
 
   private buildBuildingsList() {
@@ -112,10 +112,7 @@ export class CityViewComponent implements OnInit {
   }
 
   quit() {
-    this.uiState.selectedCity$.next(null);
-    this.game.mapUi.highlightTiles(null);
-    this.game.mapUi.cityLabelsVisible = true;
-    this.game.mapUi.allowMapPanning = true;
+    this.mapUi.selectCity(null);
     this.quit$.next();
   }
 }

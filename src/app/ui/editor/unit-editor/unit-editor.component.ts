@@ -9,6 +9,7 @@ import { Game } from "src/app/core/game";
 import { Tile } from "src/app/core/tile";
 import { Option } from "../../widgets/option.interface";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
+import { MapUi } from "../../map-ui";
 
 @Component({
   selector: "app-unit-editor",
@@ -26,7 +27,7 @@ export class UnitEditorComponent implements OnInit {
 
   definitionOptions: Option[] = [];
 
-  constructor(private game: Game) {}
+  constructor(private game: Game, private mapUi: MapUi) {}
 
   ngOnInit(): void {
     this.definitionOptions = UNITS_DEFINITIONS.map((d) => {
@@ -37,22 +38,20 @@ export class UnitEditorComponent implements OnInit {
     const hidden = this.isVisible$.pipe(filter((v) => !v));
 
     shown.subscribe(() => {
-      this.game.mapUi.enableSelectingTile(true);
-      this.game.mapUi.selectedTile$
-        .pipe(takeUntil(hidden))
-        .subscribe((tile) => {
-          if (!tile) {
-            return;
-          }
-          if (this.spawnMode) {
-            this.spawn(tile);
-          } else {
-            this.selectTile(tile);
-          }
-        });
+      this.mapUi.enableSelectingTile(true);
+      this.mapUi.selectedTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
+        if (!tile) {
+          return;
+        }
+        if (this.spawnMode) {
+          this.spawn(tile);
+        } else {
+          this.selectTile(tile);
+        }
+      });
     });
 
-    hidden.subscribe(() => this.game.mapUi.enableSelectingTile(false));
+    hidden.subscribe(() => this.mapUi.enableSelectingTile(false));
   }
 
   spawn(tile: Tile) {

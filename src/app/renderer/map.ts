@@ -7,6 +7,8 @@ import { YiedsDrawer } from "./tile/yields";
 import { RiverDrawer } from "./tile/river";
 import { CityDrawer } from "./tile/city";
 import { AreaDrawer } from "./tile/area";
+import { GameRenderer } from "./renderer";
+import { MapUi } from "../ui/map-ui";
 
 export class MapDrawer {
   container = new TileWrapperContainer();
@@ -25,7 +27,12 @@ export class MapDrawer {
 
   overlaysContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
-  terrainDrawer: TerrainDrawer | undefined;
+  terrainDrawer = new TerrainDrawer(
+    this.game,
+    this.renderer,
+    this.terrainContainer,
+    this.waterContainer,
+  );
 
   unitsDrawer: UnitsDrawer;
 
@@ -37,7 +44,7 @@ export class MapDrawer {
 
   areaDrawer: AreaDrawer;
 
-  constructor(private game: Game) {
+  constructor(private game: Game, private renderer: GameRenderer) {
     this.container.addChild(this.waterContainer);
     this.container.addChild(this.terrainContainer);
     this.container.addChild(this.riverContainer);
@@ -55,6 +62,31 @@ export class MapDrawer {
     });
 
     this.game.started$.subscribe(() => this.build());
+
+    // Drawers must be created after started$ subscription. Race condition will occur otherwise.
+    this.terrainDrawer = new TerrainDrawer(
+      this.game,
+      this.renderer,
+      this.terrainContainer,
+      this.waterContainer,
+    );
+
+    this.unitsDrawer = new UnitsDrawer(this.game, this.unitsContainer);
+
+    this.yieldsDrawer = new YiedsDrawer(
+      this.renderer.mapUi,
+      this.yieldsContainer,
+    );
+
+    this.riverDrawer = new RiverDrawer(this.game, this.riverContainer);
+
+    this.cityDrawer = new CityDrawer(
+      this.game,
+      this.renderer,
+      this.cityContainer,
+    );
+
+    this.areaDrawer = new AreaDrawer(this.game, this.overlaysContainer);
   }
 
   hideAllTiles() {
@@ -88,17 +120,6 @@ export class MapDrawer {
   }
 
   private build() {
-    this.terrainDrawer = new TerrainDrawer(
-      this.game,
-      this.terrainContainer,
-      this.waterContainer,
-    );
-    this.unitsDrawer = new UnitsDrawer(this.game, this.unitsContainer);
-    this.yieldsDrawer = new YiedsDrawer(this.yieldsContainer);
-    this.riverDrawer = new RiverDrawer(this.game, this.riverContainer);
-    this.cityDrawer = new CityDrawer(this.game, this.cityContainer);
-    this.areaDrawer = new AreaDrawer(this.game, this.overlaysContainer);
-
     this.container.bindToMap(this.game.map);
 
     this.waterContainer.bindToMap(this.game.map);

@@ -3,6 +3,7 @@ import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { Game } from "src/app/core/game";
 import { saveGame } from "src/app/core/saving";
 import { MenuView } from "../menu-view";
+import { UIState } from "../../ui-state";
 
 @Component({
   selector: "app-main-menu-view",
@@ -12,7 +13,7 @@ import { MenuView } from "../menu-view";
 export class MainMenuViewComponent implements OnInit {
   @Output() change = new EventEmitter<MenuView>();
 
-  constructor(public game: Game) {}
+  constructor(public game: Game, private uiState: UIState) {}
 
   ngOnInit(): void {}
 
@@ -21,6 +22,6 @@ export class MainMenuViewComponent implements OnInit {
   }
 
   return() {
-    this.game.uiState.menuVisible$.next(false);
+    this.uiState.menuVisible$.next(false);
   }
 }

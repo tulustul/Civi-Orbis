@@ -12,7 +12,7 @@ export class UnitsDrawer {
   unitGraphics = new Map<Unit, PIXIE.Graphics>();
 
   constructor(private game: Game, private container: TileContainer) {
-    game.started$.pipe(takeUntil(game.stopped$)).subscribe(() => {
+    game.started$.subscribe(() => {
       game.unitsManager.updated$
         .pipe(takeUntil(game.stopped$))
         .subscribe((unit) => this.update(unit));

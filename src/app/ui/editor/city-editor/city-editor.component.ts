@@ -6,6 +6,7 @@ import { filter, takeUntil } from "rxjs/operators";
 import { City } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { Tile } from "src/app/core/tile";
+import { MapUi } from "../../map-ui";
 
 @Component({
   selector: "app-city-editor",
@@ -17,29 +18,27 @@ export class CityEditorComponent implements OnInit {
 
   city: City | null = null;
 
-  constructor(private game: Game) {}
+  constructor(private game: Game, private mapUi: MapUi) {}
 
   ngOnInit(): void {
     const shown = this.isVisible$.pipe(filter((v) => v));
     const hidden = this.isVisible$.pipe(filter((v) => !v));
 
     shown.subscribe(() => {
-      this.game.mapUi.enableSelectingTile(true);
-      this.game.mapUi.selectedTile$
-        .pipe(takeUntil(hidden))
-        .subscribe((tile) => {
-          if (!tile) {
-            return;
-          }
-          if (tile.city) {
-            this.city = tile.city;
-          } else {
-            this.spawn(tile);
-          }
-        });
+      this.mapUi.enableSelectingTile(true);
+      this.mapUi.selectedTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
+        if (!tile) {
+          return;
+        }
+        if (tile.city) {
+          this.city = tile.city;
+        } else {
+          this.spawn(tile);
+        }
+      });
     });
 
-    hidden.subscribe(() => this.game.mapUi.enableSelectingTile(false));
+    hidden.subscribe(() => this.mapUi.enableSelectingTile(false));
   }
 
   spawn(tile: Tile) {

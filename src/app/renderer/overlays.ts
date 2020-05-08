@@ -1,8 +1,8 @@
 import * as PIXIE from "pixi.js";
 
-import { Game } from "../core/game";
 import { Tile } from "../core/tile";
 import { drawClosedHex, getTileCoords, drawHex } from "./utils";
+import { MapUi } from "../ui/map-ui";
 
 export class OverlaysRenderer {
   container = new PIXIE.Container();
@@ -13,22 +13,22 @@ export class OverlaysRenderer {
 
   highlightedTilesGraphics = new PIXIE.Graphics();
 
-  constructor(game: Game) {
+  constructor(mapUi: MapUi) {
     this.container.addChild(this.hoveredTileGraphics);
     this.container.addChild(this.selectedTileGraphics);
 
     this.buildHoveredTileGraphics();
     this.buildSelectedTileGraphics();
 
-    game.mapUi.hoveredTile$.subscribe((tile) =>
+    mapUi.hoveredTile$.subscribe((tile) =>
       this.displayAtTile(this.hoveredTileGraphics, tile),
     );
 
-    game.mapUi.selectedTile$.subscribe((tile) => {
+    mapUi.selectedTile$.subscribe((tile) => {
       this.displayAtTile(this.selectedTileGraphics, tile);
     });
 
-    game.mapUi.highlightedTiles$.subscribe((tiles) => {
+    mapUi.highlightedTiles$.subscribe((tiles) => {
       this.buildHighlightedTiles(tiles);
     });
   }

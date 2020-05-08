@@ -43,6 +43,8 @@ import { ProductRequirementsComponent } from "./ui/product-requirements/product-
 import { PlayerYieldsComponent } from "./ui/player-yields/player-yields.component";
 import { Controls } from "./controls";
 import { NextTurnService } from "./ui/next-turn.service";
+import { GameRenderer } from "./renderer/renderer";
+import { MapUi } from "./ui/map-ui";
 
 @NgModule({
   declarations: [
@@ -85,7 +87,7 @@ import { NextTurnService } from "./ui/next-turn.service";
     PlayerYieldsComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
-  providers: [Game, UIState, Controls, NextTurnService],
+  providers: [Game, UIState, Controls, NextTurnService, GameRenderer, MapUi],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

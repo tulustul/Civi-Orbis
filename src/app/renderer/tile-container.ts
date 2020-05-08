@@ -110,6 +110,7 @@ export class TileContainer extends PIXIE.DisplayObject {
   bindToMap(map: TilesMap) {
     this.map = map;
     this.grid = new Array(map.width);
+    this.tilesMap.clear();
     for (let x = 0; x < map.width; x++) {
       this.grid[x] = new Array(map.height);
       for (let y = 0; y < map.height; y++) {

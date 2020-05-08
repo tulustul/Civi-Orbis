@@ -3,6 +3,7 @@ import * as PIXIE from "pixi.js";
 import { Game } from "../core/game";
 import { Tile } from "../core/tile";
 import { getTileCenter } from "./utils";
+import { MapUi } from "../ui/map-ui";
 
 export class PathRenderer {
   container = new PIXIE.Container();
@@ -11,10 +12,10 @@ export class PathRenderer {
 
   labels: PIXIE.Text[] = [];
 
-  constructor(private game: Game) {
+  constructor(private game: Game, mapUi: MapUi) {
     this.container.addChild(this.pathGraphics);
 
-    game.mapUi.activePath$.subscribe((path) => this.buildPath(path));
+    mapUi.activePath$.subscribe((path) => this.buildPath(path));
   }
 
   clear() {

@@ -9,7 +9,7 @@ export class RiverDrawer {
   constructor(game: Game, private container: TileContainer) {
     const tilesManager = game.tilesManager;
 
-    game.started$.pipe(takeUntil(game.stopped$)).subscribe(() => {
+    game.started$.subscribe(() => {
       tilesManager.updatedTile$
         .pipe(takeUntil(game.stopped$))
         .subscribe((tile) => this.updateTile(tile));

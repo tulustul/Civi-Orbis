@@ -2,9 +2,14 @@ import * as PIXIE from "pixi.js";
 
 import { TileContainer } from "../tile-container";
 import { Tile } from "src/app/core/tile";
+import { MapUi } from "src/app/ui/map-ui";
 
 export class YiedsDrawer {
-  constructor(private container: TileContainer) {}
+  constructor(private mapUi: MapUi, private container: TileContainer) {
+    this.mapUi.yieldsVisible$.subscribe(
+      (visible) => (this.container.visible = visible),
+    );
+  }
 
   drawTile(tile: Tile) {
     const g = new PIXIE.Graphics();

@@ -7,6 +7,7 @@ import { Tile, SeaLevel, Climate, TileDirection } from "../core/tile";
 import { Game } from "../core/game";
 import { Transform } from "../renderer/camera";
 import { drawHex } from "./utils";
+import { GameRenderer } from "./renderer";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,
@@ -47,7 +48,7 @@ export class MinimapRenderer {
 
   private destroyed$ = new Subject<void>();
 
-  constructor(private game: Game) {
+  constructor(private game: Game, private renderer: GameRenderer) {
     const tilesManager = this.game.tilesManager;
     tilesManager.revealedTiles$
       .pipe(takeUntil(this.destroyed$))
@@ -151,8 +152,8 @@ export class MinimapRenderer {
   }
 
   private updateCamera(t: Transform) {
-    let width = this.game.renderer.canvas.width / t.scale;
-    let height = this.game.renderer.canvas.height / t.scale;
+    let width = this.renderer.canvas.width / t.scale;
+    let height = this.renderer.canvas.height / t.scale;
 
     const xStart = (t.x - width / 2) * this.scale;
     const yStart = (t.y - height / 2) * this.scale;

@@ -5,14 +5,19 @@ import { City } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
 import { takeUntil } from "rxjs/operators";
+import { GameRenderer } from "../renderer";
 
 const CITY_TEXTURES = getTileVariants("villageSmall", 4);
 
 export class CityDrawer {
   citiesGraphics = new Map<City, PIXIE.Sprite>();
 
-  constructor(private game: Game, private container: TileContainer) {
-    game.started$.pipe(takeUntil(game.stopped$)).subscribe(() => {
+  constructor(
+    private game: Game,
+    private renderer: GameRenderer,
+    private container: TileContainer,
+  ) {
+    game.started$.subscribe(() => {
       game.citiesManager.spawned$
         .pipe(takeUntil(game.stopped$))
         .subscribe((city) => this.spawn(city));
@@ -54,6 +59,6 @@ export class CityDrawer {
   }
 
   private get textures() {
-    return this.game.renderer.textures;
+    return this.renderer.textures;
   }
 }

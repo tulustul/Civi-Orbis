@@ -6,7 +6,7 @@ Bugs:
   ✔ TileContainer raises exception when game is loaded @done(20-05-08 22:59)
   ✔ minimap doesn't fully fill it's viewport @done(20-05-08 19:00)
   ✔ selecting building to build should hide it from production list @done(20-05-07 21:38)
-  ☐ ExpressionChangedAfterItHasBeenCheckedError when opening city view
+  ✔ ExpressionChangedAfterItHasBeenCheckedError when opening city view @done(20-05-09 00:28)
   ✔ starting new game for the second time: WebGL: INVALID_OPERATION: uniformMatrix3fv: location is not from current program @done(20-05-08 22:36)
   ☐ webgl fonts scaling
 
@@ -15,7 +15,7 @@ Minor features:
   ☐ closing city view should restore previous camera transform
   ☐ nicer start game view
   ☐ tooltips for more ui elements
-  ☐ block next turn until all units/buildings have orders (and jump to them)
+  ✔ block next turn until all units/buildings have orders (and jump to them) @done(20-05-09 00:29)
   ☐ hide city growth/production in foreign cities
   ☐ when zoomed out display areas instead of borders
   ☐ autosaving

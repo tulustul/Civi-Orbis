@@ -1,17 +1,14 @@
-import { Renderer } from "../renderer";
 import { Camera, Transform } from "../renderer/camera";
 import { Player, PlayerType, PlayerSerialized } from "./player";
 import { TilesMap, MapSerialized } from "./tiles-map";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, ReplaySubject } from "rxjs";
 import { UnitsManager } from "./unit-manager";
 import { TilesManager } from "./tiles-manager";
 import { Debug } from "./debug";
-import { UIState } from "../ui/ui-state";
 import { UnitSerialized } from "./unit";
-import { filter, distinctUntilChanged } from "rxjs/operators";
+import { filter, distinctUntilChanged, skip } from "rxjs/operators";
 import { CitiesManager } from "./cities-manager";
 import { CitySerialized } from "./city";
-import { MapUi } from "./map-ui";
 import { AreasManager } from "./areas-manager";
 
 interface GameSerialized {
@@ -42,11 +39,10 @@ export class Game {
 
   humanPlayer: Player | null = null;
 
+  // TODO camera probably shouldn't be part of the core game but it needs to be serialized on save so let's leave it here for now.
   camera: Camera;
 
   turn$ = new BehaviorSubject<number>(1);
-
-  renderer = new Renderer(this);
 
   areasManager = new AreasManager();
 
@@ -56,16 +52,12 @@ export class Game {
 
   citiesManager = new CitiesManager(this);
 
-  private _isStarted$ = new BehaviorSubject<boolean>(false);
+  private _isStarted$ = new ReplaySubject<boolean>(1);
   isStarted$ = this._isStarted$.pipe(distinctUntilChanged());
 
   started$ = this.isStarted$.pipe(filter((s) => s));
 
   stopped$ = this.isStarted$.pipe(filter((s) => !s));
-
-  uiState: UIState;
-
-  mapUi = new MapUi(this);
 
   constructor() {
     this.humanPlayer$.subscribe((player) => (this.humanPlayer = player));
@@ -105,11 +97,10 @@ export class Game {
     this.activePlayerIndex = -1;
     this.activePlayer$.next(null);
     this.turn$.next(1);
-    this.renderer.clear();
     this.unitsManager.clear();
-    this.mapUi.clear();
     this.citiesManager.clear();
     this.areasManager.clear();
+
     this._isStarted$.next(false);
   }
 

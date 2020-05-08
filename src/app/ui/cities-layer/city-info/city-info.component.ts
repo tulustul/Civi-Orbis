@@ -16,6 +16,7 @@ import { City } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { getTileCoords } from "src/app/renderer/utils";
 import { Controls } from "src/app/controls";
+import { MapUi } from "../../map-ui";
 
 @Component({
   selector: "app-city-info",
@@ -33,6 +34,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
     private elementRef: ElementRef<HTMLElement>,
     private game: Game,
     public controls: Controls,
+    private mapUi: MapUi,
   ) {}
 
   ngOnInit(): void {
@@ -72,7 +74,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
   }
 
   selectCity() {
-    this.game.mapUi.selectCity(this.city);
+    this.mapUi.selectCity(this.city);
   }
 
   onContextMenu(event: Event) {

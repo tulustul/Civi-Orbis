@@ -2,6 +2,7 @@ import { Component } from "@angular/core";
 
 import { UIState } from "./ui/ui-state";
 import { Game } from "./core/game";
+import { MapUi } from "./ui/map-ui";
 
 @Component({
   selector: "app-root",
@@ -11,5 +12,9 @@ import { Game } from "./core/game";
 export class AppComponent {
   title = "civ";
 
-  constructor(public game: Game, public uiState: UIState) {}
+  constructor(
+    public game: Game,
+    public uiState: UIState,
+    public mapUi: MapUi,
+  ) {}
 }

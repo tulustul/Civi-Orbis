@@ -1,11 +1,13 @@
 import { Component, OnInit, Input, OnDestroy } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
 
 import { City } from "src/app/core/city";
 import { Tile } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
-import { DomSanitizer } from "@angular/platform-browser";
-import { takeUntil } from "rxjs/operators";
-import { Subject } from "rxjs";
+import { MapUi } from "../../map-ui";
 
 @Component({
   selector: "app-work-tiles",
@@ -17,10 +19,14 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
 
   private ngUnsubscribe = new Subject<void>();
 
-  constructor(private domSanitizer: DomSanitizer, private game: Game) {}
+  constructor(
+    private domSanitizer: DomSanitizer,
+    private game: Game,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
-    this.game.mapUi.clickedTile$
+    this.mapUi.clickedTile$
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((tile) => this.toggle(tile));
   }

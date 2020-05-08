@@ -5,6 +5,7 @@ import { Tile, Climate, LandForm, SeaLevel } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
 import { takeUntil } from "rxjs/operators";
+import { GameRenderer } from "../renderer";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),
@@ -67,12 +68,13 @@ const DESERT_FLOOD_PLAINS_TEXTURES = getTileVariants("hexGrassySand", 4);
 export class TerrainDrawer {
   constructor(
     private game: Game,
+    private renderer: GameRenderer,
     private terrainContainer: TileContainer,
     private waterContainer: TileContainer,
   ) {
     const tilesManager = this.game.tilesManager;
 
-    game.started$.pipe(takeUntil(game.stopped$)).subscribe(() => {
+    game.started$.subscribe(() => {
       tilesManager.updatedTile$
         .pipe(takeUntil(game.stopped$))
         .subscribe((tile) => this.updateTile(tile));
@@ -130,6 +132,6 @@ export class TerrainDrawer {
   }
 
   protected get textures() {
-    return this.game.renderer.textures;
+    return this.renderer.textures;
   }
 }
