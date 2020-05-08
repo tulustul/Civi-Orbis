@@ -21,9 +21,10 @@
   --color-secondary-2-3: #1c2426;
   --color-secondary-2-4: #152024;
 
-  --growth-color: #4ea73d;
-  --production-color: #f0a00d;
-  --culture-color: #ca57ff;
+  --growth-color: #65ea4b;
+  --production-color: #ffb42c;
+  --culture-color: #d883ff;
+  --public-works-color: #e4d1b8;
 
   --color-secondary-text: #5f5f5f;
   --color-danger-text: #ff2424;
@@ -91,6 +92,10 @@ button {
 
 .culture-color {
   color: var(--culture-color);
+}
+
+.public-works-color {
+  color: var(--public-works-color);
 }
 
 .panel {

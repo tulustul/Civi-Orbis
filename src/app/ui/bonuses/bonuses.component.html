@@ -13,6 +13,13 @@
   + {{ culture }} culture
 </div>
 
+<div
+  class="public-works-color"
+  *ngIf="bonuses?.yieldValue?.publicWorks as publicWorks"
+>
+  + {{ publicWorks }} public works
+</div>
+
 <div class="growth-color" *ngIf="bonuses?.yieldFactor?.food as food">
   + {{ food | percentBonus }} food
 </div>
@@ -28,6 +35,13 @@
   + {{ culture | percentBonus }} culture
 </div>
 
+<div
+  class="public-works-color"
+  *ngIf="bonuses?.yieldFactor?.publicWorks as publicWorks"
+>
+  + {{ publicWorks | percentBonus }} public works
+</div>
+
 <div class="growth-color" *ngIf="bonuses?.transferProductionToFood as transfer">
   {{ transfer | percentBonus }} production transfered into food
 </div>
@@ -39,6 +53,9 @@
   {{ transfer | percentBonus }} production transfered into culture
 </div>
 
-<div *ngIf="bonuses?.transferProductionToPublicWorks as transfer">
+<div
+  class="public-works-color"
+  *ngIf="bonuses?.transferProductionToPublicWorks as transfer"
+>
   {{ transfer | percentBonus }} production transfered into public works
 </div>

@@ -188,6 +188,7 @@ export class City {
       productDefinition: idleProduct,
     });
     this.updateYields();
+    this.player.updateYields();
   }
 
   cancelProduction() {
@@ -196,6 +197,7 @@ export class City {
       this.currentProduct = null;
       if (type === "idleProduct") {
         this.updateYields();
+        this.player.updateYields();
       }
     }
   }

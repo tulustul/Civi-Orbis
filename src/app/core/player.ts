@@ -76,11 +76,15 @@ export class Player {
     return player;
   }
 
-  nextTurn() {
+  updateYields() {
     zeroYields(this.yieldsPerTurn);
     for (const city of this.cities) {
       addToYields(this.yieldsPerTurn, city.yields);
     }
+  }
+
+  nextTurn() {
+    this.updateYields();
     addToYields(this.yieldsTotal, this.yieldsPerTurn);
   }
 }
