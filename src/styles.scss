@@ -70,6 +70,9 @@ button {
     padding: 8px 35px;
     font-size: 18px;
   }
+  &.btn-danger {
+    background-color: var(--color-danger-text);
+  }
 }
 
 .small {

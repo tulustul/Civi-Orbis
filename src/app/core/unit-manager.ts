@@ -52,6 +52,8 @@ export class UnitsManager {
 
     this._spawned$.next(unit);
 
+    unit.player.unitsWithoutOrders.push(unit);
+
     return unit;
   }
 
@@ -77,6 +79,8 @@ export class UnitsManager {
     if (unit === this.activeUnit) {
       this.activeUnit$.next(null);
     }
+
+    unit.player.updateUnitsWithoutOrders();
   }
 
   move(unit: Unit, tile: Tile) {
@@ -116,8 +120,11 @@ export class UnitsManager {
 
   moveAlongPath(unit: Unit) {
     if (!unit.path) {
+      unit.setOrder(null);
       return;
     }
+
+    unit.setOrder(unit.path.length ? "go" : null);
 
     while (unit.actionPointsLeft && unit.path.length) {
       this.move(unit, unit.path[0][0]);
@@ -127,6 +134,7 @@ export class UnitsManager {
       }
       if (!unit.path.length) {
         unit.path = null;
+        unit.setOrder(null);
         return;
       }
     }
@@ -145,6 +153,9 @@ export class UnitsManager {
     for (const unit of this.units) {
       if (unit.path) {
         this.moveAlongPath(unit);
+      }
+      if (unit.order === "skip") {
+        unit.setOrder(null);
       }
       unit.actionPointsLeft = unit.definition.actionPoints;
     }

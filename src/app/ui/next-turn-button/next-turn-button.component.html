@@ -1,10 +1,19 @@
 <button
   class="production-color"
-  *ngIf="nextTurnService.nextCity; else nextTurnTmpl"
+  *ngIf="nextTurnService.nextCity; else nextUnitTmpl"
   (click)="nextTurnService.next()"
 >
   Choose production
 </button>
+
+<ng-template #nextUnitTmpl>
+  <button
+    *ngIf="nextTurnService.nextUnit; else nextTurnTmpl"
+    (click)="nextTurnService.next()"
+  >
+    Order unit
+  </button>
+</ng-template>
 
 <ng-template #nextTurnTmpl>
   <button (click)="nextTurnService.next()">

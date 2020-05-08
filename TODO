@@ -8,6 +8,7 @@ Bugs:
   ✔ selecting building to build should hide it from production list @done(20-05-07 21:38)
   ☐ ExpressionChangedAfterItHasBeenCheckedError when opening city view
   ☐ starting new game for the second time: WebGL: INVALID_OPERATION: uniformMatrix3fv: location is not from current program
+  ☐ webgl fonts scaling
 
 Minor features:
   ☐ ESC for closing current view

@@ -33,6 +33,7 @@ export interface PlayerSerialized {
   type: PlayerType;
   color: number;
   exploredTiles: number[];
+  yieldsTotal: Yields;
 }
 
 export class Player {
@@ -47,6 +48,8 @@ export class Player {
   cities: City[] = [];
 
   cityWithoutProduction: City[] = [];
+
+  unitsWithoutOrders: Unit[] = [];
 
   yieldsPerTurn: Yields = { ...EMPTY_YIELDS };
 
@@ -67,6 +70,7 @@ export class Player {
       exploredTiles: Array.from(this.exploredTiles).map((tile) =>
         getTileIndex(this.game.map, tile),
       ),
+      yieldsTotal: this.yieldsTotal,
     };
   }
 
@@ -75,6 +79,9 @@ export class Player {
     for (const tileIndex of data.exploredTiles) {
       player.exploredTiles.add(getTileFromIndex(game.map, tileIndex));
     }
+    player.yieldsTotal = data.yieldsTotal;
+    player.updateYields();
+    player.updateCitiesWithoutProduction();
     return player;
   }
 
@@ -89,10 +96,17 @@ export class Player {
     this.updateYields();
     addToYields(this.yieldsTotal, this.yieldsPerTurn);
     this.updateCitiesWithoutProduction();
+    this.updateUnitsWithoutOrders();
   }
 
   updateCitiesWithoutProduction() {
     this.cityWithoutProduction = this.cities.filter((c) => !c.product);
+  }
+
+  updateUnitsWithoutOrders() {
+    this.unitsWithoutOrders = this.units.filter(
+      (c) => !c.order && c.actionPointsLeft,
+    );
   }
 
   addCity(city: City) {

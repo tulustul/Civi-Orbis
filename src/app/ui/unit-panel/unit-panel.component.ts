@@ -36,4 +36,10 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
   getActionName(action: UnitAction) {
     return ACTIONS[action].name;
   }
+
+  destroy() {
+    if (this.unit) {
+      this.game.unitsManager.destroy(this.unit);
+    }
+  }
 }

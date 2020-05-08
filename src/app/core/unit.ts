@@ -4,6 +4,8 @@ import { Player } from "./player";
 import { getTileIndex } from "./serialization";
 import { UnitAction, ACTIONS } from "./unit-actions";
 
+export type UnitOrder = "go" | "skip" | "sleep" | null;
+
 export interface UnitSerialized {
   tile: number;
   definition: string;
@@ -15,6 +17,8 @@ export interface UnitSerialized {
 export class Unit {
   actionPointsLeft: number;
   path: Tile[][] | null;
+
+  order: UnitOrder = null;
 
   constructor(
     public tile: Tile,
@@ -43,5 +47,10 @@ export class Unit {
     }
 
     ACTIONS[action].fn(this.player.game, this);
+  }
+
+  setOrder(order: UnitOrder) {
+    this.order = order;
+    this.player.updateUnitsWithoutOrders();
   }
 }

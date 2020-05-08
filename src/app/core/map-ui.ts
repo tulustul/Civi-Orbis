@@ -33,12 +33,7 @@ export class MapUi {
       if (this.selectingTileEnabled) {
         this._selectedTile$.next(tile);
       } else if (tile.units.length) {
-        let unit: Unit | null = tile.units[0];
-        if (unit.player !== this.game.humanPlayer) {
-          unit = null;
-        }
-        this.game.unitsManager.activeUnit$.next(unit);
-        this.setPath(unit?.path || null);
+        this.selectUnit(tile.units[0]);
       } else if (tile?.city) {
         this.selectCity(tile.city);
       } else {
@@ -66,6 +61,8 @@ export class MapUi {
       }
       this.setPath(null);
     });
+
+    this.game.turn$.subscribe(() => this.setPath(null));
   }
 
   update() {
@@ -104,6 +101,13 @@ export class MapUi {
   selectCity(city: City) {
     if (city.player === this.game.humanPlayer) {
       this.game.uiState.selectedCity$.next(city);
+    }
+  }
+
+  selectUnit(unit: Unit) {
+    if (unit.player === this.game.humanPlayer) {
+      this.game.unitsManager.activeUnit$.next(unit);
+      this.setPath(unit.path || null);
     }
   }
 
