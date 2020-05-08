@@ -3,12 +3,17 @@ import * as PIXIE from "pixi.js";
 import { Tile, TileDirection } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
+import { takeUntil } from "rxjs/operators";
 
 export class RiverDrawer {
   constructor(game: Game, private container: TileContainer) {
     const tilesManager = game.tilesManager;
 
-    tilesManager.updatedTile$.subscribe((tile) => this.updateTile(tile));
+    game.started$.pipe(takeUntil(game.stopped$)).subscribe(() => {
+      tilesManager.updatedTile$
+        .pipe(takeUntil(game.stopped$))
+        .subscribe((tile) => this.updateTile(tile));
+    });
   }
 
   public drawTile(tile: Tile) {

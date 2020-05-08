@@ -4,6 +4,7 @@ import { getTileVariants } from "../utils";
 import { City } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
+import { takeUntil } from "rxjs/operators";
 
 const CITY_TEXTURES = getTileVariants("villageSmall", 4);
 
@@ -11,9 +12,15 @@ export class CityDrawer {
   citiesGraphics = new Map<City, PIXIE.Sprite>();
 
   constructor(private game: Game, private container: TileContainer) {
-    game.citiesManager.spawned$.subscribe((city) => this.spawn(city));
+    game.started$.pipe(takeUntil(game.stopped$)).subscribe(() => {
+      game.citiesManager.spawned$
+        .pipe(takeUntil(game.stopped$))
+        .subscribe((city) => this.spawn(city));
 
-    game.citiesManager.destroyed$.subscribe((city) => this.destroy(city));
+      game.citiesManager.destroyed$
+        .pipe(takeUntil(game.stopped$))
+        .subscribe((city) => this.destroy(city));
+    });
   }
 
   build() {

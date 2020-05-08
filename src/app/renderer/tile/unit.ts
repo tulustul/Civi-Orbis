@@ -1,5 +1,7 @@
 import * as PIXIE from "pixi.js";
 
+import { takeUntil } from "rxjs/operators";
+
 import { Unit } from "src/app/core/unit";
 import { Game } from "src/app/core/game";
 
@@ -10,9 +12,19 @@ export class UnitsDrawer {
   unitGraphics = new Map<Unit, PIXIE.Graphics>();
 
   constructor(private game: Game, private container: TileContainer) {
-    game.unitsManager.updated$.subscribe((unit) => this.update(unit));
-    game.unitsManager.spawned$.subscribe((unit) => this.spawn(unit));
-    game.unitsManager.destroyed$.subscribe((unit) => this.destroy(unit));
+    game.started$.pipe(takeUntil(game.stopped$)).subscribe(() => {
+      game.unitsManager.updated$
+        .pipe(takeUntil(game.stopped$))
+        .subscribe((unit) => this.update(unit));
+
+      game.unitsManager.spawned$
+        .pipe(takeUntil(game.stopped$))
+        .subscribe((unit) => this.spawn(unit));
+
+      game.unitsManager.destroyed$
+        .pipe(takeUntil(game.stopped$))
+        .subscribe((unit) => this.destroy(unit));
+    });
   }
 
   build() {

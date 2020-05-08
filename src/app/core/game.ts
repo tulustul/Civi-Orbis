@@ -57,9 +57,11 @@ export class Game {
   citiesManager = new CitiesManager(this);
 
   private _isStarted$ = new BehaviorSubject<boolean>(false);
-  isStarted$ = this._isStarted$.asObservable();
+  isStarted$ = this._isStarted$.pipe(distinctUntilChanged());
 
   started$ = this.isStarted$.pipe(filter((s) => s));
+
+  stopped$ = this.isStarted$.pipe(filter((s) => !s));
 
   uiState: UIState;
 
@@ -108,6 +110,7 @@ export class Game {
     this.mapUi.clear();
     this.citiesManager.clear();
     this.areasManager.clear();
+    this._isStarted$.next(false);
   }
 
   serialize(): GameSerialized {
