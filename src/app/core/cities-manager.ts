@@ -1,12 +1,13 @@
 import { Subject } from "rxjs";
 
-import { City, CitySerialized, Product } from "./city";
+import { City, CitySerialized } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
 import { Tile, LandForm, SeaLevel } from "./tile";
 import { BUILDINGS_MAP } from "./buildings";
 import { ProductDefinition } from "./product";
+import { IDLE_PRODUCTS_MAP } from "./idle-product";
 
 export class CitiesManager {
   private _spawned$ = new Subject<City>();
@@ -119,8 +120,10 @@ export class CitiesManager {
             productDefinition = this.game.unitsManager.definitions.get(
               cityData.product.id,
             )!;
-          } else {
+          } else if (cityData.product.type === "building") {
             productDefinition = BUILDINGS_MAP.get(cityData.product.id)!;
+          } else {
+            productDefinition = IDLE_PRODUCTS_MAP.get(cityData.product.id)!;
           }
 
           city.product = {

@@ -138,6 +138,9 @@ export class Game {
 
     for (const player of this.players) {
       player.area.computeBorders();
+      player.updateCitiesWithoutProduction();
+      player.updateUnitsWithoutOrders();
+      player.updateYields();
     }
 
     return this;
