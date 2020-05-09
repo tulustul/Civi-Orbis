@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  TemplateRef,
+} from "@angular/core";
 
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -11,18 +18,24 @@ import { UnitAction, ACTIONS } from "src/app/core/unit-actions";
   selector: "app-unit-panel",
   templateUrl: "./unit-panel.component.html",
   styleUrls: ["./unit-panel.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnitPanelComponent implements OnInit, OnDestroy {
   unit: Unit | null = null;
 
+  requirementsTemplates = new Map<UnitAction, TemplateRef<any>>();
+
   private ngUnsubscribe = new Subject<void>();
 
-  constructor(private game: Game) {}
+  constructor(private cdr: ChangeDetectorRef, private game: Game) {}
 
   ngOnInit(): void {
     this.game.unitsManager.activeUnit$
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((unit) => (this.unit = unit));
+      .subscribe((unit) => {
+        this.unit = unit;
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy() {

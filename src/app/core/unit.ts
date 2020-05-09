@@ -42,11 +42,29 @@ export class Unit {
   }
 
   doAction(action: UnitAction) {
-    if (!this.definition.actions.includes(action)) {
+    if (!this.canDoAction(action)) {
       return;
     }
 
     ACTIONS[action].fn(this.player.game, this);
+  }
+
+  canDoAction(action: UnitAction): boolean {
+    if (!this.actionPointsLeft) {
+      return false;
+    }
+
+    if (!this.definition.actions.includes(action)) {
+      return false;
+    }
+
+    for (const r of ACTIONS[action].requirements) {
+      if (!r.check(this)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   setOrder(order: UnitOrder) {

@@ -17,6 +17,20 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     ],
   },
   {
+    id: "worker",
+    name: "Worker",
+    actionPoints: 2,
+    power: 0,
+    actions: [
+      UnitAction.buildFarm,
+      UnitAction.buildMine,
+      UnitAction.buildSawmill,
+    ],
+    productionCost: 20,
+    requirements: [],
+    weakRequirements: [new SizeRequirement(2)],
+  },
+  {
     id: "scout",
     name: "Scout",
     actionPoints: 2,

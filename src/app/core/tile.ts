@@ -52,6 +52,19 @@ const BASE_LAND_FORM_YIELDS: Record<LandForm, Yields> = {
   [LandForm.mountains]: { ...EMPTY_YIELDS, food: -Infinity, production: -5 },
 };
 
+export const FORESTABLE_CLIMATES = new Set<Climate>([
+  Climate.continental,
+  Climate.oceanic,
+  Climate.tropical,
+  Climate.tundra,
+]);
+
+export const WETLANDS_CLIMATES = new Set<Climate>([
+  Climate.continental,
+  Climate.oceanic,
+  Climate.tropical,
+]);
+
 export class Tile {
   climate = Climate.continental;
   landForm = LandForm.plains;
@@ -160,6 +173,49 @@ export class Tile {
 
   get totalYields(): number {
     return this.yields.food + this.yields.production;
+  }
+
+  isForestable(): boolean {
+    return (
+      this.seaLevel === SeaLevel.none &&
+      this.landForm === LandForm.plains &&
+      FORESTABLE_CLIMATES.has(this.climate)
+    );
+  }
+
+  areWetlandsPossible(): boolean {
+    return !!(
+      this.seaLevel === SeaLevel.none &&
+      this.landForm === LandForm.plains &&
+      this.riverParts.length &&
+      WETLANDS_CLIMATES.has(this.climate)
+    );
+  }
+
+  isImprovementPossible(improvement: TileImprovement | null): boolean {
+    if (improvement === null) {
+      return true;
+    } else if (improvement === TileImprovement.farm) {
+      return (
+        this.seaLevel === SeaLevel.none &&
+        this.landForm === LandForm.plains &&
+        this.climate !== Climate.arctic &&
+        !this.forest &&
+        !this.wetlands
+      );
+    } else if (improvement === TileImprovement.mine) {
+      return this.landForm === LandForm.hills;
+    } else if (improvement === TileImprovement.sawmill) {
+      return this.forest && !this.wetlands;
+    } else {
+      return false;
+    }
+  }
+
+  isRoadPossible() {
+    return (
+      this.seaLevel === SeaLevel.none && this.landForm !== LandForm.mountains
+    );
   }
 }
 

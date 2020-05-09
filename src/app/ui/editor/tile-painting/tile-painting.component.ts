@@ -21,12 +21,6 @@ import { Game } from "src/app/core/game";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { getTilesInRange } from "src/app/core/hex-math";
-import {
-  isTileForestable,
-  areWetlandsPossible,
-  isImprovementPossible,
-  isRoadPossible,
-} from "../utils";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
 
@@ -139,17 +133,17 @@ export class TilePaintingComponent implements OnInit {
         tile.wetlands = this.paintData.wetlands;
       }
 
-      tile.forest = tile.forest && isTileForestable(tile);
-      tile.wetlands = tile.wetlands && areWetlandsPossible(tile);
+      tile.forest = tile.forest && tile.isForestable();
+      tile.wetlands = tile.wetlands && tile.areWetlandsPossible();
 
       if (this.paintData.improvement !== undefined) {
-        if (isImprovementPossible(tile, this.paintData.improvement)) {
+        if (tile.isImprovementPossible(this.paintData.improvement)) {
           tile.improvement = this.paintData.improvement;
         }
       }
 
       if (this.paintData.road !== undefined) {
-        if (isRoadPossible(tile)) {
+        if (tile.isRoadPossible()) {
           tile.road = this.paintData.road;
         }
       }

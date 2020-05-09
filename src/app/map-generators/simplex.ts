@@ -9,7 +9,6 @@ import {
 } from "./utils";
 import { SeaLevel, Tile, Climate, TileDirection, LandForm } from "../core/tile";
 import { getTileInDirection } from "../core/hex-math";
-import { areWetlandsPossible, isTileForestable } from "../ui/editor/utils";
 
 interface TileMetadata {
   height: number;
@@ -116,7 +115,7 @@ export class SimplexMapGenerator implements MapGenerator {
       ),
     )) {
       const bonus = tile.climate === Climate.tropical ? 0.3 : 0;
-      if (value + bonus > -0.2 && isTileForestable(tile)) {
+      if (value + bonus > -0.2 && tile.isForestable()) {
         tile.forest = true;
       }
     }
@@ -358,7 +357,7 @@ export class SimplexMapGenerator implements MapGenerator {
         this.seed,
       ),
     )) {
-      if (value > 0 && areWetlandsPossible(tile)) {
+      if (value > 0 && tile.areWetlandsPossible()) {
         tile.wetlands = true;
       }
     }

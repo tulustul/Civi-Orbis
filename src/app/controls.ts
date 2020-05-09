@@ -59,6 +59,10 @@ export class Controls {
       const tile = this.game.map.get(x, y);
       if (tile) {
         this.game.unitsManager.moveAlongPath(activeUnit);
+
+        // to refresh the ui
+        this.game.unitsManager.activeUnit$.next(activeUnit);
+
         this.mapUi.setPath(activeUnit.path);
       }
     }

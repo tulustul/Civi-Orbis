@@ -10,9 +10,12 @@
     <button (click)="unit.setOrder('skip')">Skip move</button>
 
     <button (click)="unit.setOrder('sleep')">Sleep</button>
+  </div>
 
+  <div class="actions">
     <button
       *ngFor="let action of unit.definition.actions"
+      [class.disabled]="!unit.canDoAction(action)"
       (click)="unit.doAction(action)"
     >
       {{ getActionName(action) }}

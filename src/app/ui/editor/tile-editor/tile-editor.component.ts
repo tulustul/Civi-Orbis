@@ -21,12 +21,6 @@ import {
   ROAD_OPTIONS,
 } from "../constants";
 import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
-import {
-  isTileForestable,
-  areWetlandsPossible,
-  isImprovementPossible,
-  isRoadPossible,
-} from "../utils";
 import { MapUi } from "../../map-ui";
 
 @Component({
@@ -72,21 +66,21 @@ export class TileEditorComponent implements OnInit {
 
   updateForest(forest: boolean) {
     if (this.tile) {
-      this.tile.forest = forest && isTileForestable(this.tile);
+      this.tile.forest = forest && this.tile.isForestable();
       this.update();
     }
   }
 
   updateWetlands(wetlands: boolean) {
     if (this.tile) {
-      this.tile.wetlands = wetlands && areWetlandsPossible(this.tile);
+      this.tile.wetlands = wetlands && this.tile.areWetlandsPossible();
       this.update();
     }
   }
 
   updateImprovement(improvement: TileImprovement) {
     if (this.tile) {
-      if (isImprovementPossible(this.tile, improvement)) {
+      if (this.tile.isImprovementPossible(improvement)) {
         this.tile.improvement = improvement;
         this.update();
       }
@@ -95,7 +89,7 @@ export class TileEditorComponent implements OnInit {
 
   updateRoad(road: TileRoad) {
     if (this.tile) {
-      this.tile.road = road && isRoadPossible(this.tile);
+      this.tile.road = road && this.tile.isRoadPossible();
       this.update();
     }
   }

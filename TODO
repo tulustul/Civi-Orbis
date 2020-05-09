@@ -30,9 +30,10 @@ Major features:
   ✔ implement `city work on` (how to call it properly?). @done(20-05-07 22:31)
     ✔ `food` transforms 25% of production into food @done(20-05-07 22:31)
     ✔ `public works` produces `public works points` @done(20-05-08 16:32)
-  ☐ tile improvements:
-    ☐ `farm` +1 food
-    ☐ `workshop` +1 production
+  ✔ tile improvements: @done(20-05-09 22:32)
+    ✔ `farm` +1 food @done(20-05-09 22:32)
+    ✔ `mine` +1 production @done(20-05-09 22:32)
+    ✔ `sawmill` +1 production @done(20-05-09 22:32)
     ☐ `road` 0.5 movement cost
   ☐ resources - increase tile yields
   ☐ `fog of war` - grey out tiles not visible by units and cities
