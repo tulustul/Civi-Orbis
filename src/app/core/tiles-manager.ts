@@ -41,7 +41,7 @@ export class TilesManager {
     tile.computeYields();
     tile.computeMovementCosts();
     for (const neighbour of tile.neighbours) {
-      // TODO this loop can be optimized by computing only the cost from neighbour to tile.
+      // TODO this loop can be optimized by computing only the cost from neighbour to this tile.
       neighbour.computeMovementCosts();
     }
     this._updatedTile$.next(tile);

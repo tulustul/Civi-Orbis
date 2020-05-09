@@ -1,12 +1,13 @@
 import { Game } from "./game";
 import { Unit } from "./unit";
-import { TileImprovement } from "./tile";
+import { TileImprovement, TileRoad } from "./tile";
 
 export enum UnitAction {
   foundCity,
   buildFarm,
   buildMine,
   buildSawmill,
+  buildRoad,
 }
 
 export abstract class ActionRequirement {
@@ -41,7 +42,6 @@ export class ImprovementNotYetBuiltRequirement extends ActionRequirement {
     return unit.tile.improvement !== this.improvement;
   }
 }
-
 export class IsImprovementPossibleRequirement extends ActionRequirement {
   id = "improvementPossible";
 
@@ -51,6 +51,22 @@ export class IsImprovementPossibleRequirement extends ActionRequirement {
 
   check(unit: Unit) {
     return unit.tile.isImprovementPossible(this.improvement);
+  }
+}
+
+export class NoRoadRequirement extends ActionRequirement {
+  id = "noRoad";
+
+  check(unit: Unit) {
+    return unit.tile.road === null;
+  }
+}
+
+export class isRoadPossible extends ActionRequirement {
+  id = "roadPossible";
+
+  check(unit: Unit) {
+    return unit.tile.isRoadPossible();
   }
 }
 
@@ -76,6 +92,16 @@ function buildImprovement(
   unit.actionPointsLeft = 0;
   unit.tile.improvement = improvement;
   game.tilesManager.updateTile(unit.tile);
+  unit.player.updateUnitsWithoutOrders();
+}
+
+function buildRoad(game: Game, unit: Unit) {
+  unit.actionPointsLeft = 0;
+  unit.tile.road = TileRoad.road;
+  game.tilesManager.updateTile(unit.tile);
+  for (const neighbour of unit.tile.neighbours) {
+    game.tilesManager.updateTile(neighbour);
+  }
   unit.player.updateUnitsWithoutOrders();
 }
 
@@ -115,5 +141,11 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
       new ImprovementNotYetBuiltRequirement(TileImprovement.sawmill),
       new IsImprovementPossibleRequirement(TileImprovement.sawmill),
     ],
+  },
+  [UnitAction.buildRoad]: {
+    action: UnitAction.buildRoad,
+    name: "Build a road",
+    fn: (game, unit) => buildRoad(game, unit),
+    requirements: [new NoRoadRequirement(), new isRoadPossible()],
   },
 };

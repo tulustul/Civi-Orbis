@@ -104,6 +104,9 @@ export class Tile {
           cost = 0.5;
         }
       }
+      if (neighbour.road === TileRoad.road) {
+        cost /= 3;
+      }
       this.neighboursCosts.set(neighbour, cost);
     }
   }

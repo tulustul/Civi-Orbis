@@ -25,6 +25,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
       UnitAction.buildFarm,
       UnitAction.buildMine,
       UnitAction.buildSawmill,
+      UnitAction.buildRoad,
     ],
     productionCost: 20,
     requirements: [],
