@@ -24,6 +24,16 @@ export enum SeaLevel {
   deep,
 }
 
+export enum TileImprovement {
+  farm,
+  mine,
+  sawmill,
+}
+
+export enum TileRoad {
+  road,
+}
+
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
   [Climate.continental]: { ...EMPTY_YIELDS, food: 1, production: 1 },
@@ -49,6 +59,8 @@ export class Tile {
   riverParts: TileDirection[] = [];
   forest = false;
   wetlands = false;
+  improvement: TileImprovement | null = null;
+  road: TileRoad | null = null;
 
   units: Unit[] = [];
   city: City | null = null;
@@ -133,6 +145,14 @@ export class Tile {
         this.yields.food += this.climate === Climate.desert ? 3 : 1;
       }
 
+      if (this.improvement === TileImprovement.farm) {
+        this.yields.food++;
+      } else if (this.improvement === TileImprovement.mine) {
+        this.yields.production++;
+      } else if (this.improvement === TileImprovement.sawmill) {
+        this.yields.production++;
+      }
+
       this.yields.food = Math.max(0, this.yields.food);
       this.yields.production = Math.max(0, this.yields.production);
     }
@@ -157,6 +177,8 @@ export interface TileSerialized {
   climate?: Climate;
   landForm?: LandForm;
   seaLevel?: SeaLevel;
+  improvement?: TileImprovement | null;
+  road?: TileRoad | null;
   riverParts?: TileDirection[];
   forest?: boolean;
 }

@@ -1,14 +1,32 @@
 import * as PIXIE from "pixi.js";
 
+import { takeUntil } from "rxjs/operators";
+
 import { TileContainer } from "../tile-container";
 import { Tile } from "src/app/core/tile";
 import { MapUi } from "src/app/ui/map-ui";
+import { Game } from "src/app/core/game";
 
 export class YiedsDrawer {
-  constructor(private mapUi: MapUi, private container: TileContainer) {
+  constructor(
+    game: Game,
+    private mapUi: MapUi,
+    private container: TileContainer,
+  ) {
+    game.started$.subscribe(() => {
+      game.tilesManager.updatedTile$
+        .pipe(takeUntil(game.stopped$))
+        .subscribe((tile) => this.updateTile(tile));
+    });
+
     this.mapUi.yieldsVisible$.subscribe(
       (visible) => (this.container.visible = visible),
     );
+  }
+
+  updateTile(tile: Tile) {
+    this.container.clearTile(tile);
+    this.drawTile(tile);
   }
 
   drawTile(tile: Tile) {

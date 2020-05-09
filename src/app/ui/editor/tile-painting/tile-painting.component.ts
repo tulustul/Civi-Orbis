@@ -6,26 +6,41 @@ import {
   LAND_FORM_OPTIONS,
   SEA_LEVEL_OPTIONS,
   WETLANDS_OPTIONS,
+  IMPROVEMENT_OPTIONS,
+  ROAD_OPTIONS,
 } from "../constants";
 import { Option } from "../../widgets/option.interface";
-import { SeaLevel, LandForm, Climate } from "src/app/core/tile";
+import {
+  SeaLevel,
+  LandForm,
+  Climate,
+  TileImprovement,
+  TileRoad,
+} from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { getTilesInRange } from "src/app/core/hex-math";
-import { isTileForestable, areWetlandsPossible } from "../utils";
+import {
+  isTileForestable,
+  areWetlandsPossible,
+  isImprovementPossible,
+  isRoadPossible,
+} from "../utils";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
 
-const IGNORE_OPTION: Option = { label: "ignore", value: null };
+const IGNORE_OPTION: Option = { label: "ignore", value: undefined };
 
 interface PaintData {
   size: number;
-  climate: Climate | null;
-  forest: boolean | null;
-  wetlands: boolean | null;
-  landForm: LandForm | null;
-  seaLevel: SeaLevel | null;
+  climate: Climate | undefined;
+  forest: boolean | undefined;
+  wetlands: boolean | undefined;
+  landForm: LandForm | undefined;
+  seaLevel: SeaLevel | undefined;
+  improvement: TileImprovement | undefined;
+  road: TileRoad | undefined;
 }
 
 @Component({
@@ -49,14 +64,18 @@ export class TilePaintingComponent implements OnInit {
   CLIMATE_OPTIONS: Option[] = [IGNORE_OPTION, ...CLIMATE_OPTIONS];
   FOREST_OPTIONS: Option[] = [IGNORE_OPTION, ...FOREST_OPTIONS];
   WETLANDS_OPTIONS: Option[] = [IGNORE_OPTION, ...WETLANDS_OPTIONS];
+  IMPROVEMENT_OPTIONS: Option[] = [IGNORE_OPTION, ...IMPROVEMENT_OPTIONS];
+  ROAD_OPTIONS: Option[] = [IGNORE_OPTION, ...ROAD_OPTIONS];
 
   DEFAULT_PAINT_DATA: PaintData = {
     size: 1,
-    climate: null,
-    forest: null,
-    landForm: null,
-    seaLevel: null,
-    wetlands: null,
+    climate: undefined,
+    forest: undefined,
+    landForm: undefined,
+    seaLevel: undefined,
+    wetlands: undefined,
+    improvement: undefined,
+    road: undefined,
   };
 
   @Input() isVisible$: Observable<boolean>;
@@ -104,24 +123,36 @@ export class TilePaintingComponent implements OnInit {
 
     const tiles = getTilesInRange(pivotTile, this.paintData.size - 1);
     for (const tile of tiles) {
-      if (this.paintData.seaLevel !== null) {
+      if (this.paintData.seaLevel !== undefined) {
         tile.seaLevel = this.paintData.seaLevel;
       }
-      if (this.paintData.landForm !== null) {
+      if (this.paintData.landForm !== undefined) {
         tile.landForm = this.paintData.landForm;
       }
-      if (this.paintData.climate !== null) {
+      if (this.paintData.climate !== undefined) {
         tile.climate = this.paintData.climate;
       }
-      if (this.paintData.forest !== null) {
+      if (this.paintData.forest !== undefined) {
         tile.forest = this.paintData.forest;
       }
-      if (this.paintData.wetlands !== null) {
+      if (this.paintData.wetlands !== undefined) {
         tile.wetlands = this.paintData.wetlands;
       }
 
       tile.forest = tile.forest && isTileForestable(tile);
       tile.wetlands = tile.wetlands && areWetlandsPossible(tile);
+
+      if (this.paintData.improvement !== undefined) {
+        if (isImprovementPossible(tile, this.paintData.improvement)) {
+          tile.improvement = this.paintData.improvement;
+        }
+      }
+
+      if (this.paintData.road !== undefined) {
+        if (isRoadPossible(tile)) {
+          tile.road = this.paintData.road;
+        }
+      }
 
       this.game.tilesManager.updateTile(tile);
     }

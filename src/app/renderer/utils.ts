@@ -1,6 +1,7 @@
 import * as PIXIE from "pixi.js";
 
 import { Tile } from "../core/tile";
+import { TILE_SIZE } from "./constants";
 
 export function getTileCenter(tile: Tile): [number, number] {
   return [0.5 + tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75 + 0.5];
@@ -36,4 +37,25 @@ export function getTileVariants(tileName: string, variants: number): string[] {
     result.push(`${tileName}${i.toString().padStart(2, "0")}.png`);
   }
   return result;
+}
+
+export function drawTileSprite(tile: Tile, texture: PIXIE.Texture) {
+  const sprite = new PIXIE.Sprite(texture);
+  sprite.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+  sprite.position.y = tile.y * 0.75 - 0.5;
+  sprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
+  return sprite;
+}
+
+export function drawTileSpriteCentered(tile: Tile, texture: PIXIE.Texture) {
+  const sprite = new PIXIE.Sprite(texture);
+  sprite.position.x =
+    tile.x + (tile.y % 2 ? 0.5 : 0) + 0.5 - sprite.width / 2 / TILE_SIZE;
+  sprite.position.y = tile.y * 0.75 - 0.5 + 1 - sprite.width / 2 / TILE_SIZE;
+  sprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
+  return sprite;
+}
+
+export function pickRandom(items: any[]) {
+  return items[Math.floor(Math.random() * items.length)];
 }

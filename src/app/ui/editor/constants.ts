@@ -1,4 +1,11 @@
-import { TileDirection, Climate, LandForm, SeaLevel } from "src/app/core/tile";
+import {
+  TileDirection,
+  Climate,
+  LandForm,
+  SeaLevel,
+  TileImprovement,
+  TileRoad,
+} from "src/app/core/tile";
 import { Option } from "../widgets/option.interface";
 
 export const SEA_LEVEL_OPTIONS: Option[] = [
@@ -31,6 +38,18 @@ export const FOREST_OPTIONS: Option[] = [
 export const WETLANDS_OPTIONS: Option[] = [
   { label: "no wetlands", value: false },
   { label: "wetlands", value: true },
+];
+
+export const IMPROVEMENT_OPTIONS: Option[] = [
+  { label: "no improvement", value: null },
+  { label: "farm", value: TileImprovement.farm },
+  { label: "mine", value: TileImprovement.mine },
+  { label: "sawmill", value: TileImprovement.sawmill },
+];
+
+export const ROAD_OPTIONS: Option[] = [
+  { label: "no road", value: null },
+  { label: "road", value: TileRoad.road },
 ];
 
 export const RIVER_OPTIONS: Option[] = [

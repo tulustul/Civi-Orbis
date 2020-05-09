@@ -1,4 +1,10 @@
-import { Tile, Climate, LandForm, SeaLevel } from "src/app/core/tile";
+import {
+  Tile,
+  Climate,
+  LandForm,
+  SeaLevel,
+  TileImprovement,
+} from "src/app/core/tile";
 
 export const FORESTABLE_CLIMATES = new Set<Climate>([
   Climate.continental,
@@ -27,5 +33,34 @@ export function areWetlandsPossible(tile: Tile): boolean {
     tile.landForm === LandForm.plains &&
     tile.riverParts.length &&
     WETLANDS_CLIMATES.has(tile.climate)
+  );
+}
+
+export function isImprovementPossible(
+  tile: Tile,
+  improvement: TileImprovement | null,
+): boolean {
+  if (improvement === null) {
+    return true;
+  } else if (improvement === TileImprovement.farm) {
+    return (
+      tile.seaLevel === SeaLevel.none &&
+      tile.landForm === LandForm.plains &&
+      tile.climate !== Climate.arctic &&
+      !tile.forest &&
+      !tile.wetlands
+    );
+  } else if (improvement === TileImprovement.mine) {
+    return tile.landForm === LandForm.hills;
+  } else if (improvement === TileImprovement.sawmill) {
+    return tile.forest && !tile.wetlands;
+  } else {
+    return false;
+  }
+}
+
+export function isRoadPossible(tile: Tile) {
+  return (
+    tile.seaLevel === SeaLevel.none && tile.landForm !== LandForm.mountains
   );
 }

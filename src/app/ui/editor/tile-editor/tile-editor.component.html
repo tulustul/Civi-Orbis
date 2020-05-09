@@ -52,6 +52,24 @@
       (changed)="updateRiver($event)"
     ></app-multiselect>
   </div>
+
+  <div>
+    <h4>Improvement</h4>
+    <app-radio
+      [options]="IMPROVEMENT_OPTIONS"
+      [value]="tile.improvement"
+      (changed)="updateImprovement($event)"
+    ></app-radio>
+  </div>
+
+  <div>
+    <h4>Road</h4>
+    <app-radio
+      [options]="ROAD_OPTIONS"
+      [value]="tile.road"
+      (changed)="updateRoad($event)"
+    ></app-radio>
+  </div>
 </div>
 
 <ng-template #selectTilePromptTmpl>

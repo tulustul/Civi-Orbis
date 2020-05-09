@@ -4,7 +4,12 @@ import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
 import { Game } from "src/app/core/game";
-import { Tile, TileDirection } from "src/app/core/tile";
+import {
+  Tile,
+  TileDirection,
+  TileImprovement,
+  TileRoad,
+} from "src/app/core/tile";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,
@@ -12,9 +17,16 @@ import {
   RIVER_OPTIONS,
   SEA_LEVEL_OPTIONS,
   WETLANDS_OPTIONS,
+  IMPROVEMENT_OPTIONS,
+  ROAD_OPTIONS,
 } from "../constants";
 import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
-import { isTileForestable, areWetlandsPossible } from "../utils";
+import {
+  isTileForestable,
+  areWetlandsPossible,
+  isImprovementPossible,
+  isRoadPossible,
+} from "../utils";
 import { MapUi } from "../../map-ui";
 
 @Component({
@@ -33,6 +45,8 @@ export class TileEditorComponent implements OnInit {
   FOREST_OPTIONS = FOREST_OPTIONS;
   RIVER_OPTIONS = RIVER_OPTIONS;
   WETLANDS_OPTIONS = WETLANDS_OPTIONS;
+  IMPROVEMENT_OPTIONS = IMPROVEMENT_OPTIONS;
+  ROAD_OPTIONS = ROAD_OPTIONS;
 
   constructor(private game: Game, private mapUi: MapUi) {}
 
@@ -66,6 +80,22 @@ export class TileEditorComponent implements OnInit {
   updateWetlands(wetlands: boolean) {
     if (this.tile) {
       this.tile.wetlands = wetlands && areWetlandsPossible(this.tile);
+      this.update();
+    }
+  }
+
+  updateImprovement(improvement: TileImprovement) {
+    if (this.tile) {
+      if (isImprovementPossible(this.tile, improvement)) {
+        this.tile.improvement = improvement;
+        this.update();
+      }
+    }
+  }
+
+  updateRoad(road: TileRoad) {
+    if (this.tile) {
+      this.tile.road = road && isRoadPossible(this.tile);
       this.update();
     }
   }

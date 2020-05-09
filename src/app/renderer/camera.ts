@@ -4,6 +4,7 @@ import { getTileCoords } from "./utils";
 import { Tile } from "../core/tile";
 import { AnimationEaseOutCubic, Animation } from "../core/animation";
 import { GameRenderer } from "./renderer";
+import { TILE_SIZE } from "./constants";
 
 export interface Transform {
   x: number;
@@ -19,7 +20,7 @@ export interface BoundingBox {
 }
 
 export class Camera {
-  MAX_ZOOM = 256; // tile graphics width in pixels
+  MAX_ZOOM = TILE_SIZE; // tile graphics width in pixels
   MIN_ZOOM = 7;
 
   transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 130 });

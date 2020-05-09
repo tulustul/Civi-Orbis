@@ -71,6 +71,12 @@ export class TilesMap {
         if (tile.forest !== lastTile.forest) {
           diff.forest = tile.forest;
         }
+        if (tile.improvement !== lastTile.improvement) {
+          diff.improvement = tile.improvement;
+        }
+        if (tile.road !== lastTile.road) {
+          diff.road = tile.road;
+        }
 
         // The rivers tends to not repeat in subsequent tiles so instead of using diff let's just ignore empty rivers.
         if (tile.riverParts.length) {
@@ -106,6 +112,14 @@ export class TilesMap {
           tileData.landForm !== undefined
             ? tileData.landForm!
             : lastTile.landForm;
+
+        tile.improvement =
+          tileData.improvement !== undefined
+            ? tileData.improvement!
+            : lastTile.improvement;
+
+        tile.road =
+          tileData.road !== undefined ? tileData.road! : lastTile.road;
 
         tile.riverParts = tileData.riverParts || [];
 
