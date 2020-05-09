@@ -130,6 +130,12 @@ export class TerrainDrawer {
       this.waterContainer.addChild(sprite, tile);
     }
 
+    this.drawRoads(tile);
+
+    this.drawImprovement(tile);
+  }
+
+  private drawImprovement(tile: Tile) {
     if (tile.improvement === TileImprovement.farm) {
       const textureName = pickRandom(FARM_TEXTURES);
       const sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
@@ -143,6 +149,21 @@ export class TerrainDrawer {
       const sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
       this.terrainContainer.addChild(sprite, tile);
     }
+  }
+
+  private drawRoads(tile: Tile) {
+    if (tile.road === null) {
+      return;
+    }
+
+    // FIXME This will fail to render roads on map edges because of insufficient number of neighbours.
+    const roadId = tile.neighbours
+      .map((n) => (n.road === null ? "0" : "1"))
+      .join("");
+
+    const textureName = `hexRoad-${roadId}-00.png`;
+    const sprite = drawTileSprite(tile, this.textures[textureName]);
+    this.terrainContainer.addChild(sprite, tile);
   }
 
   private updateTile(tile: Tile) {

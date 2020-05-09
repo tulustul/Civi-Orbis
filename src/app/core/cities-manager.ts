@@ -4,7 +4,7 @@ import { City, CitySerialized } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
-import { Tile, LandForm, SeaLevel } from "./tile";
+import { Tile, LandForm, SeaLevel, TileRoad } from "./tile";
 import { BUILDINGS_MAP } from "./buildings";
 import { ProductDefinition } from "./product";
 import { IDLE_PRODUCTS_MAP } from "./idle-product";
@@ -51,6 +51,7 @@ export class CitiesManager {
     tile.city = city;
     tile.forest = false;
     tile.wetlands = false;
+    tile.road = TileRoad.road;
     this.game.tilesManager.updateTile(tile);
 
     if (isNew) {

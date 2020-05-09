@@ -34,7 +34,6 @@ interface PaintData {
   landForm: LandForm | undefined;
   seaLevel: SeaLevel | undefined;
   improvement: TileImprovement | undefined;
-  road: TileRoad | undefined;
 }
 
 @Component({
@@ -59,7 +58,6 @@ export class TilePaintingComponent implements OnInit {
   FOREST_OPTIONS: Option[] = [IGNORE_OPTION, ...FOREST_OPTIONS];
   WETLANDS_OPTIONS: Option[] = [IGNORE_OPTION, ...WETLANDS_OPTIONS];
   IMPROVEMENT_OPTIONS: Option[] = [IGNORE_OPTION, ...IMPROVEMENT_OPTIONS];
-  ROAD_OPTIONS: Option[] = [IGNORE_OPTION, ...ROAD_OPTIONS];
 
   DEFAULT_PAINT_DATA: PaintData = {
     size: 1,
@@ -69,7 +67,6 @@ export class TilePaintingComponent implements OnInit {
     seaLevel: undefined,
     wetlands: undefined,
     improvement: undefined,
-    road: undefined,
   };
 
   @Input() isVisible$: Observable<boolean>;
@@ -139,12 +136,6 @@ export class TilePaintingComponent implements OnInit {
       if (this.paintData.improvement !== undefined) {
         if (tile.isImprovementPossible(this.paintData.improvement)) {
           tile.improvement = this.paintData.improvement;
-        }
-      }
-
-      if (this.paintData.road !== undefined) {
-        if (tile.isRoadPossible()) {
-          tile.road = this.paintData.road;
         }
       }
 

@@ -61,13 +61,4 @@
   ></app-radio>
 </div>
 
-<div>
-  <h4>Road</h4>
-  <app-radio
-    [options]="ROAD_OPTIONS"
-    [value]="paintData.road"
-    (changed)="paintData.road = $event"
-  ></app-radio>
-</div>
-
 <button (click)="reset()">Reset</button>

@@ -88,9 +88,12 @@ export class TileEditorComponent implements OnInit {
   }
 
   updateRoad(road: TileRoad) {
-    if (this.tile) {
-      this.tile.road = road && this.tile.isRoadPossible();
+    if (this.tile && this.tile.isRoadPossible()) {
+      this.tile.road = road;
       this.update();
+      for (const neighbour of this.tile.neighbours) {
+        this.game.tilesManager.updateTile(neighbour);
+      }
     }
   }
 
