@@ -78,6 +78,9 @@ export class City {
   private _product$ = new BehaviorSubject<Product | null>(null);
   product$ = this._product$.pipe(takeUntil(this.destroyed$));
 
+  private _sizeChange$ = new Subject<number>();
+  sizeChange$ = this._sizeChange$.pipe(takeUntil(this.destroyed$));
+
   constructor(public tile: Tile, public player: Player) {
     this.addTile(tile);
   }
@@ -142,6 +145,7 @@ export class City {
     this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
+      this._sizeChange$.next(this.size);
       const bestWorkableTile = this.pickBestTile(this.notWorkedTiles);
       if (bestWorkableTile) {
         this.workTile(bestWorkableTile);
@@ -150,6 +154,7 @@ export class City {
     } else if (this.totalFood < 0) {
       if (this.size > 1) {
         this.size--;
+        this._sizeChange$.next(this.size);
         this.totalFood += this.foodToGrow;
       } else {
         this.totalFood = 0;

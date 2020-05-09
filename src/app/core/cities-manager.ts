@@ -58,6 +58,7 @@ export class CitiesManager {
     }
 
     this._spawned$.next(city);
+    city.sizeChange$.subscribe(() => this.update(city));
 
     return city;
   }

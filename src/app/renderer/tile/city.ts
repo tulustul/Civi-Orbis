@@ -1,13 +1,14 @@
 import * as PIXIE from "pixi.js";
 
-import { getTileVariants } from "../utils";
+import { getTileVariants, pickRandom, drawTileSprite } from "../utils";
 import { City } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
 import { takeUntil } from "rxjs/operators";
 import { GameRenderer } from "../renderer";
 
-const CITY_TEXTURES = getTileVariants("villageSmall", 4);
+const SMALL_CITY_TEXTURES = getTileVariants("villageSmall", 4);
+const BIG_CITY_TEXTURES = getTileVariants("village", 4);
 
 export class CityDrawer {
   citiesGraphics = new Map<City, PIXIE.Sprite>();
@@ -25,6 +26,10 @@ export class CityDrawer {
       game.citiesManager.destroyed$
         .pipe(takeUntil(game.stopped$))
         .subscribe((city) => this.destroy(city));
+
+      game.citiesManager.updated$
+        .pipe(takeUntil(game.stopped$))
+        .subscribe((city) => this.update(city));
     });
   }
 
@@ -35,22 +40,23 @@ export class CityDrawer {
   }
 
   spawn(city: City) {
-    const textureName =
-      CITY_TEXTURES[Math.floor(Math.random() * CITY_TEXTURES.length)];
-    const g = new PIXIE.Sprite(this.textures[textureName]);
+    const variants = city.size >= 10 ? BIG_CITY_TEXTURES : SMALL_CITY_TEXTURES;
+    const textureName = pickRandom(variants);
+    const g = drawTileSprite(city.tile, this.textures[textureName]);
 
     this.container.addChild(g, city.tile);
     this.citiesGraphics.set(city, g);
-
-    g.position.x = city.tile.x + (city.tile.y % 2 ? 0.5 : 0);
-    g.position.y = city.tile.y * 0.75 - 0.5;
-    g.scale.set(1 / g.width, 1 / g.width);
   }
 
   destroy(city: City) {
     const g = this.citiesGraphics.get(city)!;
     this.citiesGraphics.delete(city);
     g.destroy();
+  }
+
+  update(city: City) {
+    this.destroy(city);
+    this.spawn(city);
   }
 
   clear() {
