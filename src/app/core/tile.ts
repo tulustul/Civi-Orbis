@@ -72,6 +72,7 @@ export class Tile {
 
   // cached data
   neighbours: Tile[] = [];
+  fullNeighbours: (Tile | null)[] = []; // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
   neighboursCosts = new Map<Tile, number>();
 
   yields: Yields = { ...EMPTY_YIELDS };
@@ -214,13 +215,13 @@ export class Tile {
 }
 
 export enum TileDirection {
-  NONE,
   NW,
   NE,
   E,
   SE,
   SW,
   W,
+  NONE,
 }
 
 export interface TileSerialized {

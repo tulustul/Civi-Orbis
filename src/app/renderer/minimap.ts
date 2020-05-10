@@ -1,6 +1,6 @@
 import * as PIXIE from "pixi.js";
 
-import { merge, Subject } from "rxjs";
+import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import { Tile, SeaLevel, Climate, TileDirection } from "../core/tile";
@@ -127,7 +127,7 @@ export class MinimapRenderer {
 
   private listenPlayerAreas() {
     for (const player of this.game.players) {
-      merge(player.area.added$, player.area.removed$).subscribe((tile) => {
+      player.area.added$.subscribe((tile) => {
         this.drawTile(tile);
         this.updateMap();
       });

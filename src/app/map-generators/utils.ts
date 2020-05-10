@@ -41,7 +41,7 @@ export const POSSIBLE_RIVER_DIRECTION_FROM_WATER_TILE: Record<
 };
 
 // flow is clockwise for first tile
-export const POSSIBLE_RIVER_PATHS: Record<
+export const POSSIBLE_BORDER_PATHS: Record<
   TileDirection,
   [[TileDirection, TileDirection], [TileDirection, TileDirection]]
 > = {

@@ -30,6 +30,7 @@ export const PLAYER_COLORS: number[] = [
   0xab57bb,
   0x79583c,
   0xb6bbe6,
+  0xb6bce6,
 ];
 
 export interface PlayerSerialized {
@@ -80,7 +81,7 @@ export class Player {
   }
 
   static deserialize(game: Game, data: PlayerSerialized) {
-    const player = new Player(game, data.color);
+    const player = new Player(game, data.color || 0);
 
     if (data.ai) {
       player.ai = new AIPlayer(player);

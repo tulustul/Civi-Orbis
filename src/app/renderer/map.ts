@@ -1,3 +1,5 @@
+import * as PIXIE from "pixi.js";
+
 import { Tile } from "../core/tile";
 import { Game } from "../core/game";
 import { TileWrapperContainer, TileContainer } from "./tile-container";
@@ -8,7 +10,6 @@ import { RiverDrawer } from "./tile/river";
 import { CityDrawer } from "./tile/city";
 import { AreaDrawer } from "./tile/area";
 import { GameRenderer } from "./renderer";
-import { MapUi } from "../ui/map-ui";
 
 export class MapDrawer {
   container = new TileWrapperContainer();
@@ -25,7 +26,7 @@ export class MapDrawer {
 
   unitsContainer = new TileContainer(this.game.camera.tileBoundingBox);
 
-  overlaysContainer = new TileContainer(this.game.camera.tileBoundingBox);
+  overlaysContainer = new PIXIE.Container();
 
   terrainDrawer = new TerrainDrawer(
     this.game,
@@ -129,7 +130,6 @@ export class MapDrawer {
     this.yieldsContainer.bindToMap(this.game.map);
     this.riverContainer.bindToMap(this.game.map);
     this.unitsContainer.bindToMap(this.game.map);
-    this.overlaysContainer.bindToMap(this.game.map);
 
     this.unitsDrawer.build();
     this.cityDrawer.build();

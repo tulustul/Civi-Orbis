@@ -82,7 +82,7 @@ export class City {
   sizeChange$ = this._sizeChange$.pipe(takeUntil(this.destroyed$));
 
   constructor(public tile: Tile, public player: Player) {
-    this.addTile(tile);
+    this.addTile(tile, false);
   }
 
   serialize(): CitySerialized {
@@ -322,12 +322,12 @@ export class City {
     }
   }
 
-  addTile(tile: Tile, emitEvent = true) {
+  addTile(tile: Tile, recomputeBorders = true) {
     if (!tile.areaOf) {
       this.tiles.add(tile);
       this.notWorkedTiles.add(tile);
       tile.areaOf = this;
-      this.player.area.add(tile, emitEvent);
+      this.player.area.add(tile, recomputeBorders);
       const newTiles = [tile, ...tile.neighbours].filter(
         (t) => !this.player.exploredTiles.has(t),
       );

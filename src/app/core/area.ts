@@ -2,11 +2,15 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import { Tile, TileDirection } from "./tile";
+import { POSSIBLE_BORDER_PATHS } from "../map-generators/utils";
+
+type Border = [Tile, TileDirection];
+type BorderPath = Border[];
 
 export class Area {
   tiles = new Set<Tile>();
 
-  borders = new Map<Tile, TileDirection[]>();
+  borders: BorderPath[] = [];
 
   backgroundOpacity = 1;
 
@@ -16,25 +20,26 @@ export class Area {
   private _added$ = new Subject<Tile>();
   added$ = this._added$.asObservable().pipe(takeUntil(this.destroyed$));
 
-  private _removed$ = new Subject<Tile>();
-  removed$ = this._removed$.asObservable().pipe(takeUntil(this.destroyed$));
+  private _updated$ = new Subject<Tile>();
+  updated$ = this._updated$.asObservable().pipe(takeUntil(this.destroyed$));
 
   constructor(public color: number) {}
 
-  add(tile: Tile, emitEvent = true) {
+  add(tile: Tile, recomputeBorders = true) {
     this.tiles.add(tile);
-    if (emitEvent) {
+    if (recomputeBorders) {
       // TODO make a local change and emit event instead of recomputing whole borders
       this.computeBorders();
-      this._added$.next(tile);
+      this._updated$.next(tile);
     }
+    this._added$.next(tile);
   }
 
-  remove(tile: Tile, emitEvent = true) {
+  remove(tile: Tile, recomputeBorders = true) {
     this.tiles.delete(tile);
-    if (emitEvent) {
+    if (recomputeBorders) {
       this.computeBorders();
-      this._removed$.next(tile);
+      this._updated$.next(tile);
     }
   }
 
@@ -45,7 +50,7 @@ export class Area {
 
   computeBorders() {
     const visited = new Set<Tile>();
-    this.borders.clear();
+    this.borders = [];
     for (const tile of this.tiles) {
       visited.add(tile);
       for (const neighbour of tile.neighbours) {
@@ -53,12 +58,79 @@ export class Area {
           continue;
         }
         if (!this.tiles.has(neighbour)) {
-          if (!this.borders.has(tile)) {
-            this.borders.set(tile, []);
-          }
-          this.borders.get(tile)!.push(tile.getDirectionTo(neighbour));
+          const dir = tile.getDirectionTo(neighbour);
+          const border: Border = [tile, dir];
+          const path = this.buildBorderPath(border, visited);
+          this.borders.push(path);
         }
       }
     }
+  }
+
+  update() {
+    this._updated$.next();
+  }
+
+  private buildBorderPath(
+    currentBorder: Border,
+    visited: Set<Tile>,
+    path: BorderPath = [],
+  ) {
+    if (path.length) {
+      const firstBorder = path[0];
+      if (
+        firstBorder[0] === currentBorder[0] &&
+        firstBorder[1] === currentBorder[1]
+      ) {
+        return path;
+      }
+    }
+
+    path.push(currentBorder);
+
+    let [tile, dir] = currentBorder;
+
+    const nextPairs = POSSIBLE_BORDER_PATHS[dir];
+
+    for (const pair of nextPairs) {
+      const [tileA, tileB] = [
+        pair[0] === TileDirection.NONE ? tile : tile.fullNeighbours[pair[0]],
+        tile.fullNeighbours[pair[1]],
+      ];
+
+      if (!tileA && !tileB) {
+        continue;
+      }
+
+      if (tileA) {
+        visited.add(tileA);
+      }
+      if (tileB) {
+        visited.add(tileB);
+      }
+
+      if (tileA) {
+        if (this.tiles.has(tileA) && !this.tiles.has(tileB!)) {
+          const nextDir = tile === tileA ? pair[1] : pair[1] - 1; // adjusting for map edges
+          const nextBorder: Border = [
+            tileA,
+            tileB ? tileA.getDirectionTo(tileB) : nextDir,
+          ];
+          return this.buildBorderPath(nextBorder, visited, path);
+        }
+      }
+
+      if (tileB) {
+        if (!this.tiles.has(tileA!) && this.tiles.has(tileB)) {
+          const nextBorder: Border = [
+            tileB,
+            tileA ? tileB.getDirectionTo(tileA) : pair[0],
+          ];
+          return this.buildBorderPath(nextBorder, visited, path);
+        }
+      }
+    }
+
+    return path;
   }
 }

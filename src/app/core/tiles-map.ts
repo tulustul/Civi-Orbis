@@ -1,5 +1,5 @@
 import { Tile, TileSerialized } from "./tile";
-import { getTileNeighbours } from "./hex-math";
+import { getTileNeighbours, getTileFullNeighbours } from "./hex-math";
 
 export interface MapSerialized {
   width: number;
@@ -22,6 +22,11 @@ export class TilesMap {
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         this.tiles[x][y].neighbours = getTileNeighbours(this.tiles, x, y);
+        this.tiles[x][y].fullNeighbours = getTileFullNeighbours(
+          this.tiles,
+          x,
+          y,
+        );
       }
     }
   }

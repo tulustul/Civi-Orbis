@@ -5,7 +5,7 @@ import { TilesMap } from "../core/tiles-map";
 import {
   findCoastline,
   placeRiverBetweenTiles,
-  POSSIBLE_RIVER_PATHS,
+  POSSIBLE_BORDER_PATHS,
 } from "./utils";
 import { SeaLevel, Tile, Climate, TileDirection, LandForm } from "../core/tile";
 import { getTileInDirection } from "../core/hex-math";
@@ -294,7 +294,7 @@ export class SimplexMapGenerator implements MapGenerator {
       return;
     }
 
-    const possibleNeighboursDirections = POSSIBLE_RIVER_PATHS[direction];
+    const possibleNeighboursDirections = POSSIBLE_BORDER_PATHS[direction];
 
     const pairs = possibleNeighboursDirections
       .map((pair) => {

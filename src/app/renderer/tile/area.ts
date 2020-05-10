@@ -1,38 +1,39 @@
 import * as PIXIE from "pixi.js";
 
-import { TileDirection } from "src/app/core/tile";
-import { TileContainer } from "../tile-container";
+import { TileDirection, Tile } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { Area } from "src/app/core/area";
-import { merge } from "rxjs";
+
+const BORDER_WIDTH = 0.11;
+const BORDER_WIDTH_HALVED = BORDER_WIDTH / 2;
 
 const BORDERS_VERTICES: Record<
   TileDirection,
   [[number, number], [number, number]]
 > = {
   [TileDirection.NW]: [
-    [0, 0.25],
-    [0.5, 0],
+    [0 + BORDER_WIDTH_HALVED, 0.25 + BORDER_WIDTH_HALVED],
+    [0.5, 0 + BORDER_WIDTH_HALVED],
   ],
   [TileDirection.NE]: [
-    [0.5, 0],
-    [1, 0.25],
+    [0.5, 0 + BORDER_WIDTH_HALVED],
+    [1 - BORDER_WIDTH_HALVED, 0.25 + BORDER_WIDTH_HALVED],
   ],
   [TileDirection.E]: [
-    [1, 0.25],
-    [1, 0.75],
+    [1 - BORDER_WIDTH_HALVED, 0.25 + BORDER_WIDTH_HALVED],
+    [1 - BORDER_WIDTH_HALVED, 0.75 - BORDER_WIDTH_HALVED],
   ],
   [TileDirection.SE]: [
-    [1, 0.75],
-    [0.5, 1],
+    [1 - BORDER_WIDTH_HALVED, 0.75 - BORDER_WIDTH_HALVED],
+    [0.5, 1 - BORDER_WIDTH_HALVED],
   ],
   [TileDirection.SW]: [
-    [0.5, 1],
-    [0, 0.75],
+    [0.5, 1 - BORDER_WIDTH_HALVED],
+    [0 + BORDER_WIDTH_HALVED, 0.75 - BORDER_WIDTH_HALVED],
   ],
   [TileDirection.W]: [
-    [0, 0.25],
-    [0, 0.75],
+    [0 + BORDER_WIDTH_HALVED, 0.75 - BORDER_WIDTH_HALVED],
+    [0 + BORDER_WIDTH_HALVED, 0.25 + BORDER_WIDTH_HALVED],
   ],
   [TileDirection.NONE]: [
     [0, 0],
@@ -43,7 +44,7 @@ const BORDERS_VERTICES: Record<
 export class AreaDrawer {
   areasMap = new Map<Area, PIXIE.DisplayObject[]>();
 
-  constructor(private game: Game, private container: TileContainer) {
+  constructor(private game: Game, private container: PIXIE.Container) {
     // game.areasManager.created$.pipe().subscribe((area) => {
     //   area.changed$
     //     // .pipe(
@@ -72,7 +73,7 @@ export class AreaDrawer {
       this.drawArea(area);
 
       // TODO we can update only single tiles here.
-      merge(area.added$, area.removed$).subscribe(() => {
+      area.updated$.subscribe(() => {
         this.clearArea(area);
         this.drawArea(area);
       });
@@ -93,32 +94,47 @@ export class AreaDrawer {
 
     const objs = this.areasMap.get(area)!;
 
-    for (const [tile, dirs] of area.borders.entries()) {
-      for (const dir of dirs) {
-        const border = new PIXIE.Graphics();
-        border.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
-        border.position.y = tile.y * 0.75;
+    for (const path of area.borders) {
+      const g = new PIXIE.Graphics();
 
-        objs.push(border);
-        this.container.addChild(border, tile);
+      g.lineStyle(BORDER_WIDTH, area.color);
+      g.alpha = 0.8;
+      objs.push(g);
+      this.container.addChild(g);
 
-        border.lineStyle(0.11, area.color);
-        border.alpha = 0.5;
-        const [p1, p2] = BORDERS_VERTICES[dir];
-        border.moveTo(p1[0], p1[1]);
-        border.lineTo(p2[0], p2[1]);
+      const firstBorder = path[0];
+
+      const points: PIXIE.Point[] = [];
+
+      this.drawBorder(points, g, firstBorder[0], firstBorder[1], true);
+
+      for (const [tile, dir] of path.slice(1)) {
+        this.drawBorder(points, g, tile, dir);
       }
 
-      // const background = new PIXIE.Graphics();
-      // background.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
-      // background.position.y = tile.y * 0.75;
-      // objs.push(background);
-      // this.backgroundContainer.addChild(background, tile.x, tile.y);
-      // background.beginFill(area.color);
-      // background.alpha = 0.15;
-      // drawHex(background);
-      // background.endFill();
+      g.drawPolygon(points);
     }
+  }
+
+  private drawBorder(
+    points: PIXIE.Point[],
+    g: PIXIE.Graphics,
+    tile: Tile,
+    dir: TileDirection,
+    start = false,
+  ) {
+    const [p1, p2] = BORDERS_VERTICES[dir];
+
+    if (start) {
+      const x1 = p1[0] + tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
+      const y1 = p1[1] + tile.y * 0.75;
+      points.push(new PIXIE.Point(x1, y1));
+    }
+
+    const x2 = p2[0] + tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
+    const y2 = p2[1] + tile.y * 0.75;
+
+    points.push(new PIXIE.Point(x2, y2));
   }
 
   clear() {

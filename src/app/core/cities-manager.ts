@@ -44,8 +44,11 @@ export class CitiesManager {
     this.cities.push(city);
 
     for (const neighbour of tile.neighbours) {
-      city.addTile(neighbour);
+      // FIXME: this will recompute borders for each tile. Can be optimized.
+      city.addTile(neighbour, false);
     }
+    city.player.area.computeBorders();
+    city.player.area.update();
 
     player.addCity(city);
 
@@ -111,7 +114,7 @@ export class CitiesManager {
         city.totalProduction = cityData.totalProduction;
         city.totalCulture = cityData.totalCulture;
         for (const tileIndex of cityData.tiles) {
-          city.addTile(getTileFromIndex(this.game.map, tileIndex));
+          city.addTile(getTileFromIndex(this.game.map, tileIndex), false);
         }
         for (const tileIndex of cityData.workedTiles) {
           city.workTile(getTileFromIndex(this.game.map, tileIndex));
