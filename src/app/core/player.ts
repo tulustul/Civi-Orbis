@@ -3,6 +3,7 @@ import { Unit } from "./unit";
 import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { City } from "./city";
+import { AIPlayer } from "../ai/ai-player";
 import {
   Yields,
   EMPTY_YIELDS,
@@ -31,13 +32,8 @@ export const PLAYER_COLORS: number[] = [
   0xb6bbe6,
 ];
 
-export enum PlayerType {
-  human,
-  ai,
-}
-
 export interface PlayerSerialized {
-  type: PlayerType;
+  ai: boolean;
   color: number;
   exploredTiles: number[];
   yieldsTotal: Yields;
@@ -68,15 +64,13 @@ export class Player {
 
   area = this.game.areasManager.make(this.color);
 
-  constructor(
-    public game: Game,
-    public type: PlayerType,
-    public color: number,
-  ) {}
+  ai: AIPlayer | null = null;
+
+  constructor(public game: Game, public color: number) {}
 
   serialize(): PlayerSerialized {
     return {
-      type: this.type,
+      ai: !!this.ai,
       color: this.color,
       exploredTiles: Array.from(this.exploredTiles).map((tile) =>
         getTileIndex(this.game.map, tile),
@@ -86,7 +80,12 @@ export class Player {
   }
 
   static deserialize(game: Game, data: PlayerSerialized) {
-    const player = new Player(game, data.type, data.color);
+    const player = new Player(game, data.color);
+
+    if (data.ai) {
+      player.ai = new AIPlayer(player);
+    }
+
     for (const tileIndex of data.exploredTiles) {
       player.exploredTiles.add(getTileFromIndex(game.map, tileIndex));
     }

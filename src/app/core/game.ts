@@ -1,5 +1,5 @@
 import { Camera, Transform } from "../renderer/camera";
-import { Player, PlayerType, PlayerSerialized } from "./player";
+import { Player, PlayerSerialized } from "./player";
 import { TilesMap, MapSerialized } from "./tiles-map";
 import { BehaviorSubject, ReplaySubject } from "rxjs";
 import { UnitsManager } from "./unit-manager";
@@ -33,7 +33,7 @@ export class Game {
   activePlayer$ = new BehaviorSubject<Player | null>(null);
 
   humanPlayer$ = this.activePlayer$.pipe(
-    filter((p) => p?.type === PlayerType.human),
+    filter((p) => !p?.ai),
     distinctUntilChanged(),
   );
 
@@ -81,6 +81,11 @@ export class Game {
       this.activePlayerIndex = 0;
     }
     this.activePlayer$.next(this.players[this.activePlayerIndex]);
+
+    if (this.activePlayer$.value?.ai) {
+      this.activePlayer$.value.ai.nextTurn();
+      this.nextPlayer();
+    }
   }
 
   nextTurn() {
