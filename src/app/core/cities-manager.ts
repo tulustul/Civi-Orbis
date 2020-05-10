@@ -4,10 +4,11 @@ import { City, CitySerialized } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
-import { Tile, LandForm, SeaLevel, TileRoad } from "./tile";
+import { Tile, LandForm, SeaLevel } from "./tile";
 import { BUILDINGS_MAP } from "./buildings";
 import { ProductDefinition } from "./product";
 import { IDLE_PRODUCTS_MAP } from "./idle-product";
+import { TileRoad } from "./tile-improvements";
 
 export class CitiesManager {
   private _spawned$ = new Subject<City>();

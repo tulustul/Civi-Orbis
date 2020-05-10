@@ -1,12 +1,6 @@
-import {
-  TileDirection,
-  Climate,
-  LandForm,
-  SeaLevel,
-  TileImprovement,
-  TileRoad,
-} from "src/app/core/tile";
+import { TileDirection, Climate, LandForm, SeaLevel } from "src/app/core/tile";
 import { Option } from "../widgets/option.interface";
+import { TileImprovement, TileRoad } from "src/app/core/tile-improvements";
 
 export const SEA_LEVEL_OPTIONS: Option[] = [
   { label: "none", value: SeaLevel.none },

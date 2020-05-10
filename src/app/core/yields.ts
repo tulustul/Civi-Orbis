@@ -19,11 +19,18 @@ export function zeroYields(yields: Yields) {
   yields.publicWorks = 0;
 }
 
-export function addToYields(targetYields: Yields, yields: Yields) {
+export function addYields(targetYields: Yields, yields: Yields) {
   targetYields.food += yields.food;
   targetYields.production += yields.production;
   targetYields.culture += yields.culture;
   targetYields.publicWorks += yields.publicWorks;
+}
+
+export function subtractYields(targetYields: Yields, yields: Yields) {
+  targetYields.food -= yields.food;
+  targetYields.production -= yields.production;
+  targetYields.culture -= yields.culture;
+  targetYields.publicWorks -= yields.publicWorks;
 }
 
 export function copyYields(targetYields: Yields, yields: Yields) {

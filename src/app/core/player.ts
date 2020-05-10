@@ -3,7 +3,14 @@ import { Unit } from "./unit";
 import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { City } from "./city";
-import { Yields, EMPTY_YIELDS, zeroYields, addToYields } from "./yields";
+import {
+  Yields,
+  EMPTY_YIELDS,
+  zeroYields,
+  addYields,
+  subtractYields,
+  copyYields,
+} from "./yields";
 
 export const PLAYER_COLORS: number[] = [
   0xff0000,
@@ -53,6 +60,10 @@ export class Player {
 
   yieldsPerTurn: Yields = { ...EMPTY_YIELDS };
 
+  yieldsIncome: Yields = { ...EMPTY_YIELDS };
+
+  yieldsCosts: Yields = { ...EMPTY_YIELDS };
+
   yieldsTotal: Yields = { ...EMPTY_YIELDS };
 
   area = this.game.areasManager.make(this.color);
@@ -86,15 +97,33 @@ export class Player {
   }
 
   updateYields() {
+    zeroYields(this.yieldsIncome);
+    zeroYields(this.yieldsCosts);
     zeroYields(this.yieldsPerTurn);
+
     for (const city of this.cities) {
-      addToYields(this.yieldsPerTurn, city.yields);
+      for (const tile of city.tiles) {
+        if (!tile.city) {
+          if (tile.improvement !== null) {
+            this.yieldsCosts.publicWorks++;
+          }
+          if (tile.road !== null) {
+            this.yieldsCosts.publicWorks++;
+          }
+        }
+      }
+      addYields(this.yieldsIncome, city.yields);
     }
+
+    copyYields(this.yieldsPerTurn, this.yieldsIncome);
+    subtractYields(this.yieldsPerTurn, this.yieldsCosts);
   }
 
   nextTurn() {
     this.updateYields();
-    addToYields(this.yieldsTotal, this.yieldsPerTurn);
+    addYields(this.yieldsTotal, this.yieldsPerTurn);
+    this.yieldsTotal.publicWorks = Math.max(0, this.yieldsTotal.publicWorks);
+
     this.updateCitiesWithoutProduction();
     this.updateUnitsWithoutOrders();
   }

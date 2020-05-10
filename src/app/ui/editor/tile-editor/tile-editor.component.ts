@@ -4,12 +4,7 @@ import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
 import { Game } from "src/app/core/game";
-import {
-  Tile,
-  TileDirection,
-  TileImprovement,
-  TileRoad,
-} from "src/app/core/tile";
+import { Tile, TileDirection } from "src/app/core/tile";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,
@@ -22,6 +17,7 @@ import {
 } from "../constants";
 import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
 import { MapUi } from "../../map-ui";
+import { TileImprovement, TileRoad } from "src/app/core/tile-improvements";
 
 @Component({
   selector: "app-tile-editor",

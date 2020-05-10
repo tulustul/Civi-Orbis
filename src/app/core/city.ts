@@ -10,7 +10,7 @@ import {
   EMPTY_YIELDS,
   Yields,
   zeroYields,
-  addToYields,
+  addYields,
   copyYields,
   roundYields,
 } from "./yields";
@@ -261,7 +261,7 @@ export class City {
     this.tileYields.production = 1;
 
     for (const tile of this.workedTiles) {
-      addToYields(this.tileYields, tile.yields);
+      addYields(this.tileYields, tile.yields);
     }
 
     this.tileYields.production += this.freeTileWorkers;

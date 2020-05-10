@@ -7,22 +7,16 @@ import {
   SEA_LEVEL_OPTIONS,
   WETLANDS_OPTIONS,
   IMPROVEMENT_OPTIONS,
-  ROAD_OPTIONS,
 } from "../constants";
 import { Option } from "../../widgets/option.interface";
-import {
-  SeaLevel,
-  LandForm,
-  Climate,
-  TileImprovement,
-  TileRoad,
-} from "src/app/core/tile";
+import { SeaLevel, LandForm, Climate } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { getTilesInRange } from "src/app/core/hex-math";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
+import { TileImprovement } from "src/app/core/tile-improvements";
 
 const IGNORE_OPTION: Option = { label: "ignore", value: undefined };
 

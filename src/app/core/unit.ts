@@ -59,7 +59,7 @@ export class Unit {
     }
 
     for (const r of ACTIONS[action].requirements) {
-      if (!r.check(this)) {
+      if (!r.check(this, action)) {
         return false;
       }
     }

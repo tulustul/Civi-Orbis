@@ -1,6 +1,7 @@
 import { Unit } from "./unit";
 import { City } from "./city";
 import { Yields, EMPTY_YIELDS } from "./yields";
+import { TileImprovement, TileRoad } from "./tile-improvements";
 
 export enum Climate {
   tropical,
@@ -22,16 +23,6 @@ export enum SeaLevel {
   none,
   shallow,
   deep,
-}
-
-export enum TileImprovement {
-  farm,
-  mine,
-  sawmill,
-}
-
-export enum TileRoad {
-  road,
 }
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {

@@ -1,5 +1,4 @@
 import { UnitDefinition } from "../core/unit.interface";
-import { UnitAction } from "../core/unit-actions";
 import { BuildingRequirement, SizeRequirement } from "../core/product";
 
 export const UNITS_DEFINITIONS: UnitDefinition[] = [
@@ -8,7 +7,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     name: "Settler",
     actionPoints: 2,
     power: 0,
-    actions: [UnitAction.foundCity],
+    actions: ["foundCity"],
     productionCost: 50,
     requirements: [],
     weakRequirements: [
@@ -21,12 +20,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     name: "Worker",
     actionPoints: 2,
     power: 0,
-    actions: [
-      UnitAction.buildFarm,
-      UnitAction.buildMine,
-      UnitAction.buildSawmill,
-      UnitAction.buildRoad,
-    ],
+    actions: ["buildFarm", "buildMine", "buildSawmill", "buildRoad"],
     productionCost: 20,
     requirements: [],
     weakRequirements: [new SizeRequirement(2)],

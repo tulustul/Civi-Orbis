@@ -16,9 +16,18 @@
     <button
       *ngFor="let action of unit.definition.actions"
       [class.disabled]="!unit.canDoAction(action)"
+      [appTooltip]="unitActionsTooltipTmpl"
+      [tooltipContext]="{ action: action }"
       (click)="unit.doAction(action)"
     >
       {{ getActionName(action) }}
     </button>
   </div>
 </div>
+
+<ng-template #unitActionsTooltipTmpl let-action="action">
+  <app-unit-action-requirements
+    [unit]="unit"
+    [action]="action"
+  ></app-unit-action-requirements>
+</ng-template>

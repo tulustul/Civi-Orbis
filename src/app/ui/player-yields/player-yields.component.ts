@@ -11,14 +11,6 @@ export class PlayerYieldsComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  get yieldsPerTurn() {
-    return this.player.yieldsPerTurn;
-  }
-
-  get yieldsTotal() {
-    return this.player.yieldsTotal;
-  }
-
   get player() {
     return this.game.humanPlayer!;
   }

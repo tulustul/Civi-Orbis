@@ -45,6 +45,7 @@ import { Controls } from "./controls";
 import { NextTurnService } from "./ui/next-turn.service";
 import { GameRenderer } from "./renderer/renderer";
 import { MapUi } from "./ui/map-ui";
+import { UnitActionRequirementsComponent } from './ui/unit-action-requirements/unit-action-requirements.component';
 
 @NgModule({
   declarations: [
@@ -85,6 +86,7 @@ import { MapUi } from "./ui/map-ui";
     PercentBonusPipe,
     ProductRequirementsComponent,
     PlayerYieldsComponent,
+    UnitActionRequirementsComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [Game, UIState, Controls, NextTurnService, GameRenderer, MapUi],

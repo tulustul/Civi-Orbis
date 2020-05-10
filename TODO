@@ -35,6 +35,7 @@ Major features:
     ✔ `mine` +1 production @done(20-05-09 22:32)
     ✔ `sawmill` +1 production @done(20-05-09 22:32)
     ✔ `road` 0.5 movement cost @done(20-05-09 23:33)
+  ☐ tile improvements damaging when not enough public works
   ☐ resources - increase tile yields
   ☐ `fog of war` - grey out tiles not visible by units and cities
   ☐ AI :/
