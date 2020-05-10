@@ -127,10 +127,10 @@ export class Tile {
 
   computeYields() {
     if (this.seaLevel === SeaLevel.deep) {
-      this.yields.food = 1;
+      this.yields.food = 0;
       this.yields.production = 0;
     } else if (this.seaLevel === SeaLevel.shallow) {
-      this.yields.food = 2;
+      this.yields.food = 1;
       this.yields.production = 0;
     } else {
       const climateYields = BASE_CLIMATE_YIELDS[this.climate];
