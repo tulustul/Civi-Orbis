@@ -13,7 +13,6 @@ import { SeaLevel, LandForm, Climate } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
-import { getTilesInRange } from "src/app/core/hex-math";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
 import { TileImprovement } from "src/app/core/tile-improvements";
@@ -86,7 +85,7 @@ export class TilePaintingComponent implements OnInit {
 
       this.mapUi.hoveredTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
         if (tile) {
-          const tiles = getTilesInRange(tile, this.paintData.size - 1);
+          const tiles = tile.getTilesInRange(this.paintData.size - 1);
           this.mapUi.highlightTiles(tiles);
           if (this.controls.mouseButton === 0) {
             this.paint();
@@ -106,7 +105,7 @@ export class TilePaintingComponent implements OnInit {
       return;
     }
 
-    const tiles = getTilesInRange(pivotTile, this.paintData.size - 1);
+    const tiles = pivotTile.getTilesInRange(this.paintData.size - 1);
     for (const tile of tiles) {
       if (this.paintData.seaLevel !== undefined) {
         tile.seaLevel = this.paintData.seaLevel;

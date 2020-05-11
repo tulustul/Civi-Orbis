@@ -74,6 +74,7 @@ export class Tile {
   neighbours: Tile[] = [];
   fullNeighbours: (Tile | null)[] = []; // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
   neighboursCosts = new Map<Tile, number>();
+  sweetSpotValue = 0; // used by ai to find good city location
 
   yields: Yields = { ...EMPTY_YIELDS };
 
@@ -211,6 +212,38 @@ export class Tile {
     return (
       this.seaLevel === SeaLevel.none && this.landForm !== LandForm.mountains
     );
+  }
+
+  getTilesInRange(range: number): Set<Tile> {
+    const result = new Set<Tile>([this]);
+    for (let i = 0; i < range; i++) {
+      let neighbours = new Set<Tile>();
+      for (const tile of result) {
+        for (const neighbour of tile.neighbours) {
+          neighbours.add(neighbour);
+        }
+      }
+      for (const tile of neighbours) {
+        result.add(tile);
+      }
+    }
+    return result;
+  }
+
+  computeSweetSpotValue() {
+    this.sweetSpotValue = 0;
+    if (this.areaOf) {
+      return;
+    }
+    const tiles = this.getTilesInRange(2);
+    for (const tile of tiles) {
+      if (tile.areaOf) {
+        this.sweetSpotValue = 0;
+        return;
+      }
+      this.sweetSpotValue += tile.yields.food;
+      this.sweetSpotValue += tile.yields.production;
+    }
   }
 }
 

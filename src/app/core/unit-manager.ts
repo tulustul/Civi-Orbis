@@ -4,7 +4,6 @@ import { BehaviorSubject, Subject } from "rxjs";
 import { UNITS_DEFINITIONS } from "../data/units";
 import { Player } from "./player";
 import { Tile } from "./tile";
-import { getTilesInRange } from "./hex-math";
 import { Game } from "./game";
 import { getTileFromIndex } from "./serialization";
 
@@ -46,7 +45,7 @@ export class UnitsManager {
     player.units.push(unit);
     tile.units.push(unit);
 
-    for (const tile of getTilesInRange(unit.tile, 2)) {
+    for (const tile of unit.tile.getTilesInRange(2)) {
       unit.player.exploredTiles.add(tile);
     }
 
@@ -102,7 +101,7 @@ export class UnitsManager {
 
     unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
 
-    const visibleTiles = getTilesInRange(tile, 2);
+    const visibleTiles = tile.getTilesInRange(2);
     const exploredTiles: Tile[] = [];
     for (const exploredTile of visibleTiles) {
       if (!unit.player.exploredTiles.has(exploredTile)) {

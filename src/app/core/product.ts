@@ -17,41 +17,6 @@ export interface ProductDefinition {
   weakRequirements: ProductRequirement[];
 }
 
-export function getAvailableProducts<T extends ProductDefinition>(
-  products: T[],
-  city: City,
-): T[] {
-  const results: T[] = [];
-  for (const p of products) {
-    let ok = true;
-    for (const r of p.requirements) {
-      if (!r.check(city)) {
-        ok = false;
-        break;
-      }
-    }
-    if (ok) {
-      results.push(p);
-    }
-  }
-  return results;
-}
-
-export function getDisabledProducts<T extends ProductDefinition>(
-  products: T[],
-  city: City,
-): Set<T> {
-  const results = new Set<T>();
-  for (const p of products) {
-    for (const r of p.weakRequirements) {
-      if (!r.check(city)) {
-        results.add(p);
-      }
-    }
-  }
-  return results;
-}
-
 export class BuildingRequirement extends ProductRequirement {
   id = "building";
 

@@ -16,6 +16,9 @@ import {
 } from "./yields";
 import { BehaviorSubject, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { UNITS_DEFINITIONS } from "../data/units";
+import { BUILDINGS } from "../data/buildings";
+import { IDLE_PRODUCTS } from "../data/idle-products";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -71,6 +74,15 @@ export class City {
   workedTiles = new Set<Tile>();
 
   notWorkedTiles = new Set<Tile>();
+
+  availableBuildings: Building[] = [];
+  disabledBuildings = new Set<Building>();
+
+  availableUnits: UnitDefinition[] = [];
+  disabledUnits = new Set<UnitDefinition>();
+
+  availableIdleProducts: IdleProduct[] = [];
+  disabledIdleProducts = new Set<IdleProduct>();
 
   private _destroyed$ = new Subject<void>();
   destroyed$ = this._destroyed$.asObservable();
@@ -431,5 +443,67 @@ export class City {
   destroy() {
     this._destroyed$.next();
     this._destroyed$.complete();
+  }
+
+  private getAvailableProducts<T extends ProductDefinition>(
+    products: T[],
+    city: City,
+  ): T[] {
+    const results: T[] = [];
+    for (const p of products) {
+      let ok = true;
+      for (const r of p.requirements) {
+        if (!r.check(city)) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) {
+        results.push(p);
+      }
+    }
+    return results;
+  }
+
+  private getDisabledProducts<T extends ProductDefinition>(
+    products: T[],
+    city: City,
+  ): Set<T> {
+    const results = new Set<T>();
+    for (const p of products) {
+      for (const r of p.weakRequirements) {
+        if (!r.check(city)) {
+          results.add(p);
+        }
+      }
+    }
+    return results;
+  }
+
+  updateProductsList() {
+    this.availableUnits = this.getAvailableProducts<UnitDefinition>(
+      UNITS_DEFINITIONS,
+      this,
+    );
+    this.disabledUnits = this.getDisabledProducts<UnitDefinition>(
+      this.availableUnits,
+      this,
+    );
+
+    const notBuildBuildings = BUILDINGS.filter(
+      (b) =>
+        this.product?.productDefinition !== b && !this.buildings.includes(b),
+    );
+
+    this.availableBuildings = this.getAvailableProducts<Building>(
+      notBuildBuildings,
+      this,
+    );
+    this.disabledBuildings = this.getDisabledProducts<Building>(
+      this.availableBuildings,
+      this,
+    );
+
+    this.availableIdleProducts = IDLE_PRODUCTS;
   }
 }

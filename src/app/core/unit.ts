@@ -3,8 +3,15 @@ import { UnitDefinition } from "./unit.interface";
 import { Player } from "./player";
 import { getTileIndex } from "./serialization";
 import { UnitAction, ACTIONS } from "./unit-actions";
+import { UNITS_DEFINITIONS } from "../data/units";
 
 export type UnitOrder = "go" | "skip" | "sleep" | null;
+
+export const UNITS_MAP = new Map<string, UnitDefinition>();
+
+for (const definition of UNITS_DEFINITIONS) {
+  UNITS_MAP.set(definition.id, definition);
+}
 
 export interface UnitSerialized {
   tile: number;

@@ -88,8 +88,8 @@
     <app-tab class="no-padding" tabTitle="recruit">
       <div
         class="product"
-        *ngFor="let unit of units"
-        [class.disabled]="disabledUnits.has(unit)"
+        *ngFor="let unit of city.availableUnits"
+        [class.disabled]="city.disabledUnits.has(unit)"
         [appTooltip]="unitTooltipTmpl"
         [tooltipContext]="{ unit: unit }"
         (click)="produceUnit(unit)"
@@ -106,8 +106,8 @@
     <app-tab class="no-padding" tabTitle="construct">
       <div
         class="product"
-        *ngFor="let building of buildings"
-        [class.disabled]="disabledBuildings.has(building)"
+        *ngFor="let building of city.availableBuildings"
+        [class.disabled]="city.disabledBuildings.has(building)"
         [appTooltip]="buildingTooltipTmpl"
         [tooltipContext]="{ building: building }"
         (click)="produceBuilding(building)"
@@ -124,7 +124,7 @@
     <app-tab class="no-padding" tabTitle="work on">
       <div
         class="product"
-        *ngFor="let idleProduct of IDLE_PRODUCTS"
+        *ngFor="let idleProduct of city.availableIdleProducts"
         [appTooltip]="idleProductTooltipTmpl"
         [tooltipContext]="{ idleProduct: idleProduct }"
         (click)="workOnIdleProduct(idleProduct)"
