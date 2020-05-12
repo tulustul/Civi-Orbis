@@ -6,12 +6,12 @@ import {
   pickRandom,
   drawTileSpriteCentered,
 } from "../utils";
-import { Tile, Climate, LandForm, SeaLevel } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
 import { takeUntil } from "rxjs/operators";
 import { GameRenderer } from "../renderer";
 import { TileImprovement } from "src/app/core/tile-improvements";
+import { SeaLevel, Climate, LandForm, Tile } from "src/app/shared";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),

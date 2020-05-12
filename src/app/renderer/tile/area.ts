@@ -1,8 +1,9 @@
 import * as PIXIE from "pixi.js";
 
-import { TileDirection, Tile } from "src/app/core/tile";
+import { TileCore } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { Area } from "src/app/core/area";
+import { TileDirection } from "src/app/shared";
 
 const BORDER_WIDTH = 0.11;
 const BORDER_WIDTH_HALVED = BORDER_WIDTH / 2;
@@ -119,7 +120,7 @@ export class AreaDrawer {
   private drawBorder(
     points: PIXIE.Point[],
     g: PIXIE.Graphics,
-    tile: Tile,
+    tile: TileCore,
     dir: TileDirection,
     start = false,
   ) {

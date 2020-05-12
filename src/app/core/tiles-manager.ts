@@ -1,16 +1,16 @@
 import { Subject } from "rxjs";
 
-import { Tile } from "./tile";
+import { TileCore } from "./tile";
 import { Game } from "./game";
 
 export class TilesManager {
-  private _updatedTile$ = new Subject<Tile>();
+  private _updatedTile$ = new Subject<TileCore>();
   updatedTile$ = this._updatedTile$.asObservable();
 
-  private _revealedTiles$ = new Subject<Tile[]>();
+  private _revealedTiles$ = new Subject<TileCore[]>();
   revealedTiles$ = this._revealedTiles$.asObservable();
 
-  private _resetTilesVisibility$ = new Subject<Set<Tile>>();
+  private _resetTilesVisibility$ = new Subject<Set<TileCore>>();
   resetTilesVisibility$ = this._resetTilesVisibility$.asObservable();
 
   constructor(private game: Game) {
@@ -21,12 +21,12 @@ export class TilesManager {
     });
   }
 
-  reveal(tiles: Tile[]) {
+  reveal(tiles: TileCore[]) {
     this._revealedTiles$.next(tiles);
   }
 
   revealAll() {
-    const tiles: Tile[] = [];
+    const tiles: TileCore[] = [];
     for (let x = 0; x < this.game.map.width; x++) {
       for (let y = 0; y < this.game.map.height; y++) {
         const tile = this.game.map.tiles[x][y];
@@ -37,7 +37,7 @@ export class TilesManager {
     this.reveal(tiles);
   }
 
-  updateTile(tile: Tile) {
+  updateTile(tile: TileCore) {
     tile.computeYields();
     tile.computeMovementCosts();
     for (const neighbour of tile.neighbours) {

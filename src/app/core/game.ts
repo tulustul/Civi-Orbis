@@ -1,14 +1,14 @@
-import { Camera, Transform } from "../renderer/camera";
-import { Player, PlayerSerialized } from "./player";
-import { TilesMap, MapSerialized } from "./tiles-map";
 import { BehaviorSubject, ReplaySubject } from "rxjs";
+import { filter, distinctUntilChanged } from "rxjs/operators";
+
+import { Player, PlayerSerialized } from "./player";
+import { TilesMapCore, MapSerialized, MapChanneled } from "./tiles-map";
 import { UnitsManager } from "./unit-manager";
 import { TilesManager } from "./tiles-manager";
 import { Debug } from "./debug";
-import { UnitSerialized } from "./unit";
-import { filter, distinctUntilChanged, skip } from "rxjs/operators";
+import { UnitSerialized, UnitChanneled } from "./unit";
 import { CitiesManager } from "./cities-manager";
-import { CitySerialized } from "./city";
+import { CitySerialized, CityChanneled } from "./city";
 import { AreasManager } from "./areas-manager";
 
 interface GameSerialized {
@@ -18,13 +18,21 @@ interface GameSerialized {
   activePlayerIndex: number;
   units: UnitSerialized[];
   cities: CitySerialized[];
-  camera: Transform;
+}
+
+export interface GameChanneled {
+  turn: number;
+  map: MapChanneled;
+  players: PlayerSerialized[];
+  activePlayerIndex: number;
+  units: UnitChanneled[];
+  cities: CityChanneled[];
 }
 
 export class Game {
   debug = new Debug();
 
-  map: TilesMap;
+  map: TilesMapCore;
 
   players: Player[] = [];
 
@@ -38,9 +46,6 @@ export class Game {
   );
 
   humanPlayer: Player | null = null;
-
-  // TODO camera probably shouldn't be part of the core game but it needs to be serialized on save so let's leave it here for now.
-  camera: Camera;
 
   turn$ = new BehaviorSubject<number>(1);
 
@@ -117,7 +122,17 @@ export class Game {
       activePlayerIndex: this.activePlayerIndex,
       units: this.unitsManager.serialize(),
       cities: this.citiesManager.serialize(),
-      camera: this.camera.serialize(),
+    };
+  }
+
+  serializeToChannel(): GameChanneled {
+    return {
+      turn: this.turn$.value,
+      map: this.map.serializeToChannel(),
+      players: this.players.map((p) => p.serialize()),
+      activePlayerIndex: this.activePlayerIndex,
+      units: this.unitsManager.serializeToChannel(),
+      cities: this.citiesManager.serializeToChannel(),
     };
   }
 
@@ -125,15 +140,13 @@ export class Game {
     this.turn$.next(data.turn);
 
     // First deserialize map as other entities depend on it.
-    this.map = TilesMap.deserialize(data.map);
+    this.map = TilesMapCore.deserialize(data.map);
 
     // Then players as unit deserialization needs them.
     for (const playerData of data.players) {
       const player = Player.deserialize(this, playerData);
       this.addPlayer(player);
     }
-
-    this.camera.transform$.next(data.camera);
 
     this.unitsManager.deserialize(data.units || []);
     this.citiesManager.deserialize(data.cities || []);

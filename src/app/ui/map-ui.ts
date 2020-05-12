@@ -3,27 +3,28 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Subject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 7;
-import { Tile } from "../core/tile";
+import { TileCore } from "../core/tile";
 import { Game } from "../core/game";
 import { UIState } from "./ui-state";
 import { City } from "../core/city";
 import { Unit } from "../core/unit";
+import { Camera } from "../renderer/camera";
 
 @Injectable()
 export class MapUi {
-  private _hoveredTile$ = new BehaviorSubject<Tile | null>(null);
+  private _hoveredTile$ = new BehaviorSubject<TileCore | null>(null);
   hoveredTile$ = this._hoveredTile$.asObservable().pipe(distinctUntilChanged());
 
-  private _clickedTile$ = new Subject<Tile>();
+  private _clickedTile$ = new Subject<TileCore>();
   clickedTile$ = this._clickedTile$.asObservable();
 
-  private _selectedTile$ = new BehaviorSubject<Tile | null>(null);
+  private _selectedTile$ = new BehaviorSubject<TileCore | null>(null);
   selectedTile$ = this._selectedTile$.asObservable();
 
-  private _highlightedTiles$ = new BehaviorSubject<Set<Tile>>(new Set());
+  private _highlightedTiles$ = new BehaviorSubject<Set<TileCore>>(new Set());
   highlightedTiles$ = this._highlightedTiles$.asObservable();
 
-  private _activePath$ = new BehaviorSubject<Tile[][] | null>(null);
+  private _activePath$ = new BehaviorSubject<TileCore[][] | null>(null);
   activePath$ = this._activePath$.asObservable();
 
   private _yieldsVisible$ = new BehaviorSubject<boolean>(true);
@@ -35,7 +36,11 @@ export class MapUi {
 
   allowMapPanning = true;
 
-  constructor(private game: Game, private uiState: UIState) {
+  constructor(
+    private game: Game,
+    private camera: Camera,
+    private uiState: UIState,
+  ) {
     this.clickedTile$.subscribe((tile) => {
       if (this.selectingTileEnabled) {
         this._selectedTile$.next(tile);
@@ -72,7 +77,7 @@ export class MapUi {
     this.game.humanPlayer$.subscribe((player) => {
       const tileOfInterest = player?.units[0]?.tile || player?.cities[0]?.tile;
       if (tileOfInterest) {
-        this.game.camera.moveToTile(tileOfInterest);
+        this.camera.moveToTile(tileOfInterest);
       }
       this.setPath(null);
     });
@@ -83,7 +88,7 @@ export class MapUi {
   }
 
   update() {
-    this._yieldsVisible$.next(this.game.camera.transform$.value.scale > 40);
+    this._yieldsVisible$.next(this.camera.transform$.value.scale > 40);
   }
 
   get hoveredTile() {
@@ -97,20 +102,20 @@ export class MapUi {
     }
   }
 
-  clickTile(tile: Tile) {
+  clickTile(tile: TileCore) {
     this._clickedTile$.next(tile);
   }
 
-  highlightTiles(tiles: Set<Tile> | null) {
+  highlightTiles(tiles: Set<TileCore> | null) {
     tiles = tiles || new Set();
     this._highlightedTiles$.next(tiles);
   }
 
-  hoverTile(tile: Tile | null) {
+  hoverTile(tile: TileCore | null) {
     this._hoveredTile$.next(tile);
   }
 
-  setPath(path: Tile[][] | null) {
+  setPath(path: TileCore[][] | null) {
     this._activePath$.next(path);
   }
 

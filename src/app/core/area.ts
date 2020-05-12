@@ -1,14 +1,17 @@
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Tile, TileDirection } from "./tile";
+import { TileCore } from "./tile";
 import { POSSIBLE_BORDER_PATHS } from "../map-generators/utils";
+import { TileDirection } from "../shared";
 
-type Border = [Tile, TileDirection];
+type Border = [TileCore, TileDirection];
 type BorderPath = Border[];
 
 export class Area {
-  tiles = new Set<Tile>();
+  id = 0;
+
+  tiles = new Set<TileCore>();
 
   borders: BorderPath[] = [];
 
@@ -17,15 +20,15 @@ export class Area {
   private _destroyed$ = new Subject<void>();
   destroyed$ = this._destroyed$.asObservable();
 
-  private _added$ = new Subject<Tile>();
+  private _added$ = new Subject<TileCore>();
   added$ = this._added$.asObservable().pipe(takeUntil(this.destroyed$));
 
-  private _updated$ = new Subject<Tile>();
+  private _updated$ = new Subject<TileCore>();
   updated$ = this._updated$.asObservable().pipe(takeUntil(this.destroyed$));
 
   constructor(public color: number) {}
 
-  add(tile: Tile, recomputeBorders = true) {
+  add(tile: TileCore, recomputeBorders = true) {
     this.tiles.add(tile);
     if (recomputeBorders) {
       // TODO make a local change and emit event instead of recomputing whole borders
@@ -35,7 +38,7 @@ export class Area {
     this._added$.next(tile);
   }
 
-  remove(tile: Tile, recomputeBorders = true) {
+  remove(tile: TileCore, recomputeBorders = true) {
     this.tiles.delete(tile);
     if (recomputeBorders) {
       this.computeBorders();
@@ -49,7 +52,7 @@ export class Area {
   }
 
   computeBorders() {
-    const visited = new Set<Tile>();
+    const visited = new Set<TileCore>();
     this.borders = [];
     for (const tile of this.tiles) {
       visited.add(tile);
@@ -73,7 +76,7 @@ export class Area {
 
   private buildBorderPath(
     currentBorder: Border,
-    visited: Set<Tile>,
+    visited: Set<TileCore>,
     path: BorderPath = [],
   ) {
     if (path.length) {

@@ -1,4 +1,4 @@
-import { Tile } from "./tile";
+import { TileCore } from "./tile";
 import { Unit } from "./unit";
 import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";
@@ -43,9 +43,9 @@ export interface PlayerSerialized {
 export class Player {
   id: number;
 
-  exploredTiles = new Set<Tile>();
+  exploredTiles = new Set<TileCore>();
 
-  visibleTiles = new Set<Tile>();
+  visibleTiles = new Set<TileCore>();
 
   units: Unit[] = [];
 

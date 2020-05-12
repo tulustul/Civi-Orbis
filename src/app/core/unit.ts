@@ -1,4 +1,4 @@
-import { Tile } from "./tile";
+import { TileCore } from "./tile";
 import { UnitDefinition } from "./unit.interface";
 import { Player } from "./player";
 import { getTileIndex } from "./serialization";
@@ -14,6 +14,7 @@ for (const definition of UNITS_DEFINITIONS) {
 }
 
 export interface UnitSerialized {
+  id: number;
   tile: number;
   definition: string;
   actionPointsLeft: number;
@@ -21,14 +22,27 @@ export interface UnitSerialized {
   path: number[][] | null;
 }
 
-export class Unit {
+export interface UnitChanneled {
+  id: number;
+  tile: number;
+  definitionId: string;
+  player: number;
+}
+
+export interface UnitState {
+  id: number;
   actionPointsLeft: number;
-  path: Tile[][] | null;
+}
+
+export class Unit {
+  id: number;
+  actionPointsLeft: number;
+  path: TileCore[][] | null;
 
   order: UnitOrder = null;
 
   constructor(
-    public tile: Tile,
+    public tile: TileCore,
     public definition: UnitDefinition,
     public player: Player,
   ) {
@@ -37,6 +51,7 @@ export class Unit {
 
   serialize(): UnitSerialized {
     return {
+      id: this.id,
       tile: getTileIndex(this.player.game.map, this.tile),
       definition: this.definition.id,
       actionPointsLeft: this.actionPointsLeft,
@@ -45,6 +60,15 @@ export class Unit {
         this.path?.map((row) =>
           row.map((tile) => getTileIndex(this.player.game.map, tile)),
         ) || null,
+    };
+  }
+
+  serializeToChannel(): UnitChanneled {
+    return {
+      id: this.id,
+      tile: this.tile.id,
+      definitionId: this.definition.id,
+      player: this.player.id,
     };
   }
 

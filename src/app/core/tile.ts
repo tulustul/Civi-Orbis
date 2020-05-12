@@ -2,28 +2,7 @@ import { Unit } from "./unit";
 import { City } from "./city";
 import { Yields, EMPTY_YIELDS } from "./yields";
 import { TileImprovement, TileRoad } from "./tile-improvements";
-
-export enum Climate {
-  tropical,
-  savanna,
-  desert,
-  continental,
-  oceanic,
-  tundra,
-  arctic,
-}
-
-export enum LandForm {
-  plains,
-  hills,
-  mountains,
-}
-
-export enum SeaLevel {
-  none,
-  shallow,
-  deep,
-}
+import { Tile, Climate, LandForm, SeaLevel, TileDirection } from "../shared";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -56,7 +35,7 @@ export const WETLANDS_CLIMATES = new Set<Climate>([
   Climate.tropical,
 ]);
 
-export class Tile {
+export class TileCore implements Tile {
   climate = Climate.continental;
   landForm = LandForm.plains;
   seaLevel = SeaLevel.deep;
@@ -69,16 +48,15 @@ export class Tile {
   units: Unit[] = [];
   city: City | null = null;
   areaOf: City | null = null;
-
-  // cached data
-  neighbours: Tile[] = [];
-  fullNeighbours: (Tile | null)[] = []; // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
-  neighboursCosts = new Map<Tile, number>();
-  sweetSpotValue = 0; // used by ai to find good city location
-
   yields: Yields = { ...EMPTY_YIELDS };
 
-  constructor(public x: number, public y: number) {}
+  // cached data
+  neighbours: TileCore[] = [];
+  fullNeighbours: (TileCore | null)[] = []; // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
+  neighboursCosts = new Map<TileCore, number>();
+  sweetSpotValue = 0; // used by ai to find good city location
+
+  constructor(public id: number, public x: number, public y: number) {}
 
   computeMovementCosts() {
     for (const neighbour of this.neighbours) {
@@ -104,7 +82,7 @@ export class Tile {
     }
   }
 
-  getDirectionTo(tile: Tile): TileDirection {
+  getDirectionTo(tile: TileCore): TileDirection {
     if (tile.x === this.x - (this.y % 2 ? 0 : 1) && tile.y === this.y - 1) {
       return TileDirection.NW;
     }
@@ -214,10 +192,10 @@ export class Tile {
     );
   }
 
-  getTilesInRange(range: number): Set<Tile> {
-    const result = new Set<Tile>([this]);
+  getTilesInRange(range: number): Set<TileCore> {
+    const result = new Set<TileCore>([this]);
     for (let i = 0; i < range; i++) {
-      let neighbours = new Set<Tile>();
+      let neighbours = new Set<TileCore>();
       for (const tile of result) {
         for (const neighbour of tile.neighbours) {
           neighbours.add(neighbour);
@@ -245,16 +223,23 @@ export class Tile {
       this.sweetSpotValue += tile.yields.production;
     }
   }
-}
 
-export enum TileDirection {
-  NW,
-  NE,
-  E,
-  SE,
-  SW,
-  W,
-  NONE,
+  serializeToChannel(): TileChanneled {
+    return {
+      id: this.id,
+      x: this.x,
+      y: this.y,
+      climate: this.climate,
+      forest: this.forest,
+      improvement: this.improvement,
+      landForm: this.landForm,
+      riverParts: this.riverParts,
+      road: this.road,
+      seaLevel: this.seaLevel,
+      wetlands: this.wetlands,
+      yields: this.yields,
+    };
+  }
 }
 
 export interface TileSerialized {
@@ -265,4 +250,20 @@ export interface TileSerialized {
   road?: TileRoad | null;
   riverParts?: TileDirection[];
   forest?: boolean;
+  wetlands?: boolean;
+}
+
+export interface TileChanneled {
+  id: number;
+  x: number;
+  y: number;
+  climate: Climate;
+  landForm: LandForm;
+  seaLevel: SeaLevel;
+  improvement: TileImprovement | null;
+  road: TileRoad | null;
+  riverParts: TileDirection[];
+  forest: boolean;
+  wetlands: boolean;
+  yields: Yields;
 }

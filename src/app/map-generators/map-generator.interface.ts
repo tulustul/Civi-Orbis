@@ -1,7 +1,7 @@
-import { TilesMap } from "../core/tiles-map";
-import { Tile } from "../core/tile";
+import { TilesMapCore } from "../core/tiles-map";
+import { TileCore } from "../core/tile";
 
 export interface MapGenerator {
-  generate(width: number, height: number): TilesMap;
-  getStartingLocations(): Tile[];
+  generate(width: number, height: number): TilesMapCore;
+  getStartingLocations(): TileCore[];
 }

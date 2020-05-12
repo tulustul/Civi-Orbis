@@ -6,7 +6,7 @@ import { filter, takeUntil } from "rxjs/operators";
 import { UnitDefinition } from "src/app/core/unit.interface";
 import { Unit } from "src/app/core/unit";
 import { Game } from "src/app/core/game";
-import { Tile } from "src/app/core/tile";
+import { TileCore } from "src/app/core/tile";
 import { Option } from "../../widgets/option.interface";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
 import { MapUi } from "../../map-ui";
@@ -54,7 +54,7 @@ export class UnitEditorComponent implements OnInit {
     hidden.subscribe(() => this.mapUi.enableSelectingTile(false));
   }
 
-  spawn(tile: Tile) {
+  spawn(tile: TileCore) {
     if (!this.definition) {
       return;
     }
@@ -72,7 +72,7 @@ export class UnitEditorComponent implements OnInit {
     }
   }
 
-  selectTile(tile: Tile) {
+  selectTile(tile: TileCore) {
     if (tile.units.length) {
       this.unit = tile.units[0];
       this.definition = this.unit.definition;

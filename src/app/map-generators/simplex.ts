@@ -1,14 +1,15 @@
 import * as SimplexNoise from "simplex-noise";
 
 import { MapGenerator } from "./map-generator.interface";
-import { TilesMap } from "../core/tiles-map";
+import { TilesMapCore } from "../core/tiles-map";
 import {
   findCoastline,
   placeRiverBetweenTiles,
   POSSIBLE_BORDER_PATHS,
 } from "./utils";
-import { SeaLevel, Tile, Climate, TileDirection, LandForm } from "../core/tile";
-import { getTileInDirection } from "../core/hex-math";
+import { TileCore } from "../core/tile";
+import { LandForm, Climate, SeaLevel, TileDirection } from "../shared";
+import { getTileInDirection } from "../shared/hex-math";
 
 interface TileMetadata {
   height: number;
@@ -17,7 +18,7 @@ interface TileMetadata {
 }
 
 export class SimplexMapGenerator implements MapGenerator {
-  private map: TilesMap;
+  private map: TilesMapCore;
 
   private width: number;
 
@@ -29,11 +30,11 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private seaLevel: number;
 
-  private startingLocations: Tile[] = [];
+  private startingLocations: TileCore[] = [];
 
-  private riversSources: Tile[] = [];
+  private riversSources: TileCore[] = [];
 
-  private metadata = new Map<Tile, TileMetadata>();
+  private metadata = new Map<TileCore, TileMetadata>();
 
   constructor(private startingLocationsCount: number) {}
 
@@ -48,7 +49,7 @@ export class SimplexMapGenerator implements MapGenerator {
     uniformity: number = 0.5,
     seaLevel = 0,
   ) {
-    this.map = new TilesMap(width, height);
+    this.map = new TilesMapCore(width, height);
     this.width = width;
     this.height = height;
     this.seed = seed;
@@ -219,7 +220,7 @@ export class SimplexMapGenerator implements MapGenerator {
 
   private *getNoisedTiles(
     noise: ComplexNoise,
-  ): Iterable<[Tile, number, number]> {
+  ): Iterable<[TileCore, number, number]> {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         const noiseValue = noise.at(x, y);
@@ -248,8 +249,8 @@ export class SimplexMapGenerator implements MapGenerator {
   private adjustHeightmap() {
     // Make heighmap suitable for rivers placement - the deeper into land the higher.
     let currentTiles = findCoastline(this.map.tiles);
-    const nextTiles = new Set<Tile>();
-    const visitedTiles = new Set<Tile>(currentTiles);
+    const nextTiles = new Set<TileCore>();
+    const visitedTiles = new Set<TileCore>(currentTiles);
     let offset = 0;
     while (currentTiles.length) {
       offset += 0.7;
@@ -289,7 +290,7 @@ export class SimplexMapGenerator implements MapGenerator {
     }
   }
 
-  private buildRiverPath(tile: Tile, direction: TileDirection) {
+  private buildRiverPath(tile: TileCore, direction: TileDirection) {
     if (direction === TileDirection.NONE) {
       return;
     }
@@ -313,13 +314,13 @@ export class SimplexMapGenerator implements MapGenerator {
           pair[1].seaLevel === SeaLevel.none &&
           pair[0].riverParts.length < 4 && // small loops prevention, big loops are still an issue
           pair[1].riverParts.length < 4,
-      ) as [Tile, Tile][];
+      ) as [TileCore, TileCore][];
 
     if (pairs.length === 0) {
       return;
     }
 
-    let pairToPlace: [Tile, Tile];
+    let pairToPlace: [TileCore, TileCore];
 
     if (pairs.length === 1) {
       pairToPlace = pairs[0];

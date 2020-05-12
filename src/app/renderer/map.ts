@@ -1,7 +1,7 @@
 import * as PIXIE from "pixi.js";
 
-import { Tile } from "../core/tile";
-import { Game } from "../core/game";
+import { TileCore } from "../core/tile";
+import { Game, GameChanneled } from "../core/game";
 import { TileWrapperContainer, TileContainer } from "./tile-container";
 import { TerrainDrawer } from "./tile/terrain";
 import { UnitsDrawer } from "./tile/unit";
@@ -10,21 +10,23 @@ import { RiverDrawer } from "./tile/river";
 import { CityDrawer } from "./tile/city";
 import { AreaDrawer } from "./tile/area";
 import { GameRenderer } from "./renderer";
+import { Camera } from "./camera";
+import { GameApi, GameState } from "../api";
 
 export class MapDrawer {
   container = new TileWrapperContainer();
 
-  waterContainer = new TileContainer(this.game.camera.tileBoundingBox);
+  waterContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  terrainContainer = new TileContainer(this.game.camera.tileBoundingBox);
+  terrainContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  riverContainer = new TileContainer(this.game.camera.tileBoundingBox);
+  riverContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  cityContainer = new TileContainer(this.game.camera.tileBoundingBox);
+  cityContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  yieldsContainer = new TileContainer(this.game.camera.tileBoundingBox);
+  yieldsContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  unitsContainer = new TileContainer(this.game.camera.tileBoundingBox);
+  unitsContainer = new TileContainer(this.camera.tileBoundingBox);
 
   overlaysContainer = new PIXIE.Container();
 
@@ -45,7 +47,12 @@ export class MapDrawer {
 
   areaDrawer: AreaDrawer;
 
-  constructor(private game: Game, private renderer: GameRenderer) {
+  constructor(
+    private game: Game,
+    private gameApi: GameApi,
+    private renderer: GameRenderer,
+    private camera: Camera,
+  ) {
     this.container.addChild(this.waterContainer);
     this.container.addChild(this.terrainContainer);
     this.container.addChild(this.riverContainer);
@@ -62,7 +69,7 @@ export class MapDrawer {
       this.reveal(tiles);
     });
 
-    this.game.started$.subscribe(() => this.build());
+    this.gameApi.init$.subscribe((gameState) => this.build(gameState));
 
     // Drawers must be created after started$ subscription. Race condition will occur otherwise.
     this.terrainDrawer = new TerrainDrawer(
@@ -99,7 +106,7 @@ export class MapDrawer {
     }
   }
 
-  reveal(tiles: Iterable<Tile>) {
+  reveal(tiles: Iterable<TileCore>) {
     for (const tile of tiles) {
       const displayObjects = this.container.tilesMap.get(tile);
       if (displayObjects) {
@@ -121,23 +128,23 @@ export class MapDrawer {
     }
   }
 
-  private build() {
-    this.container.bindToMap(this.game.map);
+  private build(gameState: GameState) {
+    this.container.bindToMap(gameState.map);
 
-    this.waterContainer.bindToMap(this.game.map);
-    this.terrainContainer.bindToMap(this.game.map);
-    this.cityContainer.bindToMap(this.game.map);
-    this.yieldsContainer.bindToMap(this.game.map);
-    this.riverContainer.bindToMap(this.game.map);
-    this.unitsContainer.bindToMap(this.game.map);
+    this.waterContainer.bindToMap(gameState.map);
+    this.terrainContainer.bindToMap(gameState.map);
+    this.cityContainer.bindToMap(gameState.map);
+    this.yieldsContainer.bindToMap(gameState.map);
+    this.riverContainer.bindToMap(gameState.map);
+    this.unitsContainer.bindToMap(gameState.map);
 
     this.unitsDrawer.build();
     this.cityDrawer.build();
     this.areaDrawer.build();
 
-    for (let x = 0; x < this.game.map.width; x++) {
-      for (let y = 0; y < this.game.map.height; y++) {
-        const tile = this.game.map.tiles[x][y];
+    for (let y = 0; y < gameState.map.height; y++) {
+      for (let x = 0; x < gameState.map.width; x++) {
+        const tile = gameState.map.tiles[x][y];
         this.terrainDrawer.drawTile(tile);
         this.yieldsDrawer.drawTile(tile);
         this.riverDrawer.drawTile(tile);

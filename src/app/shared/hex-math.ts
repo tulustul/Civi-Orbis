@@ -1,10 +1,10 @@
-import { TileDirection, Tile } from "./tile";
+import { Tile, TileDirection } from "../shared";
 
-export function getTileFullNeighbours(
-  tiles: Tile[][],
+export function getTileFullNeighbours<T extends Tile>(
+  tiles: T[][],
   x: number,
   y: number,
-): (Tile | null)[] {
+): (T | null)[] {
   return [
     getTileInDirection(tiles, tiles[x][y], TileDirection.NW),
     getTileInDirection(tiles, tiles[x][y], TileDirection.NE),
@@ -15,19 +15,19 @@ export function getTileFullNeighbours(
   ];
 }
 
-export function getTileNeighbours(
-  tiles: Tile[][],
+export function getTileNeighbours<T extends Tile>(
+  tiles: T[][],
   x: number,
   y: number,
-): Tile[] {
-  return getTileFullNeighbours(tiles, x, y).filter((t) => !!t) as Tile[];
+): T[] {
+  return getTileFullNeighbours(tiles, x, y).filter((t) => !!t) as T[];
 }
 
-export function getTileInDirection(
-  tiles: Tile[][],
-  tile: Tile,
+export function getTileInDirection<T extends Tile>(
+  tiles: T[][],
+  tile: T,
   direction: TileDirection,
-): Tile | null {
+): T | null {
   switch (direction) {
     case TileDirection.NW:
       if ((tile.y % 2 === 0 && tile.x === 0) || tile.y === 0) {

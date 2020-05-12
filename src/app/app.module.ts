@@ -6,7 +6,6 @@ import { OverlayModule } from "@angular/cdk/overlay";
 import { AppComponent } from "./app.component";
 import { GameCanvasComponent } from "./game-canvas/game-canvas.component";
 import { UnitPanelComponent } from "./ui/unit-panel/unit-panel.component";
-import { Game } from "./core/game";
 import { NextTurnButtonComponent } from "./ui/next-turn-button/next-turn-button.component";
 import { GameInfoComponent } from "./ui/game-info/game-info.component";
 import { DebugComponent } from "./ui/debug/debug.component";
@@ -45,7 +44,10 @@ import { Controls } from "./controls";
 import { NextTurnService } from "./ui/next-turn.service";
 import { GameRenderer } from "./renderer/renderer";
 import { MapUi } from "./ui/map-ui";
-import { UnitActionRequirementsComponent } from './ui/unit-action-requirements/unit-action-requirements.component';
+import { UnitActionRequirementsComponent } from "./ui/unit-action-requirements/unit-action-requirements.component";
+import { GameApi } from "./api/game";
+import { Game } from "./core/game";
+import { Camera } from "./renderer/camera";
 
 @NgModule({
   declarations: [
@@ -89,7 +91,16 @@ import { UnitActionRequirementsComponent } from './ui/unit-action-requirements/u
     UnitActionRequirementsComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
-  providers: [Game, UIState, Controls, NextTurnService, GameRenderer, MapUi],
+  providers: [
+    Game,
+    GameApi,
+    UIState,
+    Controls,
+    NextTurnService,
+    GameRenderer,
+    Camera,
+    MapUi,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

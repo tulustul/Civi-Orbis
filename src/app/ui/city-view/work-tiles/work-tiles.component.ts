@@ -5,9 +5,9 @@ import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
 import { City } from "src/app/core/city";
-import { Tile } from "src/app/core/tile";
-import { Game } from "src/app/core/game";
+import { TileCore } from "src/app/core/tile";
 import { MapUi } from "../../map-ui";
+import { Camera } from "src/app/renderer/camera";
 
 @Component({
   selector: "app-work-tiles",
@@ -21,7 +21,7 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
 
   constructor(
     private domSanitizer: DomSanitizer,
-    private game: Game,
+    private camera: Camera,
     private mapUi: MapUi,
   ) {}
 
@@ -36,7 +36,7 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  toggle(tile: Tile) {
+  toggle(tile: TileCore) {
     if (this.city.workedTiles.has(tile)) {
       this.city.unworkTile(tile);
     } else {
@@ -44,10 +44,10 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
     }
   }
 
-  getTransform(tile: Tile) {
+  getTransform(tile: TileCore) {
     const [x, y] = [tile.x + 0.5, tile.y + 0.1];
-    const [screenX, screenY] = this.game.camera.gameToScreen(x, y);
-    const scale = this.game.camera.transform$.value.scale / 100;
+    const [screenX, screenY] = this.camera.gameToScreen(x, y);
+    const scale = this.camera.transform$.value.scale / 100;
     return this.domSanitizer.bypassSecurityTrustStyle(
       `translate(${screenX}px, ${screenY}px) scale(${scale})`,
     );

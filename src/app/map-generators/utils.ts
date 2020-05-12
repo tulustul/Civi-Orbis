@@ -1,7 +1,8 @@
-import { Tile, SeaLevel, TileDirection } from "../core/tile";
+import { TileCore } from "../core/tile";
+import { SeaLevel, TileDirection } from "../shared";
 
-export function findCoastline(tiles: Tile[][]): Tile[] {
-  const coastline: Tile[] = [];
+export function findCoastline(tiles: TileCore[][]): TileCore[] {
+  const coastline: TileCore[] = [];
   for (let x = 0; x < tiles.length; x++) {
     for (let y = 0; y < tiles[x].length; y++) {
       const tile = tiles[x][y];
@@ -16,7 +17,7 @@ export function findCoastline(tiles: Tile[][]): Tile[] {
   return coastline;
 }
 
-export function placeRiverBetweenTiles(tileA: Tile, tileB: Tile) {
+export function placeRiverBetweenTiles(tileA: TileCore, tileB: TileCore) {
   const direction = tileA.getDirectionTo(tileB);
   if (tileA.riverParts.includes(direction)) {
     return false;

@@ -3,7 +3,7 @@ import { Unit, UnitSerialized } from "./unit";
 import { BehaviorSubject, Subject } from "rxjs";
 import { UNITS_DEFINITIONS } from "../data/units";
 import { Player } from "./player";
-import { Tile } from "./tile";
+import { TileCore } from "./tile";
 import { Game } from "./game";
 import { getTileFromIndex } from "./serialization";
 
@@ -23,6 +23,8 @@ export class UnitsManager {
   private _destroyed$ = new Subject<Unit>();
   destroyed$ = this._destroyed$.asObservable();
 
+  private lastId = 0;
+
   constructor(private game: Game) {
     for (const definition of UNITS_DEFINITIONS) {
       this.definitions.set(definition.id, definition);
@@ -33,13 +35,14 @@ export class UnitsManager {
     return this.activeUnit$.value;
   }
 
-  spawn(id: string, tile: Tile, player: Player) {
+  spawn(id: string, tile: TileCore, player: Player) {
     const definition = this.definitions.get(id);
     if (!definition) {
       throw Error(`UnitsManager: No unit with id "${id}"`);
     }
 
     const unit = new Unit(tile, definition, player);
+    unit.id = this.lastId++;
 
     this.units.push(unit);
     player.units.push(unit);
@@ -82,7 +85,7 @@ export class UnitsManager {
     unit.player.updateUnitsWithoutOrders();
   }
 
-  move(unit: Unit, tile: Tile) {
+  move(unit: Unit, tile: TileCore) {
     if (!unit.actionPointsLeft) {
       return;
     }
@@ -102,7 +105,7 @@ export class UnitsManager {
     unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
 
     const visibleTiles = tile.getTilesInRange(2);
-    const exploredTiles: Tile[] = [];
+    const exploredTiles: TileCore[] = [];
     for (const exploredTile of visibleTiles) {
       if (!unit.player.exploredTiles.has(exploredTile)) {
         unit.player.exploredTiles.add(exploredTile);
@@ -139,7 +142,7 @@ export class UnitsManager {
     }
   }
 
-  getMovementCost(unit: Unit, target: Tile) {
+  getMovementCost(unit: Unit, target: TileCore) {
     return unit.tile.neighboursCosts.get(target) || Infinity;
   }
 
@@ -162,6 +165,10 @@ export class UnitsManager {
 
   serialize() {
     return this.units.map((u) => u.serialize());
+  }
+
+  serializeToChannel() {
+    return this.units.map((u) => u.serializeToChannel());
   }
 
   deserialize(data: UnitSerialized[]) {

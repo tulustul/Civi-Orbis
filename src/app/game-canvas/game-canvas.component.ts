@@ -6,8 +6,6 @@ import {
   HostListener,
 } from "@angular/core";
 
-import { Game } from "../core/game";
-import { Camera } from "../renderer/camera";
 import { Controls } from "../controls";
 import { GameRenderer } from "../renderer/renderer";
 
@@ -19,14 +17,9 @@ import { GameRenderer } from "../renderer/renderer";
 export class GameCanvasComponent implements AfterViewInit {
   @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;
 
-  constructor(
-    public game: Game,
-    public controls: Controls,
-    private renderer: GameRenderer,
-  ) {}
+  constructor(public controls: Controls, private renderer: GameRenderer) {}
 
   ngAfterViewInit() {
-    this.game.camera = new Camera(this.game, this.renderer); //TODO move to more appriopriate place
     this.renderer.setCanvas(this.canvas.nativeElement);
   }
 

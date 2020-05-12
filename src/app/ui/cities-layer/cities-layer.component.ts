@@ -3,7 +3,6 @@ import {
   OnInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  ElementRef,
   HostBinding,
 } from "@angular/core";
 
@@ -12,6 +11,7 @@ import { takeUntil } from "rxjs/operators";
 
 import { Game } from "src/app/core/game";
 import { City } from "src/app/core/city";
+import { Camera } from "src/app/renderer/camera";
 
 @Component({
   selector: "app-cities-layer",
@@ -24,7 +24,11 @@ export class CitiesLayerComponent implements OnInit {
 
   cities: City[];
 
-  constructor(private cdr: ChangeDetectorRef, private game: Game) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private game: Game,
+    private camera: Camera,
+  ) {}
 
   ngOnInit(): void {
     merge(
@@ -38,7 +42,7 @@ export class CitiesLayerComponent implements OnInit {
         this.updateCities();
       });
 
-    this.game.camera.transform$
+    this.camera.transform$
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => this.cdr.markForCheck());
   }
@@ -62,7 +66,7 @@ export class CitiesLayerComponent implements OnInit {
 
   @HostBinding("style.opacity")
   get opacity() {
-    const scale = this.game.camera.transform$.value.scale;
+    const scale = this.camera.transform$.value.scale;
     if (scale > 20) {
       return 1;
     }

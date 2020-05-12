@@ -3,9 +3,9 @@ import * as PIXIE from "pixi.js";
 import { takeUntil } from "rxjs/operators";
 
 import { TileContainer } from "../tile-container";
-import { Tile } from "src/app/core/tile";
 import { MapUi } from "src/app/ui/map-ui";
 import { Game } from "src/app/core/game";
+import { Tile } from "src/app/shared";
 
 export class YiedsDrawer {
   constructor(

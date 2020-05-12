@@ -7,6 +7,8 @@ import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
 import { MapDrawer } from "./map";
 import { MapUi } from "../ui/map-ui";
+import { Camera } from "./camera";
+import { GameApi } from "../api";
 
 @Injectable()
 export class GameRenderer {
@@ -26,7 +28,13 @@ export class GameRenderer {
 
   textures: PIXIE.ITextureDictionary;
 
-  constructor(private game: Game, public mapUi: MapUi) {
+  constructor(
+    private gameApi: GameApi,
+    private game: Game,
+    public mapUi: MapUi,
+    private camera: Camera,
+  ) {
+    this.camera.setRenderer(this);
     game.stopped$.subscribe(() => this.clear());
   }
 
@@ -37,9 +45,9 @@ export class GameRenderer {
 
     this.canvas = canvas;
 
-    this.mapDrawer = new MapDrawer(this.game, this);
+    this.mapDrawer = new MapDrawer(this.game, this.gameApi, this, this.camera);
     this.overlays = new OverlaysRenderer(this.mapUi);
-    this.path = new PathRenderer(this.game, this.mapUi);
+    this.path = new PathRenderer(this.game, this.camera, this.mapUi);
 
     this.app.stage.addChild(this.mapDrawer.container);
     this.app.stage.addChild(this.overlays.container);
@@ -50,7 +58,7 @@ export class GameRenderer {
     }
 
     this.app.ticker.add(() => {
-      this.game.camera.update();
+      this.camera.update();
       this.mapUi.update();
     });
   }
@@ -60,7 +68,7 @@ export class GameRenderer {
   }
 
   onReady() {
-    this.game.camera.transform$.subscribe((t) => {
+    this.camera.transform$.subscribe((t) => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
       this.app.stage.setTransform(x, y, t.scale, t.scale);

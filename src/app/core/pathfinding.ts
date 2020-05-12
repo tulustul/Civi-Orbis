@@ -1,7 +1,7 @@
-import { Tile } from "./tile";
+import { TileCore } from "./tile";
 import { Unit } from "./unit";
 
-export function findPath(unit: Unit, end: Tile): Tile[][] | null {
+export function findPath(unit: Unit, end: TileCore): TileCore[][] | null {
   const startTime = performance.now();
   const start = unit.tile;
 
@@ -9,10 +9,10 @@ export function findPath(unit: Unit, end: Tile): Tile[][] | null {
     return null;
   }
 
-  const visitedTiles = new Set<Tile>();
-  const tilesToVisit = new Map<Tile, number>();
-  const cameFrom = new Map<Tile, [number, number, Tile | null]>();
-  const costsSoFar = new Map<Tile, number>();
+  const visitedTiles = new Set<TileCore>();
+  const tilesToVisit = new Map<TileCore, number>();
+  const cameFrom = new Map<TileCore, [number, number, TileCore | null]>();
+  const costsSoFar = new Map<TileCore, number>();
 
   const turnCost = 1 / unit.definition.actionPoints;
   tilesToVisit.set(start, 0);
@@ -20,7 +20,7 @@ export function findPath(unit: Unit, end: Tile): Tile[][] | null {
   cameFrom.set(start, [0, unit.definition.actionPoints, null]);
 
   while (tilesToVisit.size) {
-    let nextTile!: Tile;
+    let nextTile!: TileCore;
     let minEstimatedCost = Infinity;
 
     for (const [tile, estimatedCost] of tilesToVisit.entries()) {
@@ -87,7 +87,7 @@ export function findPath(unit: Unit, end: Tile): Tile[][] | null {
   return null;
 }
 
-function getEuclideanDistance(start: Tile, end: Tile) {
+function getEuclideanDistance(start: TileCore, end: TileCore) {
   return Math.sqrt(
     (start.x - end.x) * (start.x - end.x) +
       (start.y - end.y) * (start.y - end.y),
@@ -95,14 +95,14 @@ function getEuclideanDistance(start: Tile, end: Tile) {
 }
 
 function reconstructPath(
-  cameFrom: Map<Tile, [number, number, Tile | null]>,
-  target: Tile,
-): Tile[][] {
+  cameFrom: Map<TileCore, [number, number, TileCore | null]>,
+  target: TileCore,
+): TileCore[][] {
   let lastTile = target;
   let lastTurn: number | null = null;
 
-  let turnPath: Tile[] = [target];
-  const path: Tile[][] = [turnPath];
+  let turnPath: TileCore[] = [target];
+  const path: TileCore[][] = [turnPath];
   while (true) {
     const [turn, _, tile] = cameFrom.get(lastTile)!;
     if (!tile || !cameFrom.has(tile)) {

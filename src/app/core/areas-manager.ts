@@ -1,8 +1,11 @@
-import { Area } from "./area";
 import { Subject } from "rxjs";
+
+import { Area } from "./area";
 
 export class AreasManager {
   areas: Area[] = [];
+
+  lastId = 0;
 
   private _created$ = new Subject<Area>();
   created$ = this._created$.asObservable();
@@ -12,6 +15,7 @@ export class AreasManager {
 
   make(color: number) {
     const area = new Area(color);
+    area.id = this.lastId++;
     this.areas.push(area);
     this._created$.next(area);
     return area;

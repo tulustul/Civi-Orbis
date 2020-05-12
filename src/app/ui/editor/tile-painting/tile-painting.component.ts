@@ -9,13 +9,13 @@ import {
   IMPROVEMENT_OPTIONS,
 } from "../constants";
 import { Option } from "../../widgets/option.interface";
-import { SeaLevel, LandForm, Climate } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
 import { TileImprovement } from "src/app/core/tile-improvements";
+import { Climate, LandForm, SeaLevel } from "src/app/shared";
 
 const IGNORE_OPTION: Option = { label: "ignore", value: undefined };
 

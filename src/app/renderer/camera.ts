@@ -1,8 +1,11 @@
+import { Injectable } from "@angular/core";
+
 import { BehaviorSubject } from "rxjs";
+
 import { Game } from "../core/game";
 import { getTileCoords } from "./utils";
-import { Tile } from "../core/tile";
-import { AnimationEaseOutCubic, Animation } from "../core/animation";
+import { TileCore } from "../core/tile";
+import { AnimationEaseOutCubic, Animation } from "./animation";
 import { GameRenderer } from "./renderer";
 import { TILE_SIZE } from "./constants";
 
@@ -19,6 +22,7 @@ export interface BoundingBox {
   yEnd: number;
 }
 
+@Injectable()
 export class Camera {
   MAX_ZOOM = TILE_SIZE; // tile graphics width in pixels
   MIN_ZOOM = 7;
@@ -32,6 +36,8 @@ export class Camera {
   private moveXAnimation: Animation | null = null;
   private moveYAnimation: Animation | null = null;
 
+  private renderer: GameRenderer;
+
   public tileBoundingBox: BoundingBox = {
     xStart: 0,
     yStart: 0,
@@ -39,7 +45,11 @@ export class Camera {
     yEnd: 0,
   };
 
-  constructor(private game: Game, private renderer: GameRenderer) {}
+  constructor(private game: Game) {}
+
+  setRenderer(renderer: GameRenderer) {
+    this.renderer = renderer;
+  }
 
   moveBy(x: number, y: number) {
     this.transform$.value.x -= x / this.transform$.value.scale;
@@ -53,7 +63,7 @@ export class Camera {
     this.transform$.next(this.transform$.value);
   }
 
-  moveToTileWithEasing(tile: Tile) {
+  moveToTileWithEasing(tile: TileCore) {
     const t = this.transform$.value;
     const [x, y] = getTileCoords(tile);
     this.moveXAnimation = new AnimationEaseOutCubic(t.x, x, 600);
@@ -102,7 +112,7 @@ export class Camera {
     this.transform$.next(t);
   }
 
-  moveToTile(tile: Tile) {
+  moveToTile(tile: TileCore) {
     const [x, y] = getTileCoords(tile);
     this.moveTo(x, y);
   }

@@ -1,4 +1,7 @@
-import { Tile } from "./tile";
+import { BehaviorSubject, Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+
+import { TileCore } from "./tile";
 import { Player } from "./player";
 import { getTileIndex } from "./serialization";
 import { UnitDefinition } from "./unit.interface";
@@ -14,8 +17,7 @@ import {
   copyYields,
   roundYields,
 } from "./yields";
-import { BehaviorSubject, Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+
 import { UNITS_DEFINITIONS } from "../data/units";
 import { BUILDINGS } from "../data/buildings";
 import { IDLE_PRODUCTS } from "../data/idle-products";
@@ -47,6 +49,17 @@ export interface CitySerialized {
   buildings: string[];
 }
 
+export interface CityChanneled {
+  id: number;
+  name: string;
+  size: number;
+  tile: number;
+  player: number;
+  totalFood: number;
+  totalProduction: number;
+  product: ProductSerialized | null;
+}
+
 export class City {
   id: number;
   name: string;
@@ -69,11 +82,11 @@ export class City {
   buildings: Building[] = [];
   buildingsIds = new Set<string>();
 
-  tiles = new Set<Tile>();
+  tiles = new Set<TileCore>();
 
-  workedTiles = new Set<Tile>();
+  workedTiles = new Set<TileCore>();
 
-  notWorkedTiles = new Set<Tile>();
+  notWorkedTiles = new Set<TileCore>();
 
   availableBuildings: Building[] = [];
   disabledBuildings = new Set<Building>();
@@ -93,7 +106,7 @@ export class City {
   private _sizeChange$ = new Subject<number>();
   sizeChange$ = this._sizeChange$.pipe(takeUntil(this.destroyed$));
 
-  constructor(public tile: Tile, public player: Player) {
+  constructor(public tile: TileCore, public player: Player) {
     this.addTile(tile, false);
   }
 
@@ -103,7 +116,7 @@ export class City {
       name: this.name,
       size: this.size,
       player: this.player.id,
-      tile: getTileIndex(this.player.game.map, this.tile),
+      tile: this.tile.id,
       totalFood: this.totalFood,
       totalProduction: this.totalProduction,
       totalCulture: this.totalCulture,
@@ -120,6 +133,24 @@ export class City {
         getTileIndex(this.player.game.map, tile),
       ),
       buildings: this.buildings.map((b) => b.id),
+    };
+  }
+
+  serializeToChannel(): CityChanneled {
+    return {
+      id: this.id,
+      name: this.name,
+      size: this.size,
+      player: this.player.id,
+      tile: this.tile.id,
+      totalFood: this.totalFood,
+      totalProduction: this.totalProduction,
+      product: this.product
+        ? {
+            type: this.product.type,
+            id: this.product.productDefinition.id,
+          }
+        : null,
     };
   }
 
@@ -334,7 +365,7 @@ export class City {
     }
   }
 
-  addTile(tile: Tile, recomputeBorders = true) {
+  addTile(tile: TileCore, recomputeBorders = true) {
     if (!tile.areaOf) {
       this.tiles.add(tile);
       this.notWorkedTiles.add(tile);
@@ -350,7 +381,7 @@ export class City {
     }
   }
 
-  removeTile(tile: Tile, emitEvent = true) {
+  removeTile(tile: TileCore, emitEvent = true) {
     if (this.tiles.has(tile)) {
       this.tiles.delete(tile);
       tile.areaOf = null;
@@ -358,7 +389,7 @@ export class City {
     }
   }
 
-  workTile(tile: Tile, updateYields = true) {
+  workTile(tile: TileCore, updateYields = true) {
     if (this.freeTileWorkers && this.tiles.has(tile)) {
       this.workedTiles.add(tile);
       this.notWorkedTiles.delete(tile);
@@ -368,7 +399,7 @@ export class City {
     }
   }
 
-  unworkTile(tile: Tile, updateYields = true) {
+  unworkTile(tile: TileCore, updateYields = true) {
     this.workedTiles.delete(tile);
     this.notWorkedTiles.add(tile);
     if (updateYields) {
@@ -376,8 +407,8 @@ export class City {
     }
   }
 
-  getAvailableTiles(): Set<Tile> {
-    const availableTiles = new Set<Tile>();
+  getAvailableTiles(): Set<TileCore> {
+    const availableTiles = new Set<TileCore>();
     for (const tile of this.tiles) {
       for (const neighbour of tile.neighbours) {
         if (!neighbour.areaOf) {
@@ -388,8 +419,8 @@ export class City {
     return availableTiles;
   }
 
-  pickBestTile(tiles: Set<Tile>): Tile | null {
-    let bestTile: Tile | null = null;
+  pickBestTile(tiles: Set<TileCore>): TileCore | null {
+    let bestTile: TileCore | null = null;
     let bestYields = 0;
 
     for (const tile of tiles) {

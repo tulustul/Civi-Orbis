@@ -1,10 +1,12 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 
-import { Game } from "src/app/core/game";
 import { SimplexMapGenerator } from "src/app/map-generators/simplex";
 import { Player, PLAYER_COLORS } from "src/app/core/player";
 import { UIState } from "../../ui-state";
 import { AIPlayer } from "src/app/ai/ai-player";
+import { GameApi } from "src/app/api/game";
+import { MapGeneratorOptions } from "src/app/api/game.interface";
+import { Camera } from "src/app/renderer/camera";
 
 @Component({
   selector: "app-new-game-view",
@@ -28,47 +30,37 @@ export class NewGameViewComponent implements OnInit {
 
   seed: number | null = null;
 
-  constructor(private game: Game, private uiState: UIState) {}
+  waiting = false;
+
+  constructor(
+    private game: GameApi,
+    private uiState: UIState,
+    private camera: Camera,
+  ) {}
 
   ngOnInit(): void {}
 
-  start() {
-    this.game.clear();
+  async start() {
+    const mapOptions: MapGeneratorOptions = {
+      width: this.width,
+      height: this.height,
+      uniformity: this.uniformity,
+      seaLevel: this.seaLevel,
+      aiPlayersCount: this.aiPlayersCount,
+      humanPlayersCount: this.humanPlayersCount,
+      seed: this.seed ? this.seed?.toString() : undefined,
+    };
 
-    for (let i = 0; i < this.humanPlayersCount + this.aiPlayersCount; i++) {
-      const player = new Player(this.game, PLAYER_COLORS[i]);
+    this.waiting = true;
+    const game = await this.game.newGame(mapOptions);
+    this.waiting = false;
 
-      if (i >= this.humanPlayersCount) {
-        player.ai = new AIPlayer(player);
-      }
+    console.log(game);
 
-      this.game.addPlayer(player);
-    }
-
-    const generator = new SimplexMapGenerator(this.game.players.length);
-    this.game.map = generator.generate(
-      this.width,
-      this.height,
-      this.seed ? this.seed?.toString() : undefined,
-      this.uniformity,
-      this.seaLevel,
-    );
-    this.game.map.precompute();
-
-    for (let i = 0; i < this.game.players.length; i++) {
-      this.game.unitsManager.spawn(
-        "settler",
-        generator.getStartingLocations()[i],
-        this.game.players[i],
-      );
-    }
-
-    this.game.start();
-
-    const unit = this.game.activePlayer$.value?.units[0];
-    if (unit) {
-      this.game.camera.moveToTile(unit.tile);
-    }
+    // const unit = game.activePlayer.units[0];
+    // if (unit) {
+    //   this.camera.moveToTile(unit.tile);
+    // }
 
     this.uiState.menuVisible$.next(false);
   }

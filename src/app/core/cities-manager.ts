@@ -4,11 +4,12 @@ import { City, CitySerialized } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
-import { Tile, LandForm, SeaLevel } from "./tile";
 import { BUILDINGS_MAP } from "./buildings";
 import { ProductDefinition } from "./product";
 import { IDLE_PRODUCTS_MAP } from "./idle-product";
 import { TileRoad } from "./tile-improvements";
+import { TileCore } from "./tile";
+import { LandForm, SeaLevel } from "../shared";
 
 export class CitiesManager {
   private _spawned$ = new Subject<City>();
@@ -22,9 +23,11 @@ export class CitiesManager {
 
   cities: City[] = [];
 
+  lastId = 0;
+
   constructor(private game: Game) {}
 
-  spawn(tile: Tile, player: Player, isNew = true) {
+  spawn(tile: TileCore, player: Player, isNew = true) {
     if (tile.city) {
       return null;
     }
@@ -37,9 +40,9 @@ export class CitiesManager {
     }
 
     const city = new City(tile, player);
-    city.id = this.cities.length;
+    city.id = this.lastId++;
     city.size = 1;
-    city.name = `City ${this.cities.length + 1}`;
+    city.name = `City ${city.id}`;
     city.tile = tile;
     this.cities.push(city);
 
@@ -100,6 +103,10 @@ export class CitiesManager {
 
   serialize() {
     return this.cities.map((u) => u.serialize());
+  }
+
+  serializeToChannel() {
+    return this.cities.map((u) => u.serializeToChannel());
   }
 
   deserialize(data: CitySerialized[]) {

@@ -1,9 +1,10 @@
 import * as PIXIE from "pixi.js";
 
 import { Game } from "../core/game";
-import { Tile } from "../core/tile";
+import { TileCore } from "../core/tile";
 import { getTileCenter } from "./utils";
 import { MapUi } from "../ui/map-ui";
+import { Camera } from "./camera";
 
 export class PathRenderer {
   container = new PIXIE.Container();
@@ -12,7 +13,7 @@ export class PathRenderer {
 
   labels: PIXIE.Text[] = [];
 
-  constructor(private game: Game, mapUi: MapUi) {
+  constructor(private game: Game, private camera: Camera, mapUi: MapUi) {
     this.container.addChild(this.pathGraphics);
 
     mapUi.activePath$.subscribe((path) => this.buildPath(path));
@@ -27,7 +28,7 @@ export class PathRenderer {
     this.labels = [];
   }
 
-  buildPath(path: Tile[][] | null) {
+  buildPath(path: TileCore[][] | null) {
     this.clear();
 
     const unit = this.game.unitsManager.activeUnit;
@@ -53,7 +54,7 @@ export class PathRenderer {
 
     for (let turn = 0; turn < path.length; turn++) {
       if (path[turn][0]) {
-        const scale = this.game.camera.transform$.value.scale;
+        const scale = this.camera.transform$.value.scale;
 
         const label = new PIXIE.Text(turn.toString(), {
           align: "center",

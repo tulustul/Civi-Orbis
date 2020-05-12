@@ -1,7 +1,7 @@
 import { Player } from "../core/player";
 import { IDLE_PRODUCTS_MAP } from "../core/idle-product";
 import { Unit, UNITS_MAP } from "../core/unit";
-import { Tile } from "../core/tile";
+import { TileCore } from "../core/tile";
 import { findPath } from "../core/pathfinding";
 import { City } from "../core/city";
 
@@ -66,11 +66,11 @@ export class AIPlayer {
     }
   }
 
-  findCityLocation(startTile: Tile): Tile | null {
+  findCityLocation(startTile: TileCore): TileCore | null {
     const tiles = startTile.getTilesInRange(5);
 
     let bestSweetSpotValue = 0;
-    let bestTile: Tile | null = null;
+    let bestTile: TileCore | null = null;
     for (const tile of tiles) {
       tile.computeSweetSpotValue();
 

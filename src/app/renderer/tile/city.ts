@@ -1,10 +1,11 @@
 import * as PIXIE from "pixi.js";
 
+import { takeUntil } from "rxjs/operators";
+
 import { getTileVariants, pickRandom, drawTileSprite } from "../utils";
 import { City } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
-import { takeUntil } from "rxjs/operators";
 import { GameRenderer } from "../renderer";
 
 const SMALL_CITY_TEXTURES = getTileVariants("villageSmall", 4);

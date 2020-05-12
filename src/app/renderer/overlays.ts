@@ -1,6 +1,6 @@
 import * as PIXIE from "pixi.js";
 
-import { Tile } from "../core/tile";
+import { TileCore } from "../core/tile";
 import { drawClosedHex, getTileCoords, drawHex } from "./utils";
 import { MapUi } from "../ui/map-ui";
 
@@ -33,7 +33,7 @@ export class OverlaysRenderer {
     });
   }
 
-  private displayAtTile(obj: PIXIE.DisplayObject, tile: Tile | null) {
+  private displayAtTile(obj: PIXIE.DisplayObject, tile: TileCore | null) {
     if (tile) {
       const [x, y] = getTileCoords(tile);
       obj.position.x = x;
@@ -58,7 +58,7 @@ export class OverlaysRenderer {
     this.selectedTileGraphics.endFill();
   }
 
-  buildHighlightedTiles(tiles: Set<Tile>) {
+  buildHighlightedTiles(tiles: Set<TileCore>) {
     this.highlightedTilesGraphics.clear();
     if (!tiles.size) {
       this.container.removeChild(this.highlightedTilesGraphics);

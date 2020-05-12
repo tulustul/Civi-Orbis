@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
 import { Game } from "src/app/core/game";
-import { Tile, TileDirection } from "src/app/core/tile";
+import { TileCore } from "src/app/core/tile";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,
@@ -18,6 +18,7 @@ import {
 import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
 import { MapUi } from "../../map-ui";
 import { TileImprovement, TileRoad } from "src/app/core/tile-improvements";
+import { TileDirection } from "src/app/shared";
 
 @Component({
   selector: "app-tile-editor",
@@ -27,7 +28,7 @@ import { TileImprovement, TileRoad } from "src/app/core/tile-improvements";
 export class TileEditorComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;
 
-  tile: Tile | null = null;
+  tile: TileCore | null = null;
 
   SEA_LEVEL_OPTIONS = SEA_LEVEL_OPTIONS;
   LAND_FORM_OPTIONS = LAND_FORM_OPTIONS;

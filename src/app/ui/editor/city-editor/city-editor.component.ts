@@ -5,7 +5,7 @@ import { filter, takeUntil } from "rxjs/operators";
 
 import { City } from "src/app/core/city";
 import { Game } from "src/app/core/game";
-import { Tile } from "src/app/core/tile";
+import { TileCore } from "src/app/core/tile";
 import { MapUi } from "../../map-ui";
 
 @Component({
@@ -41,7 +41,7 @@ export class CityEditorComponent implements OnInit {
     hidden.subscribe(() => this.mapUi.enableSelectingTile(false));
   }
 
-  spawn(tile: Tile) {
+  spawn(tile: TileCore) {
     this.city = this.game.citiesManager.spawn(tile, this.game.players[0]);
   }
 

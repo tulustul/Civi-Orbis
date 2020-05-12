@@ -17,6 +17,7 @@ import { Game } from "src/app/core/game";
 import { getTileCoords } from "src/app/renderer/utils";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
+import { Camera } from "src/app/renderer/camera";
 
 @Component({
   selector: "app-city-info",
@@ -33,6 +34,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef<HTMLElement>,
     private game: Game,
+    private camera: Camera,
     public controls: Controls,
     private mapUi: MapUi,
   ) {}
@@ -66,10 +68,10 @@ export class CityInfoComponent implements OnInit, OnDestroy {
   @HostBinding("style.transform")
   get transform() {
     // FIXME: This migth lead to performance issues. It is calculated for every city every time camera transform changes.
-    let scale = this.game.camera.transform$.value.scale;
+    let scale = this.camera.transform$.value.scale;
     scale = Math.pow(scale / 70, 0.4);
     let [x, y] = getTileCoords(this.city.tile);
-    [x, y] = this.game.camera.canvasToScreen(x + 0.5, y + 0.8);
+    [x, y] = this.camera.canvasToScreen(x + 0.5, y + 0.8);
     return `translate(${x}px, ${y}px) scale(${scale})`;
   }
 

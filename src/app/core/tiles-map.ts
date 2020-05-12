@@ -1,5 +1,5 @@
-import { Tile, TileSerialized } from "./tile";
-import { getTileNeighbours, getTileFullNeighbours } from "./hex-math";
+import { TileCore, TileSerialized, TileChanneled } from "./tile";
+import { getTileNeighbours, getTileFullNeighbours } from "../shared/hex-math";
 
 export interface MapSerialized {
   width: number;
@@ -7,15 +7,21 @@ export interface MapSerialized {
   tiles: TileSerialized[];
 }
 
-export class TilesMap {
-  tiles: Tile[][] = [];
+export interface MapChanneled {
+  width: number;
+  height: number;
+  tiles: TileChanneled[][];
+}
+
+export class TilesMapCore {
+  tiles: TileCore[][] = [];
 
   constructor(public width: number, public height: number) {
     for (let x = 0; x < width; x++) {
-      const row: Tile[] = [];
+      const row: TileCore[] = [];
       this.tiles.push(row);
       for (let y = 0; y < height; y++) {
-        row.push(new Tile(x, y));
+        row.push(new TileCore(x * width + y, x, y));
       }
     }
 
@@ -42,7 +48,7 @@ export class TilesMap {
     }
   }
 
-  get(x: number, y: number): Tile | null {
+  get(x: number, y: number): TileCore | null {
     if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
       return null;
     }
@@ -57,14 +63,22 @@ export class TilesMap {
     };
   }
 
+  serializeToChannel(): MapChanneled {
+    return {
+      width: this.width,
+      height: this.height,
+      tiles: this.serializeTilesToChannel(),
+    };
+  }
+
   serializeTiles(): TileSerialized[] {
     // Store only changes from the last tile to keep save size minimal
-    const result: Partial<Tile>[] = [];
-    let lastTile: Partial<Tile> = {};
+    const result: Partial<TileCore>[] = [];
+    let lastTile: Partial<TileCore> = {};
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         const tile = this.tiles[x][y];
-        const diff: Partial<Tile> = {};
+        const diff: Partial<TileCore> = {};
 
         if (tile.seaLevel !== lastTile.seaLevel) {
           diff.seaLevel = tile.seaLevel;
@@ -77,6 +91,9 @@ export class TilesMap {
         }
         if (tile.forest !== lastTile.forest) {
           diff.forest = tile.forest;
+        }
+        if (tile.wetlands !== lastTile.wetlands) {
+          diff.wetlands = tile.wetlands;
         }
         if (tile.improvement !== lastTile.improvement) {
           diff.improvement = tile.improvement;
@@ -97,9 +114,21 @@ export class TilesMap {
     return result;
   }
 
+  serializeTilesToChannel(): TileChanneled[][] {
+    const result: TileChanneled[][] = [];
+    for (let x = 0; x < this.width; x++) {
+      const row: TileChanneled[] = [];
+      result.push(row);
+      for (let y = 0; y < this.height; y++) {
+        row.push(this.tiles[x][y].serializeToChannel());
+      }
+    }
+    return result;
+  }
+
   static deserialize(mapData: MapSerialized) {
-    const map = new TilesMap(mapData.width, mapData.height);
-    let lastTile: Tile = map.tiles[0][0];
+    const map = new TilesMapCore(mapData.width, mapData.height);
+    let lastTile: TileCore = map.tiles[0][0];
     let index = 0;
 
     for (let x = 0; x < mapData.width; x++) {

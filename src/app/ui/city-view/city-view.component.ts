@@ -9,6 +9,7 @@ import { Building } from "src/app/core/buildings";
 import { UnitDefinition } from "src/app/core/unit.interface";
 import { IdleProduct } from "src/app/core/idle-product";
 import { MapUi } from "../map-ui";
+import { Camera } from "src/app/renderer/camera";
 
 @Component({
   selector: "app-city-view",
@@ -20,7 +21,7 @@ export class CityViewComponent implements OnInit {
 
   private _city: City;
 
-  constructor(private game: Game, private mapUi: MapUi) {}
+  constructor(private camera: Camera, private mapUi: MapUi) {}
 
   ngOnInit(): void {
     this.city.updateProductsList();
@@ -29,12 +30,12 @@ export class CityViewComponent implements OnInit {
   @Input() set city(city: City) {
     this._city = city;
 
-    this.game.camera.moveToTileWithEasing(this.city.tile);
-    const [x, y] = this.game.camera.canvasToScreen(
+    this.camera.moveToTileWithEasing(this.city.tile);
+    const [x, y] = this.camera.canvasToScreen(
       this.city.tile.x,
       this.city.tile.y,
     );
-    this.game.camera.scaleToWithEasing(130, x, y);
+    this.camera.scaleToWithEasing(130, x, y);
     this.mapUi.highlightTiles(this.city.tiles);
 
     this.mapUi.clickedTile$.pipe(takeUntil(this.quit$)).subscribe((tile) => {

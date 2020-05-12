@@ -3,11 +3,12 @@ import * as PIXIE from "pixi.js";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Tile, SeaLevel, Climate, TileDirection } from "../core/tile";
+import { TileCore } from "../core/tile";
 import { Game } from "../core/game";
-import { Transform } from "../renderer/camera";
+import { Transform, Camera } from "../renderer/camera";
 import { drawHex } from "./utils";
 import { GameRenderer } from "./renderer";
+import { SeaLevel, Climate, TileDirection } from "../shared";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,
@@ -42,13 +43,17 @@ export class MinimapRenderer {
 
   private mapTexture: PIXIE.RenderTexture;
 
-  private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
+  private tilesMap = new Map<TileCore, PIXIE.DisplayObject[]>();
 
   private app: PIXIE.Application;
 
   private destroyed$ = new Subject<void>();
 
-  constructor(private game: Game, private renderer: GameRenderer) {
+  constructor(
+    private game: Game,
+    private renderer: GameRenderer,
+    private camera: Camera,
+  ) {
     const tilesManager = this.game.tilesManager;
     tilesManager.revealedTiles$
       .pipe(takeUntil(this.destroyed$))
@@ -104,7 +109,7 @@ export class MinimapRenderer {
 
     this.app.stage.addChild(this.container);
 
-    this.game.camera.transform$
+    this.camera.transform$
       .pipe(takeUntil(this.destroyed$))
       .subscribe((transform) => {
         this.updateCamera(transform);
@@ -140,7 +145,7 @@ export class MinimapRenderer {
     }
   }
 
-  private reveal(tiles: Iterable<Tile>) {
+  private reveal(tiles: Iterable<TileCore>) {
     for (const tile of tiles) {
       const displayObjects = this.tilesMap.get(tile);
       if (displayObjects) {
@@ -186,7 +191,7 @@ export class MinimapRenderer {
     }
   }
 
-  private drawTile(tile: Tile) {
+  private drawTile(tile: TileCore) {
     let color: number;
 
     if (tile.seaLevel !== SeaLevel.none) {
@@ -213,7 +218,7 @@ export class MinimapRenderer {
     this.renderRivers(tile, g);
   }
 
-  private renderRivers(tile: Tile, graphics: PIXIE.Graphics) {
+  private renderRivers(tile: TileCore, graphics: PIXIE.Graphics) {
     if (!tile.riverParts.length) {
       return;
     }
