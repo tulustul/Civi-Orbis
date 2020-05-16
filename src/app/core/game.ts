@@ -1,7 +1,12 @@
 import { BehaviorSubject, ReplaySubject } from "rxjs";
 import { filter, distinctUntilChanged } from "rxjs/operators";
 
-import { Player, PlayerSerialized } from "./player";
+import {
+  Player,
+  PlayerSerialized,
+  TrackedPlayerChanneled,
+  PlayerChanneled,
+} from "./player";
 import { TilesMapCore, MapSerialized, MapChanneled } from "./tiles-map";
 import { UnitsManager } from "./unit-manager";
 import { TilesManager } from "./tiles-manager";
@@ -23,8 +28,8 @@ interface GameSerialized {
 export interface GameChanneled {
   turn: number;
   map: MapChanneled;
-  players: PlayerSerialized[];
-  activePlayerIndex: number;
+  players: PlayerChanneled[];
+  trackedPlayer: TrackedPlayerChanneled;
   units: UnitChanneled[];
   cities: CityChanneled[];
 }
@@ -126,11 +131,12 @@ export class Game {
   }
 
   serializeToChannel(): GameChanneled {
+    const trackedPlayer = this.humanPlayer || this.players[0];
     return {
       turn: this.turn$.value,
       map: this.map.serializeToChannel(),
-      players: this.players.map((p) => p.serialize()),
-      activePlayerIndex: this.activePlayerIndex,
+      players: this.players.map((p) => p.serializeToChannel()),
+      trackedPlayer: trackedPlayer.serializeToTrackedPlayer(),
       units: this.unitsManager.serializeToChannel(),
       cities: this.citiesManager.serializeToChannel(),
     };

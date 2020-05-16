@@ -8,7 +8,7 @@ import { MapUi } from "./ui/map-ui";
 import { UIState } from "./ui/ui-state";
 import { Camera } from "./renderer/camera";
 import { GameApi } from "./api/game";
-import { Unit } from "./core/unit";
+import { UnitCore } from "./core/unit";
 
 @Injectable()
 export class Controls {
@@ -122,7 +122,7 @@ export class Controls {
     // this.mapUi.setPath(this.activeUnit?.path || null);
   }
 
-  get activeUnit(): Unit | null {
+  get activeUnit(): UnitCore | null {
     // return this.game.unitsManager.activeUnit;
     return null;
   }

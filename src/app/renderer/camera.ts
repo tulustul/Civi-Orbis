@@ -2,12 +2,12 @@ import { Injectable } from "@angular/core";
 
 import { BehaviorSubject } from "rxjs";
 
-import { Game } from "../core/game";
 import { getTileCoords } from "./utils";
 import { TileCore } from "../core/tile";
 import { AnimationEaseOutCubic, Animation } from "./animation";
 import { GameRenderer } from "./renderer";
 import { TILE_SIZE } from "./constants";
+import { GameApi } from "../api";
 
 export interface Transform {
   x: number;
@@ -45,7 +45,7 @@ export class Camera {
     yEnd: 0,
   };
 
-  constructor(private game: Game) {}
+  constructor(private game: GameApi) {}
 
   setRenderer(renderer: GameRenderer) {
     this.renderer = renderer;
@@ -195,7 +195,7 @@ export class Camera {
   }
 
   updateBoundingBox() {
-    if (!this.game.map) {
+    if (!this.game.state) {
       return;
     }
 
@@ -203,7 +203,7 @@ export class Camera {
     const width = Math.floor(this.renderer.canvas.width / t.scale);
     const height = Math.floor(this.renderer.canvas.height / t.scale);
 
-    const map = this.game.map;
+    const map = this.game.state.map;
 
     const xStart = Math.floor(t.x - width / 2 - 1);
     const yStart = Math.floor(t.y - height / 2);

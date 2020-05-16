@@ -29,13 +29,11 @@ export class GameRenderer {
   textures: PIXIE.ITextureDictionary;
 
   constructor(
-    private gameApi: GameApi,
-    private game: Game,
+    private game: GameApi,
     public mapUi: MapUi,
     private camera: Camera,
   ) {
     this.camera.setRenderer(this);
-    game.stopped$.subscribe(() => this.clear());
   }
 
   setCanvas(canvas: HTMLCanvasElement) {
@@ -45,7 +43,7 @@ export class GameRenderer {
 
     this.canvas = canvas;
 
-    this.mapDrawer = new MapDrawer(this.game, this.gameApi, this, this.camera);
+    this.mapDrawer = new MapDrawer(this.game, this, this.camera);
     this.overlays = new OverlaysRenderer(this.mapUi);
     this.path = new PathRenderer(this.game, this.camera, this.mapUi);
 

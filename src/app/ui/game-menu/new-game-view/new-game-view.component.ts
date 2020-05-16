@@ -52,10 +52,8 @@ export class NewGameViewComponent implements OnInit {
     };
 
     this.waiting = true;
-    const game = await this.game.newGame(mapOptions);
+    await this.game.newGame(mapOptions);
     this.waiting = false;
-
-    console.log(game);
 
     // const unit = game.activePlayer.units[0];
     // if (unit) {

@@ -1,13 +1,13 @@
 import * as PIXIE from "pixi.js";
 
-import { TileCore, TileChanneled } from "../core/tile";
 import { TILE_SIZE } from "./constants";
+import { Tile } from "../shared";
 
-export function getTileCenter(tile: TileCore): [number, number] {
+export function getTileCenter(tile: Tile): [number, number] {
   return [0.5 + tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75 + 0.5];
 }
 
-export function getTileCoords(tile: TileCore): [number, number] {
+export function getTileCoords(tile: Tile): [number, number] {
   return [tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75];
 }
 
@@ -39,7 +39,7 @@ export function getTileVariants(tileName: string, variants: number): string[] {
   return result;
 }
 
-export function drawTileSprite(tile: TileChanneled, texture: PIXIE.Texture) {
+export function drawTileSprite(tile: Tile, texture: PIXIE.Texture) {
   const sprite = new PIXIE.Sprite(texture);
   sprite.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
   sprite.position.y = tile.y * 0.75 - 0.5;
@@ -47,10 +47,7 @@ export function drawTileSprite(tile: TileChanneled, texture: PIXIE.Texture) {
   return sprite;
 }
 
-export function drawTileSpriteCentered(
-  tile: TileChanneled,
-  texture: PIXIE.Texture,
-) {
+export function drawTileSpriteCentered(tile: Tile, texture: PIXIE.Texture) {
   const sprite = new PIXIE.Sprite(texture);
   sprite.position.x =
     tile.x + (tile.y % 2 ? 0.5 : 0) + 0.5 - sprite.width / 2 / TILE_SIZE;

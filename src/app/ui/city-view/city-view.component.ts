@@ -3,7 +3,7 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { City } from "src/app/core/city";
+import { CityCore } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { Building } from "src/app/core/buildings";
 import { UnitDefinition } from "src/app/core/unit.interface";
@@ -19,7 +19,7 @@ import { Camera } from "src/app/renderer/camera";
 export class CityViewComponent implements OnInit {
   private quit$ = new Subject<void>();
 
-  private _city: City;
+  private _city: CityCore;
 
   constructor(private camera: Camera, private mapUi: MapUi) {}
 
@@ -27,7 +27,7 @@ export class CityViewComponent implements OnInit {
     this.city.updateProductsList();
   }
 
-  @Input() set city(city: City) {
+  @Input() set city(city: CityCore) {
     this._city = city;
 
     this.camera.moveToTileWithEasing(this.city.tile);

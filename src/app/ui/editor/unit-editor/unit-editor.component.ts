@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
 import { UnitDefinition } from "src/app/core/unit.interface";
-import { Unit } from "src/app/core/unit";
+import { UnitCore } from "src/app/core/unit";
 import { Game } from "src/app/core/game";
 import { TileCore } from "src/app/core/tile";
 import { Option } from "../../widgets/option.interface";
@@ -23,7 +23,7 @@ export class UnitEditorComponent implements OnInit {
 
   definition: UnitDefinition | null = null;
 
-  unit: Unit | null = null;
+  unit: UnitCore | null = null;
 
   definitionOptions: Option[] = [];
 

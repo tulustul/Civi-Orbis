@@ -1,8 +1,8 @@
 import { TileCore } from "./tile";
-import { Unit } from "./unit";
+import { UnitCore } from "./unit";
 import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";
-import { City } from "./city";
+import { CityCore } from "./city";
 import { AIPlayer } from "../ai/ai-player";
 import {
   Yields,
@@ -34,9 +34,26 @@ export const PLAYER_COLORS: number[] = [
 ];
 
 export interface PlayerSerialized {
+  id: number;
   ai: boolean;
   color: number;
   exploredTiles: number[];
+  yieldsTotal: Yields;
+}
+
+export interface PlayerChanneled {
+  id: number;
+  color: number;
+}
+
+export interface TrackedPlayerChanneled {
+  id: number;
+  color: number;
+  exploredTiles: number[];
+
+  yieldsPerTurn: Yields;
+  yieldsIncome: Yields;
+  yieldsCosts: Yields;
   yieldsTotal: Yields;
 }
 
@@ -47,13 +64,13 @@ export class Player {
 
   visibleTiles = new Set<TileCore>();
 
-  units: Unit[] = [];
+  units: UnitCore[] = [];
 
-  cities: City[] = [];
+  cities: CityCore[] = [];
 
-  cityWithoutProduction: City[] = [];
+  cityWithoutProduction: CityCore[] = [];
 
-  unitsWithoutOrders: Unit[] = [];
+  unitsWithoutOrders: UnitCore[] = [];
 
   yieldsPerTurn: Yields = { ...EMPTY_YIELDS };
 
@@ -71,11 +88,30 @@ export class Player {
 
   serialize(): PlayerSerialized {
     return {
+      id: this.id,
       ai: !!this.ai,
       color: this.color,
-      exploredTiles: Array.from(this.exploredTiles).map((tile) =>
-        getTileIndex(this.game.map, tile),
-      ),
+      exploredTiles: Array.from(this.exploredTiles).map((t) => t.id),
+      yieldsTotal: this.yieldsTotal,
+    };
+  }
+
+  serializeToChannel(): PlayerChanneled {
+    return {
+      id: this.id,
+      color: this.color,
+    };
+  }
+
+  serializeToTrackedPlayer(): TrackedPlayerChanneled {
+    return {
+      id: this.id,
+      color: this.color,
+      exploredTiles: Array.from(this.exploredTiles).map((t) => t.id),
+
+      yieldsCosts: this.yieldsCosts,
+      yieldsIncome: this.yieldsIncome,
+      yieldsPerTurn: this.yieldsPerTurn,
       yieldsTotal: this.yieldsTotal,
     };
   }
@@ -138,7 +174,7 @@ export class Player {
     );
   }
 
-  addCity(city: City) {
+  addCity(city: CityCore) {
     this.cities.push(city);
     city.product$.subscribe(() => this.updateCitiesWithoutProduction());
   }

@@ -1,4 +1,3 @@
-import { BehaviorSubject, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import { TileCore } from "./tile";
@@ -21,6 +20,7 @@ import {
 import { UNITS_DEFINITIONS } from "../data/units";
 import { BUILDINGS } from "../data/buildings";
 import { IDLE_PRODUCTS } from "../data/idle-products";
+import { Subject, BehaviorSubject } from "rxjs";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -53,14 +53,18 @@ export interface CityChanneled {
   id: number;
   name: string;
   size: number;
-  tile: number;
-  player: number;
+  tileId: number;
+  playerId: number;
+
   totalFood: number;
+  foodToGrow: number;
+
   totalProduction: number;
-  product: ProductSerialized | null;
+  productionRequired: number | null;
+  productName: string | null;
 }
 
-export class City {
+export class CityCore {
   id: number;
   name: string;
   size: number;
@@ -141,16 +145,17 @@ export class City {
       id: this.id,
       name: this.name,
       size: this.size,
-      player: this.player.id,
-      tile: this.tile.id,
+      playerId: this.player.id,
+      tileId: this.tile.id,
+
       totalFood: this.totalFood,
+      foodToGrow: this.foodToGrow,
+
       totalProduction: this.totalProduction,
-      product: this.product
-        ? {
-            type: this.product.type,
-            id: this.product.productDefinition.id,
-          }
+      productionRequired: this.product
+        ? this.product.productDefinition.productionCost
         : null,
+      productName: this.product ? this.product.productDefinition.name : null,
     };
   }
 
@@ -478,7 +483,7 @@ export class City {
 
   private getAvailableProducts<T extends ProductDefinition>(
     products: T[],
-    city: City,
+    city: CityCore,
   ): T[] {
     const results: T[] = [];
     for (const p of products) {
@@ -498,7 +503,7 @@ export class City {
 
   private getDisabledProducts<T extends ProductDefinition>(
     products: T[],
-    city: City,
+    city: CityCore,
   ): Set<T> {
     const results = new Set<T>();
     for (const p of products) {

@@ -1,8 +1,8 @@
-import { City } from "./city";
+import { CityCore } from "./city";
 
 export abstract class ProductRequirement {
   static id: string;
-  abstract check(city: City): boolean;
+  abstract check(city: CityCore): boolean;
 }
 
 export interface ProductDefinition {
@@ -24,7 +24,7 @@ export class BuildingRequirement extends ProductRequirement {
     super();
   }
 
-  check(city: City) {
+  check(city: CityCore) {
     return city.buildingsIds.has(this.buildingId);
   }
 }
@@ -36,7 +36,7 @@ export class SizeRequirement extends ProductRequirement {
     super();
   }
 
-  check(city: City) {
+  check(city: CityCore) {
     return city.size >= this.size;
   }
 }

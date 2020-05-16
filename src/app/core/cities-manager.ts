@@ -1,6 +1,6 @@
 import { Subject } from "rxjs";
 
-import { City, CitySerialized } from "./city";
+import { CitySerialized, CityCore } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { Player } from "./player";
@@ -12,16 +12,16 @@ import { TileCore } from "./tile";
 import { LandForm, SeaLevel } from "../shared";
 
 export class CitiesManager {
-  private _spawned$ = new Subject<City>();
+  private _spawned$ = new Subject<CityCore>();
   spawned$ = this._spawned$.asObservable();
 
-  private _updated$ = new Subject<City>();
+  private _updated$ = new Subject<CityCore>();
   updated$ = this._updated$.asObservable();
 
-  private _destroyed$ = new Subject<City>();
+  private _destroyed$ = new Subject<CityCore>();
   destroyed$ = this._destroyed$.asObservable();
 
-  cities: City[] = [];
+  cities: CityCore[] = [];
 
   lastId = 0;
 
@@ -39,7 +39,7 @@ export class CitiesManager {
       return null;
     }
 
-    const city = new City(tile, player);
+    const city = new CityCore(tile, player);
     city.id = this.lastId++;
     city.size = 1;
     city.name = `City ${city.id}`;
@@ -71,7 +71,7 @@ export class CitiesManager {
     return city;
   }
 
-  destroy(city: City) {
+  destroy(city: CityCore) {
     // TODO rewrite to sets for better performance?
     let index = this.cities.indexOf(city);
     if (index !== -1) {
@@ -93,7 +93,7 @@ export class CitiesManager {
     this._destroyed$.next(city);
   }
 
-  update(city: City) {
+  update(city: CityCore) {
     this._updated$.next(city);
   }
 

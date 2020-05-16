@@ -4,6 +4,7 @@ import { TileCore } from "src/app/core/tile";
 import { Game } from "src/app/core/game";
 import { Area } from "src/app/core/area";
 import { TileDirection } from "src/app/shared";
+import { GameApi } from "src/app/api";
 
 const BORDER_WIDTH = 0.11;
 const BORDER_WIDTH_HALVED = BORDER_WIDTH / 2;
@@ -45,7 +46,7 @@ const BORDERS_VERTICES: Record<
 export class AreaDrawer {
   areasMap = new Map<Area, PIXIE.DisplayObject[]>();
 
-  constructor(private game: Game, private container: PIXIE.Container) {
+  constructor(private game: GameApi, private container: PIXIE.Container) {
     // game.areasManager.created$.pipe().subscribe((area) => {
     //   area.changed$
     //     // .pipe(
@@ -61,24 +62,21 @@ export class AreaDrawer {
     //       this.drawArea(area);
     //     });
     // });
-
-    game.areasManager.destroyed$.subscribe((area) => {
-      this.clearArea(area);
-    });
-
-    this.game.started$.subscribe(() => this.build());
+    // game.areasManager.destroyed$.subscribe((area) => {
+    //   this.clearArea(area);
+    // });
+    // this.game.started$.subscribe(() => this.build());
   }
 
   build() {
-    for (const area of this.game.areasManager.areas) {
-      this.drawArea(area);
-
-      // TODO we can update only single tiles here.
-      area.updated$.subscribe(() => {
-        this.clearArea(area);
-        this.drawArea(area);
-      });
-    }
+    // for (const area of this.game.areasManager.areas) {
+    //   this.drawArea(area);
+    //   // TODO we can update only single tiles here.
+    //   area.updated$.subscribe(() => {
+    //     this.clearArea(area);
+    //     this.drawArea(area);
+    //   });
+    // }
   }
 
   clearArea(area: Area) {

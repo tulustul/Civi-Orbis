@@ -1,34 +1,21 @@
 import * as PIXIE from "pixi.js";
 
-import { takeUntil } from "rxjs/operators";
-
-import { Unit } from "src/app/core/unit";
-import { Game } from "src/app/core/game";
-
 import { getTileCoords } from "../utils";
 import { TileContainer } from "../tile-container";
+import { GameApi } from "src/app/api";
+import { Unit } from "src/app/api/unit";
 
 export class UnitsDrawer {
   unitGraphics = new Map<Unit, PIXIE.Graphics>();
 
-  constructor(private game: Game, private container: TileContainer) {
-    game.started$.subscribe(() => {
-      game.unitsManager.updated$
-        .pipe(takeUntil(game.stopped$))
-        .subscribe((unit) => this.update(unit));
-
-      game.unitsManager.spawned$
-        .pipe(takeUntil(game.stopped$))
-        .subscribe((unit) => this.spawn(unit));
-
-      game.unitsManager.destroyed$
-        .pipe(takeUntil(game.stopped$))
-        .subscribe((unit) => this.destroy(unit));
-    });
-  }
+  constructor(private game: GameApi, private container: TileContainer) {}
 
   build() {
-    for (const unit of this.game.unitsManager.units) {
+    if (!this.game.state) {
+      return;
+    }
+
+    for (const unit of this.game.state.units) {
       this.spawn(unit);
     }
   }

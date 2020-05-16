@@ -3,7 +3,7 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Observable } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
-import { City } from "src/app/core/city";
+import { CityCore } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { TileCore } from "src/app/core/tile";
 import { MapUi } from "../../map-ui";
@@ -16,7 +16,7 @@ import { MapUi } from "../../map-ui";
 export class CityEditorComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;
 
-  city: City | null = null;
+  city: CityCore | null = null;
 
   constructor(private game: Game, private mapUi: MapUi) {}
 

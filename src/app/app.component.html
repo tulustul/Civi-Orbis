@@ -2,7 +2,7 @@
 
 <app-game-canvas></app-game-canvas>
 
-<ng-container *ngIf="game.started$ | async">
+<ng-container *ngIf="game.state$ | async">
   <app-editor
     class="panel"
     *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"

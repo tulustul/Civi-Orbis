@@ -10,7 +10,7 @@ import { Subject, merge } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import { Game } from "src/app/core/game";
-import { City } from "src/app/core/city";
+import { CityCore } from "src/app/core/city";
 import { Camera } from "src/app/renderer/camera";
 
 @Component({
@@ -22,7 +22,7 @@ import { Camera } from "src/app/renderer/camera";
 export class CitiesLayerComponent implements OnInit {
   ngUnsubscribe = new Subject<void>();
 
-  cities: City[];
+  cities: CityCore[];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -60,7 +60,7 @@ export class CitiesLayerComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  trackByCityId(index: number, city: City) {
+  trackByCityId(index: number, city: CityCore) {
     return city.id;
   }
 

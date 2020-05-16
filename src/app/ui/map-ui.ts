@@ -3,28 +3,28 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Subject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 7;
-import { TileCore } from "../core/tile";
-import { Game } from "../core/game";
 import { UIState } from "./ui-state";
-import { City } from "../core/city";
-import { Unit } from "../core/unit";
 import { Camera } from "../renderer/camera";
+import { Tile } from "../shared";
+import { City } from "../api/city";
+import { Unit } from "../api/unit";
+import { GameApi } from "../api";
 
 @Injectable()
 export class MapUi {
-  private _hoveredTile$ = new BehaviorSubject<TileCore | null>(null);
+  private _hoveredTile$ = new BehaviorSubject<Tile | null>(null);
   hoveredTile$ = this._hoveredTile$.asObservable().pipe(distinctUntilChanged());
 
-  private _clickedTile$ = new Subject<TileCore>();
+  private _clickedTile$ = new Subject<Tile>();
   clickedTile$ = this._clickedTile$.asObservable();
 
-  private _selectedTile$ = new BehaviorSubject<TileCore | null>(null);
+  private _selectedTile$ = new BehaviorSubject<Tile | null>(null);
   selectedTile$ = this._selectedTile$.asObservable();
 
-  private _highlightedTiles$ = new BehaviorSubject<Set<TileCore>>(new Set());
+  private _highlightedTiles$ = new BehaviorSubject<Set<Tile>>(new Set());
   highlightedTiles$ = this._highlightedTiles$.asObservable();
 
-  private _activePath$ = new BehaviorSubject<TileCore[][] | null>(null);
+  private _activePath$ = new BehaviorSubject<Tile[][] | null>(null);
   activePath$ = this._activePath$.asObservable();
 
   private _yieldsVisible$ = new BehaviorSubject<boolean>(true);
@@ -37,54 +37,48 @@ export class MapUi {
   allowMapPanning = true;
 
   constructor(
-    private game: Game,
+    private game: GameApi,
     private camera: Camera,
     private uiState: UIState,
   ) {
-    this.clickedTile$.subscribe((tile) => {
-      if (this.selectingTileEnabled) {
-        this._selectedTile$.next(tile);
-      } else if (tile.units.length) {
-        this.selectUnit(tile.units[0]);
-      } else if (tile?.city) {
-        this.selectCity(tile.city);
-      } else {
-        this.game.unitsManager.activeUnit$.next(null);
-        this.setPath(null);
-      }
-    });
-
-    this.hoveredTile$.subscribe((tile) => {
-      if (!this.uiState.selectedCity$.value) {
-        if (tile?.city) {
-          this.highlightTiles(tile.city.tiles);
-        } else {
-          this.highlightTiles(null);
-        }
-      }
-    });
-
-    this.game.citiesManager.spawned$.subscribe((city) => {
-      if (city.player === this.game.humanPlayer) {
-        this.selectCity(city);
-      }
-    });
-
-    this.game.activePlayer$.subscribe(() => {
-      this.game.unitsManager.activeUnit$.next(null);
-    });
-
-    this.game.humanPlayer$.subscribe((player) => {
-      const tileOfInterest = player?.units[0]?.tile || player?.cities[0]?.tile;
-      if (tileOfInterest) {
-        this.camera.moveToTile(tileOfInterest);
-      }
-      this.setPath(null);
-    });
-
-    this.game.turn$.subscribe(() => this.setPath(null));
-
-    this.game.stopped$.subscribe(() => this.clear());
+    // this.clickedTile$.subscribe((tile) => {
+    //   if (this.selectingTileEnabled) {
+    //     this._selectedTile$.next(tile);
+    //   } else if (tile.units.length) {
+    //     this.selectUnit(tile.units[0]);
+    //   } else if (tile?.city) {
+    //     this.selectCity(tile.city);
+    //   } else {
+    //     this.game.unitsManager.activeUnit$.next(null);
+    //     this.setPath(null);
+    //   }
+    // });
+    // this.hoveredTile$.subscribe((tile) => {
+    //   if (!this.uiState.selectedCity$.value) {
+    //     if (tile?.city) {
+    //       this.highlightTiles(tile.city.tiles);
+    //     } else {
+    //       this.highlightTiles(null);
+    //     }
+    //   }
+    // });
+    // this.game.citiesManager.spawned$.subscribe((city) => {
+    //   if (city.player === this.game.humanPlayer) {
+    //     this.selectCity(city);
+    //   }
+    // });
+    // this.game.activePlayer$.subscribe(() => {
+    //   this.game.unitsManager.activeUnit$.next(null);
+    // });
+    // this.game.humanPlayer$.subscribe((player) => {
+    //   const tileOfInterest = player?.units[0]?.tile || player?.cities[0]?.tile;
+    //   if (tileOfInterest) {
+    //     this.camera.moveToTile(tileOfInterest);
+    //   }
+    //   this.setPath(null);
+    // });
+    // this.game.turn$.subscribe(() => this.setPath(null));
+    // this.game.stopped$.subscribe(() => this.clear());
   }
 
   update() {
@@ -102,47 +96,46 @@ export class MapUi {
     }
   }
 
-  clickTile(tile: TileCore) {
+  clickTile(tile: Tile) {
     this._clickedTile$.next(tile);
   }
 
-  highlightTiles(tiles: Set<TileCore> | null) {
+  highlightTiles(tiles: Set<Tile> | null) {
     tiles = tiles || new Set();
     this._highlightedTiles$.next(tiles);
   }
 
-  hoverTile(tile: TileCore | null) {
+  hoverTile(tile: Tile | null) {
     this._hoveredTile$.next(tile);
   }
 
-  setPath(path: TileCore[][] | null) {
+  setPath(path: Tile[][] | null) {
     this._activePath$.next(path);
   }
 
   selectCity(city: City | null) {
-    if (!city) {
-      this.uiState.selectedCity$.next(city);
-      this.highlightTiles(null);
-      this.cityLabelsVisible = true;
-      this.allowMapPanning = true;
-      return;
-    }
-
-    if (city.player === this.game.humanPlayer) {
-      this.uiState.selectedCity$.next(city);
-      if (city) {
-        this.highlightTiles(city.tiles);
-        this.cityLabelsVisible = false;
-        this.allowMapPanning = false;
-      }
-    }
+    // if (!city) {
+    //   this.uiState.selectedCity$.next(city);
+    //   this.highlightTiles(null);
+    //   this.cityLabelsVisible = true;
+    //   this.allowMapPanning = true;
+    //   return;
+    // }
+    // if (city.player === this.game.humanPlayer) {
+    //   this.uiState.selectedCity$.next(city);
+    //   if (city) {
+    //     this.highlightTiles(city.tiles);
+    //     this.cityLabelsVisible = false;
+    //     this.allowMapPanning = false;
+    //   }
+    // }
   }
 
   selectUnit(unit: Unit) {
-    if (unit.player === this.game.humanPlayer) {
-      this.game.unitsManager.activeUnit$.next(unit);
-      this.setPath(unit.path || null);
-    }
+    // if (unit.player === this.game.humanPlayer) {
+    //   this.game.unitsManager.activeUnit$.next(unit);
+    //   this.setPath(unit.path || null);
+    // }
   }
 
   clear() {

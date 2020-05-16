@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-import { Game } from "src/app/core/game";
+
+import { GameApi } from "src/app/api";
 
 @Component({
   selector: "app-player-yields",
@@ -7,11 +8,11 @@ import { Game } from "src/app/core/game";
   styleUrls: ["./player-yields.component.scss"],
 })
 export class PlayerYieldsComponent implements OnInit {
-  constructor(private game: Game) {}
+  constructor(private game: GameApi) {}
 
   ngOnInit(): void {}
 
   get player() {
-    return this.game.humanPlayer!;
+    return this.game.state?.trackedPlayer;
   }
 }

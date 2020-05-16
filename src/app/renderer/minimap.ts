@@ -3,12 +3,11 @@ import * as PIXIE from "pixi.js";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { TileCore } from "../core/tile";
-import { Game } from "../core/game";
 import { Transform, Camera } from "../renderer/camera";
 import { drawHex } from "./utils";
 import { GameRenderer } from "./renderer";
-import { SeaLevel, Climate, TileDirection } from "../shared";
+import { SeaLevel, Climate, TileDirection, Tile } from "../shared";
+import { GameApi } from "../api";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,
@@ -43,39 +42,43 @@ export class MinimapRenderer {
 
   private mapTexture: PIXIE.RenderTexture;
 
-  private tilesMap = new Map<TileCore, PIXIE.DisplayObject[]>();
+  private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   private app: PIXIE.Application;
 
   private destroyed$ = new Subject<void>();
 
   constructor(
-    private game: Game,
+    private game: GameApi,
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
-    const tilesManager = this.game.tilesManager;
-    tilesManager.revealedTiles$
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe((tiles) => {
-        this.reveal(tiles);
-        this.updateMap();
-      });
+    // const tilesManager = this.game.tilesManager;
+    // tilesManager.revealedTiles$
+    //   .pipe(takeUntil(this.destroyed$))
+    //   .subscribe((tiles) => {
+    //     this.reveal(tiles);
+    //     this.updateMap();
+    //   });
 
-    tilesManager.resetTilesVisibility$
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe((tiles) => {
-        this.hideAllTiles();
-        this.reveal(tiles);
-        this.updateMap();
-      });
+    // tilesManager.resetTilesVisibility$
+    //   .pipe(takeUntil(this.destroyed$))
+    //   .subscribe((tiles) => {
+    //     this.hideAllTiles();
+    //     this.reveal(tiles);
+    //     this.updateMap();
+    //   });
 
     this.container.addChild(this.mapSprite);
     this.container.addChild(this.cameraGraphics);
   }
 
   calculateSize() {
-    const map = this.game.map;
+    if (!this.game.state) {
+      return;
+    }
+
+    const map = this.game.state.map;
 
     if (map.width > map.height) {
       this.width = maxSize;
@@ -90,6 +93,10 @@ export class MinimapRenderer {
   }
 
   create(app: PIXIE.Application) {
+    if (!this.game.state) {
+      return;
+    }
+
     this.app = app;
 
     this.mapTexture = PIXIE.RenderTexture.create({
@@ -103,9 +110,7 @@ export class MinimapRenderer {
     this.listenPlayerAreas();
 
     this.hideAllTiles();
-    if (this.game.humanPlayer) {
-      this.reveal(this.game.humanPlayer.exploredTiles);
-    }
+    this.reveal(this.game.state.trackedPlayer.exploredTiles);
 
     this.app.stage.addChild(this.container);
 
@@ -131,12 +136,12 @@ export class MinimapRenderer {
   }
 
   private listenPlayerAreas() {
-    for (const player of this.game.players) {
-      player.area.added$.subscribe((tile) => {
-        this.drawTile(tile);
-        this.updateMap();
-      });
-    }
+    // for (const player of this.game.players) {
+    //   player.area.added$.subscribe((tile) => {
+    //     this.drawTile(tile);
+    //     this.updateMap();
+    //   });
+    // }
   }
 
   private hideAllTiles() {
@@ -145,7 +150,7 @@ export class MinimapRenderer {
     }
   }
 
-  private reveal(tiles: Iterable<TileCore>) {
+  private reveal(tiles: Iterable<Tile>) {
     for (const tile of tiles) {
       const displayObjects = this.tilesMap.get(tile);
       if (displayObjects) {
@@ -184,14 +189,18 @@ export class MinimapRenderer {
   }
 
   private drawMap() {
-    for (let y = 0; y < this.game.map.height; y++) {
-      for (let x = 0; x < this.game.map.width; x++) {
-        this.drawTile(this.game.map.tiles[x][y]);
+    if (!this.game.state) {
+      return;
+    }
+
+    for (let y = 0; y < this.game.state.map.height; y++) {
+      for (let x = 0; x < this.game.state.map.width; x++) {
+        this.drawTile(this.game.state.map.tiles[x][y]);
       }
     }
   }
 
-  private drawTile(tile: TileCore) {
+  private drawTile(tile: Tile) {
     let color: number;
 
     if (tile.seaLevel !== SeaLevel.none) {
@@ -218,7 +227,7 @@ export class MinimapRenderer {
     this.renderRivers(tile, g);
   }
 
-  private renderRivers(tile: TileCore, graphics: PIXIE.Graphics) {
+  private renderRivers(tile: Tile, graphics: PIXIE.Graphics) {
     if (!tile.riverParts.length) {
       return;
     }

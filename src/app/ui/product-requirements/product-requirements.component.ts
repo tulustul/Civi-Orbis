@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 
 import { ProductDefinition, ProductRequirement } from "src/app/core/product";
-import { City } from "src/app/core/city";
+import { CityCore } from "src/app/core/city";
 import { BUILDINGS_MAP } from "src/app/core/buildings";
 
 @Component({
@@ -18,7 +18,7 @@ import { BUILDINGS_MAP } from "src/app/core/buildings";
 export class ProductRequirementsComponent implements AfterViewInit {
   @Input() product: ProductDefinition;
 
-  @Input() city: City;
+  @Input() city: CityCore;
 
   @ViewChild("buildingTmpl") buildingRef: TemplateRef<any>;
 

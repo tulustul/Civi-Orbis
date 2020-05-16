@@ -1,8 +1,15 @@
-import { Unit } from "./unit";
-import { City } from "./city";
+import { UnitCore } from "./unit";
+import { CityCore } from "./city";
 import { Yields, EMPTY_YIELDS } from "./yields";
 import { TileImprovement, TileRoad } from "./tile-improvements";
-import { Tile, Climate, LandForm, SeaLevel, TileDirection } from "../shared";
+import {
+  Climate,
+  LandForm,
+  SeaLevel,
+  TileDirection,
+  BaseTile,
+  TileChanneled,
+} from "../shared";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -35,7 +42,7 @@ export const WETLANDS_CLIMATES = new Set<Climate>([
   Climate.tropical,
 ]);
 
-export class TileCore implements Tile {
+export class TileCore implements BaseTile {
   climate = Climate.continental;
   landForm = LandForm.plains;
   seaLevel = SeaLevel.deep;
@@ -45,9 +52,9 @@ export class TileCore implements Tile {
   improvement: TileImprovement | null = null;
   road: TileRoad | null = null;
 
-  units: Unit[] = [];
-  city: City | null = null;
-  areaOf: City | null = null;
+  units: UnitCore[] = [];
+  city: CityCore | null = null;
+  areaOf: CityCore | null = null;
   yields: Yields = { ...EMPTY_YIELDS };
 
   // cached data
@@ -238,6 +245,9 @@ export class TileCore implements Tile {
       seaLevel: this.seaLevel,
       wetlands: this.wetlands,
       yields: this.yields,
+      areaOf: this.city ? this.city.id : null,
+      unitsIds: this.units.map((u) => u.id),
+      cityId: this.city ? this.city.id : null,
     };
   }
 }
@@ -251,19 +261,4 @@ export interface TileSerialized {
   riverParts?: TileDirection[];
   forest?: boolean;
   wetlands?: boolean;
-}
-
-export interface TileChanneled {
-  id: number;
-  x: number;
-  y: number;
-  climate: Climate;
-  landForm: LandForm;
-  seaLevel: SeaLevel;
-  improvement: TileImprovement | null;
-  road: TileRoad | null;
-  riverParts: TileDirection[];
-  forest: boolean;
-  wetlands: boolean;
-  yields: Yields;
 }

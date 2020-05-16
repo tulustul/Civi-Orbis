@@ -1,5 +1,5 @@
 import { UnitDefinition } from "./unit.interface";
-import { Unit, UnitSerialized } from "./unit";
+import { UnitCore, UnitSerialized } from "./unit";
 import { BehaviorSubject, Subject } from "rxjs";
 import { UNITS_DEFINITIONS } from "../data/units";
 import { Player } from "./player";
@@ -10,17 +10,17 @@ import { getTileFromIndex } from "./serialization";
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
 
-  units: Unit[] = [];
+  units: UnitCore[] = [];
 
-  activeUnit$ = new BehaviorSubject<Unit | null>(null);
+  activeUnit$ = new BehaviorSubject<UnitCore | null>(null);
 
-  private _updated$ = new Subject<Unit>();
+  private _updated$ = new Subject<UnitCore>();
   updated$ = this._updated$.asObservable();
 
-  private _spawned$ = new Subject<Unit>();
+  private _spawned$ = new Subject<UnitCore>();
   spawned$ = this._spawned$.asObservable();
 
-  private _destroyed$ = new Subject<Unit>();
+  private _destroyed$ = new Subject<UnitCore>();
   destroyed$ = this._destroyed$.asObservable();
 
   private lastId = 0;
@@ -41,7 +41,7 @@ export class UnitsManager {
       throw Error(`UnitsManager: No unit with id "${id}"`);
     }
 
-    const unit = new Unit(tile, definition, player);
+    const unit = new UnitCore(tile, definition, player);
     unit.id = this.lastId++;
 
     this.units.push(unit);
@@ -59,7 +59,7 @@ export class UnitsManager {
     return unit;
   }
 
-  destroy(unit: Unit) {
+  destroy(unit: UnitCore) {
     // TODO rewrite to sets for better performance?
     let index = this.units.indexOf(unit);
     if (index !== -1) {
@@ -85,7 +85,7 @@ export class UnitsManager {
     unit.player.updateUnitsWithoutOrders();
   }
 
-  move(unit: Unit, tile: TileCore) {
+  move(unit: UnitCore, tile: TileCore) {
     if (!unit.actionPointsLeft) {
       return;
     }
@@ -120,7 +120,7 @@ export class UnitsManager {
     this._updated$.next(unit);
   }
 
-  moveAlongPath(unit: Unit) {
+  moveAlongPath(unit: UnitCore) {
     if (!unit.path) {
       unit.setOrder(null);
       return;
@@ -142,7 +142,7 @@ export class UnitsManager {
     }
   }
 
-  getMovementCost(unit: Unit, target: TileCore) {
+  getMovementCost(unit: UnitCore, target: TileCore) {
     return unit.tile.neighboursCosts.get(target) || Infinity;
   }
 

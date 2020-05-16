@@ -11,7 +11,7 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import { Game } from "src/app/core/game";
-import { Unit } from "src/app/core/unit";
+import { UnitCore } from "src/app/core/unit";
 import { UnitAction, ACTIONS } from "src/app/core/unit-actions";
 
 @Component({
@@ -21,7 +21,7 @@ import { UnitAction, ACTIONS } from "src/app/core/unit-actions";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnitPanelComponent implements OnInit, OnDestroy {
-  unit: Unit | null = null;
+  unit: UnitCore | null = null;
 
   requirementsTemplates = new Map<UnitAction, TemplateRef<any>>();
 

@@ -1,5 +1,7 @@
 import { TileImprovement, TileRoad } from "../core/tile-improvements";
 import { Yields } from "../core/yields";
+import { City } from "../api/city";
+import { Unit } from "../api/unit";
 
 export enum TileDirection {
   NW,
@@ -33,7 +35,7 @@ export enum SeaLevel {
   deep,
 }
 
-export interface Tile {
+export interface BaseTile {
   id: number;
 
   x: number;
@@ -49,7 +51,20 @@ export interface Tile {
   road: TileRoad | null;
 
   yields: Yields;
+}
+
+export interface Tile extends BaseTile {
+  areaOf: City | null;
 
   neighbours: Tile[];
   fullNeighbours: (Tile | null)[]; // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
+
+  city: City | null;
+  units: Unit[];
+}
+
+export interface TileChanneled extends BaseTile {
+  areaOf: number | null;
+  cityId: number | null;
+  unitsIds: number[];
 }

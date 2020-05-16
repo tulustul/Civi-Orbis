@@ -1,5 +1,6 @@
-import { TileCore, TileSerialized, TileChanneled } from "./tile";
+import { TileCore, TileSerialized } from "./tile";
 import { getTileNeighbours, getTileFullNeighbours } from "../shared/hex-math";
+import { TileChanneled } from "../shared";
 
 export interface MapSerialized {
   width: number;

@@ -1,20 +1,19 @@
 import * as PIXIE from "pixi.js";
 
 import { TileCore, TileChanneled } from "src/app/core/tile";
-import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
 import { takeUntil } from "rxjs/operators";
 import { TileDirection } from "src/app/shared";
+import { GameApi } from "src/app/api";
 
 export class RiverDrawer {
-  constructor(game: Game, private container: TileContainer) {
-    const tilesManager = game.tilesManager;
-
-    game.started$.subscribe(() => {
-      tilesManager.updatedTile$
-        .pipe(takeUntil(game.stopped$))
-        .subscribe((tile) => this.updateTile(tile));
-    });
+  constructor(game: GameApi, private container: TileContainer) {
+    // const tilesManager = game.tilesManager;
+    // game.started$.subscribe(() => {
+    //   tilesManager.updatedTile$
+    //     .pipe(takeUntil(game.stopped$))
+    //     .subscribe((tile) => this.updateTile(tile));
+    // });
   }
 
   public drawTile(tile: TileChanneled) {

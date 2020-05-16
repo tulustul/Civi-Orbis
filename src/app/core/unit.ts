@@ -24,17 +24,12 @@ export interface UnitSerialized {
 
 export interface UnitChanneled {
   id: number;
-  tile: number;
+  tileId: number;
   definitionId: string;
-  player: number;
+  playerId: number;
 }
 
-export interface UnitState {
-  id: number;
-  actionPointsLeft: number;
-}
-
-export class Unit {
+export class UnitCore {
   id: number;
   actionPointsLeft: number;
   path: TileCore[][] | null;
@@ -66,9 +61,9 @@ export class Unit {
   serializeToChannel(): UnitChanneled {
     return {
       id: this.id,
-      tile: this.tile.id,
+      tileId: this.tile.id,
       definitionId: this.definition.id,
-      player: this.player.id,
+      playerId: this.player.id,
     };
   }
 

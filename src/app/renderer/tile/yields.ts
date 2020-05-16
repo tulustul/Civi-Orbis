@@ -4,20 +4,20 @@ import { takeUntil } from "rxjs/operators";
 
 import { TileContainer } from "../tile-container";
 import { MapUi } from "src/app/ui/map-ui";
-import { Game } from "src/app/core/game";
 import { Tile } from "src/app/shared";
+import { GameApi } from "src/app/api";
 
 export class YiedsDrawer {
   constructor(
-    game: Game,
+    game: GameApi,
     private mapUi: MapUi,
     private container: TileContainer,
   ) {
-    game.started$.subscribe(() => {
-      game.tilesManager.updatedTile$
-        .pipe(takeUntil(game.stopped$))
-        .subscribe((tile) => this.updateTile(tile));
-    });
+    // game.started$.subscribe(() => {
+    //   game.tilesManager.updatedTile$
+    //     .pipe(takeUntil(game.stopped$))
+    //     .subscribe((tile) => this.updateTile(tile));
+    // });
 
     this.mapUi.yieldsVisible$.subscribe(
       (visible) => (this.container.visible = visible),

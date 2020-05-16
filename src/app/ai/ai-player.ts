@@ -1,9 +1,9 @@
 import { Player } from "../core/player";
 import { IDLE_PRODUCTS_MAP } from "../core/idle-product";
-import { Unit, UNITS_MAP } from "../core/unit";
+import { UnitCore, UNITS_MAP } from "../core/unit";
 import { TileCore } from "../core/tile";
 import { findPath } from "../core/pathfinding";
-import { City } from "../core/city";
+import { CityCore } from "../core/city";
 
 export class AIPlayer {
   constructor(private player: Player) {}
@@ -28,7 +28,7 @@ export class AIPlayer {
     }
   }
 
-  processSettler(unit: Unit) {
+  processSettler(unit: UnitCore) {
     const bestCityLocation = this.findCityLocation(unit.tile);
     if (!bestCityLocation) {
       unit.order = "sleep";
@@ -46,7 +46,7 @@ export class AIPlayer {
     }
   }
 
-  produceNext(city: City) {
+  produceNext(city: CityCore) {
     const settler = UNITS_MAP.get("settler")!;
     if (Math.random() > 0.7 && city.canProduce(settler)) {
       const newCityLocation = this.findCityLocation(city.tile);

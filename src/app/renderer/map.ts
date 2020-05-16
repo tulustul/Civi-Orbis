@@ -11,7 +11,8 @@ import { CityDrawer } from "./tile/city";
 import { AreaDrawer } from "./tile/area";
 import { GameRenderer } from "./renderer";
 import { Camera } from "./camera";
-import { GameApi, GameState } from "../api";
+import { GameApi } from "../api";
+import { GameState } from "../api/state";
 
 export class MapDrawer {
   container = new TileWrapperContainer();
@@ -30,12 +31,7 @@ export class MapDrawer {
 
   overlaysContainer = new PIXIE.Container();
 
-  terrainDrawer = new TerrainDrawer(
-    this.game,
-    this.renderer,
-    this.terrainContainer,
-    this.waterContainer,
-  );
+  terrainDrawer: TerrainDrawer;
 
   unitsDrawer: UnitsDrawer;
 
@@ -48,8 +44,7 @@ export class MapDrawer {
   areaDrawer: AreaDrawer;
 
   constructor(
-    private game: Game,
-    private gameApi: GameApi,
+    private game: GameApi,
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
@@ -61,19 +56,18 @@ export class MapDrawer {
     this.container.addChild(this.unitsContainer);
     this.container.addChild(this.overlaysContainer);
 
-    const tilesManager = this.game.tilesManager;
-    tilesManager.revealedTiles$.subscribe((tiles) => this.reveal(tiles));
+    // const tilesManager = this.game.tilesManager;
+    // tilesManager.revealedTiles$.subscribe((tiles) => this.reveal(tiles));
 
-    tilesManager.resetTilesVisibility$.subscribe((tiles) => {
-      this.hideAllTiles();
-      this.reveal(tiles);
-    });
+    // tilesManager.resetTilesVisibility$.subscribe((tiles) => {
+    //   this.hideAllTiles();
+    //   this.reveal(tiles);
+    // });
 
-    this.gameApi.init$.subscribe((gameState) => this.build(gameState));
+    this.game.init$.subscribe((state) => this.build(state));
 
     // Drawers must be created after started$ subscription. Race condition will occur otherwise.
     this.terrainDrawer = new TerrainDrawer(
-      this.game,
       this.renderer,
       this.terrainContainer,
       this.waterContainer,
@@ -151,9 +145,9 @@ export class MapDrawer {
       }
     }
 
-    if (this.game.humanPlayer) {
-      this.hideAllTiles();
-      this.reveal(this.game.humanPlayer.exploredTiles);
-    }
+    // if (this.game.humanPlayer) {
+    //   this.hideAllTiles();
+    //   this.reveal(this.game.humanPlayer.exploredTiles);
+    // }
   }
 }

@@ -1,7 +1,7 @@
 import { TileCore } from "./tile";
-import { Unit } from "./unit";
+import { UnitCore } from "./unit";
 
-export function findPath(unit: Unit, end: TileCore): TileCore[][] | null {
+export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
   const startTime = performance.now();
   const start = unit.tile;
 

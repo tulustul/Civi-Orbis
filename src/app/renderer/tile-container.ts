@@ -4,7 +4,7 @@ import { BoundingBox } from "./camera";
 import { TileChanneled } from "../core/tile";
 import { MapChanneled } from "../core/tiles-map";
 import { Tile } from "../shared";
-import { TilesMap } from "../api";
+import { TilesMap } from "../api/map";
 
 export class TileWrapperContainer extends PIXIE.Container {
   tilesMap = new Map<TileChanneled, PIXIE.DisplayObject[]>();

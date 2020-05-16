@@ -1,14 +1,10 @@
-import * as PIXIE from "pixi.js";
-
 import {
   getTileVariants,
   drawTileSprite,
   pickRandom,
   drawTileSpriteCentered,
 } from "../utils";
-import { Game } from "src/app/core/game";
 import { TileContainer } from "../tile-container";
-import { takeUntil } from "rxjs/operators";
 import { GameRenderer } from "../renderer";
 import { TileImprovement } from "src/app/core/tile-improvements";
 import { SeaLevel, Climate, LandForm, Tile } from "src/app/shared";
@@ -77,19 +73,10 @@ const SAWMILL_TEXTURES = getTileVariants("forester_hut", 4);
 
 export class TerrainDrawer {
   constructor(
-    private game: Game,
     private renderer: GameRenderer,
     private terrainContainer: TileContainer,
     private waterContainer: TileContainer,
-  ) {
-    const tilesManager = this.game.tilesManager;
-
-    game.started$.subscribe(() => {
-      tilesManager.updatedTile$
-        .pipe(takeUntil(game.stopped$))
-        .subscribe((tile) => this.updateTile(tile));
-    });
-  }
+  ) {}
 
   public drawTile(tile: Tile) {
     let variants: string[];
@@ -159,12 +146,6 @@ export class TerrainDrawer {
     const textureName = `hexRoad-${roadId}-00.png`;
     const sprite = drawTileSprite(tile, this.textures[textureName]);
     this.terrainContainer.addChild(sprite, tile);
-  }
-
-  private updateTile(tile: Tile) {
-    this.waterContainer.clearTile(tile);
-    this.terrainContainer.clearTile(tile);
-    this.drawTile(tile);
   }
 
   clear() {

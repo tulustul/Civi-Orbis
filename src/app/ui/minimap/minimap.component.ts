@@ -6,6 +6,7 @@ import { Game } from "src/app/core/game";
 import { MinimapRenderer } from "src/app/renderer/minimap";
 import { GameRenderer } from "src/app/renderer/renderer";
 import { Camera } from "src/app/renderer/camera";
+import { GameApi } from "src/app/api";
 
 @Component({
   selector: "app-minimap",
@@ -20,13 +21,13 @@ export class MinimapComponent implements AfterViewInit {
   @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;
 
   constructor(
-    private game: Game,
+    private game: GameApi,
     private renderer: GameRenderer,
     private camera: Camera,
   ) {}
 
   ngAfterViewInit(): void {
-    this.game.started$.subscribe(() => this.create());
+    this.game.init$.subscribe(() => this.create());
   }
 
   create() {

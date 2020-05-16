@@ -1,6 +1,7 @@
 import { Tile, TileDirection } from "../shared";
+import { BaseTile } from "./tile.interface";
 
-export function getTileFullNeighbours<T extends Tile>(
+export function getTileFullNeighbours<T extends BaseTile>(
   tiles: T[][],
   x: number,
   y: number,
@@ -15,7 +16,7 @@ export function getTileFullNeighbours<T extends Tile>(
   ];
 }
 
-export function getTileNeighbours<T extends Tile>(
+export function getTileNeighbours<T extends BaseTile>(
   tiles: T[][],
   x: number,
   y: number,
@@ -23,7 +24,7 @@ export function getTileNeighbours<T extends Tile>(
   return getTileFullNeighbours(tiles, x, y).filter((t) => !!t) as T[];
 }
 
-export function getTileInDirection<T extends Tile>(
+export function getTileInDirection<T extends BaseTile>(
   tiles: T[][],
   tile: T,
   direction: TileDirection,

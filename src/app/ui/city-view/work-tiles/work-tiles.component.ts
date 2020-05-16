@@ -4,7 +4,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
-import { City } from "src/app/core/city";
+import { CityCore } from "src/app/core/city";
 import { TileCore } from "src/app/core/tile";
 import { MapUi } from "../../map-ui";
 import { Camera } from "src/app/renderer/camera";
@@ -15,7 +15,7 @@ import { Camera } from "src/app/renderer/camera";
   styleUrls: ["./work-tiles.component.scss"],
 })
 export class WorkTilesComponent implements OnInit, OnDestroy {
-  @Input() city: City;
+  @Input() city: CityCore;
 
   private ngUnsubscribe = new Subject<void>();
 

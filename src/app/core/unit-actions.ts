@@ -1,5 +1,5 @@
 import { Game } from "./game";
-import { Unit } from "./unit";
+import { UnitCore } from "./unit";
 import {
   TileImprovement,
   TileRoad,
@@ -46,13 +46,13 @@ export function getPublicWorksPerTurn(action: UnitAction) {
 
 export abstract class ActionRequirement {
   static id: string;
-  abstract check(unit: Unit, action: UnitAction): boolean;
+  abstract check(unit: UnitCore, action: UnitAction): boolean;
 }
 
 export class OwnTileRequirement extends ActionRequirement {
   id = "ownTile";
 
-  check(unit: Unit) {
+  check(unit: UnitCore) {
     return unit.tile.areaOf?.player === unit.player;
   }
 }
@@ -60,7 +60,7 @@ export class OwnTileRequirement extends ActionRequirement {
 export class NotForeignTileRequirement extends ActionRequirement {
   id = "notForeignTile";
 
-  check(unit: Unit) {
+  check(unit: UnitCore) {
     return !unit.tile.areaOf || unit.tile.areaOf?.player === unit.player;
   }
 }
@@ -72,7 +72,7 @@ export class ImprovementNotYetBuiltRequirement extends ActionRequirement {
     super();
   }
 
-  check(unit: Unit) {
+  check(unit: UnitCore) {
     return unit.tile.improvement !== this.improvement;
   }
 }
@@ -83,7 +83,7 @@ export class IsImprovementPossibleRequirement extends ActionRequirement {
     super();
   }
 
-  check(unit: Unit) {
+  check(unit: UnitCore) {
     return unit.tile.isImprovementPossible(this.improvement);
   }
 }
@@ -91,7 +91,7 @@ export class IsImprovementPossibleRequirement extends ActionRequirement {
 export class NoRoadRequirement extends ActionRequirement {
   id = "noRoad";
 
-  check(unit: Unit) {
+  check(unit: UnitCore) {
     return unit.tile.road === null;
   }
 }
@@ -99,7 +99,7 @@ export class NoRoadRequirement extends ActionRequirement {
 export class isRoadPossibleRequirement extends ActionRequirement {
   id = "roadPossible";
 
-  check(unit: Unit) {
+  check(unit: UnitCore) {
     return unit.tile.isRoadPossible();
   }
 }
@@ -107,7 +107,7 @@ export class isRoadPossibleRequirement extends ActionRequirement {
 export class PublicWorksPointsRequirement extends ActionRequirement {
   id = "publicWorks";
 
-  check(unit: Unit, action: UnitAction) {
+  check(unit: UnitCore, action: UnitAction) {
     return (
       unit.player.yieldsTotal.publicWorks >= getPublicWorksRequired(action)
     );
@@ -117,11 +117,11 @@ export class PublicWorksPointsRequirement extends ActionRequirement {
 interface ActionDefinition {
   action: UnitAction;
   name: string;
-  fn: (game: Game, unit: Unit) => void;
+  fn: (game: Game, unit: UnitCore) => void;
   requirements: ActionRequirement[];
 }
 
-function foundCity(game: Game, unit: Unit) {
+function foundCity(game: Game, unit: UnitCore) {
   const city = game.citiesManager.spawn(unit.tile, unit.player);
   if (city) {
     game.unitsManager.destroy(unit);
@@ -130,7 +130,7 @@ function foundCity(game: Game, unit: Unit) {
 
 function buildImprovement(
   game: Game,
-  unit: Unit,
+  unit: UnitCore,
   improvement: TileImprovement,
 ) {
   unit.actionPointsLeft = 0;
@@ -148,7 +148,7 @@ function buildImprovement(
     IMPROVEMENT_PUBLIC_WORKS_COSTS_PER_TURN[improvement];
 }
 
-function buildRoad(game: Game, unit: Unit) {
+function buildRoad(game: Game, unit: UnitCore) {
   unit.actionPointsLeft = 0;
   unit.tile.road = TileRoad.road;
   game.tilesManager.updateTile(unit.tile);

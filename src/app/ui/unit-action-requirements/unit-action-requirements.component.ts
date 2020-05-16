@@ -5,7 +5,7 @@ import {
   ChangeDetectionStrategy,
 } from "@angular/core";
 
-import { Unit } from "src/app/core/unit";
+import { UnitCore } from "src/app/core/unit";
 import {
   UnitAction,
   ActionRequirement,
@@ -21,7 +21,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnitActionRequirementsComponent implements OnInit {
-  @Input() unit: Unit;
+  @Input() unit: UnitCore;
 
   @Input() action: UnitAction;
 

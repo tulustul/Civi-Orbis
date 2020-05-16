@@ -12,7 +12,7 @@ import {
 import { Subject, merge } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
-import { City } from "src/app/core/city";
+import { CityCore } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { getTileCoords } from "src/app/renderer/utils";
 import { Controls } from "src/app/controls";
@@ -26,7 +26,7 @@ import { Camera } from "src/app/renderer/camera";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CityInfoComponent implements OnInit, OnDestroy {
-  private _city: City;
+  private _city: CityCore;
 
   ngUnsubscribe = new Subject<void>();
 
@@ -58,7 +58,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  @Input() set city(city: City) {
+  @Input() set city(city: CityCore) {
     this._city = city;
   }
   get city() {
