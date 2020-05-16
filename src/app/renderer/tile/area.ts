@@ -1,10 +1,8 @@
 import * as PIXIE from "pixi.js";
 
-import { TileCore } from "src/app/core/tile";
-import { Game } from "src/app/core/game";
-import { Area } from "src/app/core/area";
-import { TileDirection } from "src/app/shared";
+import { TileDirection, Tile } from "src/app/shared";
 import { GameApi } from "src/app/api";
+import { Area } from "src/app/api/area";
 
 const BORDER_WIDTH = 0.11;
 const BORDER_WIDTH_HALVED = BORDER_WIDTH / 2;
@@ -69,14 +67,14 @@ export class AreaDrawer {
   }
 
   build() {
-    // for (const area of this.game.areasManager.areas) {
-    //   this.drawArea(area);
-    //   // TODO we can update only single tiles here.
-    //   area.updated$.subscribe(() => {
-    //     this.clearArea(area);
-    //     this.drawArea(area);
-    //   });
-    // }
+    for (const area of this.game.state!.areas) {
+      this.drawArea(area);
+      // TODO we can update only single tiles here.
+      area.updated$.subscribe(() => {
+        this.clearArea(area);
+        this.drawArea(area);
+      });
+    }
   }
 
   clearArea(area: Area) {
@@ -118,7 +116,7 @@ export class AreaDrawer {
   private drawBorder(
     points: PIXIE.Point[],
     g: PIXIE.Graphics,
-    tile: TileCore,
+    tile: Tile,
     dir: TileDirection,
     start = false,
   ) {

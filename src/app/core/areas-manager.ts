@@ -1,27 +1,27 @@
 import { Subject } from "rxjs";
 
-import { Area } from "./area";
+import { AreaCore } from "./area";
 
 export class AreasManager {
-  areas: Area[] = [];
+  areas: AreaCore[] = [];
 
   lastId = 0;
 
-  private _created$ = new Subject<Area>();
+  private _created$ = new Subject<AreaCore>();
   created$ = this._created$.asObservable();
 
-  private _destroyed$ = new Subject<Area>();
+  private _destroyed$ = new Subject<AreaCore>();
   destroyed$ = this._destroyed$.asObservable();
 
   make(color: number) {
-    const area = new Area(color);
+    const area = new AreaCore(color);
     area.id = this.lastId++;
     this.areas.push(area);
     this._created$.next(area);
     return area;
   }
 
-  destroy(area: Area) {
+  destroy(area: AreaCore) {
     area.destroy();
     const index = this.areas.indexOf(area);
     if (index !== -1) {

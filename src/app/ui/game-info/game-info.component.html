@@ -1,5 +1,5 @@
 <div class="bar">
-  <span>turn: {{ game.turn$ | async }}</span>
+  <span>turn: {{ game.state.turn$ | async }}</span>
   <button (click)="debugModalVisible = !debugModalVisible">debug</button>
   <button (click)="openEditor()">editor</button>
   <button (click)="openMenu()">menu</button>

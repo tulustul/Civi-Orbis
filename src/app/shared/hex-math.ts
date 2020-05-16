@@ -78,3 +78,37 @@ export function getTileInDirection<T extends BaseTile>(
 export function getDistance(start: Tile, end: Tile): number {
   return 0;
 }
+
+export function getDirectionTo(fromtile: Tile, toTile: Tile): TileDirection {
+  if (
+    toTile.x === fromtile.x - (fromtile.y % 2 ? 0 : 1) &&
+    toTile.y === fromtile.y - 1
+  ) {
+    return TileDirection.NW;
+  }
+  if (
+    toTile.x === fromtile.x + (fromtile.y % 2 ? 1 : 0) &&
+    toTile.y === fromtile.y - 1
+  ) {
+    return TileDirection.NE;
+  }
+  if (toTile.x === fromtile.x + 1 && toTile.y === fromtile.y) {
+    return TileDirection.E;
+  }
+  if (
+    toTile.x === fromtile.x + (fromtile.y % 2 ? 1 : 0) &&
+    toTile.y === fromtile.y + 1
+  ) {
+    return TileDirection.SE;
+  }
+  if (
+    toTile.x === fromtile.x - (fromtile.y % 2 ? 0 : 1) &&
+    toTile.y === fromtile.y + 1
+  ) {
+    return TileDirection.SW;
+  }
+  if (toTile.x === fromtile.x - 1 && toTile.y === fromtile.y) {
+    return TileDirection.W;
+  }
+  return TileDirection.NONE;
+}

@@ -116,7 +116,7 @@ export class CityCore {
   sizeChange$ = this._sizeChange$.pipe(takeUntil(this.destroyed$));
 
   constructor(public tile: TileCore, public player: Player) {
-    this.addTile(tile, false);
+    this.addTile(tile);
   }
 
   serialize(): CitySerialized {
@@ -381,12 +381,12 @@ export class CityCore {
     }
   }
 
-  addTile(tile: TileCore, recomputeBorders = true) {
+  addTile(tile: TileCore) {
     if (!tile.areaOf) {
       this.tiles.add(tile);
       this.notWorkedTiles.add(tile);
       tile.areaOf = this;
-      this.player.area.add(tile, recomputeBorders);
+      this.player.area.add(tile);
       const newTiles = [tile, ...tile.neighbours].filter(
         (t) => !this.player.exploredTiles.has(t),
       );
@@ -397,11 +397,11 @@ export class CityCore {
     }
   }
 
-  removeTile(tile: TileCore, emitEvent = true) {
+  removeTile(tile: TileCore) {
     if (this.tiles.has(tile)) {
       this.tiles.delete(tile);
       tile.areaOf = null;
-      this.player.area.remove(tile, emitEvent);
+      this.player.area.remove(tile);
     }
   }
 

@@ -15,6 +15,8 @@ import { UnitSerialized, UnitChanneled } from "./unit";
 import { CitiesManager } from "./cities-manager";
 import { CitySerialized, CityChanneled } from "./city";
 import { AreasManager } from "./areas-manager";
+import { collector } from "./collector";
+import { AreaChanneled } from "./area";
 
 interface GameSerialized {
   turn: number;
@@ -32,6 +34,7 @@ export interface GameChanneled {
   trackedPlayer: TrackedPlayerChanneled;
   units: UnitChanneled[];
   cities: CityChanneled[];
+  areas: AreaChanneled[];
 }
 
 export class Game {
@@ -105,6 +108,7 @@ export class Game {
       player.nextTurn();
     }
     this.turn$.next(this.turn$.value + 1);
+    collector.turn = this.turn$.value;
   }
 
   clear() {
@@ -139,6 +143,7 @@ export class Game {
       trackedPlayer: trackedPlayer.serializeToTrackedPlayer(),
       units: this.unitsManager.serializeToChannel(),
       cities: this.citiesManager.serializeToChannel(),
+      areas: this.areasManager.areas.map((a) => a.serializeToChannel()),
     };
   }
 
@@ -161,8 +166,8 @@ export class Game {
     this.activePlayer$.next(this.players[this.activePlayerIndex]);
 
     for (const player of this.players) {
-      player.area.computeBorders();
-      player.area.update();
+      // player.area.computeBorders();
+      // player.area.update();
       player.updateCitiesWithoutProduction();
       player.updateUnitsWithoutOrders();
       player.updateYields();

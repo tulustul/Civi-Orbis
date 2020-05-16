@@ -1,8 +1,8 @@
 import * as PIXIE from "pixi.js";
 
-import { Tile } from "../core/tile";
 import { drawClosedHex, getTileCoords, drawHex } from "./utils";
 import { MapUi } from "../ui/map-ui";
+import { Tile } from "../shared";
 
 export class OverlaysRenderer {
   container = new PIXIE.Container();

@@ -9,6 +9,8 @@ import { changeHandler } from "./commander";
 import { gameApi } from "./game";
 import { Subject, BehaviorSubject } from "rxjs";
 import { CityChanneled } from "../core/city";
+import { Area } from "./area";
+import { AreaChanneled } from "../core/area";
 
 export class GameState {
   private _turn$ = new BehaviorSubject<number>(0);
@@ -19,9 +21,11 @@ export class GameState {
   trackedPlayer: TrackedPlayer;
   units: Unit[] = [];
   cities: City[] = [];
+  areas: Area[] = [];
 
   unitsMap = new Map<number, Unit>();
   citiesMap = new Map<number, City>();
+  areasMap = new Map<number, Area>();
 
   playersMap = new Map<number, PlayerChanneled>();
 
@@ -43,6 +47,15 @@ export class GameState {
   private _cityDestroyed$ = new Subject<City>();
   cityDestroyed$ = this._cityDestroyed$.asObservable();
 
+  private _areaSpawned$ = new Subject<Area>();
+  areaSpawned$ = this._areaSpawned$.asObservable();
+
+  private _areaUpdated$ = new Subject<Area>();
+  areaUpdated$ = this._areaUpdated$.asObservable();
+
+  private _areaDestroyed$ = new Subject<Area>();
+  areaDestroyed$ = this._areaDestroyed$.asObservable();
+
   constructor(game: GameChanneled) {
     for (const player of game.players) {
       this.playersMap.set(player.id, player);
@@ -55,6 +68,7 @@ export class GameState {
 
     this.units = this.restoreUnits(game);
     this.cities = this.restoreCities(game);
+    this.areas = this.restoreAreas(game);
   }
 
   private restoreUnits(game: GameChanneled): Unit[] {
@@ -63,6 +77,10 @@ export class GameState {
 
   private restoreCities(game: GameChanneled): City[] {
     return game.cities.map((city) => new City(this, city));
+  }
+
+  private restoreAreas(game: GameChanneled): Area[] {
+    return game.areas.map((area) => new Area(this, area));
   }
 
   @changeHandler("unit.updated")
@@ -98,5 +116,28 @@ export class GameState {
       this.cities.push(newCity);
       this._citySpawned$.next(newCity);
     }
+  }
+
+  @changeHandler("game.turn")
+  onTurn(turn: number) {
+    this._turn$.next(turn);
+  }
+
+  @changeHandler("area.updated")
+  onAreaUpdate(areaChanneled: AreaChanneled) {
+    const area = this.areasMap.get(areaChanneled.id);
+    if (area) {
+      area.update(this, areaChanneled);
+      this._areaUpdated$.next(area);
+    } else {
+      const newArea = new Area(this, areaChanneled);
+      this.areas.push(newArea);
+      this._areaSpawned$.next(newArea);
+    }
+  }
+
+  @changeHandler("area.destroyed")
+  onAreaDestroyed(turn: number) {
+    this._turn$.next(turn);
   }
 }

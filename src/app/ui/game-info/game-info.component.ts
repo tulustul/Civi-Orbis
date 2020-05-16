@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 
-import { Game } from "src/app/core/game";
 import { UIState } from "../ui-state";
+import { GameApi } from "src/app/api";
 
 @Component({
   selector: "app-game-info",
@@ -11,7 +11,7 @@ import { UIState } from "../ui-state";
 export class GameInfoComponent implements OnInit {
   debugModalVisible = false;
 
-  constructor(public game: Game, private uiState: UIState) {}
+  constructor(public game: GameApi, private uiState: UIState) {}
 
   ngOnInit(): void {}
 

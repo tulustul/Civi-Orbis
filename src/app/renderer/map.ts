@@ -1,7 +1,6 @@
 import * as PIXIE from "pixi.js";
 
 import { TileCore } from "../core/tile";
-import { Game, GameChanneled } from "../core/game";
 import { TileWrapperContainer, TileContainer } from "./tile-container";
 import { TerrainDrawer } from "./tile/terrain";
 import { UnitsDrawer } from "./tile/unit";
@@ -66,7 +65,7 @@ export class MapDrawer {
 
     this.game.init$.subscribe((state) => this.build(state));
 
-    // Drawers must be created after started$ subscription. Race condition will occur otherwise.
+    // Drawers must be created after init$ subscription?. Race condition will occur otherwise.
     this.terrainDrawer = new TerrainDrawer(
       this.renderer,
       this.terrainContainer,
