@@ -10,6 +10,12 @@ Bugs:
   ✔ starting new game for the second time: WebGL: INVALID_OPERATION: uniformMatrix3fv: location is not from current program @done(20-05-08 22:36)
   ☐ webgl fonts scaling
 
+Performance:
+  ☐ core running in webworker
+  ☐ areas updating locality
+  ☐ showing a lot of city labels on map
+  ☐ pathfinding
+
 Minor features:
   ☐ ESC for closing current view
   ☐ closing city view should restore previous camera transform
@@ -25,6 +31,7 @@ Minor features:
   ☐ city production queue
   ☐ previous/next city button in city view
   ☐ cities overview panel
+  ☐ nicer borders
 
 Major features:
   ✔ implement `city work on` (how to call it properly?). @done(20-05-07 22:31)

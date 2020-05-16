@@ -5,6 +5,14 @@ import { MapGeneratorOptions } from "./api/game.interface";
 import { Game, GameChanneled } from "./core/game";
 import { Player, PLAYER_COLORS } from "./core/player";
 import { AIPlayer } from "./ai/ai-player";
+import { collector } from "./core/collector";
+
+let game: Game;
+
+const HANDLERS = {
+  "game.new": newGameHandler,
+  "game.nextPlayer": nextPlayerHandler,
+};
 
 addEventListener("message", ({ data }) => {
   const handler = HANDLERS[data.command];
@@ -15,15 +23,13 @@ addEventListener("message", ({ data }) => {
 
   const result = handler(data.data);
 
-  postMessage(result);
+  const changes = collector.flush();
+
+  postMessage({ result, changes });
 });
 
-const HANDLERS = {
-  "game.new": newGameHandler,
-};
-
 function newGameHandler(data: MapGeneratorOptions): GameChanneled {
-  const game = new Game();
+  game = new Game();
 
   for (let i = 0; i < data.humanPlayersCount + data.aiPlayersCount; i++) {
     const player = new Player(game, PLAYER_COLORS[i]);
@@ -54,4 +60,8 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
   }
 
   return game.serializeToChannel();
+}
+
+function nextPlayerHandler() {
+  game.nextPlayer();
 }

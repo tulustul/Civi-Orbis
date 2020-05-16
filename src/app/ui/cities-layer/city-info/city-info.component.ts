@@ -12,12 +12,12 @@ import {
 import { Subject, merge } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
-import { CityCore } from "src/app/core/city";
-import { Game } from "src/app/core/game";
 import { getTileCoords } from "src/app/renderer/utils";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
 import { Camera } from "src/app/renderer/camera";
+import { GameApi } from "src/app/api";
+import { City } from "src/app/api/city";
 
 @Component({
   selector: "app-city-info",
@@ -26,14 +26,14 @@ import { Camera } from "src/app/renderer/camera";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CityInfoComponent implements OnInit, OnDestroy {
-  private _city: CityCore;
+  private _city: City;
 
   ngUnsubscribe = new Subject<void>();
 
   constructor(
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef<HTMLElement>,
-    private game: Game,
+    private game: GameApi,
     private camera: Camera,
     public controls: Controls,
     private mapUi: MapUi,
@@ -44,11 +44,11 @@ export class CityInfoComponent implements OnInit, OnDestroy {
     const el = this.elementRef.nativeElement;
     el.style.setProperty("--player-color", "#" + color);
 
-    const thisCity = this.game.citiesManager.updated$.pipe(
+    const thisCity = this.game.state!.cityUpdated$.pipe(
       filter((c) => c.id === this.city.id),
     );
 
-    merge(this.game.turn$, thisCity)
+    merge(this.game.state!.turn$, thisCity)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => this.cdr.markForCheck());
   }
@@ -58,7 +58,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  @Input() set city(city: CityCore) {
+  @Input() set city(city: City) {
     this._city = city;
   }
   get city() {

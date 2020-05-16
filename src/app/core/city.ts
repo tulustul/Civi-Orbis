@@ -21,6 +21,7 @@ import { UNITS_DEFINITIONS } from "../data/units";
 import { BUILDINGS } from "../data/buildings";
 import { IDLE_PRODUCTS } from "../data/idle-products";
 import { Subject, BehaviorSubject } from "rxjs";
+import { collector } from "./collector";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -58,9 +59,13 @@ export interface CityChanneled {
 
   totalFood: number;
   foodToGrow: number;
+  foodPerTurn: number;
+  turnsToGrow: number;
 
   totalProduction: number;
+  productionPerTurn: number;
   productionRequired: number | null;
+  turnsToProductionEnd: number | null;
   productName: string | null;
 }
 
@@ -150,11 +155,15 @@ export class CityCore {
 
       totalFood: this.totalFood,
       foodToGrow: this.foodToGrow,
+      foodPerTurn: this.yields.food,
+      turnsToGrow: this.turnsToGrow,
 
       totalProduction: this.totalProduction,
+      productionPerTurn: this.yields.production,
       productionRequired: this.product
         ? this.product.productDefinition.productionCost
         : null,
+      turnsToProductionEnd: this.turnsToProductionEnd,
       productName: this.product ? this.product.productDefinition.name : null,
     };
   }
@@ -164,9 +173,10 @@ export class CityCore {
     this.progressProduction();
     this.progressGrowth();
     this.updateYields();
+    collector.cities.add(this);
   }
 
-  progressProduction() {
+  private progressProduction() {
     if (!this.product) {
       return;
     }
@@ -189,7 +199,7 @@ export class CityCore {
     }
   }
 
-  progressGrowth() {
+  private progressGrowth() {
     this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
@@ -211,7 +221,7 @@ export class CityCore {
     this.foodToGrow = 15 * Math.pow(1.2, this.size);
   }
 
-  progressExpansion() {
+  private progressExpansion() {
     this.totalCulture += this.perTurn.culture;
     if (this.totalCulture >= this.cultureToExpand) {
       this.totalCulture -= this.cultureToExpand;
@@ -261,7 +271,7 @@ export class CityCore {
     }
   }
 
-  startProducing(product: Product) {
+  private startProducing(product: Product) {
     if (!this.canProduce(product.productDefinition)) {
       return;
     }
@@ -272,6 +282,7 @@ export class CityCore {
     this._product$.next(product);
     this.totalProduction = 0;
     this.player.game.citiesManager.update(this);
+    collector.cities.add(this);
   }
 
   get turnsToGrow() {

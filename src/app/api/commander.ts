@@ -1,3 +1,18 @@
+import { gameApi } from "./game";
+
+export type ChangeHandler = (data: any) => void;
+const changeHandlers = new Map<string, ChangeHandler>();
+
+export function changeHandler(changeType: string) {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    changeHandlers.set(changeType, target[propertyKey]);
+  };
+}
+
 const worker = new Worker("../core.worker", { type: "module" });
 
 const awaitingExecutors: ((value: any) => void)[] = [];
@@ -12,7 +27,16 @@ function onMessage(event: MessageEvent) {
     console.error("No awaiting executors but message received.");
     return;
   }
-  executor(event.data);
+  for (const change of event.data.changes) {
+    const handler = changeHandlers.get(change.type);
+    if (!handler) {
+      console.error(`No handler for change with type "${change.type}"`);
+      continue;
+    }
+
+    handler.bind(gameApi.state)(change.data);
+  }
+  executor(event.data.result);
 }
 
 function onError(error: any) {

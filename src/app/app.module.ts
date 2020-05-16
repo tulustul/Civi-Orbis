@@ -45,7 +45,7 @@ import { NextTurnService } from "./ui/next-turn.service";
 import { GameRenderer } from "./renderer/renderer";
 import { MapUi } from "./ui/map-ui";
 import { UnitActionRequirementsComponent } from "./ui/unit-action-requirements/unit-action-requirements.component";
-import { GameApi } from "./api/game";
+import { GameApi, gameApi } from "./api/game";
 import { Game } from "./core/game";
 import { Camera } from "./renderer/camera";
 
@@ -93,7 +93,7 @@ import { Camera } from "./renderer/camera";
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [
     Game,
-    GameApi,
+    { provide: GameApi, useValue: gameApi },
     UIState,
     Controls,
     NextTurnService,

@@ -6,6 +6,7 @@ import { Player } from "./player";
 import { TileCore } from "./tile";
 import { Game } from "./game";
 import { getTileFromIndex } from "./serialization";
+import { collector } from "./collector";
 
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
@@ -83,6 +84,7 @@ export class UnitsManager {
     }
 
     unit.player.updateUnitsWithoutOrders();
+    collector.unitsDestroyed.add(unit.id);
   }
 
   move(unit: UnitCore, tile: TileCore) {
@@ -140,6 +142,8 @@ export class UnitsManager {
         return;
       }
     }
+
+    collector.units.add(unit);
   }
 
   getMovementCost(unit: UnitCore, target: TileCore) {

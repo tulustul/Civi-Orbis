@@ -19,17 +19,19 @@ export class CityDrawer {
     private renderer: GameRenderer,
     private container: TileContainer,
   ) {
-    // game.started$.subscribe(() => {
-    //   game.citiesManager.spawned$
-    //     .pipe(takeUntil(game.stopped$))
-    //     .subscribe((city) => this.spawn(city));
-    //   game.citiesManager.destroyed$
-    //     .pipe(takeUntil(game.stopped$))
-    //     .subscribe((city) => this.destroy(city));
-    //   game.citiesManager.updated$
-    //     .pipe(takeUntil(game.stopped$))
-    //     .subscribe((city) => this.update(city));
-    // });
+    game.init$.subscribe((state) => {
+      state.citySpawned$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((city) => this.spawn(city));
+
+      state.cityUpdated$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((city) => this.update(city));
+
+      state.cityDestroyed$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((city) => this.destroy(city));
+    });
   }
 
   build() {

@@ -11,11 +11,15 @@ export class City {
   name: string;
   size: number;
 
-  totalFood = 0;
-  foodToGrow = 20;
+  totalFood: number;
+  foodToGrow: number;
+  foodPerTurn: number;
+  turnsToGrow: number;
 
-  totalProduction = 0;
+  totalProduction: number;
   productionRequired: number | null;
+  productionPerTurn: number;
+  turnsToProductionEnd: number | null;
   productName: string | null;
 
   constructor(game: GameState, city: CityChanneled) {
@@ -25,14 +29,24 @@ export class City {
 
     this.tile.city = this;
 
+    this.update(city);
+
+    game.citiesMap.set(this.id, this);
+  }
+
+  update(city: CityChanneled) {
     this.name = city.name;
     this.size = city.size;
 
     this.totalFood = city.totalFood;
     this.foodToGrow = city.foodToGrow;
+    this.foodPerTurn = city.foodPerTurn;
+    this.turnsToGrow = city.turnsToGrow;
 
     this.totalProduction = city.totalProduction;
     this.productionRequired = city.productionRequired;
+    this.productionPerTurn = city.productionPerTurn;
+    this.turnsToProductionEnd = city.turnsToProductionEnd;
     this.productName = city.productName;
   }
 }

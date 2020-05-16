@@ -10,6 +10,7 @@ import { IDLE_PRODUCTS_MAP } from "./idle-product";
 import { TileRoad } from "./tile-improvements";
 import { TileCore } from "./tile";
 import { LandForm, SeaLevel } from "../shared";
+import { collector } from "./collector";
 
 export class CitiesManager {
   private _spawned$ = new Subject<CityCore>();
@@ -68,6 +69,8 @@ export class CitiesManager {
     this._spawned$.next(city);
     city.sizeChange$.subscribe(() => this.update(city));
 
+    collector.cities.add(city);
+
     return city;
   }
 
@@ -91,6 +94,7 @@ export class CitiesManager {
 
     city.destroy();
     this._destroyed$.next(city);
+    collector.citiesDestroyed.add(city.id);
   }
 
   update(city: CityCore) {

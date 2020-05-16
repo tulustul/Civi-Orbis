@@ -18,6 +18,26 @@ export class Unit {
     this.definition = UNITS_MAP.get(unit.definitionId)!;
 
     this.tile.units.push(this);
+    game.unitsMap.set(this.id, this);
+  }
+
+  update(game: GameState, unit: UnitChanneled) {
+    const index = this.tile.units.indexOf(this);
+    if (index !== -1) {
+      this.tile.units.splice(index, 1);
+    }
+
+    this.tile = game.map.tilesMap.get(unit.tileId)!;
+    this.tile.units.push(this);
+  }
+
+  destroy(game: GameState) {
+    const index = this.tile.units.indexOf(this);
+    if (index !== -1) {
+      this.tile.units.splice(index, 1);
+    }
+
+    game.unitsMap.delete(this.id);
   }
 
   findPath(destination: Tile): Promise<Tile[][]> {

@@ -9,9 +9,9 @@ import {
 import { Subject, merge } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Game } from "src/app/core/game";
-import { CityCore } from "src/app/core/city";
 import { Camera } from "src/app/renderer/camera";
+import { GameApi } from "src/app/api";
+import { City } from "src/app/api/city";
 
 @Component({
   selector: "app-cities-layer",
@@ -22,21 +22,19 @@ import { Camera } from "src/app/renderer/camera";
 export class CitiesLayerComponent implements OnInit {
   ngUnsubscribe = new Subject<void>();
 
-  cities: CityCore[];
+  cities: City[];
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private game: Game,
+    private game: GameApi,
     private camera: Camera,
   ) {}
 
   ngOnInit(): void {
-    merge(
-      this.game.citiesManager.spawned$,
-      this.game.citiesManager.destroyed$,
-      this.game.humanPlayer$,
-      this.game.tilesManager.revealedTiles$,
-    )
+    if (!this.game.state) {
+      return;
+    }
+    merge(this.game.state.citySpawned$, this.game.state.cityDestroyed$)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => {
         this.updateCities();
@@ -53,14 +51,15 @@ export class CitiesLayerComponent implements OnInit {
   }
 
   updateCities() {
-    const player = this.game.humanPlayer;
-    this.cities = this.game.citiesManager.cities.filter((city) =>
-      player?.exploredTiles.has(city.tile),
-    );
+    // const player = this.game.humanPlayer;
+    // this.cities = this.game.citiesManager.cities.filter((city) =>
+    //   player?.exploredTiles.has(city.tile),
+    // );
+    this.cities = this.game.state!.cities;
     this.cdr.markForCheck();
   }
 
-  trackByCityId(index: number, city: CityCore) {
+  trackByCityId(index: number, city: City) {
     return city.id;
   }
 

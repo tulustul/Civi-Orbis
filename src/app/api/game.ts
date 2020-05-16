@@ -47,3 +47,5 @@ export class GameApi {
     return this._state$.value;
   }
 }
+
+export const gameApi = new GameApi();

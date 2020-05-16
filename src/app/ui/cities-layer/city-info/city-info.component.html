@@ -13,7 +13,7 @@
     <app-progress-bar
       class="growth"
       [progress]="city.totalFood"
-      [nextProgress]="city.totalFood + city.perTurn.food"
+      [nextProgress]="city.totalFood + city.foodPerTurn"
       [total]="city.foodToGrow"
     >
       <span> {{ city.name }} </span>
@@ -23,11 +23,11 @@
     <app-progress-bar
       class="production"
       [progress]="city.totalProduction"
-      [nextProgress]="city.totalProduction + city.perTurn.production"
-      [total]="city.product?.productDefinition.productionCost || 0"
+      [nextProgress]="city.totalProduction + city.productionPerTurn"
+      [total]="city.productionRequired || 0"
     >
       <span>
-        {{ city.product?.productDefinition.name }}
+        {{ city.productName }}
       </span>
       <span class="turns">({{ city.turnsToProductionEnd | turns }})</span>
     </app-progress-bar>

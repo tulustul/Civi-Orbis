@@ -4,6 +4,7 @@ import { Player } from "./player";
 import { getTileIndex } from "./serialization";
 import { UnitAction, ACTIONS } from "./unit-actions";
 import { UNITS_DEFINITIONS } from "../data/units";
+import { collector } from "./collector";
 
 export type UnitOrder = "go" | "skip" | "sleep" | null;
 
@@ -73,6 +74,7 @@ export class UnitCore {
     }
 
     ACTIONS[action].fn(this.player.game, this);
+    collector.units.add(this);
   }
 
   canDoAction(action: UnitAction): boolean {
