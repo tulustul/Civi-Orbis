@@ -1,13 +1,11 @@
 import * as PIXIE from "pixi.js";
 
 import { BoundingBox } from "./camera";
-import { TileChanneled } from "../core/tile";
-import { MapChanneled } from "../core/tiles-map";
 import { Tile } from "../shared";
 import { TilesMap } from "../api/map";
 
 export class TileWrapperContainer extends PIXIE.Container {
-  tilesMap = new Map<TileChanneled, PIXIE.DisplayObject[]>();
+  tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   bindToMap(map: TilesMap) {
     for (let x = 0; x < map.width; x++) {
@@ -21,19 +19,19 @@ export class TileWrapperContainer extends PIXIE.Container {
 export class TileContainer extends PIXIE.DisplayObject {
   parent: TileWrapperContainer;
 
-  private map: MapChanneled;
+  private map: TilesMap;
 
   private grid: PIXIE.DisplayObject[][][] = [];
-  private childrenMap = new Map<PIXIE.DisplayObject, TileChanneled>();
+  private childrenMap = new Map<PIXIE.DisplayObject, Tile>();
 
   // TODO can it rewritten tile ids? Map<number, ...>
-  private tilesMap = new Map<TileChanneled, PIXIE.DisplayObject[]>();
+  private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   constructor(private bBox: BoundingBox) {
     super();
   }
 
-  addChild<T extends PIXIE.DisplayObject>(child: T, tile: TileChanneled): void {
+  addChild<T extends PIXIE.DisplayObject>(child: T, tile: Tile): void {
     if (child.parent) {
       child.parent.removeChild(child);
     }

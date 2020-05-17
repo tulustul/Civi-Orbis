@@ -16,13 +16,16 @@ export interface MapChanneled {
 
 export class TilesMapCore {
   tiles: TileCore[][] = [];
+  tilesMap = new Map<number, TileCore>();
 
   constructor(public width: number, public height: number) {
     for (let x = 0; x < width; x++) {
       const row: TileCore[] = [];
       this.tiles.push(row);
       for (let y = 0; y < height; y++) {
-        row.push(new TileCore(x * width + y, x, y));
+        const tile = new TileCore(x * width + y, x, y);
+        row.push(tile);
+        this.tilesMap.set(tile.id, tile);
       }
     }
 

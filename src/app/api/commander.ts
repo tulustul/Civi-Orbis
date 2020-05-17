@@ -27,15 +27,21 @@ function onMessage(event: MessageEvent) {
     console.error("No awaiting executors but message received.");
     return;
   }
-  for (const change of event.data.changes) {
-    const handler = changeHandlers.get(change.type);
-    if (!handler) {
-      console.error(`No handler for change with type "${change.type}"`);
-      continue;
-    }
 
-    handler.bind(gameApi.state)(change.data);
+  if (event.data.changes.length && !gameApi.state) {
+    console.error("Received change events but state is not instantiated yet.");
+  } else {
+    for (const change of event.data.changes) {
+      const handler = changeHandlers.get(change.type);
+      if (!handler) {
+        console.error(`No handler for change with type "${change.type}"`);
+        continue;
+      }
+
+      handler.bind(gameApi.state)(change.data);
+    }
   }
+
   executor(event.data.result);
 }
 

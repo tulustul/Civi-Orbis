@@ -9,13 +9,22 @@ import {
   IMPROVEMENT_OPTIONS,
 } from "../constants";
 import { Option } from "../../widgets/option.interface";
-import { Game } from "src/app/core/game";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
 import { TileImprovement } from "src/app/core/tile-improvements";
-import { Climate, LandForm, SeaLevel } from "src/app/shared";
+import {
+  Climate,
+  LandForm,
+  SeaLevel,
+  Tile,
+  isForestable,
+  areWetlandsPossible,
+  isImprovementPossible,
+} from "src/app/shared";
+import { GameApi } from "src/app/api";
+import { getTilesInRange } from "src/app/shared/hex-math";
 
 const IGNORE_OPTION: Option = { label: "ignore", value: undefined };
 
@@ -67,7 +76,7 @@ export class TilePaintingComponent implements OnInit {
   paintData = { ...this.DEFAULT_PAINT_DATA };
 
   constructor(
-    private game: Game,
+    private game: GameApi,
     private controls: Controls,
     private mapUi: MapUi,
   ) {}
@@ -85,8 +94,8 @@ export class TilePaintingComponent implements OnInit {
 
       this.mapUi.hoveredTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
         if (tile) {
-          const tiles = tile.getTilesInRange(this.paintData.size - 1);
-          this.mapUi.highlightTiles(tiles);
+          const tiles = getTilesInRange(tile, this.paintData.size - 1);
+          this.mapUi.highlightTiles(tiles as Set<Tile>);
           if (this.controls.mouseButton === 0) {
             this.paint();
           }
@@ -105,7 +114,7 @@ export class TilePaintingComponent implements OnInit {
       return;
     }
 
-    const tiles = pivotTile.getTilesInRange(this.paintData.size - 1);
+    const tiles = getTilesInRange(pivotTile, this.paintData.size - 1);
     for (const tile of tiles) {
       if (this.paintData.seaLevel !== undefined) {
         tile.seaLevel = this.paintData.seaLevel;
@@ -123,17 +132,16 @@ export class TilePaintingComponent implements OnInit {
         tile.wetlands = this.paintData.wetlands;
       }
 
-      tile.forest = tile.forest && tile.isForestable();
-      tile.wetlands = tile.wetlands && tile.areWetlandsPossible();
+      tile.forest = tile.forest && isForestable(tile);
+      tile.wetlands = tile.wetlands && areWetlandsPossible(tile);
 
       if (this.paintData.improvement !== undefined) {
-        if (tile.isImprovementPossible(this.paintData.improvement)) {
+        if (isImprovementPossible(tile, this.paintData.improvement)) {
           tile.improvement = this.paintData.improvement;
         }
       }
-
-      this.game.tilesManager.updateTile(tile);
     }
+    this.game.state?.updateTiles(Array.from(tiles) as Tile[]);
   }
 
   reset() {

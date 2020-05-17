@@ -12,6 +12,7 @@ import {
   subtractYields,
   copyYields,
 } from "./yields";
+import { collector } from "./collector";
 
 export const PLAYER_COLORS: number[] = [
   0xff0000,
@@ -50,6 +51,8 @@ export interface TrackedPlayerChanneled {
   id: number;
   color: number;
   exploredTiles: number[];
+  units: number[];
+  cities: number[];
 
   yieldsPerTurn: Yields;
   yieldsIncome: Yields;
@@ -57,7 +60,7 @@ export interface TrackedPlayerChanneled {
   yieldsTotal: Yields;
 }
 
-export class Player {
+export class PlayerCore {
   id: number;
 
   exploredTiles = new Set<TileCore>();
@@ -108,6 +111,8 @@ export class Player {
       id: this.id,
       color: this.color,
       exploredTiles: Array.from(this.exploredTiles).map((t) => t.id),
+      units: this.units.map((u) => u.id),
+      cities: this.cities.map((c) => c.id),
 
       yieldsCosts: this.yieldsCosts,
       yieldsIncome: this.yieldsIncome,
@@ -117,7 +122,7 @@ export class Player {
   }
 
   static deserialize(game: Game, data: PlayerSerialized) {
-    const player = new Player(game, data.color || 0);
+    const player = new PlayerCore(game, data.color || 0);
 
     if (data.ai) {
       player.ai = new AIPlayer(player);
@@ -130,6 +135,17 @@ export class Player {
     player.updateYields();
     player.updateCitiesWithoutProduction();
     return player;
+  }
+
+  exploreTiles(tiles: Iterable<TileCore>) {
+    for (const tile of tiles) {
+      if (!this.exploredTiles.has(tile)) {
+        this.exploredTiles.add(tile);
+        if (this.id === this.game.trackedPlayer.id) {
+          collector.tilesExplored.add(tile.id);
+        }
+      }
+    }
   }
 
   updateYields() {

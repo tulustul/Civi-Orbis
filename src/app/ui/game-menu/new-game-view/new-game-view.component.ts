@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 
 import { SimplexMapGenerator } from "src/app/map-generators/simplex";
-import { Player, PLAYER_COLORS } from "src/app/core/player";
+import { PlayerCore, PLAYER_COLORS } from "src/app/core/player";
 import { UIState } from "../../ui-state";
 import { AIPlayer } from "src/app/ai/ai-player";
 import { GameApi } from "src/app/api/game";
@@ -55,10 +55,10 @@ export class NewGameViewComponent implements OnInit {
     await this.game.newGame(mapOptions);
     this.waiting = false;
 
-    // const unit = game.activePlayer.units[0];
-    // if (unit) {
-    //   this.camera.moveToTile(unit.tile);
-    // }
+    const unit = this.game.state?.trackedPlayer.units[0];
+    if (unit) {
+      this.camera.moveToTile(unit.tile);
+    }
 
     this.uiState.menuVisible$.next(false);
   }

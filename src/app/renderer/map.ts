@@ -1,6 +1,5 @@
 import * as PIXIE from "pixi.js";
 
-import { TileCore } from "../core/tile";
 import { TileWrapperContainer, TileContainer } from "./tile-container";
 import { TerrainDrawer } from "./tile/terrain";
 import { UnitsDrawer } from "./tile/unit";
@@ -12,6 +11,9 @@ import { GameRenderer } from "./renderer";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
 import { GameState } from "../api/state";
+import { Tile } from "../shared";
+import { takeUntil } from "rxjs/operators";
+import { TrackedPlayer } from "../api/tracked-player";
 
 export class MapDrawer {
   container = new TileWrapperContainer();
@@ -55,15 +57,21 @@ export class MapDrawer {
     this.container.addChild(this.unitsContainer);
     this.container.addChild(this.overlaysContainer);
 
-    // const tilesManager = this.game.tilesManager;
-    // tilesManager.revealedTiles$.subscribe((tiles) => this.reveal(tiles));
+    this.game.init$.subscribe((state) => {
+      state.trackedPlayer$
+        .pipe(takeUntil(this.game.stop$))
+        .subscribe((player) => this.limitViewToPlayer(player));
 
-    // tilesManager.resetTilesVisibility$.subscribe((tiles) => {
-    //   this.hideAllTiles();
-    //   this.reveal(tiles);
-    // });
+      state.tilesExplored$
+        .pipe(takeUntil(this.game.stop$))
+        .subscribe((tiles) => this.reveal(tiles));
 
-    this.game.init$.subscribe((state) => this.build(state));
+      state.tileUpdated$
+        .pipe(takeUntil(this.game.stop$))
+        .subscribe((tile) => this.updateTile(tile));
+
+      this.build(state);
+    });
 
     // Drawers must be created after init$ subscription?. Race condition will occur otherwise.
     this.terrainDrawer = new TerrainDrawer(
@@ -75,7 +83,6 @@ export class MapDrawer {
     this.unitsDrawer = new UnitsDrawer(this.game, this.unitsContainer);
 
     this.yieldsDrawer = new YiedsDrawer(
-      this.game,
       this.renderer.mapUi,
       this.yieldsContainer,
     );
@@ -99,7 +106,7 @@ export class MapDrawer {
     }
   }
 
-  reveal(tiles: Iterable<TileCore>) {
+  reveal(tiles: Iterable<Tile>) {
     for (const tile of tiles) {
       const displayObjects = this.container.tilesMap.get(tile);
       if (displayObjects) {
@@ -138,15 +145,34 @@ export class MapDrawer {
     for (let y = 0; y < gameState.map.height; y++) {
       for (let x = 0; x < gameState.map.width; x++) {
         const tile = gameState.map.tiles[x][y];
-        this.terrainDrawer.drawTile(tile);
-        this.yieldsDrawer.drawTile(tile);
-        this.riverDrawer.drawTile(tile);
+        this.drawTile(tile);
       }
     }
 
-    // if (this.game.humanPlayer) {
-    //   this.hideAllTiles();
-    //   this.reveal(this.game.humanPlayer.exploredTiles);
-    // }
+    if (this.game.state?.trackedPlayer) {
+      this.limitViewToPlayer(this.game.state?.trackedPlayer);
+    }
+  }
+
+  private updateTile(tile: Tile) {
+    this.clearTile(tile);
+    this.drawTile(tile);
+  }
+
+  private drawTile(tile: Tile) {
+    this.terrainDrawer.drawTile(tile);
+    this.yieldsDrawer.drawTile(tile);
+    this.riverDrawer.drawTile(tile);
+  }
+
+  private clearTile(tile: Tile) {
+    this.terrainDrawer.clearTile(tile);
+    this.yieldsDrawer.clearTile(tile);
+    this.riverContainer.clearTile(tile);
+  }
+
+  private limitViewToPlayer(player: TrackedPlayer) {
+    this.hideAllTiles();
+    this.reveal(player.exploredTiles);
   }
 }

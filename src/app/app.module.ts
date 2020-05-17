@@ -48,6 +48,7 @@ import { UnitActionRequirementsComponent } from "./ui/unit-action-requirements/u
 import { GameApi, gameApi } from "./api/game";
 import { Game } from "./core/game";
 import { Camera } from "./renderer/camera";
+import { PlayersEditorComponent } from './ui/editor/players-editor/players-editor.component';
 
 @NgModule({
   declarations: [
@@ -89,6 +90,7 @@ import { Camera } from "./renderer/camera";
     ProductRequirementsComponent,
     PlayerYieldsComponent,
     UnitActionRequirementsComponent,
+    PlayersEditorComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [

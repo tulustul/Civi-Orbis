@@ -2,7 +2,7 @@ import { BehaviorSubject, ReplaySubject } from "rxjs";
 import { filter, distinctUntilChanged } from "rxjs/operators";
 
 import {
-  Player,
+  PlayerCore,
   PlayerSerialized,
   TrackedPlayerChanneled,
   PlayerChanneled,
@@ -23,6 +23,7 @@ interface GameSerialized {
   map: MapSerialized;
   players: PlayerSerialized[];
   activePlayerIndex: number;
+  trackedPlayerId: number;
   units: UnitSerialized[];
   cities: CitySerialized[];
 }
@@ -42,18 +43,20 @@ export class Game {
 
   map: TilesMapCore;
 
-  players: Player[] = [];
+  players: PlayerCore[] = [];
 
   activePlayerIndex = -1;
 
-  activePlayer$ = new BehaviorSubject<Player | null>(null);
+  activePlayer$ = new BehaviorSubject<PlayerCore | null>(null);
 
   humanPlayer$ = this.activePlayer$.pipe(
     filter((p) => !p?.ai),
     distinctUntilChanged(),
   );
 
-  humanPlayer: Player | null = null;
+  trackedPlayer: PlayerCore;
+
+  humanPlayer: PlayerCore | null = null;
 
   turn$ = new BehaviorSubject<number>(1);
 
@@ -82,9 +85,12 @@ export class Game {
     this._isStarted$.next(true);
   }
 
-  addPlayer(player: Player) {
+  addPlayer(player: PlayerCore) {
     player.id = this.players.length;
     this.players.push(player);
+    if (!this.trackedPlayer) {
+      this.trackedPlayer = player;
+    }
   }
 
   nextPlayer() {
@@ -98,6 +104,9 @@ export class Game {
     if (this.activePlayer$.value?.ai) {
       this.activePlayer$.value.ai.nextTurn();
       this.nextPlayer();
+    } else {
+      this.trackedPlayer = this.activePlayer$.value!;
+      collector.trackedPlayer = this.trackedPlayer;
     }
   }
 
@@ -131,16 +140,16 @@ export class Game {
       activePlayerIndex: this.activePlayerIndex,
       units: this.unitsManager.serialize(),
       cities: this.citiesManager.serialize(),
+      trackedPlayerId: this.trackedPlayer.id,
     };
   }
 
   serializeToChannel(): GameChanneled {
-    const trackedPlayer = this.humanPlayer || this.players[0];
     return {
       turn: this.turn$.value,
       map: this.map.serializeToChannel(),
       players: this.players.map((p) => p.serializeToChannel()),
-      trackedPlayer: trackedPlayer.serializeToTrackedPlayer(),
+      trackedPlayer: this.trackedPlayer.serializeToTrackedPlayer(),
       units: this.unitsManager.serializeToChannel(),
       cities: this.citiesManager.serializeToChannel(),
       areas: this.areasManager.areas.map((a) => a.serializeToChannel()),
@@ -155,7 +164,7 @@ export class Game {
 
     // Then players as unit deserialization needs them.
     for (const playerData of data.players) {
-      const player = Player.deserialize(this, playerData);
+      const player = PlayerCore.deserialize(this, playerData);
       this.addPlayer(player);
     }
 

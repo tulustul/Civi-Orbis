@@ -43,11 +43,11 @@ export class UnitEditorComponent implements OnInit {
         if (!tile) {
           return;
         }
-        if (this.spawnMode) {
-          this.spawn(tile);
-        } else {
-          this.selectTile(tile);
-        }
+        // if (this.spawnMode) {
+        //   this.spawn(tile);
+        // } else {
+        //   this.selectTile(tile);
+        // }
       });
     });
 

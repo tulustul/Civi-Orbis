@@ -1,9 +1,8 @@
 import * as PIXIE from "pixi.js";
 
-import { TileCore, TileChanneled } from "src/app/core/tile";
 import { TileContainer } from "../tile-container";
 import { takeUntil } from "rxjs/operators";
-import { TileDirection } from "src/app/shared";
+import { TileDirection, Tile } from "src/app/shared";
 import { GameApi } from "src/app/api";
 
 export class RiverDrawer {
@@ -16,7 +15,7 @@ export class RiverDrawer {
     // });
   }
 
-  public drawTile(tile: TileChanneled) {
+  public drawTile(tile: Tile) {
     if (!tile.riverParts.length) {
       return;
     }
@@ -61,9 +60,8 @@ export class RiverDrawer {
     }
   }
 
-  private updateTile(tile: TileCore) {
+  clearTile(tile: Tile) {
     this.container.clearTile(tile);
-    this.drawTile(tile);
   }
 
   clear() {

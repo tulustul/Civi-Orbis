@@ -10,9 +10,10 @@ import {
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Game } from "src/app/core/game";
-import { UnitCore } from "src/app/core/unit";
 import { UnitAction, ACTIONS } from "src/app/core/unit-actions";
+import { GameApi } from "src/app/api";
+import { MapUi } from "../map-ui";
+import { UnitDetails } from "src/app/api/unit-details";
 
 @Component({
   selector: "app-unit-panel",
@@ -21,18 +22,22 @@ import { UnitAction, ACTIONS } from "src/app/core/unit-actions";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnitPanelComponent implements OnInit, OnDestroy {
-  unit: UnitCore | null = null;
+  unit: UnitDetails | null = null;
 
   requirementsTemplates = new Map<UnitAction, TemplateRef<any>>();
 
   private ngUnsubscribe = new Subject<void>();
 
-  constructor(private cdr: ChangeDetectorRef, private game: Game) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private game: GameApi,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
-    this.game.unitsManager.activeUnit$
+    this.mapUi.selectedUnit$
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((unit) => {
+      .subscribe(async (unit) => {
         this.unit = unit;
         this.cdr.markForCheck();
       });
@@ -42,17 +47,13 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.next();
   }
 
-  get unit$() {
-    return this.game.unitsManager;
-  }
-
   getActionName(action: UnitAction) {
     return ACTIONS[action].name;
   }
 
   destroy() {
     if (this.unit) {
-      this.game.unitsManager.destroy(this.unit);
+      this.unit.disband();
     }
   }
 }

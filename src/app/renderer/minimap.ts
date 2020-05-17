@@ -53,21 +53,22 @@ export class MinimapRenderer {
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
-    // const tilesManager = this.game.tilesManager;
-    // tilesManager.revealedTiles$
-    //   .pipe(takeUntil(this.destroyed$))
-    //   .subscribe((tiles) => {
-    //     this.reveal(tiles);
-    //     this.updateMap();
-    //   });
+    this.game.init$.subscribe((state) => {
+      state.trackedPlayer$
+        .pipe(takeUntil(this.game.stop$))
+        .subscribe((player) => {
+          this.hideAllTiles();
+          this.reveal(player.exploredTiles);
+          this.updateMap();
+        });
 
-    // tilesManager.resetTilesVisibility$
-    //   .pipe(takeUntil(this.destroyed$))
-    //   .subscribe((tiles) => {
-    //     this.hideAllTiles();
-    //     this.reveal(tiles);
-    //     this.updateMap();
-    //   });
+      state.tilesExplored$
+        .pipe(takeUntil(this.game.stop$))
+        .subscribe((tiles) => {
+          this.reveal(tiles);
+          this.updateMap();
+        });
+    });
 
     this.container.addChild(this.mapSprite);
     this.container.addChild(this.cameraGraphics);

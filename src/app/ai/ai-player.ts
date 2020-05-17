@@ -1,4 +1,4 @@
-import { Player } from "../core/player";
+import { PlayerCore } from "../core/player";
 import { IDLE_PRODUCTS_MAP } from "../core/idle-product";
 import { UnitCore, UNITS_MAP } from "../core/unit";
 import { TileCore } from "../core/tile";
@@ -6,7 +6,7 @@ import { findPath } from "../core/pathfinding";
 import { CityCore } from "../core/city";
 
 export class AIPlayer {
-  constructor(private player: Player) {}
+  constructor(private player: PlayerCore) {}
 
   nextTurn() {
     for (const unit of this.player.unitsWithoutOrders) {

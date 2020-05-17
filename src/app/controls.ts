@@ -2,13 +2,11 @@ import { Injectable } from "@angular/core";
 
 import { BehaviorSubject } from "rxjs";
 
-import { findPath } from "./core/pathfinding";
 import { NextTurnService } from "./ui/next-turn.service";
 import { MapUi } from "./ui/map-ui";
 import { UIState } from "./ui/ui-state";
 import { Camera } from "./renderer/camera";
 import { GameApi } from "./api/game";
-import { UnitCore } from "./core/unit";
 
 @Injectable()
 export class Controls {
@@ -31,11 +29,14 @@ export class Controls {
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.activeUnit && this.mouseButton === 2) {
+    if (this.mapUi.selectedUnit && this.mouseButton === 2) {
       const tile = this.getTileFromMouseEvent(event);
       if (tile) {
-        this.activeUnit.path = findPath(this.activeUnit, tile);
-        this.mapUi.setPath(this.activeUnit.path);
+        this.mapUi.selectedUnit.findPath(tile).then(() => {
+          if (this.mapUi.selectedUnit) {
+            this.mapUi.setPath(this.mapUi.selectedUnit.path);
+          }
+        });
       }
     }
 
@@ -57,18 +58,17 @@ export class Controls {
   onMouseUp(event: MouseEvent) {
     const [x, y] = this.camera.screenToGame(event.clientX, event.clientY);
 
-    // const activeUnit = this.game.unitsManager.activeUnit;
-    // if (activeUnit && this.mouseButton === 2) {
-    //   const tile = this.game.map.get(x, y);
-    //   if (tile) {
-    //     this.game.unitsManager.moveAlongPath(activeUnit);
-
-    //     // to refresh the ui
-    //     this.game.unitsManager.activeUnit$.next(activeUnit);
-
-    //     this.mapUi.setPath(activeUnit.path);
-    //   }
-    // }
+    const selectedUnit = this.mapUi.selectedUnit;
+    if (selectedUnit && this.mouseButton === 2) {
+      const tile = this.game.state!.map.get(x, y);
+      if (tile) {
+        selectedUnit.moveAlongPath().then(() => {
+          this.mapUi.setPath(selectedUnit.path);
+          // to refresh the ui
+          // this.game.unitsManager.activeUnit$.next(selectedUnit);
+        });
+      }
+    }
 
     this.isMousePressed = false;
     this._mouseButton$.next(null);
@@ -80,9 +80,12 @@ export class Controls {
     if (tile !== this.mapUi.hoveredTile) {
       this.mapUi.hoverTile(tile);
 
-      if (tile && this.activeUnit && this.mouseButton === 2) {
-        this.activeUnit.path = findPath(this.activeUnit, tile);
-        this.mapUi.setPath(this.activeUnit.path);
+      if (tile && this.mapUi.selectedUnit && this.mouseButton === 2) {
+        this.mapUi.selectedUnit.findPath(tile).then(() => {
+          if (this.mapUi.selectedUnit) {
+            this.mapUi.setPath(this.mapUi.selectedUnit.path);
+          }
+        });
       }
     }
 
@@ -114,17 +117,11 @@ export class Controls {
 
   getTileFromMouseEvent(event: MouseEvent) {
     const [x, y] = this.camera.screenToGame(event.clientX, event.clientY);
-    // return this.game.map.get(x, y);
-    return null;
+    return this.game.state!.map.get(x, y);
   }
 
   nextTurn() {
     // this.mapUi.setPath(this.activeUnit?.path || null);
-  }
-
-  get activeUnit(): UnitCore | null {
-    // return this.game.unitsManager.activeUnit;
-    return null;
   }
 
   get mouseButton() {

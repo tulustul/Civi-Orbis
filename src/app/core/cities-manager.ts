@@ -3,7 +3,7 @@ import { Subject } from "rxjs";
 import { CitySerialized, CityCore } from "./city";
 import { getTileFromIndex } from "./serialization";
 import { Game } from "./game";
-import { Player } from "./player";
+import { PlayerCore } from "./player";
 import { BUILDINGS_MAP } from "./buildings";
 import { ProductDefinition } from "./product";
 import { IDLE_PRODUCTS_MAP } from "./idle-product";
@@ -28,7 +28,7 @@ export class CitiesManager {
 
   constructor(private game: Game) {}
 
-  spawn(tile: TileCore, player: Player, isNew = true) {
+  spawn(tile: TileCore, player: PlayerCore, isNew = true) {
     if (tile.city) {
       return null;
     }

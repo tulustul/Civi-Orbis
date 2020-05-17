@@ -1,7 +1,7 @@
 import { takeUntil } from "rxjs/operators";
 
 import { TileCore } from "./tile";
-import { Player } from "./player";
+import { PlayerCore } from "./player";
 import { getTileIndex } from "./serialization";
 import { UnitDefinition } from "./unit.interface";
 import { Building } from "./buildings";
@@ -115,7 +115,7 @@ export class CityCore {
   private _sizeChange$ = new Subject<number>();
   sizeChange$ = this._sizeChange$.pipe(takeUntil(this.destroyed$));
 
-  constructor(public tile: TileCore, public player: Player) {
+  constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
   }
 
@@ -387,13 +387,12 @@ export class CityCore {
       this.notWorkedTiles.add(tile);
       tile.areaOf = this;
       this.player.area.add(tile);
-      const newTiles = [tile, ...tile.neighbours].filter(
-        (t) => !this.player.exploredTiles.has(t),
-      );
-      for (const newTile of newTiles) {
-        this.player.exploredTiles.add(newTile);
-      }
-      this.player.game.tilesManager.reveal(newTiles);
+      // const newTiles = [tile, ...tile.neighbours].filter(
+      //   (t) => !this.player.exploredTiles.has(t),
+      // );
+      this.player.exploreTiles([tile]);
+      this.player.exploreTiles(tile.neighbours);
+      // this.player.game.tilesManager.reveal(newTiles);
     }
   }
 

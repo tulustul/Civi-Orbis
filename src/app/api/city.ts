@@ -1,11 +1,11 @@
 import { Tile } from "../shared";
-import { PlayerChanneled } from "../core/player";
 import { CityChanneled } from "../core/city";
 import { GameState } from "./state";
+import { Player } from "./player";
 
 export class City {
   id: number;
-  player: PlayerChanneled;
+  player: Player;
   tile: Tile;
 
   name: string;

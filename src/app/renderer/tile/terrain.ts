@@ -148,6 +148,11 @@ export class TerrainDrawer {
     this.terrainContainer.addChild(sprite, tile);
   }
 
+  clearTile(tile: Tile) {
+    this.waterContainer.clearTile(tile);
+    this.terrainContainer.clearTile(tile);
+  }
+
   clear() {
     this.waterContainer.destroyAllChildren();
     this.terrainContainer.destroyAllChildren();

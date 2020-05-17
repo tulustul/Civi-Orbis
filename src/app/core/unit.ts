@@ -1,6 +1,6 @@
 import { TileCore } from "./tile";
 import { UnitDefinition } from "./unit.interface";
-import { Player } from "./player";
+import { PlayerCore } from "./player";
 import { getTileIndex } from "./serialization";
 import { UnitAction, ACTIONS } from "./unit-actions";
 import { UNITS_DEFINITIONS } from "../data/units";
@@ -30,6 +30,15 @@ export interface UnitChanneled {
   playerId: number;
 }
 
+export interface UnitDetailsChanneled {
+  id: number;
+  tileId: number;
+  definitionId: string;
+  playerId: number;
+  actionPointsLeft: number;
+  path: number[][] | null;
+}
+
 export class UnitCore {
   id: number;
   actionPointsLeft: number;
@@ -40,7 +49,7 @@ export class UnitCore {
   constructor(
     public tile: TileCore,
     public definition: UnitDefinition,
-    public player: Player,
+    public player: PlayerCore,
   ) {
     this.actionPointsLeft = definition.actionPoints;
   }
@@ -52,10 +61,7 @@ export class UnitCore {
       definition: this.definition.id,
       actionPointsLeft: this.actionPointsLeft,
       player: this.player.id,
-      path:
-        this.path?.map((row) =>
-          row.map((tile) => getTileIndex(this.player.game.map, tile)),
-        ) || null,
+      path: this.path?.map((row) => row.map((tile) => tile.id)) || null,
     };
   }
 
@@ -65,6 +71,17 @@ export class UnitCore {
       tileId: this.tile.id,
       definitionId: this.definition.id,
       playerId: this.player.id,
+    };
+  }
+
+  serializeToDetailsChannel(): UnitDetailsChanneled {
+    return {
+      id: this.id,
+      tileId: this.tile.id,
+      definitionId: this.definition.id,
+      playerId: this.player.id,
+      actionPointsLeft: this.actionPointsLeft,
+      path: this.path?.map((row) => row.map((tile) => tile.id)) || null,
     };
   }
 

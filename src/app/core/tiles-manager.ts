@@ -2,6 +2,7 @@ import { Subject } from "rxjs";
 
 import { TileCore } from "./tile";
 import { Game } from "./game";
+import { collector } from "./collector";
 
 export class TilesManager {
   private _updatedTile$ = new Subject<TileCore>();
@@ -45,5 +46,6 @@ export class TilesManager {
       neighbour.computeMovementCosts();
     }
     this._updatedTile$.next(tile);
+    collector.tiles.add(tile);
   }
 }

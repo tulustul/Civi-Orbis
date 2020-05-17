@@ -13,6 +13,6 @@ export class PlayerYieldsComponent implements OnInit {
   ngOnInit(): void {}
 
   get player() {
-    return this.game.state?.trackedPlayer;
+    return this.game.state!.trackedPlayer;
   }
 }

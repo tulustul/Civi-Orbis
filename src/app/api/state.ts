@@ -1,23 +1,24 @@
 import { TilesMap } from "./map";
-import { PlayerChanneled } from "../core/player";
+import { TrackedPlayerChanneled } from "../core/player";
 import { Unit } from "./unit";
 import { City } from "./city";
 import { GameChanneled } from "../core/game";
-import { UNITS_MAP, UnitChanneled } from "../core/unit";
+import { UnitChanneled, UnitDetailsChanneled } from "../core/unit";
 import { TrackedPlayer } from "./tracked-player";
-import { changeHandler } from "./commander";
-import { gameApi } from "./game";
+import { changeHandler, makeCommand } from "./commander";
 import { Subject, BehaviorSubject } from "rxjs";
 import { CityChanneled } from "../core/city";
 import { Area } from "./area";
 import { AreaChanneled } from "../core/area";
+import { Tile, BaseTile, TileChanneled } from "../shared";
+import { Player } from "./player";
 
 export class GameState {
   private _turn$ = new BehaviorSubject<number>(0);
   turn$ = this._turn$.asObservable();
 
   map: TilesMap;
-  players: PlayerChanneled[] = [];
+  players: Player[] = [];
   trackedPlayer: TrackedPlayer;
   units: Unit[] = [];
   cities: City[] = [];
@@ -27,7 +28,10 @@ export class GameState {
   citiesMap = new Map<number, City>();
   areasMap = new Map<number, Area>();
 
-  playersMap = new Map<number, PlayerChanneled>();
+  playersMap = new Map<number, Player>();
+
+  private _tileUpdated$ = new Subject<Tile>();
+  tileUpdated$ = this._tileUpdated$.asObservable();
 
   private _unitSpawned$ = new Subject<Unit>();
   unitSpawned$ = this._unitSpawned$.asObservable();
@@ -56,19 +60,30 @@ export class GameState {
   private _areaDestroyed$ = new Subject<Area>();
   areaDestroyed$ = this._areaDestroyed$.asObservable();
 
-  constructor(game: GameChanneled) {
-    for (const player of game.players) {
-      this.playersMap.set(player.id, player);
-    }
+  private _tilesExplored$ = new Subject<Tile[]>();
+  tilesExplored$ = this._tilesExplored$.asObservable();
 
+  private _trackedPlayer$ = new Subject<TrackedPlayer>();
+  trackedPlayer$ = this._trackedPlayer$.asObservable();
+
+  constructor(game: GameChanneled) {
     this._turn$.next(game.turn);
     this.map = new TilesMap(game.map);
-    this.players = game.players;
-    this.trackedPlayer = new TrackedPlayer(this, game.trackedPlayer);
+
+    this.players = this.restorePlayers(game);
+    for (const player of this.players) {
+      this.playersMap.set(player.id, player);
+    }
 
     this.units = this.restoreUnits(game);
     this.cities = this.restoreCities(game);
     this.areas = this.restoreAreas(game);
+
+    this.trackedPlayer = new TrackedPlayer(this, game.trackedPlayer);
+  }
+
+  private restorePlayers(game: GameChanneled): Player[] {
+    return game.players.map((player) => new Player(player));
   }
 
   private restoreUnits(game: GameChanneled): Unit[] {
@@ -81,6 +96,42 @@ export class GameState {
 
   private restoreAreas(game: GameChanneled): Area[] {
     return game.areas.map((area) => new Area(this, area));
+  }
+
+  async setTrackedPlayer(playerId: number) {
+    const data = await makeCommand<TrackedPlayerChanneled>(
+      "trackedPlayer.set",
+      playerId,
+    );
+    this.trackedPlayer = new TrackedPlayer(this, data);
+    this._trackedPlayer$.next(this.trackedPlayer);
+  }
+
+  getUnitDetails(unitId: number): Promise<UnitDetailsChanneled | null> {
+    return makeCommand<UnitDetailsChanneled | null>("unit.getDetails", unitId);
+  }
+
+  updateTile(tile: Tile) {
+    return makeCommand("tile.update", this.serializeTileToUpdate(tile));
+  }
+
+  private serializeTileToUpdate(tile: Tile) {
+    return {
+      id: tile.id,
+      climate: tile.climate,
+      landForm: tile.landForm,
+      seaLevel: tile.seaLevel,
+      riverParts: tile.riverParts,
+      forest: tile.forest,
+      wetlands: tile.wetlands,
+      improvement: tile.improvement,
+      road: tile.road,
+    } as Partial<BaseTile>;
+  }
+
+  updateTiles(tiles: Tile[]) {
+    const data = tiles.map((t) => this.serializeTileToUpdate(t));
+    return makeCommand("tile.bulkUpdate", data);
   }
 
   @changeHandler("unit.updated")
@@ -139,5 +190,25 @@ export class GameState {
   @changeHandler("area.destroyed")
   onAreaDestroyed(turn: number) {
     this._turn$.next(turn);
+  }
+
+  @changeHandler("trackedPlayer.tilesExplored")
+  onTilesExplored(tilesIds: number[]) {
+    const tiles = tilesIds.map((id) => this.map.tilesMap.get(id)!);
+    this.trackedPlayer.exploreTiles(tiles);
+    this._tilesExplored$.next(tiles);
+  }
+
+  @changeHandler("trackedPlayer.set")
+  onTrackedPlayerSet(trackedPlayer: TrackedPlayerChanneled) {
+    this.trackedPlayer = new TrackedPlayer(this, trackedPlayer);
+    this._trackedPlayer$.next(this.trackedPlayer);
+  }
+
+  @changeHandler("tile.updated")
+  onTileUpdate(tileChanneled: TileChanneled) {
+    const tile = this.map.tilesMap.get(tileChanneled.id)!;
+    Object.assign(tile, tileChanneled);
+    this._tileUpdated$.next(tile);
   }
 }

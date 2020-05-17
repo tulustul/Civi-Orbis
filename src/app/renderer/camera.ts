@@ -3,11 +3,11 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 
 import { getTileCoords } from "./utils";
-import { TileCore } from "../core/tile";
 import { AnimationEaseOutCubic, Animation } from "./animation";
 import { GameRenderer } from "./renderer";
 import { TILE_SIZE } from "./constants";
 import { GameApi } from "../api";
+import { Tile } from "../shared";
 
 export interface Transform {
   x: number;
@@ -63,7 +63,7 @@ export class Camera {
     this.transform$.next(this.transform$.value);
   }
 
-  moveToTileWithEasing(tile: TileCore) {
+  moveToTileWithEasing(tile: Tile) {
     const t = this.transform$.value;
     const [x, y] = getTileCoords(tile);
     this.moveXAnimation = new AnimationEaseOutCubic(t.x, x, 600);
@@ -112,7 +112,7 @@ export class Camera {
     this.transform$.next(t);
   }
 
-  moveToTile(tile: TileCore) {
+  moveToTile(tile: Tile) {
     const [x, y] = getTileCoords(tile);
     this.moveTo(x, y);
   }

@@ -3,8 +3,6 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Observable } from "rxjs";
 import { takeUntil, filter } from "rxjs/operators";
 
-import { Game } from "src/app/core/game";
-import { TileCore } from "src/app/core/tile";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,
@@ -18,7 +16,16 @@ import {
 import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
 import { MapUi } from "../../map-ui";
 import { TileImprovement, TileRoad } from "src/app/core/tile-improvements";
-import { TileDirection } from "src/app/shared";
+import {
+  TileDirection,
+  Tile,
+  isForestable,
+  areWetlandsPossible,
+  isImprovementPossible,
+  isRoadPossible,
+} from "src/app/shared";
+import { GameApi } from "src/app/api";
+import { getDirectionTo } from "src/app/shared/hex-math";
 
 @Component({
   selector: "app-tile-editor",
@@ -28,7 +35,7 @@ import { TileDirection } from "src/app/shared";
 export class TileEditorComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;
 
-  tile: TileCore | null = null;
+  tile: Tile | null = null;
 
   SEA_LEVEL_OPTIONS = SEA_LEVEL_OPTIONS;
   LAND_FORM_OPTIONS = LAND_FORM_OPTIONS;
@@ -39,7 +46,7 @@ export class TileEditorComponent implements OnInit {
   IMPROVEMENT_OPTIONS = IMPROVEMENT_OPTIONS;
   ROAD_OPTIONS = ROAD_OPTIONS;
 
-  constructor(private game: Game, private mapUi: MapUi) {}
+  constructor(private game: GameApi, private mapUi: MapUi) {}
 
   ngOnInit(): void {
     const shown = this.isVisible$.pipe(filter((v) => v));
@@ -57,27 +64,27 @@ export class TileEditorComponent implements OnInit {
 
   update() {
     if (this.tile) {
-      this.game.tilesManager.updateTile(this.tile);
+      this.game.state!.updateTile(this.tile);
     }
   }
 
   updateForest(forest: boolean) {
     if (this.tile) {
-      this.tile.forest = forest && this.tile.isForestable();
+      this.tile.forest = forest && isForestable(this.tile);
       this.update();
     }
   }
 
   updateWetlands(wetlands: boolean) {
     if (this.tile) {
-      this.tile.wetlands = wetlands && this.tile.areWetlandsPossible();
+      this.tile.wetlands = wetlands && areWetlandsPossible(this.tile);
       this.update();
     }
   }
 
   updateImprovement(improvement: TileImprovement) {
     if (this.tile) {
-      if (this.tile.isImprovementPossible(improvement)) {
+      if (isImprovementPossible(this.tile, improvement)) {
         this.tile.improvement = improvement;
         this.update();
       }
@@ -85,11 +92,11 @@ export class TileEditorComponent implements OnInit {
   }
 
   updateRoad(road: TileRoad) {
-    if (this.tile && this.tile.isRoadPossible()) {
+    if (this.tile && isRoadPossible(this.tile)) {
       this.tile.road = road;
       this.update();
       for (const neighbour of this.tile.neighbours) {
-        this.game.tilesManager.updateTile(neighbour);
+        this.game.state!.updateTile(neighbour);
       }
     }
   }
@@ -101,7 +108,7 @@ export class TileEditorComponent implements OnInit {
 
     this.tile.riverParts = riverParts;
     for (const neighbour of this.tile.neighbours) {
-      const dir = this.tile.getDirectionTo(neighbour);
+      const dir = getDirectionTo(this.tile, neighbour);
       const hasRiver = riverParts.includes(dir);
       const oppositeDir = OPPOSITE_DIRECTIONS[dir];
       const neighbourRiverParts = new Set(neighbour.riverParts);
@@ -111,7 +118,7 @@ export class TileEditorComponent implements OnInit {
         neighbourRiverParts.delete(oppositeDir);
       }
       neighbour.riverParts = Array.from(neighbourRiverParts);
-      this.game.tilesManager.updateTile(neighbour);
+      this.game.state!.updateTile(neighbour);
     }
     this.update();
   }

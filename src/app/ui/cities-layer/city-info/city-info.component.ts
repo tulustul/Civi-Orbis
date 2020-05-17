@@ -40,9 +40,8 @@ export class CityInfoComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const color = this.city.player.color.toString(16).padStart(6, "0");
     const el = this.elementRef.nativeElement;
-    el.style.setProperty("--player-color", "#" + color);
+    el.style.setProperty("--player-color", this.city.player.cssColor);
 
     const thisCity = this.game.state!.cityUpdated$.pipe(
       filter((c) => c.id === this.city.id),

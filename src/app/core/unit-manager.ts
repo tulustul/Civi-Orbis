@@ -2,7 +2,7 @@ import { UnitDefinition } from "./unit.interface";
 import { UnitCore, UnitSerialized } from "./unit";
 import { BehaviorSubject, Subject } from "rxjs";
 import { UNITS_DEFINITIONS } from "../data/units";
-import { Player } from "./player";
+import { PlayerCore } from "./player";
 import { TileCore } from "./tile";
 import { Game } from "./game";
 import { getTileFromIndex } from "./serialization";
@@ -12,6 +12,8 @@ export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
 
   units: UnitCore[] = [];
+
+  unitsMap = new Map<number, UnitCore>();
 
   activeUnit$ = new BehaviorSubject<UnitCore | null>(null);
 
@@ -36,7 +38,7 @@ export class UnitsManager {
     return this.activeUnit$.value;
   }
 
-  spawn(id: string, tile: TileCore, player: Player) {
+  spawn(id: string, tile: TileCore, player: PlayerCore) {
     const definition = this.definitions.get(id);
     if (!definition) {
       throw Error(`UnitsManager: No unit with id "${id}"`);
@@ -46,12 +48,11 @@ export class UnitsManager {
     unit.id = this.lastId++;
 
     this.units.push(unit);
+    this.unitsMap.set(unit.id, unit);
     player.units.push(unit);
     tile.units.push(unit);
 
-    for (const tile of unit.tile.getTilesInRange(2)) {
-      unit.player.exploredTiles.add(tile);
-    }
+    unit.player.exploreTiles(unit.tile.getTilesInRange(2));
 
     this._spawned$.next(unit);
 
@@ -62,6 +63,9 @@ export class UnitsManager {
 
   destroy(unit: UnitCore) {
     // TODO rewrite to sets for better performance?
+
+    this.unitsMap.delete(unit.id);
+
     let index = this.units.indexOf(unit);
     if (index !== -1) {
       this.units.splice(index, 1);
@@ -87,7 +91,7 @@ export class UnitsManager {
     collector.unitsDestroyed.add(unit.id);
   }
 
-  move(unit: UnitCore, tile: TileCore) {
+  private move(unit: UnitCore, tile: TileCore) {
     if (!unit.actionPointsLeft) {
       return;
     }
@@ -106,18 +110,7 @@ export class UnitsManager {
 
     unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
 
-    const visibleTiles = tile.getTilesInRange(2);
-    const exploredTiles: TileCore[] = [];
-    for (const exploredTile of visibleTiles) {
-      if (!unit.player.exploredTiles.has(exploredTile)) {
-        unit.player.exploredTiles.add(exploredTile);
-        exploredTiles.push(exploredTile);
-      }
-    }
-
-    if (unit.player === this.game.activePlayer$.value) {
-      this.game.tilesManager.reveal(exploredTiles);
-    }
+    unit.player.exploreTiles(tile.getTilesInRange(2));
 
     this._updated$.next(unit);
   }
@@ -129,6 +122,8 @@ export class UnitsManager {
     }
 
     unit.setOrder(unit.path.length ? "go" : null);
+
+    collector.units.add(unit);
 
     while (unit.actionPointsLeft && unit.path.length) {
       this.move(unit, unit.path[0][0]);
@@ -142,8 +137,6 @@ export class UnitsManager {
         return;
       }
     }
-
-    collector.units.add(unit);
   }
 
   getMovementCost(unit: UnitCore, target: TileCore) {

@@ -2,12 +2,16 @@ import { TileCore } from "./tile";
 import { UnitCore } from "./unit";
 import { CityCore } from "./city";
 import { AreaCore } from "./area";
+import { PlayerCore } from "./player";
 
 class Collector {
   tiles = new Set<TileCore>();
   units = new Set<UnitCore>();
   cities = new Set<CityCore>();
   areas = new Set<AreaCore>();
+  tilesExplored = new Set<number>();
+
+  trackedPlayer: PlayerCore | undefined;
 
   unitsDestroyed = new Set<number>();
   citiesDestroyed = new Set<number>();
@@ -44,6 +48,20 @@ class Collector {
       changes.push({ type: "game.turn", data: this.turn });
     }
 
+    if (this.tilesExplored.size) {
+      changes.push({
+        type: "trackedPlayer.tilesExplored",
+        data: Array.from(this.tilesExplored),
+      });
+    }
+
+    if (this.trackedPlayer) {
+      changes.push({
+        type: "trackedPlayer.set",
+        data: this.trackedPlayer.serializeToTrackedPlayer(),
+      });
+    }
+
     this.tiles.clear();
     this.units.clear();
     this.cities.clear();
@@ -52,7 +70,9 @@ class Collector {
     this.unitsDestroyed.clear();
     this.citiesDestroyed.clear();
     this.areasDestroyed.clear();
+    this.tilesExplored.clear();
     this.turn = 0;
+    this.trackedPlayer = undefined;
 
     return changes;
   }

@@ -8,6 +8,7 @@ import {
   ROAD_PUBLIC_WORKS_COSTS,
   ROAD_PUBLIC_WORKS_COSTS_PER_TURN,
 } from "./tile-improvements";
+import { isImprovementPossible, isRoadPossible } from "../shared";
 
 export type UnitAction =
   | "foundCity"
@@ -84,7 +85,7 @@ export class IsImprovementPossibleRequirement extends ActionRequirement {
   }
 
   check(unit: UnitCore) {
-    return unit.tile.isImprovementPossible(this.improvement);
+    return isImprovementPossible(unit.tile, this.improvement);
   }
 }
 
@@ -100,7 +101,7 @@ export class isRoadPossibleRequirement extends ActionRequirement {
   id = "roadPossible";
 
   check(unit: UnitCore) {
-    return unit.tile.isRoadPossible();
+    return isRoadPossible(unit.tile);
   }
 }
 

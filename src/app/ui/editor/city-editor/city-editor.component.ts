@@ -3,10 +3,10 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Observable } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
-import { CityCore } from "src/app/core/city";
 import { Game } from "src/app/core/game";
 import { TileCore } from "src/app/core/tile";
 import { MapUi } from "../../map-ui";
+import { City } from "src/app/api/city";
 
 @Component({
   selector: "app-city-editor",
@@ -16,7 +16,7 @@ import { MapUi } from "../../map-ui";
 export class CityEditorComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;
 
-  city: CityCore | null = null;
+  city: City | null = null;
 
   constructor(private game: Game, private mapUi: MapUi) {}
 
@@ -30,11 +30,11 @@ export class CityEditorComponent implements OnInit {
         if (!tile) {
           return;
         }
-        if (tile.city) {
-          this.city = tile.city;
-        } else {
-          this.spawn(tile);
-        }
+        // if (tile.city) {
+        //   this.city = tile.city;
+        // } else {
+        //   this.spawn(tile);
+        // }
       });
     });
 
@@ -42,13 +42,13 @@ export class CityEditorComponent implements OnInit {
   }
 
   spawn(tile: TileCore) {
-    this.city = this.game.citiesManager.spawn(tile, this.game.players[0]);
+    // this.city = this.game.citiesManager.spawn(tile, this.game.players[0]);
   }
 
   destroy() {
-    if (this.city) {
-      this.game.citiesManager.destroy(this.city);
-      this.city = null;
-    }
+    // if (this.city) {
+    //   this.game.citiesManager.destroy(this.city);
+    //   this.city = null;
+    // }
   }
 }

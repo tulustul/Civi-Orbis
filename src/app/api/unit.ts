@@ -1,14 +1,14 @@
 import { makeCommand } from "./commander";
 import { Tile } from "../shared";
 import { UnitDefinition } from "../core/unit.interface";
-import { PlayerChanneled } from "../core/player";
 import { GameState } from "./state";
 import { UnitChanneled, UNITS_MAP } from "../core/unit";
+import { Player } from "./player";
 
 export class Unit {
   id: number;
   definition: UnitDefinition;
-  player: PlayerChanneled;
+  player: Player;
   tile: Tile;
 
   constructor(game: GameState, unit: UnitChanneled) {
@@ -38,10 +38,5 @@ export class Unit {
     }
 
     game.unitsMap.delete(this.id);
-  }
-
-  findPath(destination: Tile): Promise<Tile[][]> {
-    const data = { unitId: this.id, destinationId: destination.id };
-    return makeCommand("pathfinding.findPath", data);
   }
 }

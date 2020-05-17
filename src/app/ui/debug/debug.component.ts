@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 
-import { Game } from "src/app/core/game";
+import { GameApi } from "src/app/api";
 
 @Component({
   selector: "app-debug",
@@ -8,7 +8,11 @@ import { Game } from "src/app/core/game";
   styleUrls: ["./debug.component.scss"],
 })
 export class DebugComponent implements OnInit {
-  constructor(public game: Game) {}
+  constructor(public game: GameApi) {}
 
   ngOnInit(): void {}
+
+  revealWorld() {
+    this.game.state!.trackedPlayer.revealWorld();
+  }
 }

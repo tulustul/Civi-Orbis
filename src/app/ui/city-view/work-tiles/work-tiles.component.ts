@@ -4,10 +4,10 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
-import { CityCore } from "src/app/core/city";
-import { TileCore } from "src/app/core/tile";
 import { MapUi } from "../../map-ui";
 import { Camera } from "src/app/renderer/camera";
+import { Tile } from "src/app/shared";
+import { City } from "src/app/api/city";
 
 @Component({
   selector: "app-work-tiles",
@@ -15,7 +15,7 @@ import { Camera } from "src/app/renderer/camera";
   styleUrls: ["./work-tiles.component.scss"],
 })
 export class WorkTilesComponent implements OnInit, OnDestroy {
-  @Input() city: CityCore;
+  @Input() city: City;
 
   private ngUnsubscribe = new Subject<void>();
 
@@ -36,15 +36,15 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  toggle(tile: TileCore) {
-    if (this.city.workedTiles.has(tile)) {
-      this.city.unworkTile(tile);
-    } else {
-      this.city.workTile(tile);
-    }
+  toggle(tile: Tile) {
+    // if (this.city.workedTiles.has(tile)) {
+    //   this.city.unworkTile(tile);
+    // } else {
+    //   this.city.workTile(tile);
+    // }
   }
 
-  getTransform(tile: TileCore) {
+  getTransform(tile: Tile) {
     const [x, y] = [tile.x + 0.5, tile.y + 0.1];
     const [screenX, screenY] = this.camera.gameToScreen(x, y);
     const scale = this.camera.transform$.value.scale / 100;

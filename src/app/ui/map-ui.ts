@@ -9,6 +9,7 @@ import { Tile } from "../shared";
 import { City } from "../api/city";
 import { Unit } from "../api/unit";
 import { GameApi } from "../api";
+import { UnitDetails } from "../api/unit-details";
 
 @Injectable()
 export class MapUi {
@@ -30,6 +31,9 @@ export class MapUi {
   private _yieldsVisible$ = new BehaviorSubject<boolean>(true);
   yieldsVisible$ = this._yieldsVisible$.pipe(distinctUntilChanged());
 
+  private _selectedUnit$ = new BehaviorSubject<UnitDetails | null>(null);
+  selectedUnit$ = this._selectedUnit$.pipe(distinctUntilChanged());
+
   private selectingTileEnabled = false;
 
   cityLabelsVisible = true;
@@ -41,44 +45,42 @@ export class MapUi {
     private camera: Camera,
     private uiState: UIState,
   ) {
-    // this.clickedTile$.subscribe((tile) => {
-    //   if (this.selectingTileEnabled) {
-    //     this._selectedTile$.next(tile);
-    //   } else if (tile.units.length) {
-    //     this.selectUnit(tile.units[0]);
-    //   } else if (tile?.city) {
-    //     this.selectCity(tile.city);
-    //   } else {
-    //     this.game.unitsManager.activeUnit$.next(null);
-    //     this.setPath(null);
-    //   }
-    // });
-    // this.hoveredTile$.subscribe((tile) => {
-    //   if (!this.uiState.selectedCity$.value) {
-    //     if (tile?.city) {
-    //       this.highlightTiles(tile.city.tiles);
-    //     } else {
-    //       this.highlightTiles(null);
-    //     }
-    //   }
-    // });
+    this.clickedTile$.subscribe((tile) => {
+      if (this.selectingTileEnabled) {
+        this._selectedTile$.next(tile);
+      } else if (tile.units.length) {
+        this.selectUnit(tile.units[0]);
+      } else if (tile?.city) {
+        this.selectCity(tile.city);
+      } else {
+        this._selectedUnit$.next(null);
+        this.setPath(null);
+      }
+    });
+    this.hoveredTile$.subscribe((tile) => {
+      if (!this.uiState.selectedCity$.value) {
+        if (tile?.city) {
+          // this.highlightTiles(tile.city.tiles);
+        } else {
+          this.highlightTiles(null);
+        }
+      }
+    });
     // this.game.citiesManager.spawned$.subscribe((city) => {
     //   if (city.player === this.game.humanPlayer) {
     //     this.selectCity(city);
     //   }
     // });
-    // this.game.activePlayer$.subscribe(() => {
-    //   this.game.unitsManager.activeUnit$.next(null);
-    // });
-    // this.game.humanPlayer$.subscribe((player) => {
-    //   const tileOfInterest = player?.units[0]?.tile || player?.cities[0]?.tile;
-    //   if (tileOfInterest) {
-    //     this.camera.moveToTile(tileOfInterest);
-    //   }
-    //   this.setPath(null);
-    // });
-    // this.game.turn$.subscribe(() => this.setPath(null));
-    // this.game.stopped$.subscribe(() => this.clear());
+    this.game.state?.trackedPlayer$.subscribe((player) => {
+      this._selectedUnit$.next(null);
+      const tileOfInterest = player?.units[0]?.tile || player?.cities[0]?.tile;
+      if (tileOfInterest) {
+        this.camera.moveToTile(tileOfInterest);
+      }
+      this.setPath(null);
+    });
+    this.game.state?.turn$.subscribe(() => this.setPath(null));
+    this.game.stop$.subscribe(() => this.clear());
   }
 
   update() {
@@ -131,11 +133,21 @@ export class MapUi {
     // }
   }
 
-  selectUnit(unit: Unit) {
-    // if (unit.player === this.game.humanPlayer) {
-    //   this.game.unitsManager.activeUnit$.next(unit);
-    //   this.setPath(unit.path || null);
-    // }
+  async selectUnit(unit: Unit) {
+    if (unit.player.id === this.game.state?.trackedPlayer.id) {
+      const data = await this.game.state.getUnitDetails(unit.id);
+      if (data) {
+        const unitDetails = new UnitDetails(this.game.state!, data);
+        this._selectedUnit$.next(unitDetails);
+      } else {
+        this._selectedUnit$.next(null);
+      }
+      this.setPath(this._selectedUnit$.value?.path || null);
+    }
+  }
+
+  get selectedUnit() {
+    return this._selectedUnit$.value;
   }
 
   clear() {

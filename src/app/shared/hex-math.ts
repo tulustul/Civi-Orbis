@@ -1,5 +1,6 @@
 import { Tile, TileDirection } from "../shared";
 import { BaseTile } from "./tile.interface";
+import { TileCore } from "../core/tile";
 
 export function getTileFullNeighbours<T extends BaseTile>(
   tiles: T[][],
@@ -111,4 +112,23 @@ export function getDirectionTo(fromtile: Tile, toTile: Tile): TileDirection {
     return TileDirection.W;
   }
   return TileDirection.NONE;
+}
+
+export function getTilesInRange(
+  tile: Tile | TileCore,
+  range: number,
+): Set<Tile | TileCore> {
+  const result = new Set<Tile | TileCore>([tile]);
+  for (let i = 0; i < range; i++) {
+    let neighbours = new Set<Tile | TileCore>();
+    for (const tile of result) {
+      for (const neighbour of tile.neighbours) {
+        neighbours.add(neighbour);
+      }
+    }
+    for (const tile of neighbours) {
+      result.add(tile);
+    }
+  }
+  return result;
 }
