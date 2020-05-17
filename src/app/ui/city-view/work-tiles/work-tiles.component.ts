@@ -1,4 +1,11 @@
-import { Component, OnInit, Input, OnDestroy } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Input,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 
 import { takeUntil } from "rxjs/operators";
@@ -7,19 +14,21 @@ import { Subject } from "rxjs";
 import { MapUi } from "../../map-ui";
 import { Camera } from "src/app/renderer/camera";
 import { Tile } from "src/app/shared";
-import { City } from "src/app/api/city";
+import { CityDetails } from "src/app/api/city-details";
 
 @Component({
   selector: "app-work-tiles",
   templateUrl: "./work-tiles.component.html",
   styleUrls: ["./work-tiles.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkTilesComponent implements OnInit, OnDestroy {
-  @Input() city: City;
+  @Input() city: CityDetails;
 
   private ngUnsubscribe = new Subject<void>();
 
   constructor(
+    private cdr: ChangeDetectorRef,
     private domSanitizer: DomSanitizer,
     private camera: Camera,
     private mapUi: MapUi,
@@ -29,6 +38,10 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
     this.mapUi.clickedTile$
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((tile) => this.toggle(tile));
+
+    this.camera.transform$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(() => this.cdr.markForCheck());
   }
 
   ngOnDestroy() {
@@ -37,11 +50,11 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
   }
 
   toggle(tile: Tile) {
-    // if (this.city.workedTiles.has(tile)) {
-    //   this.city.unworkTile(tile);
-    // } else {
-    //   this.city.workTile(tile);
-    // }
+    if (this.city.workedTiles.has(tile)) {
+      // this.city.unworkTile(tile);
+    } else {
+      // this.city.workTile(tile);
+    }
   }
 
   getTransform(tile: Tile) {

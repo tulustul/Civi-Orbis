@@ -24,6 +24,8 @@ export class CitiesManager {
 
   cities: CityCore[] = [];
 
+  citiesMap = new Map<number, CityCore>();
+
   lastId = 0;
 
   constructor(private game: Game) {}
@@ -46,6 +48,7 @@ export class CitiesManager {
     city.name = `City ${city.id}`;
     city.tile = tile;
     this.cities.push(city);
+    this.citiesMap.set(city.id, city);
 
     for (const neighbour of tile.neighbours) {
       // FIXME: this will recompute borders for each tile. Can be optimized.
@@ -80,6 +83,8 @@ export class CitiesManager {
     if (index !== -1) {
       this.cities.splice(index, 1);
     }
+
+    this.citiesMap.delete(city.id);
 
     index = city.player.cities.indexOf(city);
     if (index !== -1) {

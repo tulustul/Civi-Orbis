@@ -11,9 +11,9 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import { UnitAction, ACTIONS } from "src/app/core/unit-actions";
-import { GameApi } from "src/app/api";
 import { MapUi } from "../map-ui";
 import { UnitDetails } from "src/app/api/unit-details";
+import { UnitOrder } from "src/app/core/unit";
 
 @Component({
   selector: "app-unit-panel",
@@ -28,11 +28,7 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
 
   private ngUnsubscribe = new Subject<void>();
 
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private game: GameApi,
-    private mapUi: MapUi,
-  ) {}
+  constructor(private cdr: ChangeDetectorRef, private mapUi: MapUi) {}
 
   ngOnInit(): void {
     this.mapUi.selectedUnit$
@@ -51,9 +47,15 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
     return ACTIONS[action].name;
   }
 
+  async setOrder(order: UnitOrder) {
+    await this.unit?.setOrder(order);
+    this.cdr.markForCheck();
+  }
+
   destroy() {
     if (this.unit) {
       this.unit.disband();
+      this.mapUi.selectUnit(null);
     }
   }
 }

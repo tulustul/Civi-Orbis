@@ -43,6 +43,8 @@ export class CitiesLayerComponent implements OnInit {
     this.camera.transform$
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => this.cdr.markForCheck());
+
+    this.updateCities();
   }
 
   ngOnDestroy() {
@@ -51,11 +53,10 @@ export class CitiesLayerComponent implements OnInit {
   }
 
   updateCities() {
-    // const player = this.game.humanPlayer;
-    // this.cities = this.game.citiesManager.cities.filter((city) =>
-    //   player?.exploredTiles.has(city.tile),
-    // );
-    this.cities = this.game.state!.cities;
+    const player = this.game.state!.trackedPlayer;
+    this.cities = this.game.state!.cities.filter((city) =>
+      player.exploredTiles.has(city.tile),
+    );
     this.cdr.markForCheck();
   }
 

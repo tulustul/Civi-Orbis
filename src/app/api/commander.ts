@@ -32,6 +32,7 @@ function onMessage(event: MessageEvent) {
     console.error("Received change events but state is not instantiated yet.");
   } else {
     for (const change of event.data.changes) {
+      console.debug(`change: ${change.type}`);
       const handler = changeHandlers.get(change.type);
       if (!handler) {
         console.error(`No handler for change with type "${change.type}"`);

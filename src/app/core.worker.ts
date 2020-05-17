@@ -7,9 +7,12 @@ import { PlayerCore, PLAYER_COLORS } from "./core/player";
 import { AIPlayer } from "./ai/ai-player";
 import { collector } from "./core/collector";
 import { UnitAction } from "./core/unit-actions";
-import { UnitOrder } from "./core/unit";
+import { UnitOrder, UNITS_MAP } from "./core/unit";
 import { findPath } from "./core/pathfinding";
 import { BaseTile } from "./shared";
+import { ProductDefinition } from "./core/product";
+import { BUILDINGS_MAP } from "./core/buildings";
+import { IDLE_PRODUCTS_MAP } from "./core/idle-product";
 
 let game: Game;
 
@@ -26,6 +29,8 @@ const HANDLERS = {
   "unit.moveAlongPath": unitMoveAlongPath,
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
+  "city.getDetails": getCityDetails,
+  "city.produce": cityProduce,
 };
 
 addEventListener("message", ({ data }) => {
@@ -177,4 +182,31 @@ export function tileBulkUpdate(tiles: Partial<BaseTile>[]) {
   for (const tile of tiles) {
     tileUpdate(tile);
   }
+}
+
+export function getCityDetails(cityId: number) {
+  const city = game.citiesManager.citiesMap.get(cityId);
+  if (!city) {
+    return;
+  }
+
+  return city.serializeDetailsToChannel();
+}
+
+export function cityProduce(data) {
+  const city = game.citiesManager.citiesMap.get(data.cityId);
+
+  if (!city) {
+    return;
+  }
+
+  if (data.type === "building") {
+    city.produceBuilding(BUILDINGS_MAP.get(data.productId)!);
+  } else if (data.type === "unit") {
+    city.produceUnit(UNITS_MAP.get(data.productId)!);
+  } else {
+    city.workOnIdleProduct(IDLE_PRODUCTS_MAP.get(data.productId)!);
+  }
+
+  return city.serializeDetailsToChannel();
 }

@@ -58,6 +58,8 @@ export class UnitsManager {
 
     unit.player.unitsWithoutOrders.push(unit);
 
+    collector.units.add(unit);
+
     return unit;
   }
 

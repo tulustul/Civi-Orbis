@@ -10,6 +10,7 @@ import { City } from "../api/city";
 import { Unit } from "../api/unit";
 import { GameApi } from "../api";
 import { UnitDetails } from "../api/unit-details";
+import { CityDetails } from "../api/city-details";
 
 @Injectable()
 export class MapUi {
@@ -32,11 +33,12 @@ export class MapUi {
   yieldsVisible$ = this._yieldsVisible$.pipe(distinctUntilChanged());
 
   private _selectedUnit$ = new BehaviorSubject<UnitDetails | null>(null);
-  selectedUnit$ = this._selectedUnit$.pipe(distinctUntilChanged());
+  selectedUnit$ = this._selectedUnit$.pipe();
 
   private selectingTileEnabled = false;
 
-  cityLabelsVisible = true;
+  private _cityLabelsVisible$ = new BehaviorSubject<boolean>(true);
+  cityLabelsVisible$ = this._cityLabelsVisible$.pipe(distinctUntilChanged());
 
   allowMapPanning = true;
 
@@ -116,24 +118,31 @@ export class MapUi {
   }
 
   selectCity(city: City | null) {
-    // if (!city) {
-    //   this.uiState.selectedCity$.next(city);
-    //   this.highlightTiles(null);
-    //   this.cityLabelsVisible = true;
-    //   this.allowMapPanning = true;
-    //   return;
-    // }
-    // if (city.player === this.game.humanPlayer) {
-    //   this.uiState.selectedCity$.next(city);
-    //   if (city) {
-    //     this.highlightTiles(city.tiles);
-    //     this.cityLabelsVisible = false;
-    //     this.allowMapPanning = false;
-    //   }
-    // }
+    if (!city) {
+      this.uiState.selectedCity$.next(null);
+      this.highlightTiles(null);
+      this._cityLabelsVisible$.next(true);
+      this.allowMapPanning = true;
+      return;
+    }
+
+    if (city.player.id === this.game.state?.trackedPlayer.id) {
+      this.game.state.getCityDetails(city.id).then((data) => {
+        const cityDetails = new CityDetails(this.game.state!, data);
+        this.uiState.selectedCity$.next(cityDetails);
+        this._cityLabelsVisible$.next(false);
+        this.highlightTiles(cityDetails.tiles);
+        this.allowMapPanning = false;
+      });
+    }
   }
 
-  async selectUnit(unit: Unit) {
+  async selectUnit(unit: Unit | null) {
+    if (!unit) {
+      this._selectedUnit$.next(null);
+      return;
+    }
+
     if (unit.player.id === this.game.state?.trackedPlayer.id) {
       const data = await this.game.state.getUnitDetails(unit.id);
       if (data) {

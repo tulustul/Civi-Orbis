@@ -10,7 +10,10 @@
 </ng-container>
 
 <ng-template #gameUiTmpl>
-  <app-cities-layer *ngIf="mapUi.cityLabelsVisible"></app-cities-layer>
+  <div class="panel">
+    {{ mapUi.cityLabelsVisible$ | async }}
+  </div>
+  <app-cities-layer *ngIf="mapUi.cityLabelsVisible$ | async"></app-cities-layer>
   <app-turn-counter></app-turn-counter>
 
   <app-city-view

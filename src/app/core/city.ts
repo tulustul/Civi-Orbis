@@ -69,6 +69,48 @@ export interface CityChanneled {
   productName: string | null;
 }
 
+export interface CityDetailsChanneled {
+  id: number;
+  name: string;
+  size: number;
+  tileId: number;
+  playerId: number;
+
+  totalFood: number;
+  foodToGrow: number;
+  turnsToGrow: number;
+
+  totalProduction: number;
+  turnsToProductionEnd: number | null;
+  foodConsumed: number;
+
+  totalCulture: number;
+  cultureToExpand: number;
+
+  tileYields: Yields;
+  yields: Yields;
+  perTurn: Yields;
+
+  productId: string | null;
+  productType: ProductType | null;
+
+  buildingsIds: string[];
+
+  tiles: number[];
+
+  workedTiles: number[];
+
+  availableBuildings: string[];
+
+  disabledBuildings: string[];
+
+  availableUnits: string[];
+  disabledUnits: string[];
+
+  availableIdleProducts: string[];
+  disabledIdleProducts: string[];
+}
+
 export class CityCore {
   id: number;
   name: string;
@@ -155,7 +197,7 @@ export class CityCore {
 
       totalFood: this.totalFood,
       foodToGrow: this.foodToGrow,
-      foodPerTurn: this.yields.food,
+      foodPerTurn: this.perTurn.food,
       turnsToGrow: this.turnsToGrow,
 
       totalProduction: this.totalProduction,
@@ -165,6 +207,43 @@ export class CityCore {
         : null,
       turnsToProductionEnd: this.turnsToProductionEnd,
       productName: this.product ? this.product.productDefinition.name : null,
+    };
+  }
+
+  serializeDetailsToChannel(): CityDetailsChanneled {
+    this.updateProductsList();
+    return {
+      id: this.id,
+      name: this.name,
+      size: this.size,
+      playerId: this.player.id,
+      tileId: this.tile.id,
+
+      totalFood: this.totalFood,
+      foodToGrow: this.foodToGrow,
+      turnsToGrow: this.turnsToGrow,
+
+      totalProduction: this.totalProduction,
+      turnsToProductionEnd: this.turnsToProductionEnd,
+      availableBuildings: this.availableBuildings.map((b) => b.id),
+      availableIdleProducts: this.availableIdleProducts.map((p) => p.id),
+      availableUnits: this.availableUnits.map((u) => u.id),
+      buildingsIds: Array.from(this.buildingsIds),
+      cultureToExpand: this.cultureToExpand,
+      disabledBuildings: Array.from(this.disabledBuildings).map((b) => b.id),
+      disabledIdleProducts: Array.from(this.disabledIdleProducts).map(
+        (p) => p.id,
+      ),
+      disabledUnits: Array.from(this.disabledUnits).map((u) => u.id),
+      foodConsumed: this.foodConsumed,
+      perTurn: this.perTurn,
+      productId: this.product?.productDefinition.id || null,
+      productType: this.product?.type || null,
+      tileYields: this.tileYields,
+      tiles: Array.from(this.tiles).map((t) => t.id),
+      totalCulture: this.totalCulture,
+      workedTiles: Array.from(this.workedTiles).map((t) => t.id),
+      yields: this.yields,
     };
   }
 

@@ -65,7 +65,7 @@ export class Controls {
         selectedUnit.moveAlongPath().then(() => {
           this.mapUi.setPath(selectedUnit.path);
           // to refresh the ui
-          // this.game.unitsManager.activeUnit$.next(selectedUnit);
+          this.mapUi["_selectedUnit$"].next(selectedUnit);
         });
       }
     }

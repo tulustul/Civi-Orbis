@@ -36,6 +36,7 @@ export interface UnitDetailsChanneled {
   definitionId: string;
   playerId: number;
   actionPointsLeft: number;
+  order: UnitOrder;
   path: number[][] | null;
 }
 
@@ -81,6 +82,7 @@ export class UnitCore {
       definitionId: this.definition.id,
       playerId: this.player.id,
       actionPointsLeft: this.actionPointsLeft,
+      order: this.order,
       path: this.path?.map((row) => row.map((tile) => tile.id)) || null,
     };
   }

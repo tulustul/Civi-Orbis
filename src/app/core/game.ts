@@ -105,8 +105,10 @@ export class Game {
       this.activePlayer$.value.ai.nextTurn();
       this.nextPlayer();
     } else {
-      this.trackedPlayer = this.activePlayer$.value!;
-      collector.trackedPlayer = this.trackedPlayer;
+      if (this.trackedPlayer !== this.activePlayer$.value!) {
+        this.trackedPlayer = this.activePlayer$.value!;
+        collector.trackedPlayer = this.trackedPlayer;
+      }
     }
   }
 

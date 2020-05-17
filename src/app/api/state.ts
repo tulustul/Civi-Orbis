@@ -7,7 +7,7 @@ import { UnitChanneled, UnitDetailsChanneled } from "../core/unit";
 import { TrackedPlayer } from "./tracked-player";
 import { changeHandler, makeCommand } from "./commander";
 import { Subject, BehaviorSubject } from "rxjs";
-import { CityChanneled } from "../core/city";
+import { CityChanneled, CityDetailsChanneled } from "../core/city";
 import { Area } from "./area";
 import { AreaChanneled } from "../core/area";
 import { Tile, BaseTile, TileChanneled } from "../shared";
@@ -132,6 +132,10 @@ export class GameState {
   updateTiles(tiles: Tile[]) {
     const data = tiles.map((t) => this.serializeTileToUpdate(t));
     return makeCommand("tile.bulkUpdate", data);
+  }
+
+  getCityDetails(cityId: number) {
+    return makeCommand<CityDetailsChanneled>("city.getDetails", cityId);
   }
 
   @changeHandler("unit.updated")

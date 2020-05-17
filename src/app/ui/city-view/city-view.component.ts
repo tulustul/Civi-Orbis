@@ -1,4 +1,10 @@
-import { Component, OnInit, Input } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  Input,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from "@angular/core";
 
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -8,25 +14,30 @@ import { UnitDefinition } from "src/app/core/unit.interface";
 import { IdleProduct } from "src/app/core/idle-product";
 import { MapUi } from "../map-ui";
 import { Camera } from "src/app/renderer/camera";
-import { City } from "src/app/api/city";
+import { CityDetails } from "src/app/api/city-details";
 
 @Component({
   selector: "app-city-view",
   templateUrl: "./city-view.component.html",
   styleUrls: ["./city-view.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CityViewComponent implements OnInit {
   private quit$ = new Subject<void>();
 
-  private _city: City;
+  private _city: CityDetails;
 
-  constructor(private camera: Camera, private mapUi: MapUi) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private camera: Camera,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
     // this.city.updateProductsList();
   }
 
-  @Input() set city(city: City) {
+  @Input() set city(city: CityDetails) {
     this._city = city;
 
     this.camera.moveToTileWithEasing(this.city.tile);
@@ -35,28 +46,28 @@ export class CityViewComponent implements OnInit {
       this.city.tile.y,
     );
     this.camera.scaleToWithEasing(130, x, y);
-    // this.mapUi.highlightTiles(this.city.tiles);
+    this.mapUi.highlightTiles(this.city.tiles);
 
     this.mapUi.clickedTile$.pipe(takeUntil(this.quit$)).subscribe((tile) => {
-      // if (!this.city.tiles.has(tile)) {
-      //   this.quit();
-      // }
+      if (!this.city.tiles.has(tile)) {
+        this.quit();
+      }
     });
   }
 
-  produceBuilding(building: Building) {
-    // this.city.produceBuilding(building);
-    // this.city.updateProductsList();
+  async produceBuilding(building: Building) {
+    await this.city.produceBuilding(building);
+    this.cdr.markForCheck();
   }
 
-  produceUnit(unit: UnitDefinition) {
-    // this.city.produceUnit(unit);
-    // this.city.updateProductsList();
+  async produceUnit(unit: UnitDefinition) {
+    await this.city.produceUnit(unit);
+    this.cdr.markForCheck();
   }
 
-  workOnIdleProduct(idleProduct: IdleProduct) {
-    // this.city.workOnIdleProduct(idleProduct);
-    // this.city.updateProductsList();
+  async workOnIdleProduct(idleProduct: IdleProduct) {
+    await this.city.workOnIdleProduct(idleProduct);
+    this.cdr.markForCheck();
   }
 
   get city() {

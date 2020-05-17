@@ -13,6 +13,7 @@ export class UnitDetails {
   player: Player;
   actionPointsLeft: number;
   path: Tile[][] | null = null;
+  order: UnitOrder;
 
   constructor(private game: GameState, unit: UnitDetailsChanneled) {
     this.id = unit.id;
@@ -24,6 +25,7 @@ export class UnitDetails {
     this.tile = this.game.map.tilesMap.get(unit.tileId)!;
     this.player = this.game.playersMap.get(unit.playerId)!;
     this.actionPointsLeft = unit.actionPointsLeft;
+    this.order = unit.order;
 
     this.path = null;
     if (unit.path) {
