@@ -2,7 +2,7 @@ import { TrackedPlayerChanneled } from "../core/player";
 import { GameState } from "./state";
 import { Tile } from "../shared";
 import { Yields } from "../core/yields";
-import { makeCommand } from "./commander";
+import { makeCommand } from "./internal/commander";
 import { Unit } from "./unit";
 import { City } from "./city";
 

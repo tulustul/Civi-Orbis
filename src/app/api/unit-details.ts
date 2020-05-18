@@ -4,7 +4,7 @@ import { Tile } from "../shared";
 import { GameState } from "./state";
 import { UnitDefinition } from "../core/unit.interface";
 import { Player } from "./player";
-import { makeCommand } from "./commander";
+import { makeCommand } from "./internal/commander";
 
 export class UnitDetails {
   id: number;

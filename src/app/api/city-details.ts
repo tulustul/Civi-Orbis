@@ -8,7 +8,7 @@ import { IdleProduct, IDLE_PRODUCTS_MAP } from "../core/idle-product";
 import { GameState } from "./state";
 import { ProductDefinition } from "../core/product";
 import { UNITS_MAP } from "../core/unit";
-import { makeCommand } from "./commander";
+import { makeCommand } from "./internal/commander";
 
 export class CityDetails {
   id: number;

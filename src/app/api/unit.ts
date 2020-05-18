@@ -1,4 +1,4 @@
-import { makeCommand } from "./commander";
+import { makeCommand } from "./internal/commander";
 import { Tile } from "../shared";
 import { UnitDefinition } from "../core/unit.interface";
 import { GameState } from "./state";

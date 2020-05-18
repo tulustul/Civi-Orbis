@@ -10,7 +10,6 @@ import { UnitAction } from "./core/unit-actions";
 import { UnitOrder, UNITS_MAP } from "./core/unit";
 import { findPath } from "./core/pathfinding";
 import { BaseTile } from "./shared";
-import { ProductDefinition } from "./core/product";
 import { BUILDINGS_MAP } from "./core/buildings";
 import { IDLE_PRODUCTS_MAP } from "./core/idle-product";
 

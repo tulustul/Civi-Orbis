@@ -2,9 +2,14 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { filter } from "rxjs/operators";
 
 import { MapGeneratorOptions } from "./game.interface";
-import { makeCommand } from "./commander";
+import { makeCommand } from "./internal/commander";
+import { initWorkerListeners } from "./internal/listener";
 import { GameChanneled } from "../core/game";
 import { GameState } from "./state";
+import { initChangeHandlers } from "./change-handlers";
+
+initWorkerListeners();
+initChangeHandlers();
 
 export class GameApi {
   private _state$ = new BehaviorSubject<GameState | null>(null);

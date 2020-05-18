@@ -3,14 +3,13 @@ import { TrackedPlayerChanneled } from "../core/player";
 import { Unit } from "./unit";
 import { City } from "./city";
 import { GameChanneled } from "../core/game";
-import { UnitChanneled, UnitDetailsChanneled } from "../core/unit";
+import { UnitDetailsChanneled } from "../core/unit";
 import { TrackedPlayer } from "./tracked-player";
-import { changeHandler, makeCommand } from "./commander";
+import { makeCommand } from "./internal/commander";
 import { Subject, BehaviorSubject } from "rxjs";
-import { CityChanneled, CityDetailsChanneled } from "../core/city";
+import { CityDetailsChanneled } from "../core/city";
 import { Area } from "./area";
-import { AreaChanneled } from "../core/area";
-import { Tile, BaseTile, TileChanneled } from "../shared";
+import { Tile, BaseTile } from "../shared";
 import { Player } from "./player";
 
 export class GameState {
@@ -136,83 +135,5 @@ export class GameState {
 
   getCityDetails(cityId: number) {
     return makeCommand<CityDetailsChanneled>("city.getDetails", cityId);
-  }
-
-  @changeHandler("unit.updated")
-  onUnitUpdate(unitChanneled: UnitChanneled) {
-    const unit = this.unitsMap.get(unitChanneled.id);
-    if (unit) {
-      unit.update(this, unitChanneled);
-      this._unitUpdated$.next(unit);
-    } else {
-      const newUnit = new Unit(this, unitChanneled);
-      this.units.push(newUnit);
-      this._unitSpawned$.next(newUnit);
-    }
-  }
-
-  @changeHandler("unit.destroyed")
-  onUnitDestroyed(id: number) {
-    const unit = this.unitsMap.get(id);
-    if (unit) {
-      unit.destroy(this);
-      this._unitDestroyed$.next(unit);
-    }
-  }
-
-  @changeHandler("city.updated")
-  onCityUpdate(cityChanneled: CityChanneled) {
-    const city = this.citiesMap.get(cityChanneled.id);
-    if (city) {
-      city.update(cityChanneled);
-      this._cityUpdated$.next(city);
-    } else {
-      const newCity = new City(this, cityChanneled);
-      this.cities.push(newCity);
-      this._citySpawned$.next(newCity);
-    }
-  }
-
-  @changeHandler("game.turn")
-  onTurn(turn: number) {
-    this._turn$.next(turn);
-  }
-
-  @changeHandler("area.updated")
-  onAreaUpdate(areaChanneled: AreaChanneled) {
-    const area = this.areasMap.get(areaChanneled.id);
-    if (area) {
-      area.update(this, areaChanneled);
-      this._areaUpdated$.next(area);
-    } else {
-      const newArea = new Area(this, areaChanneled);
-      this.areas.push(newArea);
-      this._areaSpawned$.next(newArea);
-    }
-  }
-
-  @changeHandler("area.destroyed")
-  onAreaDestroyed(turn: number) {
-    this._turn$.next(turn);
-  }
-
-  @changeHandler("trackedPlayer.tilesExplored")
-  onTilesExplored(tilesIds: number[]) {
-    const tiles = tilesIds.map((id) => this.map.tilesMap.get(id)!);
-    this.trackedPlayer.exploreTiles(tiles);
-    this._tilesExplored$.next(tiles);
-  }
-
-  @changeHandler("trackedPlayer.set")
-  onTrackedPlayerSet(trackedPlayer: TrackedPlayerChanneled) {
-    this.trackedPlayer = new TrackedPlayer(this, trackedPlayer);
-    this._trackedPlayer$.next(this.trackedPlayer);
-  }
-
-  @changeHandler("tile.updated")
-  onTileUpdate(tileChanneled: TileChanneled) {
-    const tile = this.map.tilesMap.get(tileChanneled.id)!;
-    Object.assign(tile, tileChanneled);
-    this._tileUpdated$.next(tile);
   }
 }
