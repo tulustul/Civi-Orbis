@@ -46,9 +46,8 @@ export class GameApi {
     return makeCommand<string>("game.saveDump");
   }
 
-  async nextPlayer() {
-    const gameState: GameChanneled = await makeCommand("game.nextPlayer");
-    return gameState;
+  nextPlayer() {
+    return makeCommand("game.nextPlayer");
   }
 
   get state() {

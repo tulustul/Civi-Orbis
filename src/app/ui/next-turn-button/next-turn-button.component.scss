@@ -8,5 +8,12 @@
     font-size: 22px;
     cursor: pointer;
     outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  app-spinner {
+    --spinner-size: 20px;
+    margin-right: 15px;
   }
 }

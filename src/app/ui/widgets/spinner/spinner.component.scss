@@ -1,15 +1,13 @@
 :host {
   --spinner-size: 64px;
   display: inline-block;
-  width: 80px;
-  height: 80px;
   &:after {
     content: " ";
     display: block;
     width: var(--spinner-size);
     height: var(--spinner-size);
     border-radius: 50%;
-    border: 6px solid #fff;
+    border: calc(var(--spinner-size) / 6) solid #fff;
     border-color: #fff transparent #fff transparent;
     animation: lds-dual-ring 1.2s linear infinite;
   }
