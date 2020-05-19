@@ -49,6 +49,8 @@ import { GameApi, gameApi } from "./api/game";
 import { Game } from "./core/game";
 import { Camera } from "./renderer/camera";
 import { PlayersEditorComponent } from './ui/editor/players-editor/players-editor.component';
+import { SpinnerComponent } from './ui/widgets/spinner/spinner.component';
+import { ModalComponent } from './ui/widgets/modal/modal.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +93,8 @@ import { PlayersEditorComponent } from './ui/editor/players-editor/players-edito
     PlayerYieldsComponent,
     UnitActionRequirementsComponent,
     PlayersEditorComponent,
+    SpinnerComponent,
+    ModalComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [

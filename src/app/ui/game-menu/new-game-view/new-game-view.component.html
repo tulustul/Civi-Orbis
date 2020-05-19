@@ -46,4 +46,9 @@
   <button (click)="start()">Start</button>
 </div>
 
-<div *ngIf="waiting">Generating...</div>
+<app-modal *ngIf="waiting">
+  <div class="center">
+    <h2>Generating map</h2>
+    <app-spinner></app-spinner>
+  </div>
+</app-modal>

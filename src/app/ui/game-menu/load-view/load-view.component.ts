@@ -23,6 +23,8 @@ export class LoadViewComponent implements OnInit {
 
   saveName = "";
 
+  waiting = false;
+
   constructor(private game: GameApi, private uiState: UIState) {}
 
   ngOnInit(): void {}
@@ -37,8 +39,12 @@ export class LoadViewComponent implements OnInit {
       return null;
     }
 
+    this.waiting = true;
+
     await this.game.loadGame(data);
     this.uiState.menuVisible$.next(false);
+
+    this.waiting = false;
   }
 
   async import(event: Event) {
