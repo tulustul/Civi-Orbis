@@ -1,10 +1,10 @@
-import { TrackedPlayerChanneled } from "../core/player";
 import { GameState } from "./state";
 import { Tile } from "../shared";
 import { Yields } from "../core/yields";
 import { makeCommand } from "./internal/commander";
 import { Unit } from "./unit";
 import { City } from "./city";
+import { TrackedPlayerChanneled } from "../core/serialization/channel";
 
 export class TrackedPlayer {
   id: number;

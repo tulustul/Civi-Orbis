@@ -3,8 +3,8 @@ import { filter } from "rxjs/operators";
 
 import { MapGeneratorOptions } from "./game.interface";
 import { makeCommand } from "./internal/commander";
-import { GameChanneled } from "../core/game";
 import { GameState } from "./state";
+import { GameChanneled } from "../core/serialization/channel";
 
 export class GameApi {
   private _state$ = new BehaviorSubject<GameState | null>(null);

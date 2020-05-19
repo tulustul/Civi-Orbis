@@ -1,8 +1,5 @@
-import { takeUntil } from "rxjs/operators";
-
 import { TileCore } from "./tile";
 import { PlayerCore } from "./player";
-import { getTileIndex } from "./serialization";
 import { UnitDefinition } from "./unit.interface";
 import { Building } from "./buildings";
 import { ProductDefinition } from "./product";
@@ -20,7 +17,6 @@ import {
 import { UNITS_DEFINITIONS } from "../data/units";
 import { BUILDINGS } from "../data/buildings";
 import { IDLE_PRODUCTS } from "../data/idle-products";
-import { Subject, BehaviorSubject } from "rxjs";
 import { collector } from "./collector";
 
 export type ProductType = "unit" | "building" | "idleProduct";
@@ -28,87 +24,6 @@ export type ProductType = "unit" | "building" | "idleProduct";
 export interface Product {
   type: ProductType;
   productDefinition: ProductDefinition;
-}
-
-export interface ProductSerialized {
-  type: ProductType;
-  id: string;
-}
-
-export interface CitySerialized {
-  id: number;
-  name: string;
-  size: number;
-  tile: number;
-  player: number;
-  totalFood: number;
-  totalCulture: number;
-  totalProduction: number;
-  product: ProductSerialized | null;
-  tiles: number[];
-  workedTiles: number[];
-  buildings: string[];
-}
-
-export interface CityChanneled {
-  id: number;
-  name: string;
-  size: number;
-  tileId: number;
-  playerId: number;
-
-  totalFood: number;
-  foodToGrow: number;
-  foodPerTurn: number;
-  turnsToGrow: number;
-
-  totalProduction: number;
-  productionPerTurn: number;
-  productionRequired: number | null;
-  turnsToProductionEnd: number | null;
-  productName: string | null;
-}
-
-export interface CityDetailsChanneled {
-  id: number;
-  name: string;
-  size: number;
-  tileId: number;
-  playerId: number;
-
-  totalFood: number;
-  foodToGrow: number;
-  turnsToGrow: number;
-
-  totalProduction: number;
-  turnsToProductionEnd: number | null;
-  foodConsumed: number;
-
-  totalCulture: number;
-  cultureToExpand: number;
-
-  tileYields: Yields;
-  yields: Yields;
-  perTurn: Yields;
-
-  productId: string | null;
-  productType: ProductType | null;
-
-  buildingsIds: string[];
-
-  tiles: number[];
-
-  workedTiles: number[];
-
-  availableBuildings: string[];
-
-  disabledBuildings: string[];
-
-  availableUnits: string[];
-  disabledUnits: string[];
-
-  availableIdleProducts: string[];
-  disabledIdleProducts: string[];
 }
 
 export class CityCore {
@@ -148,103 +63,8 @@ export class CityCore {
   availableIdleProducts: IdleProduct[] = [];
   disabledIdleProducts = new Set<IdleProduct>();
 
-  private _destroyed$ = new Subject<void>();
-  destroyed$ = this._destroyed$.asObservable();
-
-  private _product$ = new BehaviorSubject<Product | null>(null);
-  product$ = this._product$.pipe(takeUntil(this.destroyed$));
-
-  private _sizeChange$ = new Subject<number>();
-  sizeChange$ = this._sizeChange$.pipe(takeUntil(this.destroyed$));
-
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
-  }
-
-  serialize(): CitySerialized {
-    return {
-      id: this.id,
-      name: this.name,
-      size: this.size,
-      player: this.player.id,
-      tile: this.tile.id,
-      totalFood: this.totalFood,
-      totalProduction: this.totalProduction,
-      totalCulture: this.totalCulture,
-      product: this.product
-        ? {
-            type: this.product.type,
-            id: this.product.productDefinition.id,
-          }
-        : null,
-      tiles: Array.from(this.tiles).map((tile) =>
-        getTileIndex(this.player.game.map, tile),
-      ),
-      workedTiles: Array.from(this.workedTiles).map((tile) =>
-        getTileIndex(this.player.game.map, tile),
-      ),
-      buildings: this.buildings.map((b) => b.id),
-    };
-  }
-
-  serializeToChannel(): CityChanneled {
-    return {
-      id: this.id,
-      name: this.name,
-      size: this.size,
-      playerId: this.player.id,
-      tileId: this.tile.id,
-
-      totalFood: this.totalFood,
-      foodToGrow: this.foodToGrow,
-      foodPerTurn: this.perTurn.food,
-      turnsToGrow: this.turnsToGrow,
-
-      totalProduction: this.totalProduction,
-      productionPerTurn: this.yields.production,
-      productionRequired: this.product
-        ? this.product.productDefinition.productionCost
-        : null,
-      turnsToProductionEnd: this.turnsToProductionEnd,
-      productName: this.product ? this.product.productDefinition.name : null,
-    };
-  }
-
-  serializeDetailsToChannel(): CityDetailsChanneled {
-    this.updateProductsList();
-    return {
-      id: this.id,
-      name: this.name,
-      size: this.size,
-      playerId: this.player.id,
-      tileId: this.tile.id,
-
-      totalFood: this.totalFood,
-      foodToGrow: this.foodToGrow,
-      turnsToGrow: this.turnsToGrow,
-
-      totalProduction: this.totalProduction,
-      turnsToProductionEnd: this.turnsToProductionEnd,
-      availableBuildings: this.availableBuildings.map((b) => b.id),
-      availableIdleProducts: this.availableIdleProducts.map((p) => p.id),
-      availableUnits: this.availableUnits.map((u) => u.id),
-      buildingsIds: Array.from(this.buildingsIds),
-      cultureToExpand: this.cultureToExpand,
-      disabledBuildings: Array.from(this.disabledBuildings).map((b) => b.id),
-      disabledIdleProducts: Array.from(this.disabledIdleProducts).map(
-        (p) => p.id,
-      ),
-      disabledUnits: Array.from(this.disabledUnits).map((u) => u.id),
-      foodConsumed: this.foodConsumed,
-      perTurn: this.perTurn,
-      productId: this.product?.productDefinition.id || null,
-      productType: this.product?.type || null,
-      tileYields: this.tileYields,
-      tiles: Array.from(this.tiles).map((t) => t.id),
-      totalCulture: this.totalCulture,
-      workedTiles: Array.from(this.workedTiles).map((t) => t.id),
-      yields: this.yields,
-    };
   }
 
   nextTurn() {
@@ -282,7 +102,6 @@ export class CityCore {
     this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
-      this._sizeChange$.next(this.size);
       const bestWorkableTile = this.pickBestTile(this.notWorkedTiles);
       if (bestWorkableTile) {
         this.workTile(bestWorkableTile);
@@ -291,7 +110,6 @@ export class CityCore {
     } else if (this.totalFood < 0) {
       if (this.size > 1) {
         this.size--;
-        this._sizeChange$.next(this.size);
         this.totalFood += this.foodToGrow;
       } else {
         this.totalFood = 0;
@@ -342,7 +160,6 @@ export class CityCore {
     if (this.product) {
       const type = this.product.type;
       this.product = null;
-      this._product$.next(null);
       if (type === "idleProduct") {
         this.updateYields();
         this.player.updateYields();
@@ -358,9 +175,7 @@ export class CityCore {
     this.cancelProduction();
 
     this.product = product;
-    this._product$.next(product);
     this.totalProduction = 0;
-    this.player.game.citiesManager.update(this);
     collector.cities.add(this);
   }
 
@@ -563,11 +378,6 @@ export class CityCore {
     }
 
     return true;
-  }
-
-  destroy() {
-    this._destroyed$.next();
-    this._destroyed$.complete();
   }
 
   private getAvailableProducts<T extends ProductDefinition>(

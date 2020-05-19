@@ -1,11 +1,10 @@
 import { UnitDefinition } from "./unit.interface";
-import { UnitCore, UnitSerialized } from "./unit";
+import { UnitCore } from "./unit";
 import { BehaviorSubject, Subject } from "rxjs";
 import { UNITS_DEFINITIONS } from "../data/units";
 import { PlayerCore } from "./player";
 import { TileCore } from "./tile";
 import { Game } from "./game";
-import { getTileFromIndex } from "./serialization";
 import { collector } from "./collector";
 
 export class UnitsManager {
@@ -15,27 +14,12 @@ export class UnitsManager {
 
   unitsMap = new Map<number, UnitCore>();
 
-  activeUnit$ = new BehaviorSubject<UnitCore | null>(null);
-
-  private _updated$ = new Subject<UnitCore>();
-  updated$ = this._updated$.asObservable();
-
-  private _spawned$ = new Subject<UnitCore>();
-  spawned$ = this._spawned$.asObservable();
-
-  private _destroyed$ = new Subject<UnitCore>();
-  destroyed$ = this._destroyed$.asObservable();
-
   private lastId = 0;
 
   constructor(private game: Game) {
     for (const definition of UNITS_DEFINITIONS) {
       this.definitions.set(definition.id, definition);
     }
-  }
-
-  get activeUnit() {
-    return this.activeUnit$.value;
   }
 
   spawn(id: string, tile: TileCore, player: PlayerCore) {
@@ -53,8 +37,6 @@ export class UnitsManager {
     tile.units.push(unit);
 
     unit.player.exploreTiles(unit.tile.getTilesInRange(2));
-
-    this._spawned$.next(unit);
 
     unit.player.unitsWithoutOrders.push(unit);
 
@@ -83,12 +65,6 @@ export class UnitsManager {
       unit.tile.units.splice(index, 1);
     }
 
-    this._destroyed$.next(unit);
-
-    if (unit === this.activeUnit) {
-      this.activeUnit$.next(null);
-    }
-
     unit.player.updateUnitsWithoutOrders();
     collector.unitsDestroyed.add(unit.id);
   }
@@ -113,8 +89,6 @@ export class UnitsManager {
     unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
 
     unit.player.exploreTiles(tile.getTilesInRange(2));
-
-    this._updated$.next(unit);
   }
 
   moveAlongPath(unit: UnitCore) {
@@ -145,11 +119,6 @@ export class UnitsManager {
     return unit.tile.neighboursCosts.get(target) || Infinity;
   }
 
-  clear() {
-    this.activeUnit$.next(null);
-    this.units = [];
-  }
-
   nextTurn() {
     for (const unit of this.units) {
       if (unit.path) {
@@ -159,26 +128,6 @@ export class UnitsManager {
         unit.setOrder(null);
       }
       unit.actionPointsLeft = unit.definition.actionPoints;
-    }
-  }
-
-  serialize() {
-    return this.units.map((u) => u.serialize());
-  }
-
-  serializeToChannel() {
-    return this.units.map((u) => u.serializeToChannel());
-  }
-
-  deserialize(data: UnitSerialized[]) {
-    for (const unitData of data) {
-      const tile = getTileFromIndex(this.game.map, unitData.tile);
-      const player = this.game.players[unitData.player];
-      const unit = this.spawn(unitData.definition, tile, player);
-      unit.actionPointsLeft = unitData.actionPointsLeft;
-
-      // TODO path deserialization
-      // unit.path = unitData.path;
     }
   }
 }

@@ -3,6 +3,13 @@ import { UnitCore } from "./unit";
 import { CityCore } from "./city";
 import { AreaCore } from "./area";
 import { PlayerCore } from "./player";
+import {
+  tileToChannel,
+  unitToChannel,
+  cityToChannel,
+  areaToChannel,
+  trackedPlayerToChannel,
+} from "./serialization/channel";
 
 class Collector {
   tiles = new Set<TileCore>();
@@ -22,16 +29,16 @@ class Collector {
   flush() {
     const changes: any[] = [];
     for (const tile of this.tiles) {
-      changes.push({ type: "tile.updated", data: tile.serializeToChannel() });
+      changes.push({ type: "tile.updated", data: tileToChannel(tile) });
     }
     for (const unit of this.units) {
-      changes.push({ type: "unit.updated", data: unit.serializeToChannel() });
+      changes.push({ type: "unit.updated", data: unitToChannel(unit) });
     }
     for (const city of this.cities) {
-      changes.push({ type: "city.updated", data: city.serializeToChannel() });
+      changes.push({ type: "city.updated", data: cityToChannel(city) });
     }
     for (const area of this.areas) {
-      changes.push({ type: "area.updated", data: area.serializeToChannel() });
+      changes.push({ type: "area.updated", data: areaToChannel(area) });
     }
 
     for (const id of this.unitsDestroyed) {
@@ -58,7 +65,7 @@ class Collector {
     if (this.trackedPlayer) {
       changes.push({
         type: "trackedPlayer.set",
-        data: this.trackedPlayer.serializeToTrackedPlayer(),
+        data: trackedPlayerToChannel(this.trackedPlayer),
       });
     }
 

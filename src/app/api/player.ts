@@ -1,4 +1,4 @@
-import { PlayerChanneled } from "../core/player";
+import { PlayerChanneled } from "../core/serialization/channel";
 
 export class Player {
   id: number;

@@ -1,10 +1,11 @@
 import { UnitAction } from "../core/unit-actions";
-import { UnitOrder, UnitDetailsChanneled, UNITS_MAP } from "../core/unit";
+import { UnitOrder, UNITS_MAP } from "../core/unit";
 import { Tile } from "../shared";
 import { GameState } from "./state";
 import { UnitDefinition } from "../core/unit.interface";
 import { Player } from "./player";
 import { makeCommand } from "./internal/commander";
+import { UnitDetailsChanneled } from "../core/serialization/channel";
 
 export class UnitDetails {
   id: number;

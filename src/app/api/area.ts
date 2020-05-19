@@ -3,9 +3,9 @@ import { takeUntil } from "rxjs/operators";
 
 import { TileDirection, Tile } from "../shared";
 import { GameState } from "./state";
-import { AreaChanneled } from "../core/area";
 import { POSSIBLE_BORDER_PATHS } from "../map-generators/utils";
 import { getDirectionTo } from "../shared/hex-math";
+import { AreaChanneled } from "../core/serialization/channel";
 
 type Border = [Tile, TileDirection];
 type BorderPath = Border[];

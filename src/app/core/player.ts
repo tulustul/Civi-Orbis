@@ -1,6 +1,5 @@
 import { TileCore } from "./tile";
 import { UnitCore } from "./unit";
-import { getTileIndex, getTileFromIndex } from "./serialization";
 import { Game } from "./game";
 import { CityCore } from "./city";
 import { AIPlayer } from "../ai/ai-player";
@@ -34,32 +33,6 @@ export const PLAYER_COLORS: number[] = [
   0xb6bce6,
 ];
 
-export interface PlayerSerialized {
-  id: number;
-  ai: boolean;
-  color: number;
-  exploredTiles: number[];
-  yieldsTotal: Yields;
-}
-
-export interface PlayerChanneled {
-  id: number;
-  color: number;
-}
-
-export interface TrackedPlayerChanneled {
-  id: number;
-  color: number;
-  exploredTiles: number[];
-  units: number[];
-  cities: number[];
-
-  yieldsPerTurn: Yields;
-  yieldsIncome: Yields;
-  yieldsCosts: Yields;
-  yieldsTotal: Yields;
-}
-
 export class PlayerCore {
   id: number;
 
@@ -88,54 +61,6 @@ export class PlayerCore {
   ai: AIPlayer | null = null;
 
   constructor(public game: Game, public color: number) {}
-
-  serialize(): PlayerSerialized {
-    return {
-      id: this.id,
-      ai: !!this.ai,
-      color: this.color,
-      exploredTiles: Array.from(this.exploredTiles).map((t) => t.id),
-      yieldsTotal: this.yieldsTotal,
-    };
-  }
-
-  serializeToChannel(): PlayerChanneled {
-    return {
-      id: this.id,
-      color: this.color,
-    };
-  }
-
-  serializeToTrackedPlayer(): TrackedPlayerChanneled {
-    return {
-      id: this.id,
-      color: this.color,
-      exploredTiles: Array.from(this.exploredTiles).map((t) => t.id),
-      units: this.units.map((u) => u.id),
-      cities: this.cities.map((c) => c.id),
-
-      yieldsCosts: this.yieldsCosts,
-      yieldsIncome: this.yieldsIncome,
-      yieldsPerTurn: this.yieldsPerTurn,
-      yieldsTotal: this.yieldsTotal,
-    };
-  }
-
-  static deserialize(game: Game, data: PlayerSerialized) {
-    const player = new PlayerCore(game, data.color || 0);
-
-    if (data.ai) {
-      player.ai = new AIPlayer(player);
-    }
-
-    for (const tileId of data.exploredTiles) {
-      player.exploredTiles.add(game.map.tilesMap.get(tileId)!);
-    }
-    player.yieldsTotal = data.yieldsTotal;
-    player.updateYields();
-    player.updateCitiesWithoutProduction();
-    return player;
-  }
 
   exploreTiles(tiles: Iterable<TileCore>) {
     for (const tile of tiles) {
@@ -192,6 +117,5 @@ export class PlayerCore {
 
   addCity(city: CityCore) {
     this.cities.push(city);
-    city.product$.subscribe(() => this.updateCitiesWithoutProduction());
   }
 }

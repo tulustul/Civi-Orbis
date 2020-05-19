@@ -8,10 +8,8 @@ import {
   SeaLevel,
   TileDirection,
   BaseTile,
-  TileChanneled,
-  FORESTABLE_CLIMATES,
-  WETLANDS_CLIMATES,
 } from "../shared";
+import { collector } from "./collector";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -177,34 +175,13 @@ export class TileCore implements BaseTile {
     }
   }
 
-  serializeToChannel(): TileChanneled {
-    return {
-      id: this.id,
-      x: this.x,
-      y: this.y,
-      climate: this.climate,
-      forest: this.forest,
-      improvement: this.improvement,
-      landForm: this.landForm,
-      riverParts: this.riverParts,
-      road: this.road,
-      seaLevel: this.seaLevel,
-      wetlands: this.wetlands,
-      yields: this.yields,
-      areaOf: this.city ? this.city.id : null,
-      unitsIds: this.units.map((u) => u.id),
-      cityId: this.city ? this.city.id : null,
-    };
+  update() {
+    this.computeYields();
+    this.computeMovementCosts();
+    for (const neighbour of this.neighbours) {
+      // TODO this loop can be optimized by computing only the cost from neighbour to this tile.
+      neighbour.computeMovementCosts();
+    }
+    collector.tiles.add(this);
   }
-}
-
-export interface TileSerialized {
-  climate?: Climate;
-  landForm?: LandForm;
-  seaLevel?: SeaLevel;
-  improvement?: TileImprovement | null;
-  road?: TileRoad | null;
-  riverParts?: TileDirection[];
-  forest?: boolean;
-  wetlands?: boolean;
 }

@@ -63,12 +63,6 @@ export interface Tile extends BaseTile {
   units: Unit[];
 }
 
-export interface TileChanneled extends BaseTile {
-  areaOf: number | null;
-  cityId: number | null;
-  unitsIds: number[];
-}
-
 export const FORESTABLE_CLIMATES = new Set<Climate>([
   Climate.continental,
   Climate.oceanic,

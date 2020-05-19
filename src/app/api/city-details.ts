@@ -1,6 +1,6 @@
 import { Tile } from "../shared";
 import { Player } from "./player";
-import { Product, CityDetailsChanneled, ProductType } from "../core/city";
+import { Product, ProductType } from "../core/city";
 import { Yields } from "../core/yields";
 import { Building, BUILDINGS_MAP } from "../core/buildings";
 import { UnitDefinition } from "../core/unit.interface";
@@ -9,6 +9,7 @@ import { GameState } from "./state";
 import { ProductDefinition } from "../core/product";
 import { UNITS_MAP } from "../core/unit";
 import { makeCommand } from "./internal/commander";
+import { CityDetailsChanneled } from "../core/serialization/channel";
 
 export class CityDetails {
   id: number;

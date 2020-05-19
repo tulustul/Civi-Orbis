@@ -1,6 +1,6 @@
 import { Tile } from "../shared";
-import { MapChanneled } from "../core/tiles-map";
 import { getTileNeighbours, getTileFullNeighbours } from "../shared/hex-math";
+import { MapChanneled } from "../core/serialization/channel";
 
 export class TilesMap {
   width = 0;

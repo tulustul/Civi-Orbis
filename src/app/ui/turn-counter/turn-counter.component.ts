@@ -2,7 +2,7 @@ import { Component, OnInit, HostBinding } from "@angular/core";
 
 import { filter } from "rxjs/operators";
 
-import { Game } from "src/app/core/game";
+import { GameApi } from "src/app/api";
 
 @Component({
   selector: "app-turn-counter",
@@ -15,10 +15,10 @@ export class TurnCounterComponent implements OnInit {
 
   timeout: number;
 
-  constructor(public game: Game) {}
+  constructor(public game: GameApi) {}
 
   ngOnInit(): void {
-    this.game.turn$.pipe(filter((turn) => turn > 1)).subscribe(() => {
+    this.game.state!.turn$.pipe(filter((turn) => turn > 1)).subscribe(() => {
       this.isVisible = true;
       if (this.timeout) {
         clearTimeout(this.timeout);

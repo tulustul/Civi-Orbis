@@ -1,7 +1,7 @@
 import { Tile } from "../shared";
-import { CityChanneled } from "../core/city";
 import { GameState } from "./state";
 import { Player } from "./player";
+import { CityChanneled } from "../core/serialization/channel";
 
 export class City {
   id: number;

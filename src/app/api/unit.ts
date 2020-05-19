@@ -1,9 +1,9 @@
-import { makeCommand } from "./internal/commander";
 import { Tile } from "../shared";
 import { UnitDefinition } from "../core/unit.interface";
 import { GameState } from "./state";
-import { UnitChanneled, UNITS_MAP } from "../core/unit";
+import { UNITS_MAP } from "../core/unit";
 import { Player } from "./player";
+import { UnitChanneled } from "../core/serialization/channel";
 
 export class Unit {
   id: number;

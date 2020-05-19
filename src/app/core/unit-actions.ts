@@ -136,7 +136,7 @@ function buildImprovement(
 ) {
   unit.actionPointsLeft = 0;
   unit.tile.improvement = improvement;
-  game.tilesManager.updateTile(unit.tile);
+  unit.tile.update();
   unit.player.updateUnitsWithoutOrders();
 
   unit.player.yieldsTotal.publicWorks -=
@@ -152,9 +152,9 @@ function buildImprovement(
 function buildRoad(game: Game, unit: UnitCore) {
   unit.actionPointsLeft = 0;
   unit.tile.road = TileRoad.road;
-  game.tilesManager.updateTile(unit.tile);
+  unit.tile.update();
   for (const neighbour of unit.tile.neighbours) {
-    game.tilesManager.updateTile(neighbour);
+    neighbour.update();
   }
   unit.player.updateUnitsWithoutOrders();
 

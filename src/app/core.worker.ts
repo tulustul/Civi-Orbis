@@ -2,7 +2,7 @@
 
 import { SimplexMapGenerator } from "./map-generators/simplex";
 import { MapGeneratorOptions } from "./api/game.interface";
-import { Game, GameChanneled } from "./core/game";
+import { Game } from "./core/game";
 import { PlayerCore, PLAYER_COLORS } from "./core/player";
 import { AIPlayer } from "./ai/ai-player";
 import { collector } from "./core/collector";
@@ -12,6 +12,14 @@ import { findPath } from "./core/pathfinding";
 import { BaseTile } from "./shared";
 import { BUILDINGS_MAP } from "./core/buildings";
 import { IDLE_PRODUCTS_MAP } from "./core/idle-product";
+import {
+  gameToChannel,
+  trackedPlayerToChannel,
+  unitDetailsToChannel,
+  cityDetailsToChannel,
+  GameChanneled,
+} from "./core/serialization/channel";
+import { dumpGame, loadGame } from "./core/serialization/dump";
 
 let game: Game;
 
@@ -83,17 +91,16 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
     );
   }
 
-  return game.serializeToChannel();
+  return gameToChannel(game);
 }
 
 function saveDumpHandler(): string {
-  return JSON.stringify(game.serialize());
+  return JSON.stringify(dumpGame(game));
 }
 
 function loadDumpHandler(data: string) {
-  game = new Game();
-  game.deserialize(JSON.parse(data));
-  return game.serializeToChannel();
+  game = loadGame(JSON.parse(data));
+  return gameToChannel(game);
 }
 
 function nextPlayerHandler() {
@@ -118,7 +125,7 @@ function setTrackedPlayer(playerId: number) {
 
   game.trackedPlayer = player;
 
-  return game.trackedPlayer.serializeToTrackedPlayer();
+  return trackedPlayerToChannel(game.trackedPlayer);
 }
 
 function getUnitDetails(unitId: number) {
@@ -127,7 +134,7 @@ function getUnitDetails(unitId: number) {
     return null;
   }
 
-  return unit.serializeToDetailsChannel();
+  return unitDetailsToChannel(unit);
 }
 
 function unitDoAction(data: { unitId: number; action: UnitAction }) {
@@ -138,7 +145,7 @@ function unitDoAction(data: { unitId: number; action: UnitAction }) {
 
   unit.doAction(data.action);
 
-  return unit.serializeToDetailsChannel();
+  return unitDetailsToChannel(unit);
 }
 
 function unitSetOrder(data: { unitId: number; order: UnitOrder }) {
@@ -148,7 +155,8 @@ function unitSetOrder(data: { unitId: number; order: UnitOrder }) {
   }
 
   unit.setOrder(data.order);
-  return unit.serializeToDetailsChannel();
+
+  return unitDetailsToChannel(unit);
 }
 
 function unitFindPath(data: { unitId: number; destinationId: number }) {
@@ -160,7 +168,7 @@ function unitFindPath(data: { unitId: number; destinationId: number }) {
 
   unit.path = findPath(unit, tile);
 
-  return unit.serializeToDetailsChannel();
+  return unitDetailsToChannel(unit);
 }
 
 function unitDisband(unitId: number) {
@@ -180,7 +188,7 @@ function unitMoveAlongPath(unitId: number) {
 
   game.unitsManager.moveAlongPath(unit);
 
-  return unit.serializeToDetailsChannel();
+  return unitDetailsToChannel(unit);
 }
 
 export function tileUpdate(tile: Partial<BaseTile>) {
@@ -190,7 +198,7 @@ export function tileUpdate(tile: Partial<BaseTile>) {
   }
 
   Object.assign(tileCore, tile);
-  game.tilesManager.updateTile(tileCore);
+  tileCore.update();
 }
 
 export function tileBulkUpdate(tiles: Partial<BaseTile>[]) {
@@ -205,7 +213,7 @@ export function getCityDetails(cityId: number) {
     return;
   }
 
-  return city.serializeDetailsToChannel();
+  return cityDetailsToChannel(city);
 }
 
 export function cityProduce(data) {
@@ -223,5 +231,5 @@ export function cityProduce(data) {
     city.workOnIdleProduct(IDLE_PRODUCTS_MAP.get(data.productId)!);
   }
 
-  return city.serializeDetailsToChannel();
+  return cityDetailsToChannel(city);
 }

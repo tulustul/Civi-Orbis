@@ -1,16 +1,18 @@
 import { TilesMap } from "./map";
-import { TrackedPlayerChanneled } from "../core/player";
 import { Unit } from "./unit";
 import { City } from "./city";
-import { GameChanneled } from "../core/game";
-import { UnitDetailsChanneled } from "../core/unit";
 import { TrackedPlayer } from "./tracked-player";
 import { makeCommand } from "./internal/commander";
 import { Subject, BehaviorSubject } from "rxjs";
-import { CityDetailsChanneled } from "../core/city";
 import { Area } from "./area";
 import { Tile, BaseTile } from "../shared";
 import { Player } from "./player";
+import {
+  GameChanneled,
+  TrackedPlayerChanneled,
+  UnitDetailsChanneled,
+  CityDetailsChanneled,
+} from "../core/serialization/channel";
 
 export class GameState {
   private _turn$ = new BehaviorSubject<number>(0);

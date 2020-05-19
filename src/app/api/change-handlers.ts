@@ -1,14 +1,16 @@
-import { UnitChanneled } from "../core/unit";
 import { Unit } from "./unit";
-import { CityChanneled } from "../core/city";
 import { City } from "./city";
-import { AreaChanneled } from "../core/area";
 import { Area } from "./area";
-import { TrackedPlayerChanneled } from "../core/player";
-import { TileChanneled } from "../shared";
 import { TrackedPlayer } from "./tracked-player";
 import { setChangesHandlers } from "./internal/changes";
 import { GameState } from "./state";
+import {
+  UnitChanneled,
+  CityChanneled,
+  AreaChanneled,
+  TrackedPlayerChanneled,
+  TileChanneled,
+} from "../core/serialization/channel";
 
 const HANDLERS = {
   "tile.updated": onTileUpdate,
