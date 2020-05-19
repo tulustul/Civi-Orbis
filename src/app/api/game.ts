@@ -8,9 +8,6 @@ import { GameChanneled } from "../core/game";
 import { GameState } from "./state";
 import { initChangeHandlers } from "./change-handlers";
 
-initWorkerListeners();
-initChangeHandlers();
-
 export class GameApi {
   private _state$ = new BehaviorSubject<GameState | null>(null);
   state$ = this._state$.asObservable();
