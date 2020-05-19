@@ -1,10 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 
-import {
-  listSaveGames,
-  deleteSaveGame,
-  exportSave,
-} from "../../../core/saving";
+import { listSaveGames, deleteSaveGame, exportSave } from "../../../api/saving";
 
 @Component({
   selector: "app-saves-list",
@@ -17,8 +13,6 @@ export class SavesListComponent implements OnInit {
   @Output() change = new EventEmitter<string>();
 
   saves: string[];
-
-  constructor() {}
 
   ngOnInit(): void {
     this.refresh();

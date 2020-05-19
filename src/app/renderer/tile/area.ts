@@ -64,6 +64,8 @@ export class AreaDrawer {
     //   this.clearArea(area);
     // });
     // this.game.started$.subscribe(() => this.build());
+
+    this.game.stop$.subscribe(() => this.clear());
   }
 
   build() {

@@ -1,22 +1,17 @@
-import { Game } from "./game";
-
 const savesKeyPrefix = "saves:";
 const listKey = "savesList";
 
-export function saveGame(game: Game, saveName: string) {
-  const data = game.serialize();
-  storeData(saveName, JSON.stringify(data));
+export function saveGameData(data: string, saveName: string) {
+  storeData(saveName, data);
 }
 
-export function loadGame(game: Game, saveName: string) {
+export function loadGameData(saveName: string): string | null {
   const data = getSave(saveName);
   if (!data) {
     console.error(`No save with name ${saveName}`);
-    return;
+    return null;
   }
-  game.clear();
-  game.deserialize(JSON.parse(data));
-  game.start();
+  return data;
 }
 
 export function deleteSaveGame(saveName: string) {

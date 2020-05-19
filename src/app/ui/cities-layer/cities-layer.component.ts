@@ -34,6 +34,7 @@ export class CitiesLayerComponent implements OnInit {
     if (!this.game.state) {
       return;
     }
+
     merge(this.game.state.citySpawned$, this.game.state.cityDestroyed$)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => {
@@ -43,6 +44,11 @@ export class CitiesLayerComponent implements OnInit {
     this.camera.transform$
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => this.cdr.markForCheck());
+
+    this.game.stop$.subscribe(() => {
+      this.cities = [];
+      this.cdr.markForCheck();
+    });
 
     this.updateCities();
   }

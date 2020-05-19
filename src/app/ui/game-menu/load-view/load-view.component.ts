@@ -6,10 +6,10 @@ import {
   ViewChild,
 } from "@angular/core";
 
-import { Game } from "src/app/core/game";
 import { UIState } from "../../ui-state";
-import { loadGame, importSave } from "src/app/core/saving";
 import { SavesListComponent } from "../saves-list/saves-list.component";
+import { importSave, loadGameData } from "src/app/api/saving";
+import { GameApi } from "src/app/api";
 
 @Component({
   selector: "app-load-view",
@@ -23,15 +23,22 @@ export class LoadViewComponent implements OnInit {
 
   saveName = "";
 
-  constructor(private game: Game, private uiState: UIState) {}
+  constructor(private game: GameApi, private uiState: UIState) {}
 
   ngOnInit(): void {}
 
-  load() {
-    if (this.saveName) {
-      loadGame(this.game, this.saveName);
-      this.uiState.menuVisible$.next(false);
+  async load() {
+    if (!this.saveName) {
+      return;
     }
+
+    const data = loadGameData(this.saveName);
+    if (!data) {
+      return null;
+    }
+
+    await this.game.loadGame(data);
+    this.uiState.menuVisible$.next(false);
   }
 
   async import(event: Event) {

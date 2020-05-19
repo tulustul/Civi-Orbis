@@ -128,8 +128,8 @@ export class PlayerCore {
       player.ai = new AIPlayer(player);
     }
 
-    for (const tileIndex of data.exploredTiles) {
-      player.exploredTiles.add(getTileFromIndex(game.map, tileIndex));
+    for (const tileId of data.exploredTiles) {
+      player.exploredTiles.add(game.map.tilesMap.get(tileId)!);
     }
     player.yieldsTotal = data.yieldsTotal;
     player.updateYields();

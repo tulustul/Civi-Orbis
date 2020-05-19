@@ -17,17 +17,23 @@ let game: Game;
 
 const HANDLERS = {
   "game.new": newGameHandler,
+  "game.saveDump": saveDumpHandler,
+  "game.loadDump": loadDumpHandler,
   "game.nextPlayer": nextPlayerHandler,
+
   "trackedPlayer.revealWorld": revealWorld,
   "trackedPlayer.set": setTrackedPlayer,
+
   "unit.getDetails": getUnitDetails,
   "unit.doAction": unitDoAction,
   "unit.setOrder": unitSetOrder,
   "unit.findPath": unitFindPath,
   "unit.disband": unitDisband,
   "unit.moveAlongPath": unitMoveAlongPath,
+
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
+
   "city.getDetails": getCityDetails,
   "city.produce": cityProduce,
 };
@@ -77,6 +83,16 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
     );
   }
 
+  return game.serializeToChannel();
+}
+
+function saveDumpHandler(): string {
+  return JSON.stringify(game.serialize());
+}
+
+function loadDumpHandler(data: string) {
+  game = new Game();
+  game.deserialize(JSON.parse(data));
   return game.serializeToChannel();
 }
 

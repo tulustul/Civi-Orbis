@@ -3,10 +3,8 @@ import { filter } from "rxjs/operators";
 
 import { MapGeneratorOptions } from "./game.interface";
 import { makeCommand } from "./internal/commander";
-import { initWorkerListeners } from "./internal/listener";
 import { GameChanneled } from "../core/game";
 import { GameState } from "./state";
-import { initChangeHandlers } from "./change-handlers";
 
 export class GameApi {
   private _state$ = new BehaviorSubject<GameState | null>(null);
@@ -17,6 +15,10 @@ export class GameApi {
   stop$ = this.state$.pipe(filter((state) => !state));
 
   async newGame(mapGeneratorOptions: MapGeneratorOptions): Promise<GameState> {
+    if (this.state) {
+      this._state$.next(null);
+    }
+
     const gameChanneled = await makeCommand<GameChanneled>(
       "game.new",
       mapGeneratorOptions,
@@ -26,18 +28,22 @@ export class GameApi {
     return this._state$.value as GameState;
   }
 
-  async loadGame(saveData: string): Promise<GameState | null> {
+  async loadGame(data: string): Promise<GameState | null> {
+    if (this.state) {
+      this._state$.next(null);
+    }
+
     const gameChanneled = await makeCommand<GameChanneled>(
-      "game.load",
-      saveData,
+      "game.loadDump",
+      data,
     );
 
     this._state$.next(new GameState(gameChanneled));
     return this._state$.value;
   }
 
-  saveGame(): Promise<string> {
-    return makeCommand("game.save");
+  saveGame() {
+    return makeCommand<string>("game.saveDump");
   }
 
   async nextPlayer() {
