@@ -9,6 +9,10 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
     return null;
   }
 
+  if (start.passableArea !== end.passableArea) {
+    return null;
+  }
+
   const visitedTiles = new Set<TileCore>();
   const tilesToVisit = new Map<TileCore, number>();
   const cameFrom = new Map<TileCore, [number, number, TileCore | null]>();

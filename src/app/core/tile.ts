@@ -49,6 +49,7 @@ export class TileCore implements BaseTile {
   fullNeighbours: (TileCore | null)[] = []; // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
   neighboursCosts = new Map<TileCore, number>();
   sweetSpotValue = 0; // used by ai to find good city location
+  passableArea = 0; // used by pathfinding to quickly decide if a path between two tiles exists
 
   constructor(public id: number, public x: number, public y: number) {}
 
