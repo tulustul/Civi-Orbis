@@ -5,6 +5,7 @@
   width: 300px;
   margin-left: -150px;
   transform-origin: top;
+  will-change: transform;
   .info {
     border-radius: 20px;
     color: white;

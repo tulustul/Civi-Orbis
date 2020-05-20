@@ -3,7 +3,9 @@ import {
   OnInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  HostBinding,
+  ViewChildren,
+  AfterViewInit,
+  ElementRef,
 } from "@angular/core";
 
 import { Subject, merge } from "rxjs";
@@ -12,6 +14,8 @@ import { takeUntil } from "rxjs/operators";
 import { Camera } from "src/app/renderer/camera";
 import { GameApi } from "src/app/api";
 import { City } from "src/app/api/city";
+import { CityInfoComponent } from "./city-info/city-info.component";
+import { getTileCoords } from "src/app/renderer/utils";
 
 @Component({
   selector: "app-cities-layer",
@@ -19,19 +23,16 @@ import { City } from "src/app/api/city";
   styleUrls: ["./cities-layer.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CitiesLayerComponent implements OnInit {
+export class CitiesLayerComponent implements OnInit, AfterViewInit {
   ngUnsubscribe = new Subject<void>();
+
+  @ViewChildren(CityInfoComponent) citiesComponents: CityInfoComponent[];
 
   cities: City[];
 
-  // @HostBinding("style.width.px")
-  // width: number;
-
-  // @HostBinding("style.height.px")
-  // height: number;
-
   constructor(
     private cdr: ChangeDetectorRef,
+    private elementRef: ElementRef<HTMLElement>,
     private game: GameApi,
     private camera: Camera,
   ) {}
@@ -41,18 +42,11 @@ export class CitiesLayerComponent implements OnInit {
       return;
     }
 
-    // this.width = this.game.state.map.width;
-    // this.height = this.game.state.map.height * 0.75;
-
     merge(this.game.state.citySpawned$, this.game.state.cityDestroyed$)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => {
         this.updateCities();
       });
-
-    this.camera.transform$
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(() => this.cdr.markForCheck());
 
     this.game.stop$.subscribe(() => {
       this.cities = [];
@@ -60,6 +54,45 @@ export class CitiesLayerComponent implements OnInit {
     });
 
     this.updateCities();
+  }
+
+  ngAfterViewInit() {
+    this.camera.transform$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+      const el = this.elementRef.nativeElement;
+      let scale = this.camera.transform.scale;
+      const box = this.camera.tileBoundingBox;
+
+      let opacity = 1;
+      if (scale < 30) {
+        opacity = Math.max(0, 1 - (30 - scale) / 8);
+      }
+      el.style.opacity = opacity.toString();
+
+      if (opacity === 0) {
+        return;
+      }
+
+      for (const cityComponent of this.citiesComponents) {
+        const tile = cityComponent.city.tile;
+        const cityEl = cityComponent.elementRef.nativeElement;
+        if (
+          tile.x >= box.xStart &&
+          tile.x <= box.xEnd &&
+          tile.y >= box.yStart &&
+          tile.y <= box.yEnd
+        ) {
+          cityEl.style.display = "flex";
+        } else {
+          cityEl.style.display = "none";
+          continue;
+        }
+
+        const cityScale = Math.pow(scale / 70, 0.4);
+        let [x, y] = getTileCoords(cityComponent.city.tile);
+        [x, y] = this.camera.canvasToScreen(x + 0.5, y + 0.8);
+        cityEl.style.transform = `translate(${x}px, ${y}px) scale(${cityScale})`;
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -78,22 +111,4 @@ export class CitiesLayerComponent implements OnInit {
   trackByCityId(index: number, city: City) {
     return city.id;
   }
-
-  @HostBinding("style.opacity")
-  get opacity() {
-    const scale = this.camera.transform.scale;
-    if (scale > 20) {
-      return 1;
-    }
-    return Math.max(0, 1 - (20 - scale) / 8);
-  }
-
-  // @HostBinding("style.transform")
-  // get transform() {
-  //   let scale = this.camera.transform.scale;
-  //   // scale = Math.pow(scale / 70, 0.4);
-  //   // let [x, y] = getTileCoords(this.city.tile);
-  //   const [x, y] = this.camera.canvasToScreen(this.width / 2, this.height / 2);
-  //   return `translate(${x}px, ${y}px) scale(${scale})`;
-  // }
 }
