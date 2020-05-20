@@ -54,7 +54,7 @@ export class PathRenderer {
 
     for (let turn = 0; turn < path.length; turn++) {
       if (path[turn][0]) {
-        const scale = this.camera.transform$.value.scale;
+        const scale = this.camera.transform.scale;
         const label = new PIXIE.Text(turn.toString(), {
           align: "center",
           fill: "white",

@@ -60,7 +60,7 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
   getTransform(tile: Tile) {
     const [x, y] = [tile.x + 0.5, tile.y + 0.1];
     const [screenX, screenY] = this.camera.gameToScreen(x, y);
-    const scale = this.camera.transform$.value.scale / 100;
+    const scale = this.camera.transform.scale / 100;
     return this.domSanitizer.bypassSecurityTrustStyle(
       `translate(${screenX}px, ${screenY}px) scale(${scale})`,
     );

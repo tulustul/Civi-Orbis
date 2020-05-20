@@ -9,6 +9,7 @@ import { MapDrawer } from "./map";
 import { MapUi } from "../ui/map-ui";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
+import { Subject } from "rxjs";
 
 @Injectable()
 export class GameRenderer {
@@ -27,6 +28,9 @@ export class GameRenderer {
   atlas = this.loader.add("assets/atlas.json").load(() => this.onLoad());
 
   textures: PIXIE.ITextureDictionary;
+
+  private _tick$ = new Subject<void>();
+  tick$ = this._tick$.asObservable();
 
   constructor(
     private game: GameApi,
@@ -58,6 +62,7 @@ export class GameRenderer {
     this.app.ticker.add(() => {
       this.camera.update();
       this.mapUi.update();
+      this._tick$.next();
     });
   }
 

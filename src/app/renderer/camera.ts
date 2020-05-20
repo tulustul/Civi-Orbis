@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 
 import { getTileCoords } from "./utils";
 import { AnimationEaseOutCubic, Animation } from "./animation";
@@ -27,7 +27,10 @@ export class Camera {
   MAX_ZOOM = TILE_SIZE; // tile graphics width in pixels
   MIN_ZOOM = 7;
 
-  transform$ = new BehaviorSubject<Transform>({ x: 0, y: 0, scale: 130 });
+  transform = { x: 0, y: 0, scale: 130 };
+  private _transform$ = new BehaviorSubject<Transform>(this.transform);
+  transform$ = this._transform$.asObservable();
+  private transformChanged = false;
 
   private scalePivotX: number;
   private scalePivotY: number;
@@ -49,22 +52,29 @@ export class Camera {
 
   setRenderer(renderer: GameRenderer) {
     this.renderer = renderer;
+
+    renderer.tick$.subscribe(() => {
+      if (this.transformChanged) {
+        this._transform$.next(this.transform);
+        this.transformChanged = false;
+      }
+    });
   }
 
   moveBy(x: number, y: number) {
-    this.transform$.value.x -= x / this.transform$.value.scale;
-    this.transform$.value.y -= y / this.transform$.value.scale;
-    this.transform$.next(this.transform$.value);
+    this.transform.x -= x / this.transform.scale;
+    this.transform.y -= y / this.transform.scale;
+    this.transformChanged = true;
   }
 
   moveTo(x: number, y: number) {
-    this.transform$.value.x = x;
-    this.transform$.value.y = y;
-    this.transform$.next(this.transform$.value);
+    this.transform.x = x;
+    this.transform.y = y;
+    this.transformChanged = true;
   }
 
   moveToTileWithEasing(tile: Tile) {
-    const t = this.transform$.value;
+    const t = this.transform;
     const [x, y] = getTileCoords(tile);
     this.moveXAnimation = new AnimationEaseOutCubic(t.x, x, 600);
     this.moveYAnimation = new AnimationEaseOutCubic(t.y, y, 600);
@@ -76,7 +86,7 @@ export class Camera {
     screenPivotY: number,
     duration = 600,
   ) {
-    const t = this.transform$.value;
+    const t = this.transform;
     this.scalePivotX = screenPivotX;
     this.scalePivotY = screenPivotY;
     this.scaleAnimation = new AnimationEaseOutCubic(
@@ -92,14 +102,14 @@ export class Camera {
     screenPivotY: number,
     duration = 600,
   ) {
-    const t = this.transform$.value;
+    const t = this.transform;
     const currentScale = this.scaleAnimation?.end || t.scale;
     const newScale = currentScale * scaleFactor;
     this.scaleToWithEasing(newScale, screenPivotX, screenPivotY, duration);
   }
 
   scaleTo(scale: number, screenPivotX: number, screenPivotY: number) {
-    const t = this.transform$.value;
+    const t = this.transform;
     const [x1, y1] = this.screenToCanvas(screenPivotX, screenPivotY);
 
     t.scale = Math.max(this.MIN_ZOOM, Math.min(this.MAX_ZOOM, scale));
@@ -109,7 +119,7 @@ export class Camera {
     t.x += x1 - x2;
     t.y += y1 - y2;
 
-    this.transform$.next(t);
+    this.transformChanged = true;
   }
 
   moveToTile(tile: Tile) {
@@ -118,7 +128,7 @@ export class Camera {
   }
 
   screenToCanvas(screenX: number, screenY: number): [number, number] {
-    const t = this.transform$.value;
+    const t = this.transform;
     return [
       (screenX - this.canvas.width / 2) / t.scale + t.x,
       (screenY - this.canvas.height / 2) / t.scale + t.y,
@@ -133,7 +143,7 @@ export class Camera {
   }
 
   canvasToScreen(canvasX: number, canvasY: number): [number, number] {
-    const t = this.transform$.value;
+    const t = this.transform;
     return [
       t.scale * (canvasX - t.x) + this.canvas.width / 2,
       t.scale * (canvasY - t.y) + this.canvas.height / 2,
@@ -151,10 +161,6 @@ export class Camera {
     return this.renderer.canvas;
   }
 
-  serialize(): Transform {
-    return this.transform$.value;
-  }
-
   update() {
     const elapsedMS = this.renderer.app.ticker.elapsedMS;
 
@@ -168,7 +174,7 @@ export class Camera {
     }
 
     if (this.moveXAnimation || this.moveYAnimation) {
-      const t = this.transform$.value;
+      const t = this.transform;
       let [x, y] = [t.x, t.y];
       if (this.moveXAnimation) {
         const newX = this.moveXAnimation.step(elapsedMS);
@@ -199,7 +205,7 @@ export class Camera {
       return;
     }
 
-    const t = this.transform$.value;
+    const t = this.transform;
     const width = Math.floor(this.renderer.canvas.width / t.scale);
     const height = Math.floor(this.renderer.canvas.height / t.scale);
 

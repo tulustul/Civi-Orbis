@@ -86,7 +86,7 @@ export class MapUi {
   }
 
   update() {
-    this._yieldsVisible$.next(this.camera.transform$.value.scale > 40);
+    this._yieldsVisible$.next(this.camera.transform.scale > 40);
   }
 
   get hoveredTile() {

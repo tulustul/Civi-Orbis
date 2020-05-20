@@ -24,6 +24,12 @@ export class CitiesLayerComponent implements OnInit {
 
   cities: City[];
 
+  // @HostBinding("style.width.px")
+  // width: number;
+
+  // @HostBinding("style.height.px")
+  // height: number;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private game: GameApi,
@@ -34,6 +40,9 @@ export class CitiesLayerComponent implements OnInit {
     if (!this.game.state) {
       return;
     }
+
+    // this.width = this.game.state.map.width;
+    // this.height = this.game.state.map.height * 0.75;
 
     merge(this.game.state.citySpawned$, this.game.state.cityDestroyed$)
       .pipe(takeUntil(this.ngUnsubscribe))
@@ -72,10 +81,19 @@ export class CitiesLayerComponent implements OnInit {
 
   @HostBinding("style.opacity")
   get opacity() {
-    const scale = this.camera.transform$.value.scale;
+    const scale = this.camera.transform.scale;
     if (scale > 20) {
       return 1;
     }
     return Math.max(0, 1 - (20 - scale) / 8);
   }
+
+  // @HostBinding("style.transform")
+  // get transform() {
+  //   let scale = this.camera.transform.scale;
+  //   // scale = Math.pow(scale / 70, 0.4);
+  //   // let [x, y] = getTileCoords(this.city.tile);
+  //   const [x, y] = this.camera.canvasToScreen(this.width / 2, this.height / 2);
+  //   return `translate(${x}px, ${y}px) scale(${scale})`;
+  // }
 }

@@ -30,6 +30,9 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
   ngUnsubscribe = new Subject<void>();
 
+  // @HostBinding("style.transform")
+  // transform: string;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef<HTMLElement>,
@@ -50,6 +53,9 @@ export class CityInfoComponent implements OnInit, OnDestroy {
     merge(this.game.state!.turn$, thisCity)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => this.cdr.markForCheck());
+
+    // const [x, y] = getTileCoords(this.city.tile);
+    // this.transform = `translate(${x}px, ${y}px) scale(0.01)`;
   }
 
   ngOnDestroy() {
@@ -67,7 +73,7 @@ export class CityInfoComponent implements OnInit, OnDestroy {
   @HostBinding("style.transform")
   get transform() {
     // FIXME: This migth lead to performance issues. It is calculated for every city every time camera transform changes.
-    let scale = this.camera.transform$.value.scale;
+    let scale = this.camera.transform.scale;
     scale = Math.pow(scale / 70, 0.4);
     let [x, y] = getTileCoords(this.city.tile);
     [x, y] = this.camera.canvasToScreen(x + 0.5, y + 0.8);
