@@ -33,11 +33,8 @@ export class CitiesManager {
     this.citiesMap.set(city.id, city);
 
     for (const neighbour of tile.neighbours) {
-      // FIXME: this will recompute borders for each tile. Can be optimized.
       city.addTile(neighbour);
     }
-    // city.player.area.computeBorders();
-    // city.player.area.update();
 
     player.addCity(city);
 
@@ -46,6 +43,10 @@ export class CitiesManager {
     tile.wetlands = false;
     tile.road = TileRoad.road;
     tile.update();
+
+    for (const t of tile.getTilesInRange(3)) {
+      t.sweetSpotValue = 0;
+    }
 
     if (isNew) {
       city.optimizeYields();

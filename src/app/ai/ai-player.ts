@@ -29,20 +29,23 @@ export class AIPlayer {
   }
 
   processSettler(unit: UnitCore) {
-    const bestCityLocation = this.findCityLocation(unit.tile);
-    if (!bestCityLocation) {
-      unit.order = "sleep";
-      return;
-    }
-    if (unit.tile === bestCityLocation) {
-      unit.doAction("foundCity");
-    } else {
-      unit.path = findPath(unit, bestCityLocation);
-      if (unit.path) {
-        this.player.game.unitsManager.moveAlongPath(unit);
-      } else if (unit.canDoAction("foundCity")) {
-        unit.doAction("foundCity");
+    const destination = unit.getPathDestination();
+    if (!destination || destination.areaOf) {
+      const bestCityLocation = this.findCityLocation(unit.tile);
+      if (!bestCityLocation) {
+        unit.order = "sleep";
+        return;
       }
+
+      if (unit.tile === bestCityLocation) {
+        unit.doAction("foundCity");
+      } else {
+        unit.path = findPath(unit, bestCityLocation);
+      }
+    }
+
+    if (unit.path) {
+      this.player.game.unitsManager.moveAlongPath(unit);
     }
   }
 
@@ -72,8 +75,6 @@ export class AIPlayer {
     let bestSweetSpotValue = 0;
     let bestTile: TileCore | null = null;
     for (const tile of tiles) {
-      tile.computeSweetSpotValue();
-
       if (tile.sweetSpotValue > bestSweetSpotValue) {
         bestSweetSpotValue = tile.sweetSpotValue;
         bestTile = tile;

@@ -59,4 +59,13 @@ export class UnitCore {
     this.order = order;
     this.player.updateUnitsWithoutOrders();
   }
+
+  getPathDestination(): TileCore | null {
+    if (!this.path) {
+      return null;
+    }
+
+    const lastPathTurn = this.path[this.path.length - 1];
+    return lastPathTurn[lastPathTurn.length - 1];
+  }
 }

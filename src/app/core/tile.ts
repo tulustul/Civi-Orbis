@@ -165,12 +165,8 @@ export class TileCore implements BaseTile {
     if (this.areaOf) {
       return;
     }
-    const tiles = this.getTilesInRange(2);
+    const tiles = this.getTilesInRange(3);
     for (const tile of tiles) {
-      if (tile.areaOf) {
-        this.sweetSpotValue = 0;
-        return;
-      }
       this.sweetSpotValue += tile.yields.food;
       this.sweetSpotValue += tile.yields.production;
     }

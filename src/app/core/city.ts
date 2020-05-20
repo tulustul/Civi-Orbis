@@ -127,6 +127,7 @@ export class CityCore {
       const tile = this.pickBestTile(this.getAvailableTiles());
       if (tile) {
         this.addTile(tile);
+        tile.sweetSpotValue = 0;
       }
     }
   }
