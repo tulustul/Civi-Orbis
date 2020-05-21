@@ -41,8 +41,7 @@ export function getTileVariants(tileName: string, variants: number): string[] {
 
 export function drawTileSprite(tile: Tile, texture: PIXIE.Texture) {
   const sprite = new PIXIE.Sprite(texture);
-  sprite.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
-  sprite.position.y = tile.y * 0.75 - 0.5;
+  putContainerAtTile(tile, sprite);
   sprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
   return sprite;
 }
@@ -54,6 +53,11 @@ export function drawTileSpriteCentered(tile: Tile, texture: PIXIE.Texture) {
   sprite.position.y = tile.y * 0.75 - 0.5 + 1 - sprite.width / 2 / TILE_SIZE;
   sprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
   return sprite;
+}
+
+export function putContainerAtTile(tile: Tile, container: PIXIE.Container) {
+  container.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+  container.position.y = tile.y * 0.75 - 0.5;
 }
 
 export function pickRandom(items: any[]) {

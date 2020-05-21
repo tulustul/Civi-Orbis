@@ -1,70 +1,86 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { TileDirection, Tile } from "src/app/shared";
 import { GameApi } from "src/app/api";
 import { Area } from "src/app/api/area";
-
-const BORDER_WIDTH = 0.11;
-const BORDER_WIDTH_HALVED = BORDER_WIDTH / 2;
-
-const BORDERS_VERTICES: Record<
-  TileDirection,
-  [[number, number], [number, number]]
-> = {
-  [TileDirection.NW]: [
-    [0 + BORDER_WIDTH_HALVED, 0.25 + BORDER_WIDTH_HALVED],
-    [0.5, 0 + BORDER_WIDTH_HALVED],
-  ],
-  [TileDirection.NE]: [
-    [0.5, 0 + BORDER_WIDTH_HALVED],
-    [1 - BORDER_WIDTH_HALVED, 0.25 + BORDER_WIDTH_HALVED],
-  ],
-  [TileDirection.E]: [
-    [1 - BORDER_WIDTH_HALVED, 0.25 + BORDER_WIDTH_HALVED],
-    [1 - BORDER_WIDTH_HALVED, 0.75 - BORDER_WIDTH_HALVED],
-  ],
-  [TileDirection.SE]: [
-    [1 - BORDER_WIDTH_HALVED, 0.75 - BORDER_WIDTH_HALVED],
-    [0.5, 1 - BORDER_WIDTH_HALVED],
-  ],
-  [TileDirection.SW]: [
-    [0.5, 1 - BORDER_WIDTH_HALVED],
-    [0 + BORDER_WIDTH_HALVED, 0.75 - BORDER_WIDTH_HALVED],
-  ],
-  [TileDirection.W]: [
-    [0 + BORDER_WIDTH_HALVED, 0.75 - BORDER_WIDTH_HALVED],
-    [0 + BORDER_WIDTH_HALVED, 0.25 + BORDER_WIDTH_HALVED],
-  ],
-  [TileDirection.NONE]: [
-    [0, 0],
-    [0, 0],
-  ],
-};
+import { putContainerAtTile } from "../utils";
 
 export class AreaDrawer {
-  areasMap = new Map<Area, PIXIE.DisplayObject[]>();
+  areasMap = new Map<Area, PIXI.DisplayObject[]>();
 
-  constructor(private game: GameApi, private container: PIXIE.Container) {
-    // game.areasManager.created$.pipe().subscribe((area) => {
-    //   area.changed$
-    //     // .pipe(
-    //     //   takeUntil(
-    //     //     game.areasManager.destroyed$.pipe(
-    //     //       filter((destroyedArea) => destroyedArea === area),
-    //     //     ),
-    //     //   ),
-    //     // )
-    //     .subscribe((i) => {
-    //       console.log("RENDER updated", i);
-    //       this.clearArea(area);
-    //       this.drawArea(area);
-    //     });
-    // });
-    // game.areasManager.destroyed$.subscribe((area) => {
-    //   this.clearArea(area);
-    // });
-    // this.game.started$.subscribe(() => this.build());
+  // prettier-ignore
+  BASE_GEOMETRIES: { [key: string]: PIXI.Geometry } = {
+    "111000": new PIXI.Geometry()
+      .addAttribute("aVertexPosition", [
+          0.5, 0.5, 0, 0.5, 0, 0.25,
+          0.5, 0.5, 0, 0.25, 0.5, 0,
+          0.5, 0.5, 0.5, 0, 1, 0.25,
+          0.5, 0.5, 1, 0.25, 1, 0.75,
+          0.5, 0.5, 1, 0.75, 0.75, 0.875,
+      ], 2)
+      .addAttribute("aUvs", [
+        0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 1, 1,
+        0, 0, 1, 1, 1, 1,
+      ], 2),
+  };
 
+  GEOMETRIES: {
+    [key: string]: { rotation: number; geometry: PIXI.Geometry };
+  } = {
+    "111000": { rotation: 0, geometry: this.BASE_GEOMETRIES["111000"] },
+    "011100": {
+      rotation: Math.PI / 3,
+      geometry: this.BASE_GEOMETRIES["111000"],
+    },
+    "001110": {
+      rotation: (Math.PI / 3) * 2,
+      geometry: this.BASE_GEOMETRIES["111000"],
+    },
+    "000111": { rotation: Math.PI, geometry: this.BASE_GEOMETRIES["111000"] },
+    "100011": {
+      rotation: (Math.PI / 3) * 4,
+      geometry: this.BASE_GEOMETRIES["111000"],
+    },
+    "110001": {
+      rotation: (Math.PI / 3) * 5,
+      geometry: this.BASE_GEOMETRIES["111000"],
+    },
+  };
+
+  program = PIXI.Program.from(
+    `
+  precision mediump float;
+
+  attribute vec2 aVertexPosition;
+  attribute vec2 aUvs;
+
+  uniform mat3 translationMatrix;
+  uniform mat3 projectionMatrix;
+
+  varying vec2 vUvs;
+
+  void main() {
+
+      vUvs = aUvs;
+      gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+
+  }`,
+
+    `precision mediump float;
+
+  varying vec2 vUvs;
+
+  void main() {
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  }
+
+`,
+  );
+
+  constructor(private game: GameApi, private container: PIXI.Container) {
     this.game.stop$.subscribe(() => this.clear());
   }
 
@@ -87,53 +103,24 @@ export class AreaDrawer {
   }
 
   private drawArea(area: Area) {
-    if (!this.areasMap.has(area)) {
-      this.areasMap.set(area, []);
-    }
-
-    const objs = this.areasMap.get(area)!;
-
-    for (const path of area.borders) {
-      const g = new PIXIE.Graphics();
-
-      g.lineStyle(BORDER_WIDTH, area.color);
-      g.alpha = 0.8;
-      objs.push(g);
-      this.container.addChild(g);
-
-      const firstBorder = path[0];
-
-      const points: PIXIE.Point[] = [];
-
-      this.drawBorder(points, g, firstBorder[0], firstBorder[1], true);
-
-      for (const [tile, dir] of path.slice(1)) {
-        this.drawBorder(points, g, tile, dir);
+    for (const [tile, borders] of area.borders.entries()) {
+      const geometry = this.GEOMETRIES[borders];
+      if (!geometry) {
+        continue;
       }
 
-      g.drawPolygon(points);
+      const mesh = new PIXI.Mesh(
+        geometry.geometry,
+        new PIXI.Shader(this.program),
+      );
+      mesh.pivot.set(0.5, 0.5);
+      mesh.rotation = geometry.rotation;
+
+      putContainerAtTile(tile, mesh);
+      mesh.position.y += 0.25;
+
+      this.container.addChild(mesh);
     }
-  }
-
-  private drawBorder(
-    points: PIXIE.Point[],
-    g: PIXIE.Graphics,
-    tile: Tile,
-    dir: TileDirection,
-    start = false,
-  ) {
-    const [p1, p2] = BORDERS_VERTICES[dir];
-
-    if (start) {
-      const x1 = p1[0] + tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
-      const y1 = p1[1] + tile.y * 0.75;
-      points.push(new PIXIE.Point(x1, y1));
-    }
-
-    const x2 = p2[0] + tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
-    const y2 = p2[1] + tile.y * 0.75;
-
-    points.push(new PIXIE.Point(x2, y2));
   }
 
   clear() {

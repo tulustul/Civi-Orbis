@@ -1,21 +1,16 @@
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { TileDirection, Tile } from "../shared";
+import { Tile } from "../shared";
 import { GameState } from "./state";
-import { POSSIBLE_BORDER_PATHS } from "../map-generators/utils";
-import { getDirectionTo } from "../shared/hex-math";
 import { AreaChanneled } from "../core/serialization/channel";
-
-type Border = [Tile, TileDirection];
-type BorderPath = Border[];
 
 export class Area {
   id: number;
 
   tiles = new Set<Tile>();
 
-  borders: BorderPath[] = [];
+  borders = new Map<Tile, string>();
 
   backgroundOpacity: number;
 
@@ -50,84 +45,15 @@ export class Area {
   }
 
   computeBorders() {
-    const visited = new Set<Tile>();
-    this.borders = [];
+    this.borders.clear();
     for (const tile of this.tiles) {
-      visited.add(tile);
-      for (const neighbour of tile.neighbours) {
-        if (visited.has(neighbour)) {
-          continue;
-        }
-        if (!this.tiles.has(neighbour)) {
-          const dir = getDirectionTo(tile, neighbour);
-          const border: Border = [tile, dir];
-          const path = this.buildBorderPath(border, visited);
-          this.borders.push(path);
-        }
+      const borders = tile.fullNeighbours
+        .map((n) => (n && this.tiles.has(n) ? "0" : "1"))
+        .join("");
+
+      if (borders !== "000000") {
+        this.borders.set(tile, borders);
       }
     }
-  }
-
-  private buildBorderPath(
-    currentBorder: Border,
-    visited: Set<Tile>,
-    path: BorderPath = [],
-  ) {
-    if (path.length) {
-      const firstBorder = path[0];
-      if (
-        firstBorder[0] === currentBorder[0] &&
-        firstBorder[1] === currentBorder[1]
-      ) {
-        return path;
-      }
-    }
-
-    path.push(currentBorder);
-
-    let [tile, dir] = currentBorder;
-
-    const nextPairs = POSSIBLE_BORDER_PATHS[dir];
-
-    for (const pair of nextPairs) {
-      const [tileA, tileB] = [
-        pair[0] === TileDirection.NONE ? tile : tile.fullNeighbours[pair[0]],
-        tile.fullNeighbours[pair[1]],
-      ];
-
-      if (!tileA && !tileB) {
-        continue;
-      }
-
-      if (tileA) {
-        visited.add(tileA);
-      }
-      if (tileB) {
-        visited.add(tileB);
-      }
-
-      if (tileA) {
-        if (this.tiles.has(tileA) && !this.tiles.has(tileB!)) {
-          const nextDir = tile === tileA ? pair[1] : pair[1] - 1; // adjusting for map edges
-          const nextBorder: Border = [
-            tileA,
-            tileB ? getDirectionTo(tileA, tileB) : nextDir,
-          ];
-          return this.buildBorderPath(nextBorder, visited, path);
-        }
-      }
-
-      if (tileB) {
-        if (!this.tiles.has(tileA!) && this.tiles.has(tileB)) {
-          const nextBorder: Border = [
-            tileB,
-            tileA ? getDirectionTo(tileB, tileA) : pair[0],
-          ];
-          return this.buildBorderPath(nextBorder, visited, path);
-        }
-      }
-    }
-
-    return path;
   }
 }
