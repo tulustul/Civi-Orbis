@@ -137,12 +137,12 @@ export class MinimapRenderer {
   }
 
   private listenPlayerAreas() {
-    // for (const player of this.game.players) {
-    //   player.area.added$.subscribe((tile) => {
-    //     this.drawTile(tile);
-    //     this.updateMap();
-    //   });
-    // }
+    for (const player of this.game.state!.players) {
+      player.area.added$.subscribe((tile) => {
+        this.drawTile(tile);
+        this.updateMap();
+      });
+    }
   }
 
   private hideAllTiles() {

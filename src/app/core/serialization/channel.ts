@@ -101,6 +101,7 @@ export interface CityDetailsChanneled {
 export interface PlayerChanneled {
   id: number;
   color: number;
+  areaId: number;
 }
 
 export interface TrackedPlayerChanneled {
@@ -256,6 +257,7 @@ export function playerToChannel(player: PlayerCore): PlayerChanneled {
   return {
     id: player.id,
     color: player.color,
+    areaId: player.area.id,
   };
 }
 
