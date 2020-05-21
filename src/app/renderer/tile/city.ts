@@ -51,6 +51,10 @@ export class CityDrawer {
 
     this.container.addChild(g, city.tile);
     this.citiesGraphics.set(city, g);
+
+    if (!this.game.state!.trackedPlayer.exploredTiles.has(city.tile)) {
+      g.visible = false;
+    }
   }
 
   destroy(city: City) {

@@ -16,6 +16,8 @@ export class Area {
 
   color: number;
 
+  vec4Color: number[];
+
   private _destroyed$ = new Subject<void>();
   destroyed$ = this._destroyed$.asObservable();
 
@@ -29,6 +31,15 @@ export class Area {
     this.id = area.id;
     this.backgroundOpacity = area.backgroundOpacity;
     this.color = area.color;
+
+    const cssColor = "#" + this.color.toString(16).padStart(6, "0");
+    this.vec4Color = [
+      parseInt(cssColor[1] + cssColor[2], 16) / 255,
+      parseInt(cssColor[3] + cssColor[4], 16) / 255,
+      parseInt(cssColor[5] + cssColor[6], 16) / 255,
+      1,
+    ];
+
     this.update(game, area);
     game.areasMap.set(this.id, this);
   }
