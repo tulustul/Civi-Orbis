@@ -167,7 +167,11 @@ export class TileCore implements BaseTile {
 
   computeSweetSpotValue() {
     this.sweetSpotValue = 0;
-    if (this.areaOf) {
+    if (
+      this.areaOf ||
+      this.landForm === LandForm.mountains ||
+      this.seaLevel !== SeaLevel.none
+    ) {
       return;
     }
     const tiles = this.getTilesInRange(3);

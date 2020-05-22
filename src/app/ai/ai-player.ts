@@ -75,6 +75,10 @@ export class AIPlayer {
     let bestSweetSpotValue = 0;
     let bestTile: TileCore | null = null;
     for (const tile of tiles) {
+      if (startTile.passableArea !== tile.passableArea) {
+        continue;
+      }
+
       if (tile.sweetSpotValue > bestSweetSpotValue) {
         bestSweetSpotValue = tile.sweetSpotValue;
         bestTile = tile;
