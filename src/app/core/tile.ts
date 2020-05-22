@@ -99,6 +99,11 @@ export class TileCore implements BaseTile {
     return TileDirection.NONE;
   }
 
+  getDistanceTo(tile: TileCore) {
+    // This is imprecise but good enough for now.
+    return Math.abs(this.x - tile.x) + Math.abs(this.y - tile.y);
+  }
+
   computeYields() {
     if (this.seaLevel === SeaLevel.deep) {
       this.yields.food = 0;

@@ -18,6 +18,7 @@ import { UNITS_DEFINITIONS } from "../data/units";
 import { BUILDINGS } from "../data/buildings";
 import { IDLE_PRODUCTS } from "../data/idle-products";
 import { collector } from "./collector";
+import { getDistance } from "../shared/hex-math";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -102,7 +103,7 @@ export class CityCore {
     this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
-      const bestWorkableTile = this.pickBestTile(this.notWorkedTiles);
+      const bestWorkableTile = this.pickBestTileToWork(this.notWorkedTiles);
       if (bestWorkableTile) {
         this.workTile(bestWorkableTile);
       }
@@ -124,7 +125,10 @@ export class CityCore {
       this.totalCulture -= this.cultureToExpand;
       this.cultureToExpand = 5 * Math.pow(1.2, this.tiles.size);
 
-      const tile = this.pickBestTile(this.getAvailableTiles());
+      const tile = this.pickBestTileToExpand(
+        this.tile,
+        this.getTilesAvailableForExpansion(),
+      );
       if (tile) {
         this.addTile(tile);
         tile.sweetSpotValue = 0;
@@ -317,7 +321,7 @@ export class CityCore {
     }
   }
 
-  getAvailableTiles(): Set<TileCore> {
+  getTilesAvailableForExpansion(): Set<TileCore> {
     const availableTiles = new Set<TileCore>();
     for (const tile of this.tiles) {
       for (const neighbour of tile.neighbours) {
@@ -329,7 +333,7 @@ export class CityCore {
     return availableTiles;
   }
 
-  pickBestTile(tiles: Set<TileCore>): TileCore | null {
+  pickBestTileToWork(tiles: Set<TileCore>): TileCore | null {
     let bestTile: TileCore | null = null;
     let bestYields = 0;
 
@@ -337,6 +341,24 @@ export class CityCore {
       const yields = tile.totalYields;
       if (yields > bestYields) {
         bestYields = yields;
+        bestTile = tile;
+      }
+    }
+
+    return bestTile;
+  }
+
+  pickBestTileToExpand(
+    cityTile: TileCore,
+    tiles: Set<TileCore>,
+  ): TileCore | null {
+    let bestTile: TileCore | null = null;
+    let bestScore = -Infinity;
+
+    for (const tile of tiles) {
+      const score = tile.totalYields - cityTile.getDistanceTo(tile) / 2;
+      if (score > bestScore) {
+        bestScore = score;
         bestTile = tile;
       }
     }
@@ -352,7 +374,7 @@ export class CityCore {
     this.workedTiles.clear();
     this.notWorkedTiles = new Set(this.tiles);
     while (this.freeTileWorkers && this.notWorkedTiles.size) {
-      const tile = this.pickBestTile(this.notWorkedTiles);
+      const tile = this.pickBestTileToWork(this.notWorkedTiles);
       if (!tile) {
         break;
       }
