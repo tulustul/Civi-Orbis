@@ -200,7 +200,11 @@ export class MinimapRenderer {
     }
   }
 
-  private drawTile(tile: Tile, area: Area | null = null) {
+  private drawTile(tile: Tile) {
+    if (!this.game.state!.trackedPlayer.exploredTiles.has(tile)) {
+      return;
+    }
+
     let color: number;
 
     if (tile.seaLevel !== SeaLevel.none) {

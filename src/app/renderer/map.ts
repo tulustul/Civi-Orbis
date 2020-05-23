@@ -88,6 +88,7 @@ export class MapDrawer {
     // Drawers must be created after init$ subscription?. Race condition will occur otherwise.
     this.terrainDrawer = new TerrainDrawer(
       this.renderer,
+      this.game,
       this.terrainContainer,
       this.waterContainer,
     );

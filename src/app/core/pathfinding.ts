@@ -46,7 +46,7 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
 
     if (nextTile === end) {
       const endTime = performance.now();
-      console.log(`pathfinding took ${Math.round(endTime - startTime)}ms`);
+      console.debug(`pathfinding took ${Math.round(endTime - startTime)}ms`);
       return reconstructPath(cameFrom, end);
     }
 

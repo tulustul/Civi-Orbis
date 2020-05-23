@@ -75,4 +75,9 @@ export class UnitDetails {
     );
     this.update(data);
   }
+
+  async getRange(): Promise<Tile[]> {
+    const data = await makeCommand<number[]>("unit.getRange", this.id);
+    return data.map((tileId) => this.game.map.tilesMap.get(tileId)!);
+  }
 }

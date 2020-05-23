@@ -12,10 +12,6 @@ export class Area {
 
   borders = new Map<Tile, string>();
 
-  backgroundOpacity: number;
-
-  color: number;
-
   vec4Color: number[];
 
   private _destroyed$ = new Subject<void>();
@@ -36,23 +32,24 @@ export class Area {
     .asObservable()
     .pipe(takeUntil(this.destroyed$));
 
-  static fromDetailsChanneled(
-    state: GameState,
-    areaChanneled: AreaDetailsChanneled,
-  ) {
-    const area = new Area();
+  constructor(public color: number) {
+    const cssColor = "#" + color.toString(16).padStart(6, "0");
 
-    area.id = areaChanneled.id;
-    area.backgroundOpacity = areaChanneled.backgroundOpacity;
-    area.color = areaChanneled.color;
-
-    const cssColor = "#" + area.color.toString(16).padStart(6, "0");
-    area.vec4Color = [
+    this.vec4Color = [
       parseInt(cssColor[1] + cssColor[2], 16) / 255,
       parseInt(cssColor[3] + cssColor[4], 16) / 255,
       parseInt(cssColor[5] + cssColor[6], 16) / 255,
       1,
     ];
+  }
+
+  static fromDetailsChanneled(
+    state: GameState,
+    areaChanneled: AreaDetailsChanneled,
+  ) {
+    const area = new Area(areaChanneled.color);
+
+    area.id = areaChanneled.id;
 
     state.areasMap.set(area.id, area);
 
@@ -76,7 +73,6 @@ export class Area {
     }
 
     this._addedTiles$.next(tiles);
-    this.computeAllBorders();
     this.computeBordersForTiles(tiles);
   }
 
@@ -85,7 +81,7 @@ export class Area {
       this.tiles.delete(tile);
     }
     this._removedTiles$.next(tiles);
-    this.computeAllBorders();
+    this.computeBordersForTiles(tiles);
   }
 
   private computeBordersForTiles(tiles: Tile[]) {
@@ -126,5 +122,12 @@ export class Area {
     } else {
       this.borders.set(tile, borders);
     }
+  }
+
+  clear() {
+    this._removedTiles$.next(Array.from(this.tiles));
+    this.borders.clear();
+    this._bordersUpdated$.next(this.tiles);
+    this.tiles = new Set();
   }
 }

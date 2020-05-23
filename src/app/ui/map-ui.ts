@@ -11,6 +11,7 @@ import { Unit } from "../api/unit";
 import { GameApi } from "../api";
 import { UnitDetails } from "../api/unit-details";
 import { CityDetails } from "../api/city-details";
+import { Area } from "../api/area";
 
 @Injectable()
 export class MapUi {
@@ -42,6 +43,10 @@ export class MapUi {
 
   allowMapPanning = true;
 
+  unitRangeArea = new Area(0xffffff);
+
+  cityRangeArea = new Area(0xffffff);
+
   constructor(
     private game: GameApi,
     private camera: Camera,
@@ -55,7 +60,7 @@ export class MapUi {
       } else if (tile?.city) {
         this.selectCity(tile.city);
       } else {
-        this._selectedUnit$.next(null);
+        this.selectUnit(null);
         this.setPath(null);
       }
     });
@@ -81,7 +86,13 @@ export class MapUi {
       }
       this.setPath(null);
     });
-    this.game.state?.turn$.subscribe(() => this.setPath(null));
+    this.game.init$.subscribe(() => {
+      this.game.state!.turn$.subscribe(() => this.setPath(null));
+      setTimeout(() => {
+        this.game.state!.addArea(this.unitRangeArea);
+        this.game.state!.addArea(this.cityRangeArea);
+      });
+    });
     this.game.stop$.subscribe(() => this.clear());
   }
 
@@ -140,6 +151,7 @@ export class MapUi {
   async selectUnit(unit: Unit | null) {
     if (!unit) {
       this._selectedUnit$.next(null);
+      this.unitRangeArea.clear();
       return;
     }
 
@@ -148,8 +160,12 @@ export class MapUi {
       if (data) {
         const unitDetails = new UnitDetails(this.game.state!, data);
         this._selectedUnit$.next(unitDetails);
+        unitDetails
+          .getRange()
+          .then((tiles) => this.unitRangeArea.addTiles(tiles));
       } else {
         this._selectedUnit$.next(null);
+        this.unitRangeArea.clear();
       }
       this.setPath(this._selectedUnit$.value?.path || null);
     }

@@ -252,7 +252,7 @@ class AreaDrawer {
     }
   }
 
-  private updateTileBorders(tile) {
+  private updateTileBorders(tile: Tile) {
     const mesh = this.bordersMap.get(tile);
     if (mesh) {
       mesh.destroy();

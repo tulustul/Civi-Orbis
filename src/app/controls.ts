@@ -62,10 +62,12 @@ export class Controls {
     if (selectedUnit && this.mouseButton === 2) {
       const tile = this.game.state!.map.get(x, y);
       if (tile) {
-        selectedUnit.moveAlongPath().then(() => {
+        selectedUnit.moveAlongPath().then(async () => {
           this.mapUi.setPath(selectedUnit.path);
           // to refresh the ui
           this.mapUi["_selectedUnit$"].next(selectedUnit);
+          this.mapUi.unitRangeArea.clear();
+          this.mapUi.unitRangeArea.addTiles(await selectedUnit.getRange());
         });
       }
     }

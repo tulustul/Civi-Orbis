@@ -141,4 +141,8 @@ export class GameState {
   getCityDetails(cityId: number) {
     return makeCommand<CityDetailsChanneled>("city.getDetails", cityId);
   }
+
+  addArea(area: Area) {
+    this._areaSpawned$.next(area);
+  }
 }

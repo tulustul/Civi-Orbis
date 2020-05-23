@@ -8,6 +8,8 @@ import { TileContainer } from "../tile-container";
 import { GameRenderer } from "../renderer";
 import { TileImprovement } from "src/app/core/tile-improvements";
 import { SeaLevel, Climate, LandForm, Tile } from "src/app/shared";
+import { GameState } from "src/app/api/state";
+import { GameApi } from "src/app/api";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),
@@ -74,6 +76,7 @@ const SAWMILL_TEXTURES = getTileVariants("forester_hut", 4);
 export class TerrainDrawer {
   constructor(
     private renderer: GameRenderer,
+    private game: GameApi,
     private terrainContainer: TileContainer,
     private waterContainer: TileContainer,
   ) {}
@@ -115,6 +118,10 @@ export class TerrainDrawer {
     this.drawRoads(tile);
 
     this.drawImprovement(tile);
+
+    if (!this.game.state!.trackedPlayer.exploredTiles.has(tile)) {
+      sprite.visible = false;
+    }
   }
 
   private drawImprovement(tile: Tile) {

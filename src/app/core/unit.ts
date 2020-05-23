@@ -68,4 +68,57 @@ export class UnitCore {
     const lastPathTurn = this.path[this.path.length - 1];
     return lastPathTurn[lastPathTurn.length - 1];
   }
+
+  getRange(): Set<TileCore> {
+    const result = new Set<TileCore>();
+    const actionPointsLeftAtTile = new Map<TileCore, number>();
+
+    this._getRange(
+      this.tile,
+      this.actionPointsLeft,
+      result,
+      actionPointsLeftAtTile,
+    );
+
+    result.delete(this.tile);
+
+    return result;
+  }
+
+  private _getRange(
+    tile = this.tile,
+    actionPointsLeft = this.actionPointsLeft,
+    result: Set<TileCore>,
+    actionPointsLeftAtTile: Map<TileCore, number>,
+  ) {
+    result.add(tile);
+
+    if (actionPointsLeft <= 0) {
+      return result;
+    }
+
+    for (const neighbour of tile.neighbours) {
+      const oldActionPointsLeft = actionPointsLeftAtTile.get(neighbour);
+
+      const cost = tile.neighboursCosts.get(neighbour)!;
+      if (cost === Infinity) {
+        continue;
+      }
+
+      const newActionPointsLeft = actionPointsLeft - cost;
+
+      if (!oldActionPointsLeft || newActionPointsLeft > oldActionPointsLeft) {
+        actionPointsLeftAtTile.set(neighbour, newActionPointsLeft);
+
+        this._getRange(
+          neighbour,
+          newActionPointsLeft,
+          result,
+          actionPointsLeftAtTile,
+        );
+      }
+    }
+
+    return result;
+  }
 }
