@@ -2,6 +2,7 @@ import { Tile } from "../shared";
 import { GameState } from "./state";
 import { Player } from "./player";
 import { CityChanneled } from "../core/serialization/channel";
+import { makeCommand } from "./internal/commander";
 
 export class City {
   id: number;
@@ -22,7 +23,7 @@ export class City {
   turnsToProductionEnd: number | null;
   productName: string | null;
 
-  constructor(game: GameState, city: CityChanneled) {
+  constructor(private game: GameState, city: CityChanneled) {
     this.id = city.id;
     this.player = game.playersMap.get(city.playerId)!;
     this.tile = game.map.tilesMap.get(city.tileId)!;
@@ -48,5 +49,10 @@ export class City {
     this.productionPerTurn = city.productionPerTurn;
     this.turnsToProductionEnd = city.turnsToProductionEnd;
     this.productName = city.productName;
+  }
+
+  async getRange() {
+    const ids = await makeCommand<number[]>("city.getRange", this.id);
+    return ids.map((id) => this.game.map.tilesMap.get(id)!);
   }
 }

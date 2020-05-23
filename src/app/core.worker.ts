@@ -45,6 +45,7 @@ const HANDLERS = {
 
   "city.getDetails": getCityDetails,
   "city.produce": cityProduce,
+  "city.getRange": cityGetRange,
 };
 
 addEventListener("message", ({ data }) => {
@@ -244,4 +245,14 @@ export function cityProduce(data) {
   }
 
   return cityDetailsToChannel(city);
+}
+
+export function cityGetRange(cityId: number) {
+  const city = game.citiesManager.citiesMap.get(cityId);
+
+  if (!city) {
+    return;
+  }
+
+  return Array.from(city.tiles).map((tile) => tile.id);
 }

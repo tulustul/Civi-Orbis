@@ -77,7 +77,7 @@ export class UnitDetails {
   }
 
   async getRange(): Promise<Tile[]> {
-    const data = await makeCommand<number[]>("unit.getRange", this.id);
-    return data.map((tileId) => this.game.map.tilesMap.get(tileId)!);
+    const ids = await makeCommand<number[]>("unit.getRange", this.id);
+    return ids.map((tileId) => this.game.map.tilesMap.get(tileId)!);
   }
 }

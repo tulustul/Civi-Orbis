@@ -67,9 +67,11 @@ export class MapUi {
     this.hoveredTile$.subscribe((tile) => {
       if (!this.uiState.selectedCity$.value) {
         if (tile?.city) {
-          // this.highlightTiles(tile.city.tiles);
+          tile.city.getRange().then((tiles) => {
+            this.cityRangeArea.addTiles(tiles);
+          });
         } else {
-          this.highlightTiles(null);
+          this.cityRangeArea.clear();
         }
       }
     });
@@ -115,11 +117,6 @@ export class MapUi {
     this._clickedTile$.next(tile);
   }
 
-  highlightTiles(tiles: Set<Tile> | null) {
-    tiles = tiles || new Set();
-    this._highlightedTiles$.next(tiles);
-  }
-
   hoverTile(tile: Tile | null) {
     this._hoveredTile$.next(tile);
   }
@@ -131,7 +128,7 @@ export class MapUi {
   selectCity(city: City | null) {
     if (!city) {
       this.uiState.selectedCity$.next(null);
-      this.highlightTiles(null);
+      this.cityRangeArea.clear();
       this._cityLabelsVisible$.next(true);
       this.allowMapPanning = true;
       return;
@@ -142,7 +139,7 @@ export class MapUi {
         const cityDetails = new CityDetails(this.game.state!, data);
         this.uiState.selectedCity$.next(cityDetails);
         this._cityLabelsVisible$.next(false);
-        this.highlightTiles(cityDetails.tiles);
+        this.cityRangeArea.addTiles(Array.from(cityDetails.tiles));
         this.allowMapPanning = false;
       });
     }
