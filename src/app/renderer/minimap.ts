@@ -1,6 +1,6 @@
 import * as PIXIE from "pixi.js";
 
-import { Subject } from "rxjs";
+import { Subject, merge } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import { Transform, Camera } from "../renderer/camera";
@@ -8,6 +8,7 @@ import { drawHex } from "./utils";
 import { GameRenderer } from "./renderer";
 import { SeaLevel, Climate, TileDirection, Tile } from "../shared";
 import { GameApi } from "../api";
+import { Area } from "../api/area";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,
@@ -68,6 +69,11 @@ export class MinimapRenderer {
           this.reveal(tiles);
           this.updateMap();
         });
+
+      state.tileUpdated$.pipe(takeUntil(this.game.stop$)).subscribe((tile) => {
+        this.drawTile(tile);
+        this.updateMap();
+      });
     });
 
     this.container.addChild(this.mapSprite);
@@ -108,8 +114,6 @@ export class MinimapRenderer {
 
     this.drawMap();
 
-    this.listenPlayerAreas();
-
     this.hideAllTiles();
     this.reveal(this.game.state.trackedPlayer.exploredTiles);
 
@@ -134,17 +138,6 @@ export class MinimapRenderer {
     }
     this.destroyed$.next();
     this.destroyed$.complete();
-  }
-
-  private listenPlayerAreas() {
-    for (const player of this.game.state!.players) {
-      player.area.addedTiles$.subscribe((tiles) => {
-        for (const tile of tiles) {
-          this.drawTile(tile);
-        }
-        this.updateMap();
-      });
-    }
   }
 
   private hideAllTiles() {
@@ -203,7 +196,7 @@ export class MinimapRenderer {
     }
   }
 
-  private drawTile(tile: Tile) {
+  private drawTile(tile: Tile, area: Area | null = null) {
     let color: number;
 
     if (tile.seaLevel !== SeaLevel.none) {

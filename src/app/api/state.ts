@@ -71,8 +71,6 @@ export class GameState {
     this._turn$.next(game.turn);
     this.map = new TilesMap(game.map);
 
-    this.areas = this.restoreAreas(game);
-
     this.players = this.restorePlayers(game);
     for (const player of this.players) {
       this.playersMap.set(player.id, player);
@@ -82,6 +80,10 @@ export class GameState {
     this.cities = this.restoreCities(game);
 
     this.trackedPlayer = new TrackedPlayer(this, game.trackedPlayer);
+
+    this.map.preprocess(this);
+
+    this.areas = this.restoreAreas(game);
   }
 
   private restorePlayers(game: GameChanneled): Player[] {

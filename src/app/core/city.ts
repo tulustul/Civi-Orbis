@@ -287,6 +287,7 @@ export class CityCore {
       this.player.area.add(tile);
       this.player.exploreTiles([tile]);
       this.player.exploreTiles(tile.neighbours);
+      collector.tiles.add(tile);
     }
   }
 
@@ -295,6 +296,7 @@ export class CityCore {
       this.tiles.delete(tile);
       tile.areaOf = null;
       this.player.area.remove(tile);
+      collector.tiles.add(tile);
     }
   }
 

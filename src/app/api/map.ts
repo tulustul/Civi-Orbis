@@ -1,6 +1,7 @@
 import { Tile } from "../shared";
 import { getTileNeighbours, getTileFullNeighbours } from "../shared/hex-math";
 import { MapChanneled } from "../core/serialization/channel";
+import { GameState } from "./state";
 
 export class TilesMap {
   width = 0;
@@ -11,19 +12,25 @@ export class TilesMap {
   constructor(map: MapChanneled) {
     this.width = map.width;
     this.height = map.height;
+    this.tiles = (map.tiles as unknown) as Tile[][];
 
-    const tiles = (map.tiles as unknown) as Tile[][];
-    this.tiles = tiles;
-
-    for (let x = 0; x < map.width; x++) {
-      for (let y = 0; y < map.height; y++) {
-        const tile: Tile = tiles[x][y];
-        tile.neighbours = getTileNeighbours(tiles, x, y);
-        tile.fullNeighbours = getTileFullNeighbours(tiles, x, y);
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        const tile: Tile = this.tiles[x][y];
         this.tilesMap.set(tile.id, tile);
-        tile.areaOf = null;
-        tile.city = null;
+        tile.neighbours = getTileNeighbours(this.tiles, x, y);
+        tile.fullNeighbours = getTileFullNeighbours(this.tiles, x, y);
         tile.units = [];
+      }
+    }
+  }
+
+  preprocess(game: GameState) {
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        const tile: Tile = this.tiles[x][y];
+        tile.areaOf = game.citiesMap.get(tile.areaOf as any)!;
+        tile.city = game.citiesMap.get(tile.city as any)!;
       }
     }
   }

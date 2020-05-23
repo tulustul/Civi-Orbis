@@ -33,10 +33,6 @@ class Collector {
   flush() {
     const changes: any[] = [];
 
-    for (const tile of this.tiles) {
-      changes.push({ type: "tile.updated", data: tileToChannel(tile) });
-    }
-
     for (const unit of this.units) {
       changes.push({ type: "unit.updated", data: unitToChannel(unit) });
     }
@@ -49,6 +45,10 @@ class Collector {
     }
     for (const id of this.citiesDestroyed) {
       changes.push({ type: "city.destroyed", data: id });
+    }
+
+    for (const tile of this.tiles) {
+      changes.push({ type: "tile.updated", data: tileToChannel(tile) });
     }
 
     for (const area of this.areas) {

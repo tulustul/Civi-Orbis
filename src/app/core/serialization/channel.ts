@@ -183,7 +183,7 @@ export function tileToChannel(tile: TileCore): TileChanneled {
     seaLevel: tile.seaLevel,
     wetlands: tile.wetlands,
     yields: tile.yields,
-    areaOf: tile.city ? tile.city.id : null,
+    areaOf: tile.areaOf ? tile.areaOf.id : null,
     unitsIds: tile.units.map((u) => u.id),
     cityId: tile.city ? tile.city.id : null,
   };

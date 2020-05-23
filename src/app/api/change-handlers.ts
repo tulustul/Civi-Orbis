@@ -121,8 +121,11 @@ function onTrackedPlayerSet(
 function onTileUpdate(state: GameState, tileChanneled: TileChanneled) {
   const tile = state.map.tilesMap.get(tileChanneled.id)!;
   Object.assign(tile, tileChanneled);
-  if (tileChanneled.areaOf) {
+  if (tileChanneled.areaOf !== null) {
     tile.areaOf = state.citiesMap.get(tileChanneled.areaOf)!;
+  }
+  if (tileChanneled.cityId !== null) {
+    tile.city = state.citiesMap.get(tileChanneled.cityId)!;
   }
   state["_tileUpdated$"].next(tile);
 }
