@@ -138,8 +138,10 @@ export class MinimapRenderer {
 
   private listenPlayerAreas() {
     for (const player of this.game.state!.players) {
-      player.area.added$.subscribe((tile) => {
-        this.drawTile(tile);
+      player.area.addedTiles$.subscribe((tiles) => {
+        for (const tile of tiles) {
+          this.drawTile(tile);
+        }
         this.updateMap();
       });
     }

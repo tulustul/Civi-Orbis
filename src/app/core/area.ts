@@ -12,15 +12,25 @@ export class AreaCore {
 
   add(tile: TileCore) {
     this.tiles.add(tile);
-    collector.areas.add(this);
+    collector.addAreaTiles(this.id, [tile]);
+  }
+
+  addBulk(tiles: TileCore[]) {
+    for (const tile of tiles) {
+      this.tiles.add(tile);
+    }
+    collector.addAreaTiles(this.id, tiles);
   }
 
   remove(tile: TileCore) {
     this.tiles.delete(tile);
-    collector.areas.add(this);
+    collector.removeAreaTiles(this.id, [tile]);
   }
 
-  destroy() {
-    collector.areasDestroyed.add(this.id);
+  removeBulk(tiles: TileCore[]) {
+    for (const tile of tiles) {
+      this.tiles.delete(tile);
+    }
+    collector.removeAreaTiles(this.id, tiles);
   }
 }

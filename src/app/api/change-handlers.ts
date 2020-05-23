@@ -7,21 +7,28 @@ import { GameState } from "./state";
 import {
   UnitChanneled,
   CityChanneled,
-  AreaChanneled,
+  AreaDetailsChanneled,
   TrackedPlayerChanneled,
   TileChanneled,
 } from "../core/serialization/channel";
 
 const HANDLERS = {
   "tile.updated": onTileUpdate,
+
   "unit.updated": onUnitUpdate,
   "unit.destroyed": onUnitDestroyed,
+
   "city.updated": onCityUpdate,
+
   "game.turn": onTurn,
+
   "area.updated": onAreaUpdate,
   "area.destroyed": onAreaDestroyed,
-  "trackedPlayer.tilesExplored": onTilesExplored,
+  "area.tilesAdded": onAreaTilesAdded,
+  "area.tilesRemoved": onAreaTilesRemoved,
+
   "trackedPlayer.set": onTrackedPlayerSet,
+  "trackedPlayer.tilesExplored": onTilesExplored,
 };
 
 export function initChangeHandlers() {
@@ -64,13 +71,12 @@ function onTurn(state: GameState, turn: number) {
   state["_turn$"].next(turn);
 }
 
-function onAreaUpdate(state: GameState, areaChanneled: AreaChanneled) {
+function onAreaUpdate(state: GameState, areaChanneled: AreaDetailsChanneled) {
   const area = state.areasMap.get(areaChanneled.id);
   if (area) {
-    area.update(state, areaChanneled);
-    state["_areaUpdated$"].next(area);
+    // TODO is update needed?
   } else {
-    const newArea = new Area(state, areaChanneled);
+    const newArea = Area.fromDetailsChanneled(state, areaChanneled);
     state.areas.push(newArea);
     state["_areaSpawned$"].next(newArea);
   }
@@ -78,6 +84,24 @@ function onAreaUpdate(state: GameState, areaChanneled: AreaChanneled) {
 
 function onAreaDestroyed(state: GameState, turn: number) {
   state["_turn$"].next(turn);
+}
+
+function onAreaTilesAdded(state: GameState, data) {
+  const area = state.areasMap.get(data.id);
+  if (!area) {
+    return;
+  }
+
+  area.addTiles(state.map.getTilesFromIds(data.tiles));
+}
+
+function onAreaTilesRemoved(state: GameState, data) {
+  const area = state.areasMap.get(data.id);
+  if (!area) {
+    return;
+  }
+
+  area.removeTiles(state.map.getTilesFromIds(data.tiles));
 }
 
 function onTilesExplored(state: GameState, tilesIds: number[]) {

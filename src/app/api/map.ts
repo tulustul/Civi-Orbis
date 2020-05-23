@@ -34,4 +34,8 @@ export class TilesMap {
     }
     return this.tiles[x][y];
   }
+
+  getTilesFromIds(ids: number[]): Tile[] {
+    return ids.map((id) => this.tilesMap.get(id)!);
+  }
 }

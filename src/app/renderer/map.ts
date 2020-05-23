@@ -6,7 +6,7 @@ import { UnitsDrawer } from "./tile/unit";
 import { YiedsDrawer } from "./tile/yields";
 import { RiverDrawer } from "./tile/river";
 import { CityDrawer } from "./tile/city";
-import { AreaDrawer } from "./tile/area";
+import { AreasDrawer } from "./tile/area";
 import { GameRenderer } from "./renderer";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
@@ -44,7 +44,7 @@ export class MapDrawer {
 
   cityDrawer: CityDrawer;
 
-  areaDrawer: AreaDrawer;
+  areaDrawer: AreasDrawer;
 
   constructor(
     private game: GameApi,
@@ -100,7 +100,7 @@ export class MapDrawer {
       this.cityContainer,
     );
 
-    this.areaDrawer = new AreaDrawer(this.game, this.areasContainer);
+    this.areaDrawer = new AreasDrawer(this.game, this.areasContainer);
   }
 
   hideAllTiles() {

@@ -18,7 +18,6 @@ import { UNITS_DEFINITIONS } from "../data/units";
 import { BUILDINGS } from "../data/buildings";
 import { IDLE_PRODUCTS } from "../data/idle-products";
 import { collector } from "./collector";
-import { getDistance } from "../shared/hex-math";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -286,12 +285,8 @@ export class CityCore {
       this.notWorkedTiles.add(tile);
       tile.areaOf = this;
       this.player.area.add(tile);
-      // const newTiles = [tile, ...tile.neighbours].filter(
-      //   (t) => !this.player.exploredTiles.has(t),
-      // );
       this.player.exploreTiles([tile]);
       this.player.exploreTiles(tile.neighbours);
-      // this.player.game.tilesManager.reveal(newTiles);
     }
   }
 

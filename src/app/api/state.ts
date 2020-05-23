@@ -97,7 +97,7 @@ export class GameState {
   }
 
   private restoreAreas(game: GameChanneled): Area[] {
-    return game.areas.map((area) => new Area(this, area));
+    return game.areas.map((area) => Area.fromDetailsChanneled(this, area));
   }
 
   async setTrackedPlayer(playerId: number) {
