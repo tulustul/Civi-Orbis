@@ -70,10 +70,14 @@ export class MinimapRenderer {
           this.updateMap();
         });
 
-      state.tileUpdated$.pipe(takeUntil(this.game.stop$)).subscribe((tile) => {
-        this.drawTile(tile);
-        this.updateMap();
-      });
+      state.tilesUpdated$
+        .pipe(takeUntil(this.game.stop$))
+        .subscribe((tiles) => {
+          for (const tile of tiles) {
+            this.drawTile(tile);
+          }
+          this.updateMap();
+        });
     });
 
     this.container.addChild(this.mapSprite);

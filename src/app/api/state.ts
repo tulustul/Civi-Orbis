@@ -31,8 +31,8 @@ export class GameState {
 
   playersMap = new Map<number, Player>();
 
-  private _tileUpdated$ = new Subject<Tile>();
-  tileUpdated$ = this._tileUpdated$.asObservable();
+  private _tilesUpdated$ = new Subject<Tile[]>();
+  tilesUpdated$ = this._tilesUpdated$.asObservable();
 
   private _unitSpawned$ = new Subject<Unit>();
   unitSpawned$ = this._unitSpawned$.asObservable();

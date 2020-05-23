@@ -63,16 +63,23 @@ export class CityCore {
   availableIdleProducts: IdleProduct[] = [];
   disabledIdleProducts = new Set<IdleProduct>();
 
+  changedSize = false;
+
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
   }
 
   nextTurn() {
+    this.changedSize = false;
+
     this.progressExpansion();
     this.progressProduction();
     this.progressGrowth();
     this.updateYields();
-    collector.cities.add(this);
+
+    if (this.player === this.player.game.trackedPlayer || this.changedSize) {
+      collector.cities.add(this);
+    }
   }
 
   private progressProduction() {
@@ -102,6 +109,7 @@ export class CityCore {
     this.totalFood += this.yields.food - this.foodConsumed;
     if (this.totalFood >= this.foodToGrow) {
       this.size++;
+      this.changedSize = true;
       const bestWorkableTile = this.pickBestTileToWork(this.notWorkedTiles);
       if (bestWorkableTile) {
         this.workTile(bestWorkableTile);
@@ -110,6 +118,7 @@ export class CityCore {
     } else if (this.totalFood < 0) {
       if (this.size > 1) {
         this.size--;
+        this.changedSize = true;
         this.totalFood += this.foodToGrow;
       } else {
         this.totalFood = 0;

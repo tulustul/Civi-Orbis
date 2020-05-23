@@ -67,4 +67,8 @@ export class CityInfoComponent implements OnInit, OnDestroy {
   onContextMenu(event: Event) {
     event.preventDefault();
   }
+
+  get areDetailsVisible() {
+    return this.city.player.id === this.game.state!.trackedPlayer.id;
+  }
 }

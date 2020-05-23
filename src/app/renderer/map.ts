@@ -69,9 +69,13 @@ export class MapDrawer {
         .pipe(takeUntil(this.game.stop$))
         .subscribe((tiles) => this.reveal(tiles));
 
-      state.tileUpdated$
+      state.tilesUpdated$
         .pipe(takeUntil(this.game.stop$))
-        .subscribe((tile) => this.updateTile(tile));
+        .subscribe((tiles) => {
+          for (const tile of tiles) {
+            this.updateTile(tile);
+          }
+        });
 
       this.build(state);
     });

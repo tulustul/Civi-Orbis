@@ -11,9 +11,10 @@ import {
   TrackedPlayerChanneled,
   TileChanneled,
 } from "../core/serialization/channel";
+import { Tile } from "../shared";
 
 const HANDLERS = {
-  "tile.updated": onTileUpdate,
+  "tiles.updated": onTilesUpdate,
 
   "unit.updated": onUnitUpdate,
   "unit.destroyed": onUnitDestroyed,
@@ -118,14 +119,18 @@ function onTrackedPlayerSet(
   state["_trackedPlayer$"].next(state.trackedPlayer);
 }
 
-function onTileUpdate(state: GameState, tileChanneled: TileChanneled) {
-  const tile = state.map.tilesMap.get(tileChanneled.id)!;
-  Object.assign(tile, tileChanneled);
-  if (tileChanneled.areaOf !== null) {
-    tile.areaOf = state.citiesMap.get(tileChanneled.areaOf)!;
+function onTilesUpdate(state: GameState, tilesChanneled: TileChanneled[]) {
+  const tiles: Tile[] = [];
+  for (const tileChanneled of tilesChanneled) {
+    const tile = state.map.tilesMap.get(tileChanneled.id)!;
+    Object.assign(tile, tileChanneled);
+    if (tileChanneled.areaOf !== null) {
+      tile.areaOf = state.citiesMap.get(tileChanneled.areaOf)!;
+    }
+    if (tileChanneled.cityId !== null) {
+      tile.city = state.citiesMap.get(tileChanneled.cityId)!;
+    }
+    tiles.push(tile);
   }
-  if (tileChanneled.cityId !== null) {
-    tile.city = state.citiesMap.get(tileChanneled.cityId)!;
-  }
-  state["_tileUpdated$"].next(tile);
+  state["_tilesUpdated$"].next(tiles);
 }

@@ -36,5 +36,11 @@
         --progress-bar-color: var(--production-color);
       }
     }
+    .simple-view {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 0 5px;
+      display: flex;
+      align-items: center;
+    }
   }
 }

@@ -47,8 +47,11 @@ class Collector {
       changes.push({ type: "city.destroyed", data: id });
     }
 
-    for (const tile of this.tiles) {
-      changes.push({ type: "tile.updated", data: tileToChannel(tile) });
+    if (this.tiles.size) {
+      changes.push({
+        type: "tiles.updated",
+        data: Array.from(this.tiles).map((tile) => tileToChannel(tile)),
+      });
     }
 
     for (const area of this.areas) {

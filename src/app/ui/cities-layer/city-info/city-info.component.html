@@ -9,14 +9,14 @@
   (contextmenu)="onContextMenu($event)"
 >
   <div class="size">{{ city.size }}</div>
-  <div>
+  <div *ngIf="areDetailsVisible; else simpleViewTmpl">
     <app-progress-bar
       class="growth"
       [progress]="city.totalFood"
       [nextProgress]="city.totalFood + city.foodPerTurn"
       [total]="city.foodToGrow"
     >
-      <span> {{ city.name }} </span>
+      <span>{{ city.name }}</span>
       <span class="turns">({{ city.turnsToGrow | turns }})</span>
     </app-progress-bar>
 
@@ -33,3 +33,7 @@
     </app-progress-bar>
   </div>
 </div>
+
+<ng-template #simpleViewTmpl>
+  <div class="simple-view">{{ city.name }}</div>
+</ng-template>
