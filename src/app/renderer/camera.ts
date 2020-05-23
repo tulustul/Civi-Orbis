@@ -198,6 +198,18 @@ export class Camera {
     }
 
     this.updateBoundingBox();
+
+    this.updateProjectionMatrix();
+  }
+
+  updateProjectionMatrix() {
+    // const m = this.renderer.app.renderer.globalUniforms.uniforms
+    const m = this.renderer.app.renderer.projection.projectionMatrix;
+
+    m.tx = this.transform.x;
+    m.ty = this.transform.y;
+    m.d = this.transform.scale;
+    m.a = this.transform.scale;
   }
 
   updateBoundingBox() {

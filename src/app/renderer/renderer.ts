@@ -63,6 +63,14 @@ export class GameRenderer {
       this.camera.update();
       this.mapUi.update();
       this._tick$.next();
+
+      const scale = this.camera.transform.scale;
+      for (const areaDrawer of this.mapDrawer.areaDrawer.areasDrawers) {
+        areaDrawer.backgroundShader.uniforms.opacity = Math.min(
+          0.4,
+          Math.max(0, (70 - scale) / 150),
+        );
+      }
     });
   }
 

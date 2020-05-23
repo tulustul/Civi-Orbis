@@ -2,9 +2,9 @@ import * as PIXI from "pixi.js";
 
 import { GameApi } from "src/app/api";
 import { Area } from "src/app/api/area";
-import { putContainerAtTile } from "../utils";
+import { putContainerAtTile, drawHex, HEX_GEOMETRY } from "../utils";
 import { TileContainer } from "../tile-container";
-import { Tile } from "src/app/shared";
+import { Tile, SeaLevel } from "src/app/shared";
 import { GameState } from "src/app/api/state";
 
 const TRIANGLES: number[][] = [
@@ -34,42 +34,63 @@ const RIGHT_SIDE_TRIANGLES: number[][] = [
   [0.5, 0.5, 0, 0.25, 0.25, 0.125],
 ];
 
-const VS_PROGRAM = `
-  precision mediump float;
+const VS_BORDER_PROGRAM = `
+precision mediump float;
 
-  attribute vec2 aVertexPosition;
-  attribute float aUvs;
+attribute vec2 aVertexPosition;
+attribute float aUvs;
 
-  uniform mat3 translationMatrix;
-  uniform mat3 projectionMatrix;
+uniform mat3 translationMatrix;
+uniform mat3 projectionMatrix;
 
-  varying float vUvs;
+varying float vUvs;
 
-  void main() {
+void main() {
+  vUvs = aUvs;
+  gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+}`;
 
-      vUvs = aUvs;
-      gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+const FRAG_BORDER_PROGRAM = `
+precision mediump float;
 
-  }`;
+varying float vUvs;
 
-const FRAG_PROGRAM = `precision mediump float;
+uniform vec4 color;
 
-  varying float vUvs;
-
-  uniform vec4 color;
-
-  void main() {
-    vec4 c = color;
-    float a = 1.0;
-    if (vUvs < 0.05) {
-      a = 0.0;
-    } else if (vUvs < 0.95) {
-      a = (vUvs - 0.5) * 1.5;
-    }
-    
-    gl_FragColor = vec4(min(c.r, a), min(c.g, a), min(c.b, a), a);
+void main() {
+  vec4 c = color;
+  float a = 1.0;
+  if (vUvs < 0.05) {
+    a = 0.0;
+  } else if (vUvs < 0.95) {
+    a = (vUvs - 0.3) * 1.0;
   }
-`;
+  
+  gl_FragColor = vec4(c.r * a, c.g * a, c.b * a, a);
+}`;
+
+const VS_BACKGROUND_PROGRAM = `
+precision mediump float;
+
+attribute vec2 aVertexPosition;
+
+uniform mat3 translationMatrix;
+uniform mat3 projectionMatrix;
+
+void main() {
+  gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+}`;
+
+const FRAG_BACKGROUND_PROGRAM = `
+precision mediump float;
+
+uniform vec4 color;
+uniform float opacity;
+
+void main() {
+  float a = 0.5;
+  gl_FragColor = vec4(color.r * opacity, color.g * opacity, color.b * opacity, opacity);
+}`;
 
 function makeBorderGeometry(borders: string): PIXI.Geometry {
   const vertices: number[] = [];
@@ -107,18 +128,32 @@ function makeBorderGeometry(borders: string): PIXI.Geometry {
 const borderGeometries = new Map<string, PIXI.Geometry>();
 
 let borderProgram: PIXI.Program;
+let backgroundProgram: PIXI.Program;
 
 export class AreasDrawer {
   areasDrawers: AreaDrawer[] = [];
 
-  constructor(private game: GameApi, private container: TileContainer) {
-    borderProgram = PIXI.Program.from(VS_PROGRAM, FRAG_PROGRAM);
+  constructor(
+    private game: GameApi,
+    private bordersContainer: TileContainer,
+    private backgroundContainer: TileContainer,
+  ) {
+    borderProgram = PIXI.Program.from(VS_BORDER_PROGRAM, FRAG_BORDER_PROGRAM);
+    backgroundProgram = PIXI.Program.from(
+      VS_BACKGROUND_PROGRAM,
+      FRAG_BACKGROUND_PROGRAM,
+    );
 
     this.game.stop$.subscribe(() => this.clear());
     this.game.init$.subscribe(() => {
       this.game.state!.areaSpawned$.subscribe((area) => {
         this.areasDrawers.push(
-          new AreaDrawer(area, this.game.state!, this.container),
+          new AreaDrawer(
+            area,
+            this.game.state!,
+            this.bordersContainer,
+            this.backgroundContainer,
+          ),
         );
       });
     });
@@ -126,7 +161,12 @@ export class AreasDrawer {
 
   build() {
     for (const area of this.game.state!.areas) {
-      const areaDrawer = new AreaDrawer(area, this.game.state!, this.container);
+      const areaDrawer = new AreaDrawer(
+        area,
+        this.game.state!,
+        this.bordersContainer,
+        this.backgroundContainer,
+      );
       this.areasDrawers.push(areaDrawer);
       areaDrawer.build();
     }
@@ -143,14 +183,23 @@ export class AreasDrawer {
 class AreaDrawer {
   borderShader: PIXI.Shader;
 
+  backgroundShader: PIXI.Shader;
+
   bordersMap = new Map<Tile, PIXI.Mesh>();
+
+  backgroundMap = new Map<Tile, PIXI.Mesh>();
 
   constructor(
     private area: Area,
     private state: GameState,
-    private container: TileContainer,
+    private bordersContainer: TileContainer,
+    private backgroundContainer: TileContainer,
   ) {
     this.borderShader = new PIXI.Shader(borderProgram, {
+      color: area.vec4Color,
+    });
+
+    this.backgroundShader = new PIXI.Shader(backgroundProgram, {
       color: area.vec4Color,
     });
 
@@ -159,11 +208,47 @@ class AreaDrawer {
         this.updateTileBorders(tile);
       }
     });
+
+    area.addedTiles$.subscribe((tiles) => {
+      for (const tile of tiles) {
+        this.drawTileBackground(tile);
+      }
+    });
+
+    area.removedTiles$.subscribe((tiles) => {
+      for (const tile of tiles) {
+        const mesh = this.backgroundMap.get(tile);
+        if (mesh) {
+          mesh.destroy();
+          this.backgroundMap.delete(tile);
+        }
+      }
+    });
   }
 
   build() {
     for (const [tile, borders] of this.area.borders) {
       this.drawTileBorders(tile, borders);
+    }
+    for (const tile of this.area.tiles) {
+      this.drawTileBackground(tile);
+    }
+  }
+
+  private drawTileBackground(tile: Tile) {
+    if (tile.seaLevel !== SeaLevel.none) {
+      return;
+    }
+
+    const mesh = new PIXI.Mesh(HEX_GEOMETRY, this.backgroundShader);
+    mesh.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+    mesh.position.y = tile.y * 0.75;
+
+    this.backgroundContainer.addChild(mesh, tile);
+    this.backgroundMap.set(tile, mesh);
+
+    if (!this.state.trackedPlayer.exploredTiles.has(tile)) {
+      mesh.visible = false;
     }
   }
 
@@ -175,6 +260,8 @@ class AreaDrawer {
     const borders = this.area.borders.get(tile);
     if (borders) {
       this.drawTileBorders(tile, borders);
+    } else {
+      this.bordersMap.delete(tile);
     }
   }
 
@@ -187,11 +274,11 @@ class AreaDrawer {
 
     const mesh = new PIXI.Mesh(geometry, this.borderShader);
 
-    putContainerAtTile(tile, mesh);
+    // putContainerAtTile(tile, mesh);
     mesh.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     mesh.position.y = tile.y * 0.75;
 
-    this.container.addChild(mesh, tile);
+    this.bordersContainer.addChild(mesh, tile);
     this.bordersMap.set(tile, mesh);
 
     if (!this.state.trackedPlayer.exploredTiles.has(tile)) {
@@ -204,5 +291,10 @@ class AreaDrawer {
       obj.destroy();
     }
     this.bordersMap.clear();
+
+    for (const obj of this.backgroundMap.values()) {
+      obj.destroy();
+    }
+    this.backgroundMap.clear();
   }
 }

@@ -32,6 +32,8 @@ export class MapDrawer {
 
   areasContainer = new TileContainer(this.camera.tileBoundingBox);
 
+  politicsContainer = new TileContainer(this.camera.tileBoundingBox);
+
   overlaysContainer = new PIXIE.Container();
 
   terrainDrawer: TerrainDrawer;
@@ -59,6 +61,7 @@ export class MapDrawer {
     this.container.addChild(this.unitsContainer);
     this.container.addChild(this.overlaysContainer);
     this.container.addChild(this.areasContainer);
+    this.container.addChild(this.politicsContainer);
 
     this.game.init$.subscribe((state) => {
       state.trackedPlayer$
@@ -104,7 +107,11 @@ export class MapDrawer {
       this.cityContainer,
     );
 
-    this.areaDrawer = new AreasDrawer(this.game, this.areasContainer);
+    this.areaDrawer = new AreasDrawer(
+      this.game,
+      this.areasContainer,
+      this.politicsContainer,
+    );
   }
 
   hideAllTiles() {
@@ -147,6 +154,7 @@ export class MapDrawer {
     this.riverContainer.bindToMap(gameState.map);
     this.unitsContainer.bindToMap(gameState.map);
     this.areasContainer.bindToMap(gameState.map);
+    this.politicsContainer.bindToMap(gameState.map);
 
     this.unitsDrawer.build();
     this.cityDrawer.build();
