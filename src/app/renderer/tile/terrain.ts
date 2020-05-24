@@ -156,9 +156,8 @@ export class TerrainDrawer {
       return null;
     }
 
-    // FIXME This will fail to render roads on map edges because of insufficient number of neighbours.
-    const roadId = tile.neighbours
-      .map((n) => (n.road === null ? "0" : "1"))
+    const roadId = tile.fullNeighbours
+      .map((n) => (!n || n.road === null ? "0" : "1"))
       .join("");
 
     const textureName = `hexRoad-${roadId}-00.png`;

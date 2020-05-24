@@ -38,7 +38,6 @@ export class CityViewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // this.city.updateProductsList();
     this.mapUi.hoverCity(this.city.citySimple);
   }
 
