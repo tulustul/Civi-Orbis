@@ -80,4 +80,12 @@ export class UnitDetails {
     const ids = await makeCommand<number[]>("unit.getRange", this.id);
     return ids.map((tileId) => this.game.map.tilesMap.get(tileId)!);
   }
+
+  getFailedActionRequirements(action: UnitAction) {
+    // Returns failed requirements.
+    return makeCommand<UnitAction[]>("unit.getFailedActionRequirements", {
+      unitId: this.id,
+      action,
+    });
+  }
 }

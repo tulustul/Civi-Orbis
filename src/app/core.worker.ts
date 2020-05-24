@@ -39,6 +39,7 @@ const HANDLERS = {
   "unit.disband": unitDisband,
   "unit.moveAlongPath": unitMoveAlongPath,
   "unit.getRange": unitGetRange,
+  "unit.getFailedActionRequirements": unitGetFailedActionRequirements,
 
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
@@ -229,6 +230,15 @@ function unitGetRange(unitId: number): number[] {
   const tiles = unit.getRange();
 
   return Array.from(tiles).map((tile) => tile.id);
+}
+
+function unitGetFailedActionRequirements(data): string[] {
+  const unit = game.unitsManager.unitsMap.get(data.unitId);
+  if (!unit) {
+    return [];
+  }
+
+  return unit.getFailedActionRequirements(data.action);
 }
 
 export function tileUpdate(tile: Partial<BaseTile>) {

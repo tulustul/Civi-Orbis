@@ -1,5 +1,3 @@
-// import { UnitCore } from "./unit";
-// import { CityCore } from "./city";
 import { Yields, EMPTY_YIELDS } from "./yields";
 import { TileImprovement, TileRoad } from "./tile-improvements";
 import {
@@ -9,7 +7,9 @@ import {
   TileDirection,
   BaseTile,
 } from "../shared";
-// import { collector } from "./collector";
+import { UnitCore } from "./unit";
+import { CityCore } from "./city";
+import { collector } from "./collector";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -39,13 +39,10 @@ export class TileCore implements BaseTile {
   improvement: TileImprovement | null = null;
   road: TileRoad | null = null;
 
-  // units: UnitCore[] = [];
-  // city: CityCore | null = null;
-  // areaOf: CityCore | null = null;
+  units: UnitCore[] = [];
+  city: CityCore | null = null;
+  areaOf: CityCore | null = null;
 
-  units: any[] = [];
-  city: any | null = null;
-  areaOf: any | null = null;
   yields: Yields = { ...EMPTY_YIELDS };
 
   // cached data
@@ -192,6 +189,6 @@ export class TileCore implements BaseTile {
       // TODO this loop can be optimized by computing only the cost from neighbour to this tile.
       neighbour.computeMovementCosts();
     }
-    // collector.tiles.add(this);
+    collector.tiles.add(this);
   }
 }

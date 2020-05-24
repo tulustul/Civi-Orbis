@@ -47,6 +47,13 @@ export function getPublicWorksPerTurn(action: UnitAction) {
 
 export abstract class ActionRequirement {
   static id: string;
+
+  id: string;
+
+  constructor() {
+    this.id = this.constructor["id"];
+  }
+
   abstract check(unit: UnitCore, action: UnitAction): boolean;
 }
 

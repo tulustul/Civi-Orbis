@@ -3,16 +3,15 @@ import {
   OnInit,
   Input,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from "@angular/core";
 
-import { UnitCore } from "src/app/core/unit";
 import {
   UnitAction,
-  ActionRequirement,
-  ACTIONS,
   getPublicWorksRequired,
   getPublicWorksPerTurn,
 } from "src/app/core/unit-actions";
+import { UnitDetails } from "src/app/api/unit-details";
 
 @Component({
   selector: "app-unit-action-requirements",
@@ -21,20 +20,19 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnitActionRequirementsComponent implements OnInit {
-  @Input() unit: UnitCore;
+  @Input() unit: UnitDetails;
 
   @Input() action: UnitAction;
 
-  failedRequirements: ActionRequirement[] = [];
+  failedRequirements: string[] = [];
 
-  constructor() {}
+  constructor(private cdr: ChangeDetectorRef) {}
 
-  ngOnInit(): void {
-    for (const r of ACTIONS[this.action].requirements) {
-      if (!r.check(this.unit, this.action)) {
-        this.failedRequirements.push(r);
-      }
-    }
+  async ngOnInit() {
+    this.failedRequirements = await this.unit.getFailedActionRequirements(
+      this.action,
+    );
+    this.cdr.markForCheck();
   }
 
   get publicWorksRequired() {

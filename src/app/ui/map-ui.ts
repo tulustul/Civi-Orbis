@@ -71,6 +71,7 @@ export class MapUi {
         this.setPath(null);
       }
     });
+
     this.hoveredTile$.subscribe((tile) => {
       if (!this.uiState.selectedCity$.value) {
         if (tile?.city) {
@@ -80,11 +81,7 @@ export class MapUi {
         }
       }
     });
-    // this.game.citiesManager.spawned$.subscribe((city) => {
-    //   if (city.player === this.game.humanPlayer) {
-    //     this.selectCity(city);
-    //   }
-    // });
+
     this.game.state?.trackedPlayer$.subscribe((player) => {
       this._selectedUnit$.next(null);
       const tileOfInterest = player?.units[0]?.tile || player?.cities[0]?.tile;
@@ -95,6 +92,12 @@ export class MapUi {
     });
 
     this.game.init$.subscribe(() => {
+      this.game.state!.citySpawned$.subscribe((city) => {
+        if (city.player.id === this.game.state!.trackedPlayer.id) {
+          this.selectCity(city);
+        }
+      });
+
       this.game.state!.turn$.subscribe(() => this.setPath(null));
 
       const areasContainer = this.camera["renderer"].mapDrawer.areasContainer;

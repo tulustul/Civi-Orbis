@@ -1,5 +1,5 @@
 <div class="requirements" *ngFor="let requirement of failedRequirements">
-  <ng-container [ngSwitch]="requirement.id">
+  <ng-container [ngSwitch]="requirement">
     <ng-container *ngSwitchCase="'ownTile'">
       Must be on owned tile.
     </ng-container>

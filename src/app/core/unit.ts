@@ -55,6 +55,12 @@ export class UnitCore {
     return true;
   }
 
+  getFailedActionRequirements(action: UnitAction): string[] {
+    return ACTIONS[action].requirements
+      .filter((r) => !r.check(this, action))
+      .map((r) => r.id);
+  }
+
   setOrder(order: UnitOrder) {
     this.order = order;
     this.player.updateUnitsWithoutOrders();
