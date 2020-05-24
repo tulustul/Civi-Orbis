@@ -1,15 +1,21 @@
 import * as PIXIE from "pixi.js";
 
-import { getTileCoords } from "../utils";
+import { takeUntil } from "rxjs/operators";
+
+import { drawTileSpriteCentered, putSpriteAtTileCentered } from "../utils";
 import { TileContainer } from "../tile-container";
 import { GameApi } from "src/app/api";
 import { Unit } from "src/app/api/unit";
-import { takeUntil } from "rxjs/operators";
+import { GameRenderer } from "../renderer";
 
 export class UnitsDrawer {
-  unitGraphics = new Map<Unit, PIXIE.Graphics>();
+  unitGraphics = new Map<Unit, PIXIE.Sprite[]>();
 
-  constructor(private game: GameApi, private container: TileContainer) {
+  constructor(
+    private game: GameApi,
+    private renderer: GameRenderer,
+    private container: TileContainer,
+  ) {
     game.init$.subscribe((state) => {
       state.unitSpawned$
         .pipe(takeUntil(game.stop$))
@@ -36,45 +42,67 @@ export class UnitsDrawer {
   }
 
   spawn(unit: Unit) {
-    const g = new PIXIE.Graphics();
-    this.container.addChild(g, unit.tile);
-    this.unitGraphics.set(unit, g);
+    const backgroundTextureName = `unitBackground-${unit.definition.type}.png`;
+    const backgroundTexture = this.textures[backgroundTextureName];
 
-    const [x, y] = getTileCoords(unit.tile);
-    g.position.x = x;
-    g.position.y = y;
+    const unitTextureName = `unit-${unit.definition.id}.png`;
+    const unitTexture = this.textures[unitTextureName];
 
-    g.beginFill(unit.player.color);
-    g.drawCircle(0.5, 0.5, 0.2);
-    g.endFill();
+    const objects: PIXI.Sprite[] = [];
+
+    const backgroundSprite = drawTileSpriteCentered(
+      unit.tile,
+      backgroundTexture,
+    );
+    this.container.addChild(backgroundSprite, unit.tile);
+    objects.push(backgroundSprite);
+    backgroundSprite.tint = unit.player.color;
+
+    const unitSprite = drawTileSpriteCentered(unit.tile, unitTexture);
+    this.container.addChild(unitSprite, unit.tile);
+    objects.push(unitSprite);
+
+    this.unitGraphics.set(unit, objects);
 
     if (!this.game.state!.trackedPlayer.exploredTiles.has(unit.tile)) {
-      g.visible = false;
+      backgroundSprite.visible = false;
+      unitSprite.visible = false;
     }
   }
 
   destroy(unit: Unit) {
-    const g = this.unitGraphics.get(unit);
-    if (g) {
-      this.unitGraphics.delete(unit);
-      g.destroy();
+    const objs = this.unitGraphics.get(unit);
+    if (!objs) {
+      return;
+    }
+
+    this.unitGraphics.delete(unit);
+
+    for (const obj of objs) {
+      obj.destroy();
     }
   }
 
   update(unit: Unit) {
-    const g = this.unitGraphics.get(unit)!;
+    const objs = this.unitGraphics.get(unit)!;
 
-    const [x, y] = getTileCoords(unit.tile);
-    g.position.x = x;
-    g.position.y = y;
+    for (const sprite of objs) {
+      putSpriteAtTileCentered(unit.tile, sprite);
 
-    this.container.moveChild(g, unit.tile);
+      this.container.moveChild(sprite, unit.tile);
 
-    g.visible = this.game.state!.trackedPlayer.exploredTiles.has(unit.tile);
+      sprite.visible = this.game.state!.trackedPlayer.exploredTiles.has(
+        unit.tile,
+      );
+    }
   }
 
   clear() {
     this.container.destroyAllChildren();
     this.unitGraphics.clear();
+  }
+
+  protected get textures() {
+    return this.renderer.textures;
   }
 }

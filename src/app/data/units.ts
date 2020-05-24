@@ -5,6 +5,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "settler",
     name: "Settler",
+    type: "civilian",
     actionPoints: 2,
     power: 0,
     actions: ["foundCity"],
@@ -18,6 +19,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "worker",
     name: "Worker",
+    type: "civilian",
     actionPoints: 2,
     power: 0,
     actions: ["buildFarm", "buildMine", "buildSawmill", "buildRoad"],
@@ -28,6 +30,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "scout",
     name: "Scout",
+    type: "military",
     actionPoints: 2,
     power: 2,
     actions: [],
@@ -38,6 +41,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "warrior",
     name: "Warrior",
+    type: "military",
     actionPoints: 2,
     power: 5,
     actions: [],

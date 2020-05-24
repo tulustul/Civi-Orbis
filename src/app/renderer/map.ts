@@ -91,7 +91,11 @@ export class MapDrawer {
       this.waterContainer,
     );
 
-    this.unitsDrawer = new UnitsDrawer(this.game, this.unitsContainer);
+    this.unitsDrawer = new UnitsDrawer(
+      this.game,
+      this.renderer,
+      this.unitsContainer,
+    );
 
     this.yieldsDrawer = new YiedsDrawer(
       this.game,
