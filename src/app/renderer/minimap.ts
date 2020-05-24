@@ -201,10 +201,6 @@ export class MinimapRenderer {
   }
 
   private drawTile(tile: Tile) {
-    if (!this.game.state!.trackedPlayer.exploredTiles.has(tile)) {
-      return;
-    }
-
     let color: number;
 
     if (tile.seaLevel !== SeaLevel.none) {
@@ -229,6 +225,10 @@ export class MinimapRenderer {
     this.tilesMap.set(tile, [g]);
 
     this.renderRivers(tile, g);
+
+    if (!this.game.state!.trackedPlayer.exploredTiles.has(tile)) {
+      g.visible = false;
+    }
   }
 
   private renderRivers(tile: Tile, graphics: PIXIE.Graphics) {
