@@ -3,9 +3,14 @@ import * as PIXIE from "pixi.js";
 import { TileContainer } from "../tile-container";
 import { MapUi } from "src/app/ui/map-ui";
 import { Tile } from "src/app/api/tile.interface";
+import { GameApi } from "src/app/api";
 
 export class YiedsDrawer {
-  constructor(private mapUi: MapUi, private container: TileContainer) {
+  constructor(
+    private game: GameApi,
+    private mapUi: MapUi,
+    private container: TileContainer,
+  ) {
     this.mapUi.yieldsVisible$.subscribe(
       (visible) => (this.container.visible = visible),
     );
@@ -25,6 +30,10 @@ export class YiedsDrawer {
     this.drawYield(g, 0.65, tile.yields.production, 0xffaa00);
 
     this.container.addChild(g, tile);
+
+    if (!this.game.state!.trackedPlayer.exploredTiles.has(tile)) {
+      g.visible = false;
+    }
   }
 
   private drawYield(

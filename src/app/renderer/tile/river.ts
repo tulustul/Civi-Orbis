@@ -6,14 +6,7 @@ import { GameApi } from "src/app/api";
 import { Tile } from "src/app/api/tile.interface";
 
 export class RiverDrawer {
-  constructor(game: GameApi, private container: TileContainer) {
-    // const tilesManager = game.tilesManager;
-    // game.started$.subscribe(() => {
-    //   tilesManager.updatedTile$
-    //     .pipe(takeUntil(game.stopped$))
-    //     .subscribe((tile) => this.updateTile(tile));
-    // });
-  }
+  constructor(private game: GameApi, private container: TileContainer) {}
 
   public drawTile(tile: Tile) {
     if (!tile.riverParts.length) {
@@ -57,6 +50,10 @@ export class RiverDrawer {
         g.moveTo(0, 0.75);
         g.lineTo(0, 0.25);
       }
+    }
+
+    if (!this.game.state!.trackedPlayer.exploredTiles.has(tile)) {
+      g.visible = false;
     }
   }
 

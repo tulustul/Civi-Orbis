@@ -47,6 +47,10 @@ export class UnitsDrawer {
     g.beginFill(unit.player.color);
     g.drawCircle(0.5, 0.5, 0.2);
     g.endFill();
+
+    if (!this.game.state!.trackedPlayer.exploredTiles.has(unit.tile)) {
+      g.visible = false;
+    }
   }
 
   destroy(unit: Unit) {
@@ -65,6 +69,8 @@ export class UnitsDrawer {
     g.position.y = y;
 
     this.container.moveChild(g, unit.tile);
+
+    g.visible = this.game.state!.trackedPlayer.exploredTiles.has(unit.tile);
   }
 
   clear() {

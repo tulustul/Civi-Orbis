@@ -24,7 +24,7 @@ export class TileContainer extends PIXIE.DisplayObject {
   private grid: PIXIE.DisplayObject[][][] = [];
   private childrenMap = new Map<PIXIE.DisplayObject, Tile>();
 
-  // TODO can it rewritten tile ids? Map<number, ...>
+  // TODO can it be rewritten with tile ids? Map<number, ...>
   private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
 
   constructor(private bBox: BoundingBox) {

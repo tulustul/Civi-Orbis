@@ -115,34 +115,45 @@ export class TerrainDrawer {
       this.waterContainer.addChild(sprite, tile);
     }
 
-    this.drawRoads(tile);
+    const isVisible = this.game.state!.trackedPlayer.exploredTiles.has(tile);
 
-    this.drawImprovement(tile);
-
-    if (!this.game.state!.trackedPlayer.exploredTiles.has(tile)) {
+    if (!isVisible) {
       sprite.visible = false;
+    }
+
+    const road = this.drawRoads(tile);
+    if (road && !isVisible) {
+      road.visible = false;
+    }
+
+    const improvement = this.drawImprovement(tile);
+    if (improvement && !isVisible) {
+      improvement.visible = false;
     }
   }
 
   private drawImprovement(tile: Tile) {
+    let sprite: PIXI.Sprite | null = null;
     if (tile.improvement === TileImprovement.farm) {
       const textureName = pickRandom(FARM_TEXTURES);
-      const sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
+      sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
       this.terrainContainer.addChild(sprite, tile);
     } else if (tile.improvement === TileImprovement.mine) {
       const textureName = pickRandom(MINE_TEXTURES);
-      const sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
+      sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
       this.terrainContainer.addChild(sprite, tile);
     } else if (tile.improvement === TileImprovement.sawmill) {
       const textureName = pickRandom(SAWMILL_TEXTURES);
-      const sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
+      sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
       this.terrainContainer.addChild(sprite, tile);
     }
+
+    return sprite;
   }
 
   private drawRoads(tile: Tile) {
     if (tile.road === null) {
-      return;
+      return null;
     }
 
     // FIXME This will fail to render roads on map edges because of insufficient number of neighbours.
@@ -153,6 +164,7 @@ export class TerrainDrawer {
     const textureName = `hexRoad-${roadId}-00.png`;
     const sprite = drawTileSprite(tile, this.textures[textureName]);
     this.terrainContainer.addChild(sprite, tile);
+    return sprite;
   }
 
   clearTile(tile: Tile) {

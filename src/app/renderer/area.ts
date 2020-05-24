@@ -326,7 +326,6 @@ class AreaDrawer {
 
     const mesh = new PIXI.Mesh(geometry, this.borderShader);
 
-    // putContainerAtTile(tile, mesh);
     mesh.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     mesh.position.y = tile.y * 0.75;
 

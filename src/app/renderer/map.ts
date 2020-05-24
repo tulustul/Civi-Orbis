@@ -94,6 +94,7 @@ export class MapDrawer {
     this.unitsDrawer = new UnitsDrawer(this.game, this.unitsContainer);
 
     this.yieldsDrawer = new YiedsDrawer(
+      this.game,
       this.renderer.mapUi,
       this.yieldsContainer,
     );
