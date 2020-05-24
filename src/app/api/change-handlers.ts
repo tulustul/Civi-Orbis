@@ -10,6 +10,7 @@ import {
   TileChanneled,
 } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
+import { PlayerYields } from "../shared";
 
 const HANDLERS = {
   "tiles.updated": onTilesUpdate,
@@ -27,6 +28,7 @@ const HANDLERS = {
   "area.tilesRemoved": onAreaTilesRemoved,
 
   "trackedPlayer.set": onTrackedPlayerSet,
+  "trackedPlayer.yields": onPlayerYieldsUpdate,
   "trackedPlayer.tilesExplored": onTilesExplored,
 };
 
@@ -101,6 +103,10 @@ function onAreaTilesRemoved(state: GameState, data) {
   }
 
   area.removeTiles(state.map.getTilesFromIds(data.tiles));
+}
+
+function onPlayerYieldsUpdate(state: GameState, yields: PlayerYields) {
+  state.trackedPlayer.yields = yields;
 }
 
 function onTilesExplored(state: GameState, tilesIds: number[]) {

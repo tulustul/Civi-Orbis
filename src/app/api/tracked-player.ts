@@ -1,11 +1,10 @@
 import { GameState } from "./state";
-import { Yields } from "../core/yields";
 import { makeCommand } from "./internal/commander";
 import { Unit } from "./unit";
 import { City } from "./city";
 import { TrackedPlayerChanneled } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
-import { PlayerTask } from "../shared";
+import { PlayerYields } from "../shared";
 
 export class TrackedPlayer {
   id: number;
@@ -15,10 +14,7 @@ export class TrackedPlayer {
   units: Unit[] = [];
   cities: City[] = [];
 
-  yieldsPerTurn: Yields;
-  yieldsIncome: Yields;
-  yieldsCosts: Yields;
-  yieldsTotal: Yields;
+  yields: PlayerYields;
 
   constructor(game: GameState, player: TrackedPlayerChanneled) {
     this.id = player.id;
@@ -30,10 +26,7 @@ export class TrackedPlayer {
     this.units = player.units.map((id) => game.unitsMap.get(id)!);
     this.cities = player.cities.map((id) => game.citiesMap.get(id)!);
 
-    this.yieldsPerTurn = player.yieldsPerTurn;
-    this.yieldsIncome = player.yieldsIncome;
-    this.yieldsCosts = player.yieldsCosts;
-    this.yieldsTotal = player.yieldsTotal;
+    this.yields = player.yields;
   }
 
   exploreTiles(tiles: Tile[]) {

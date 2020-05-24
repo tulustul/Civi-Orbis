@@ -222,7 +222,7 @@ function dumpPlayer(player: PlayerCore): PlayerSerialized {
     ai: !!player.ai,
     color: player.color,
     exploredTiles: Array.from(player.exploredTiles).map((t) => t.id),
-    yieldsTotal: player.yieldsTotal,
+    yieldsTotal: player.yields.total,
   };
 }
 
@@ -236,7 +236,7 @@ function loadPlayer(game: Game, data: PlayerSerialized) {
   for (const tileId of data.exploredTiles) {
     player.exploredTiles.add(game.map.tilesMap.get(tileId)!);
   }
-  player.yieldsTotal = data.yieldsTotal;
+  player.yields.total = data.yieldsTotal;
   player.updateYields();
   return player;
 }

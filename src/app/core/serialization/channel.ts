@@ -2,7 +2,7 @@ import { Yields } from "../yields";
 import { ProductType, CityCore } from "../city";
 import { Game } from "../game";
 import { PlayerCore } from "../player";
-import { BaseTile } from "src/app/shared";
+import { BaseTile, PlayerYields } from "src/app/shared";
 import { TilesMapCore } from "../tiles-map";
 import { UnitOrder, UnitCore } from "../unit";
 import { TileCore } from "../tile";
@@ -102,10 +102,7 @@ export interface TrackedPlayerChanneled {
   units: number[];
   cities: number[];
 
-  yieldsPerTurn: Yields;
-  yieldsIncome: Yields;
-  yieldsCosts: Yields;
-  yieldsTotal: Yields;
+  yields: PlayerYields;
 }
 
 export interface UnitChanneled {
@@ -251,11 +248,7 @@ export function trackedPlayerToChannel(
     exploredTiles: Array.from(player.exploredTiles).map((t) => t.id),
     units: player.units.map((u) => u.id),
     cities: player.cities.map((c) => c.id),
-
-    yieldsCosts: player.yieldsCosts,
-    yieldsIncome: player.yieldsIncome,
-    yieldsPerTurn: player.yieldsPerTurn,
-    yieldsTotal: player.yieldsTotal,
+    yields: player.yields,
   };
 }
 

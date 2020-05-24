@@ -110,7 +110,7 @@ export class PublicWorksPointsRequirement extends ActionRequirement {
 
   check(unit: UnitCore, action: UnitAction) {
     return (
-      unit.player.yieldsTotal.publicWorks >= getPublicWorksRequired(action)
+      unit.player.yields.total.publicWorks >= getPublicWorksRequired(action)
     );
   }
 }
@@ -139,13 +139,13 @@ function buildImprovement(
   unit.tile.update();
   unit.player.updateUnitsWithoutOrders();
 
-  unit.player.yieldsTotal.publicWorks -=
+  unit.player.yields.total.publicWorks -=
     IMPROVEMENT_PUBLIC_WORKS_COSTS[improvement];
 
-  unit.player.yieldsCosts.publicWorks +=
+  unit.player.yields.costs.publicWorks +=
     IMPROVEMENT_PUBLIC_WORKS_COSTS_PER_TURN[improvement];
 
-  unit.player.yieldsPerTurn.publicWorks -=
+  unit.player.yields.perTurn.publicWorks -=
     IMPROVEMENT_PUBLIC_WORKS_COSTS_PER_TURN[improvement];
 }
 
@@ -158,12 +158,13 @@ function buildRoad(game: Game, unit: UnitCore) {
   }
   unit.player.updateUnitsWithoutOrders();
 
-  unit.player.yieldsTotal.publicWorks -= ROAD_PUBLIC_WORKS_COSTS[TileRoad.road];
+  unit.player.yields.total.publicWorks -=
+    ROAD_PUBLIC_WORKS_COSTS[TileRoad.road];
 
-  unit.player.yieldsCosts.publicWorks +=
+  unit.player.yields.costs.publicWorks +=
     ROAD_PUBLIC_WORKS_COSTS_PER_TURN[TileRoad.road];
 
-  unit.player.yieldsPerTurn.publicWorks -=
+  unit.player.yields.perTurn.publicWorks -=
     ROAD_PUBLIC_WORKS_COSTS_PER_TURN[TileRoad.road];
 }
 

@@ -4,7 +4,6 @@ import { Game } from "./game";
 import { CityCore } from "./city";
 import { AIPlayer } from "../ai/ai-player";
 import {
-  Yields,
   EMPTY_YIELDS,
   zeroYields,
   addYields,
@@ -12,6 +11,7 @@ import {
   copyYields,
 } from "./yields";
 import { collector } from "./collector";
+import { PlayerYields } from "../shared";
 
 export const PLAYER_COLORS: number[] = [
   0xff0000,
@@ -48,13 +48,12 @@ export class PlayerCore {
 
   unitsWithoutOrders: UnitCore[] = [];
 
-  yieldsPerTurn: Yields = { ...EMPTY_YIELDS };
-
-  yieldsIncome: Yields = { ...EMPTY_YIELDS };
-
-  yieldsCosts: Yields = { ...EMPTY_YIELDS };
-
-  yieldsTotal: Yields = { ...EMPTY_YIELDS };
+  yields: PlayerYields = {
+    costs: { ...EMPTY_YIELDS },
+    income: { ...EMPTY_YIELDS },
+    total: { ...EMPTY_YIELDS },
+    perTurn: { ...EMPTY_YIELDS },
+  };
 
   area = this.game.areasManager.make();
 
@@ -74,32 +73,41 @@ export class PlayerCore {
   }
 
   updateYields() {
-    zeroYields(this.yieldsIncome);
-    zeroYields(this.yieldsCosts);
-    zeroYields(this.yieldsPerTurn);
+    zeroYields(this.yields.income);
+    zeroYields(this.yields.costs);
+    zeroYields(this.yields.perTurn);
 
     for (const city of this.cities) {
       for (const tile of city.tiles) {
         if (!tile.city) {
           if (tile.improvement !== null) {
-            this.yieldsCosts.publicWorks++;
+            this.yields.costs.publicWorks++;
           }
           if (tile.road !== null) {
-            this.yieldsCosts.publicWorks++;
+            this.yields.costs.publicWorks++;
           }
         }
       }
-      addYields(this.yieldsIncome, city.yields);
+      addYields(this.yields.income, city.yields);
     }
 
-    copyYields(this.yieldsPerTurn, this.yieldsIncome);
-    subtractYields(this.yieldsPerTurn, this.yieldsCosts);
+    copyYields(this.yields.perTurn, this.yields.income);
+    subtractYields(this.yields.perTurn, this.yields.costs);
+
+    if (this === this.game.trackedPlayer) {
+      collector.trackedPlayerYields = {
+        perTurn: this.yields.perTurn,
+        income: this.yields.income,
+        total: this.yields.total,
+        costs: this.yields.costs,
+      };
+    }
   }
 
   nextTurn() {
     this.updateYields();
-    addYields(this.yieldsTotal, this.yieldsPerTurn);
-    this.yieldsTotal.publicWorks = Math.max(0, this.yieldsTotal.publicWorks);
+    addYields(this.yields.total, this.yields.perTurn);
+    this.yields.total.publicWorks = Math.max(0, this.yields.total.publicWorks);
 
     this.updateCitiesWithoutProduction();
     this.updateUnitsWithoutOrders();

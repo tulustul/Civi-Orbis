@@ -8,6 +8,7 @@ import {
   cityToChannel,
   trackedPlayerToChannel,
 } from "./serialization/channel";
+import { PlayerYields } from "../shared";
 
 class Collector {
   tiles = new Set<TileCore>();
@@ -22,6 +23,7 @@ class Collector {
   areaTilesRemoved = new Map<number, TileCore[]>();
 
   trackedPlayer: PlayerCore | undefined;
+  trackedPlayerYields: PlayerYields | undefined;
   tilesExplored = new Set<number>();
 
   turn = 0;
@@ -71,6 +73,12 @@ class Collector {
       changes.push({
         type: "trackedPlayer.set",
         data: trackedPlayerToChannel(this.trackedPlayer),
+      });
+    }
+    if (this.trackedPlayerYields) {
+      changes.push({
+        type: "trackedPlayer.yields",
+        data: this.trackedPlayerYields,
       });
     }
     if (this.tilesExplored.size) {

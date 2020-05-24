@@ -12,7 +12,7 @@ export class PlayerYieldsComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  get player() {
-    return this.game.state!.trackedPlayer;
+  get yields() {
+    return this.game.state!.trackedPlayer.yields;
   }
 }

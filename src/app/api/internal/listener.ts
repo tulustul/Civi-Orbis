@@ -31,8 +31,6 @@ function onMessage(event: MessageEvent) {
 
   executor(event.data.result);
 
-  console.debug("nextTask: ", event.data.nextTask);
-
   gameApi["_nextTask$"].next(event.data.nextTask);
 }
 

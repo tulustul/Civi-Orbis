@@ -1,11 +1,11 @@
 <div class="public-works-color" [appTooltip]="publicWorksTooltipTmpl">
-  Public works: {{ player.yieldsTotal.publicWorks }} ({{
-    player.yieldsPerTurn.publicWorks >= 0 ? "+" : ""
-  }}{{ player.yieldsPerTurn.publicWorks }})
+  Public works: {{ yields.total.publicWorks }} ({{
+    yields.perTurn.publicWorks >= 0 ? "+" : ""
+  }}{{ yields.perTurn.publicWorks }})
 </div>
 
 <ng-template #publicWorksTooltipTmpl>
-  <div>From cities: {{ player.yieldsIncome.publicWorks }}</div>
-  <div>Improvements maintainance: {{ player.yieldsCosts.publicWorks }}</div>
-  <div>Netto per turn: {{ player.yieldsPerTurn.publicWorks }}</div>
+  <div>From cities: {{ yields.income.publicWorks }}</div>
+  <div>Improvements maintainance: {{ yields.costs.publicWorks }}</div>
+  <div>Netto per turn: {{ yields.perTurn.publicWorks }}</div>
 </ng-template>
