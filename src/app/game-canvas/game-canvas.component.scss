@@ -1,5 +1,6 @@
 :host {
   canvas {
     background-color: black;
+    z-index: -10; // allow ui to cover the canvas
   }
 }

@@ -10,7 +10,7 @@ Bugs:
   ✔ ExpressionChangedAfterItHasBeenCheckedError when opening city view @done(20-05-09 00:28)
   ✔ starting new game for the second time: WebGL: INVALID_OPERATION: uniformMatrix3fv: location is not from current program @done(20-05-08 22:36)
   ☐ webgl fonts scaling
-  ☐ webworker: setting work tiles
+  ✔ webworker: setting work tiles @done(20-05-24 14:50)
   ✔ webworker: highlighting city tiles @done(20-05-24 12:58)
   ☐ webworker: building improvements
   ☐ webworker: optimizing yields

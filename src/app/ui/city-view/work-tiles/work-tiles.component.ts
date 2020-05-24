@@ -49,11 +49,20 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  toggle(tile: Tile) {
+  async toggle(tile: Tile) {
     if (this.city.workedTiles.has(tile)) {
-      // this.city.unworkTile(tile);
+      await this.city.unworkTile(tile);
     } else {
-      // this.city.workTile(tile);
+      await this.city.workTile(tile);
+    }
+
+    if (!this.ngUnsubscribe.isStopped) {
+      this.mapUi.cityWorkedTilesArea.setTiles(
+        Array.from(this.city.workedTiles),
+      );
+      this.mapUi.cityNotWorkedTilesArea.setTiles(this.city.getNotWorkedTiles());
+
+      this.cdr.markForCheck();
     }
   }
 

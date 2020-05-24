@@ -10,6 +10,7 @@ import { UNITS_MAP } from "../core/unit";
 import { makeCommand } from "./internal/commander";
 import { CityDetailsChanneled } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
+import { City } from "./city";
 
 export class CityDetails {
   id: number;
@@ -53,9 +54,12 @@ export class CityDetails {
   availableIdleProducts: IdleProduct[];
   disabledIdleProducts: Set<IdleProduct>;
 
+  citySimple: City;
+
   constructor(private game: GameState, city: CityDetailsChanneled) {
     this.id = city.id;
     this.update(city);
+    this.citySimple = game.citiesMap.get(city.id)!;
   }
 
   private update(city: CityDetailsChanneled) {
@@ -136,6 +140,27 @@ export class CityDetails {
 
   optimizeYields() {}
 
+  async workTile(tile: Tile) {
+    const cityData = await makeCommand<CityDetailsChanneled>("city.workTile", {
+      cityId: this.id,
+      tileId: tile.id,
+    });
+
+    this.update(cityData);
+  }
+
+  async unworkTile(tile: Tile) {
+    const cityData = await makeCommand<CityDetailsChanneled>(
+      "city.unworkTile",
+      {
+        cityId: this.id,
+        tileId: tile.id,
+      },
+    );
+
+    this.update(cityData);
+  }
+
   async produceBuilding(building: Building) {
     const cityData = await makeCommand<CityDetailsChanneled>("city.produce", {
       cityId: this.id,
@@ -161,5 +186,15 @@ export class CityDetails {
       productId: idleProduct.id,
     });
     this.update(cityData);
+  }
+
+  getNotWorkedTiles() {
+    const notWorkedTiles: Tile[] = [];
+    for (const tile of this.tiles) {
+      if (!this.workedTiles.has(tile)) {
+        notWorkedTiles.push(tile);
+      }
+    }
+    return notWorkedTiles;
   }
 }

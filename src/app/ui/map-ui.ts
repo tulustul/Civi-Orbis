@@ -193,7 +193,6 @@ export class MapUi {
   selectCity(city: City | null) {
     if (!city) {
       this.uiState.selectedCity$.next(null);
-      this.cityRangeArea.clear();
       this._cityLabelsVisible$.next(true);
       this.allowMapPanning = true;
       return;
@@ -233,6 +232,7 @@ export class MapUi {
     this.cityNotWorkedTilesArea.clear();
     this.cityBordersOnlyArea.clear();
     this.cityRangeArea.clear();
+    this.hoveredCity = null;
   }
 
   async selectUnit(unit: Unit | null) {
@@ -271,5 +271,8 @@ export class MapUi {
     this.editorArea.clear();
     this.cityRangeArea.clear();
     this.unitRangeArea.clear();
+    this.cityBordersOnlyArea.clear();
+    this.cityWorkedTilesArea.clear();
+    this.cityNotWorkedTilesArea.clear();
   }
 }

@@ -13,6 +13,8 @@
     border: 1px solid black;
     background-color: rgba(0, 0, 0, 0.3);
     transform-origin: top;
+    z-index: -1;
+    will-change: transform;
     &.worked {
       background-color: green;
     }
