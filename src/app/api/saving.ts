@@ -88,7 +88,6 @@ async function readFile(file: File): Promise<string> {
 }
 
 function storeData(saveName: string, data: string) {
-  // TODO we might compress the save
   localStorage.setItem(`${savesKeyPrefix}${saveName}`, data);
   const saveGames = listSaveGames();
   if (!saveGames.includes(saveName)) {

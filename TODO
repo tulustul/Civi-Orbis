@@ -12,7 +12,7 @@ Bugs:
   ☐ webgl fonts scaling
   ✔ webworker: setting work tiles @done(20-05-24 14:50)
   ✔ webworker: highlighting city tiles @done(20-05-24 12:58)
-  ☐ webworker: building improvements
+  ✔ webworker: building improvements @done(20-05-24 19:21)
   ✔ webworker: optimizing yields @done(20-05-24 15:00)
   ✔ webworker: blocking next turn till no actions remained @done(20-05-24 15:56)
 

@@ -124,10 +124,13 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
     );
   }
 
+  game.start();
+
   return gameToChannel(game);
 }
 
 function saveDumpHandler(): string {
+  // TODO we might compress the save
   return JSON.stringify(dumpGame(game));
 }
 
