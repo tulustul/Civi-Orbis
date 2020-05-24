@@ -46,6 +46,7 @@ const HANDLERS = {
   "city.getDetails": getCityDetails,
   "city.produce": cityProduce,
   "city.getRange": cityGetRange,
+  "city.getWorkTiles": cityGetWorkTiles,
 
   "area.getTiles": getAreaTiles,
 };
@@ -257,6 +258,19 @@ export function cityGetRange(cityId: number) {
   }
 
   return Array.from(city.tiles).map((tile) => tile.id);
+}
+
+export function cityGetWorkTiles(cityId: number) {
+  const city = game.citiesManager.citiesMap.get(cityId);
+
+  if (!city) {
+    return {};
+  }
+
+  return {
+    workedTiles: Array.from(city.workedTiles).map((tile) => tile.id),
+    notWorkedTiles: Array.from(city.notWorkedTiles).map((tile) => tile.id),
+  };
 }
 
 export function getAreaTiles(areaId: number): number[] {

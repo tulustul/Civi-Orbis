@@ -55,4 +55,20 @@ export class City {
     const ids = await makeCommand<number[]>("city.getRange", this.id);
     return ids.map((id) => this.game.map.tilesMap.get(id)!);
   }
+
+  async getWorkTiles() {
+    const data = await makeCommand<{
+      workedTiles: number[];
+      notWorkedTiles: number[];
+    }>("city.getWorkTiles", this.id);
+
+    return {
+      workedTiles: data.workedTiles.map(
+        (id) => this.game.map.tilesMap.get(id)!,
+      ),
+      notWorkedTiles: data.notWorkedTiles.map(
+        (id) => this.game.map.tilesMap.get(id)!,
+      ),
+    };
+  }
 }

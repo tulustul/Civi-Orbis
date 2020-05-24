@@ -152,7 +152,7 @@ export class Area {
 
   drawer: AreaDrawer;
 
-  constructor(state: GameState, options: AreaOptions) {
+  constructor(state: GameState, private options: AreaOptions) {
     this.drawer = new AreaDrawer(this, state, options);
   }
 
@@ -164,11 +164,15 @@ export class Area {
     this.clear();
     this.tiles = new Set(tiles);
     this.computeAllBorders();
+
     for (const [tile, borders] of this.borders) {
       this.drawer.drawTileBorders(tile, borders);
     }
-    for (const tile of this.tiles) {
-      this.drawer.drawTileBackground(tile);
+
+    if (this.options.backgroundOpacity > 0) {
+      for (const tile of this.tiles) {
+        this.drawer.drawTileBackground(tile);
+      }
     }
   }
 

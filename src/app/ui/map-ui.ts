@@ -43,9 +43,14 @@ export class MapUi {
 
   allowMapPanning = true;
 
+  hoveredCity: City | null;
+
   unitRangeArea: Area;
 
   cityRangeArea: Area;
+  cityBordersOnlyArea: Area;
+  cityWorkedTilesArea: Area;
+  cityNotWorkedTilesArea: Area;
 
   editorArea: Area;
 
@@ -69,13 +74,9 @@ export class MapUi {
     this.hoveredTile$.subscribe((tile) => {
       if (!this.uiState.selectedCity$.value) {
         if (tile?.city) {
-          tile.city.getRange().then((tiles) => {
-            this.cityRangeArea.setTiles(tiles);
-          });
-        } else {
-          if (this.cityRangeArea) {
-            this.cityRangeArea.clear();
-          }
+          this.hoverCity(tile.city);
+        } else if (this.hoveredCity) {
+          this.unhoverCity();
         }
       }
     });
@@ -115,6 +116,36 @@ export class MapUi {
         borderShadow: 0.3,
         borderSize: 0.1,
         borderShadowStrength: 1.2,
+        visibleOnWater: false,
+      });
+
+      this.cityBordersOnlyArea = new Area(this.game.state!, {
+        color: 0xffffff,
+        container: areasContainer,
+        backgroundOpacity: 0,
+        borderShadow: 0.3,
+        borderSize: 0.1,
+        borderShadowStrength: 1.2,
+        visibleOnWater: false,
+      });
+
+      this.cityWorkedTilesArea = new Area(this.game.state!, {
+        color: 0xffa001,
+        container: areasContainer,
+        backgroundOpacity: 0.2,
+        borderShadow: 0.8,
+        borderSize: 0,
+        borderShadowStrength: 1,
+        visibleOnWater: true,
+      });
+
+      this.cityNotWorkedTilesArea = new Area(this.game.state!, {
+        color: 0xffffff,
+        container: areasContainer,
+        backgroundOpacity: 0.2,
+        borderShadow: 0.3,
+        borderSize: 0,
+        borderShadowStrength: 1.5,
         visibleOnWater: false,
       });
 
@@ -177,6 +208,31 @@ export class MapUi {
         this.allowMapPanning = false;
       });
     }
+  }
+
+  hoverCity(city: City) {
+    this.hoveredCity = city;
+
+    if (city.player.id === this.game.state?.trackedPlayer.id) {
+      city.getWorkTiles().then((data) => {
+        this.cityWorkedTilesArea.setTiles(data.workedTiles);
+        this.cityNotWorkedTilesArea.setTiles(data.notWorkedTiles);
+        this.cityBordersOnlyArea.setTiles(
+          data.notWorkedTiles.concat(data.workedTiles),
+        );
+      });
+    } else {
+      city.getRange().then((tiles) => {
+        this.cityRangeArea.setTiles(tiles);
+      });
+    }
+  }
+
+  unhoverCity() {
+    this.cityWorkedTilesArea.clear();
+    this.cityNotWorkedTilesArea.clear();
+    this.cityBordersOnlyArea.clear();
+    this.cityRangeArea.clear();
   }
 
   async selectUnit(unit: Unit | null) {
