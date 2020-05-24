@@ -51,6 +51,7 @@ import { Camera } from "./renderer/camera";
 import { PlayersEditorComponent } from './ui/editor/players-editor/players-editor.component';
 import { SpinnerComponent } from './ui/widgets/spinner/spinner.component';
 import { ModalComponent } from './ui/widgets/modal/modal.component';
+import { UnitMarkerComponent } from './ui/unit-marker/unit-marker.component';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,7 @@ import { ModalComponent } from './ui/widgets/modal/modal.component';
     PlayersEditorComponent,
     SpinnerComponent,
     ModalComponent,
+    UnitMarkerComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [

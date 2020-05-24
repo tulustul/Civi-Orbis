@@ -57,7 +57,7 @@ export class UnitDetails {
   }
 
   disband() {
-    makeCommand("unit.disband", this.id);
+    return makeCommand("unit.disband", this.id);
   }
 
   async findPath(destination: Tile) {

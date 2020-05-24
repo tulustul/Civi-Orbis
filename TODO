@@ -39,7 +39,7 @@ Minor features:
   ☐ city production queue
   ☐ previous/next city button in city view
   ☐ cities overview panel
-  ☐ nicer borders
+  ✔ nicer borders @done(20-05-24 22:34)
 
 Major features:
   ✔ implement `city work on` (how to call it properly?). @done(20-05-07 22:31)

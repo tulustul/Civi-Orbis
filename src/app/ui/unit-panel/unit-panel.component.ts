@@ -15,6 +15,8 @@ import { MapUi } from "../map-ui";
 import { UnitDetails } from "src/app/api/unit-details";
 import { UnitOrder } from "src/app/core/unit";
 import { GameApi } from "src/app/api";
+import { Camera } from "src/app/renderer/camera";
+import { DomSanitizer } from "@angular/platform-browser";
 
 @Component({
   selector: "app-unit-panel",

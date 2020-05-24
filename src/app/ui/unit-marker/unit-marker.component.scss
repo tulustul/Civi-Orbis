@@ -1,0 +1,28 @@
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+:host {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  transform-origin: top left;
+  will-change: transform;
+  .inner {
+    width: 180px;
+    height: 180px;
+    margin-top: 24px;
+    margin-left: 24px;
+    border-radius: 50%;
+    border: 15px solid;
+    border-color: rgba(255, 255, 255, 0.8) transparent;
+    animation: spin 3s linear infinite;
+  }
+}
