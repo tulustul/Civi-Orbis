@@ -56,7 +56,7 @@ export class PlayerCore {
 
   yieldsTotal: Yields = { ...EMPTY_YIELDS };
 
-  area = this.game.areasManager.make(this.color);
+  area = this.game.areasManager.make();
 
   ai: AIPlayer | null = null;
 

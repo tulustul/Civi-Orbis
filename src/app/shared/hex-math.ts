@@ -1,6 +1,5 @@
-import { Tile, TileDirection } from "../shared";
+import { TileDirection } from "../shared";
 import { BaseTile } from "./tile.interface";
-import { TileCore } from "../core/tile";
 
 export function getTileFullNeighbours<T extends BaseTile>(
   tiles: T[][],
@@ -76,11 +75,10 @@ export function getTileInDirection<T extends BaseTile>(
   return null;
 }
 
-export function getDistance(start: Tile, end: Tile): number {
-  return 0;
-}
-
-export function getDirectionTo(fromtile: Tile, toTile: Tile): TileDirection {
+export function getDirectionTo(
+  fromtile: BaseTile,
+  toTile: BaseTile,
+): TileDirection {
   if (
     toTile.x === fromtile.x - (fromtile.y % 2 ? 0 : 1) &&
     toTile.y === fromtile.y - 1
@@ -114,15 +112,13 @@ export function getDirectionTo(fromtile: Tile, toTile: Tile): TileDirection {
   return TileDirection.NONE;
 }
 
-export function getTilesInRange(
-  tile: Tile | TileCore,
-  range: number,
-): Set<Tile | TileCore> {
-  const result = new Set<Tile | TileCore>([tile]);
+export function getTilesInRange(tile: BaseTile, range: number): Set<BaseTile> {
+  const result = new Set<BaseTile>([tile]);
   for (let i = 0; i < range; i++) {
-    let neighbours = new Set<Tile | TileCore>();
+    let neighbours = new Set<BaseTile>();
     for (const tile of result) {
-      for (const neighbour of tile.neighbours) {
+      for (const neighbour of (tile as any).neighbours) {
+        // TODO fix typing
         neighbours.add(neighbour);
       }
     }

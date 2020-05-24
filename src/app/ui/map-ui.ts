@@ -5,13 +5,13 @@ import { distinctUntilChanged } from "rxjs/operators";
 7;
 import { UIState } from "./ui-state";
 import { Camera } from "../renderer/camera";
-import { Tile } from "../shared";
 import { City } from "../api/city";
 import { Unit } from "../api/unit";
 import { GameApi } from "../api";
 import { UnitDetails } from "../api/unit-details";
 import { CityDetails } from "../api/city-details";
-import { Area } from "../api/area";
+import { Area } from "../renderer/area";
+import { Tile } from "../api/tile.interface";
 
 @Injectable()
 export class MapUi {
@@ -43,9 +43,11 @@ export class MapUi {
 
   allowMapPanning = true;
 
-  unitRangeArea = new Area(0xffffff);
+  unitRangeArea: Area;
 
-  cityRangeArea = new Area(0xffffff);
+  cityRangeArea: Area;
+
+  editorArea: Area;
 
   constructor(
     private game: GameApi,
@@ -68,10 +70,12 @@ export class MapUi {
       if (!this.uiState.selectedCity$.value) {
         if (tile?.city) {
           tile.city.getRange().then((tiles) => {
-            this.cityRangeArea.addTiles(tiles);
+            this.cityRangeArea.setTiles(tiles);
           });
         } else {
-          this.cityRangeArea.clear();
+          if (this.cityRangeArea) {
+            this.cityRangeArea.clear();
+          }
         }
       }
     });
@@ -88,13 +92,43 @@ export class MapUi {
       }
       this.setPath(null);
     });
+
     this.game.init$.subscribe(() => {
       this.game.state!.turn$.subscribe(() => this.setPath(null));
-      setTimeout(() => {
-        this.game.state!.addArea(this.unitRangeArea);
-        this.game.state!.addArea(this.cityRangeArea);
+
+      const areasContainer = this.camera["renderer"].mapDrawer.areasContainer;
+
+      this.unitRangeArea = new Area(this.game.state!, {
+        color: 0xffffff,
+        container: areasContainer,
+        backgroundOpacity: 0.15,
+        borderShadow: 0.4,
+        borderSize: 0.0,
+        borderShadowStrength: 2,
+        visibleOnWater: true,
+      });
+
+      this.cityRangeArea = new Area(this.game.state!, {
+        color: 0xffffff,
+        container: areasContainer,
+        backgroundOpacity: 0.2,
+        borderShadow: 0.3,
+        borderSize: 0.1,
+        borderShadowStrength: 1.2,
+        visibleOnWater: false,
+      });
+
+      this.editorArea = new Area(this.game.state!, {
+        color: 0xffffff,
+        container: areasContainer,
+        backgroundOpacity: 0.25,
+        borderShadow: 0.5,
+        borderSize: 0.05,
+        borderShadowStrength: 1,
+        visibleOnWater: true,
       });
     });
+
     this.game.stop$.subscribe(() => this.clear());
   }
 
@@ -139,7 +173,7 @@ export class MapUi {
         const cityDetails = new CityDetails(this.game.state!, data);
         this.uiState.selectedCity$.next(cityDetails);
         this._cityLabelsVisible$.next(false);
-        this.cityRangeArea.addTiles(Array.from(cityDetails.tiles));
+        this.cityRangeArea.setTiles(Array.from(cityDetails.tiles));
         this.allowMapPanning = false;
       });
     }
@@ -159,7 +193,7 @@ export class MapUi {
         this._selectedUnit$.next(unitDetails);
         unitDetails
           .getRange()
-          .then((tiles) => this.unitRangeArea.addTiles(tiles));
+          .then((tiles) => this.unitRangeArea.setTiles(tiles));
       } else {
         this._selectedUnit$.next(null);
         this.unitRangeArea.clear();
@@ -177,5 +211,9 @@ export class MapUi {
     this._hoveredTile$.next(null);
     this._selectedTile$.next(null);
     this._highlightedTiles$.next(new Set());
+
+    this.editorArea.clear();
+    this.cityRangeArea.clear();
+    this.unitRangeArea.clear();
   }
 }

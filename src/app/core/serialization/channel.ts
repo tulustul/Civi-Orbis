@@ -1,4 +1,3 @@
-import { AreaCore } from "../area";
 import { Yields } from "../yields";
 import { ProductType, CityCore } from "../city";
 import { Game } from "../game";
@@ -15,7 +14,6 @@ export interface GameChanneled {
   trackedPlayer: TrackedPlayerChanneled;
   units: UnitChanneled[];
   cities: CityChanneled[];
-  areas: AreaDetailsChanneled[];
 }
 
 export interface MapChanneled {
@@ -28,19 +26,6 @@ export interface TileChanneled extends BaseTile {
   areaOf: number | null;
   cityId: number | null;
   unitsIds: number[];
-}
-
-export interface AreaDetailsChanneled {
-  id: number;
-  tiles: number[];
-  backgroundOpacity: number;
-  color: number;
-}
-
-export interface AreaChanneled {
-  id: number;
-  backgroundOpacity: number;
-  color: number;
 }
 
 export interface CityChanneled {
@@ -148,7 +133,6 @@ export function gameToChannel(game: Game): GameChanneled {
     trackedPlayer: trackedPlayerToChannel(game.trackedPlayer),
     units: game.unitsManager.units.map((u) => unitToChannel(u)),
     cities: game.citiesManager.cities.map((c) => cityToChannel(c)),
-    areas: game.areasManager.areas.map((a) => areaDetailsToChannel(a)),
   };
 }
 
@@ -247,23 +231,6 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
     totalCulture: city.totalCulture,
     workedTiles: Array.from(city.workedTiles).map((t) => t.id),
     yields: city.yields,
-  };
-}
-
-export function areaDetailsToChannel(area: AreaCore): AreaDetailsChanneled {
-  return {
-    id: area.id,
-    tiles: Array.from(area.tiles).map((t) => t.id),
-    color: area.color,
-    backgroundOpacity: area.backgroundOpacity,
-  };
-}
-
-export function areaToChannel(area: AreaCore): AreaChanneled {
-  return {
-    id: area.id,
-    color: area.color,
-    backgroundOpacity: area.backgroundOpacity,
   };
 }
 

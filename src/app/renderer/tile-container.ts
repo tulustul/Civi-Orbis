@@ -1,8 +1,8 @@
 import * as PIXIE from "pixi.js";
 
 import { BoundingBox } from "./camera";
-import { Tile } from "../shared";
 import { TilesMap } from "../api/map";
+import { Tile } from "../api/tile.interface";
 
 export class TileWrapperContainer extends PIXIE.Container {
   tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();

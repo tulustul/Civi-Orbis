@@ -2,7 +2,7 @@ import * as PIXIE from "pixi.js";
 
 import { drawClosedHex, getTileCoords, drawHex } from "./utils";
 import { MapUi } from "../ui/map-ui";
-import { Tile } from "../shared";
+import { Tile } from "../api/tile.interface";
 
 export class OverlaysRenderer {
   container = new PIXIE.Container();

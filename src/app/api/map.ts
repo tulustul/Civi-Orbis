@@ -1,7 +1,7 @@
-import { Tile } from "../shared";
 import { getTileNeighbours, getTileFullNeighbours } from "../shared/hex-math";
 import { MapChanneled } from "../core/serialization/channel";
 import { GameState } from "./state";
+import { Tile } from "./tile.interface";
 
 export class TilesMap {
   width = 0;

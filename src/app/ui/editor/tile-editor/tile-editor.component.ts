@@ -18,7 +18,6 @@ import { MapUi } from "../../map-ui";
 import { TileImprovement, TileRoad } from "src/app/core/tile-improvements";
 import {
   TileDirection,
-  Tile,
   isForestable,
   areWetlandsPossible,
   isImprovementPossible,
@@ -26,6 +25,7 @@ import {
 } from "src/app/shared";
 import { GameApi } from "src/app/api";
 import { getDirectionTo } from "src/app/shared/hex-math";
+import { Tile } from "src/app/api/tile.interface";
 
 @Component({
   selector: "app-tile-editor",

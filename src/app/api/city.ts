@@ -1,8 +1,8 @@
-import { Tile } from "../shared";
 import { GameState } from "./state";
 import { Player } from "./player";
 import { CityChanneled } from "../core/serialization/channel";
 import { makeCommand } from "./internal/commander";
+import { Tile } from "./tile.interface";
 
 export class City {
   id: number;

@@ -1,19 +1,20 @@
 import * as PIXIE from "pixi.js";
 
+import { takeUntil } from "rxjs/operators";
+
 import { TileWrapperContainer, TileContainer } from "./tile-container";
 import { TerrainDrawer } from "./tile/terrain";
 import { UnitsDrawer } from "./tile/unit";
 import { YiedsDrawer } from "./tile/yields";
 import { RiverDrawer } from "./tile/river";
 import { CityDrawer } from "./tile/city";
-import { AreasDrawer } from "./tile/area";
 import { GameRenderer } from "./renderer";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
 import { GameState } from "../api/state";
-import { Tile } from "../shared";
-import { takeUntil } from "rxjs/operators";
 import { TrackedPlayer } from "../api/tracked-player";
+import { PoliticsDrawer } from "./politics";
+import { Tile } from "../api/tile.interface";
 
 export class MapDrawer {
   container = new TileWrapperContainer();
@@ -32,8 +33,6 @@ export class MapDrawer {
 
   areasContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  politicsContainer = new TileContainer(this.camera.tileBoundingBox);
-
   overlaysContainer = new PIXIE.Container();
 
   terrainDrawer: TerrainDrawer;
@@ -46,7 +45,7 @@ export class MapDrawer {
 
   cityDrawer: CityDrawer;
 
-  areaDrawer: AreasDrawer;
+  politicsDrawer: PoliticsDrawer;
 
   constructor(
     private game: GameApi,
@@ -61,7 +60,6 @@ export class MapDrawer {
     this.container.addChild(this.unitsContainer);
     this.container.addChild(this.overlaysContainer);
     this.container.addChild(this.areasContainer);
-    this.container.addChild(this.politicsContainer);
 
     this.game.init$.subscribe((state) => {
       state.trackedPlayer$
@@ -107,12 +105,6 @@ export class MapDrawer {
       this.renderer,
       this.cityContainer,
     );
-
-    this.areaDrawer = new AreasDrawer(
-      this.game,
-      this.areasContainer,
-      this.politicsContainer,
-    );
   }
 
   hideAllTiles() {
@@ -141,11 +133,12 @@ export class MapDrawer {
       this.cityDrawer.clear();
       this.unitsDrawer.clear();
       this.yieldsDrawer.clear();
-      this.areaDrawer.clear();
+      this.politicsDrawer.clear();
     }
   }
 
   private build(gameState: GameState) {
+    this.politicsDrawer = new PoliticsDrawer(gameState, this.renderer);
     this.container.bindToMap(gameState.map);
 
     this.waterContainer.bindToMap(gameState.map);
@@ -155,11 +148,9 @@ export class MapDrawer {
     this.riverContainer.bindToMap(gameState.map);
     this.unitsContainer.bindToMap(gameState.map);
     this.areasContainer.bindToMap(gameState.map);
-    this.politicsContainer.bindToMap(gameState.map);
 
     this.unitsDrawer.build();
     this.cityDrawer.build();
-    this.areaDrawer.build();
 
     for (let y = 0; y < gameState.map.height; y++) {
       for (let x = 0; x < gameState.map.width; x++) {

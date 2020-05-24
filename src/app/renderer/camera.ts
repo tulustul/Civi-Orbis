@@ -1,13 +1,13 @@
 import { Injectable } from "@angular/core";
 
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 
 import { getTileCoords } from "./utils";
 import { AnimationEaseOutCubic, Animation } from "./animation";
 import { GameRenderer } from "./renderer";
 import { TILE_SIZE } from "./constants";
 import { GameApi } from "../api";
-import { Tile } from "../shared";
+import { Tile } from "../api/tile.interface";
 
 export interface Transform {
   x: number;

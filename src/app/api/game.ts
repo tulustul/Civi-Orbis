@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from "rxjs";
-import { filter } from "rxjs/operators";
+import { filter, skip } from "rxjs/operators";
 
 import { MapGeneratorOptions } from "./game.interface";
 import { makeCommand } from "./internal/commander";
@@ -12,7 +12,10 @@ export class GameApi {
 
   init$ = this.state$.pipe(filter((state) => !!state)) as Observable<GameState>;
 
-  stop$ = this.state$.pipe(filter((state) => !state));
+  stop$ = this.state$.pipe(
+    filter((state) => !state),
+    skip(1),
+  );
 
   async newGame(mapGeneratorOptions: MapGeneratorOptions): Promise<GameState> {
     if (this.state) {

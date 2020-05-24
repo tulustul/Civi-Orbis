@@ -4,7 +4,7 @@ import { getTileCenter } from "./utils";
 import { MapUi } from "../ui/map-ui";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
-import { Tile } from "../shared";
+import { Tile } from "../api/tile.interface";
 
 export class PathRenderer {
   container = new PIXIE.Container();

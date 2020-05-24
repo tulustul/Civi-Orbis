@@ -1,9 +1,9 @@
-import { Tile } from "../shared";
 import { UnitDefinition } from "../core/unit.interface";
 import { GameState } from "./state";
 import { UNITS_MAP } from "../core/unit";
 import { Player } from "./player";
 import { UnitChanneled } from "../core/serialization/channel";
+import { Tile } from "./tile.interface";
 
 export class Unit {
   id: number;

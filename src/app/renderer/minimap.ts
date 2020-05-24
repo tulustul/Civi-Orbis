@@ -1,14 +1,14 @@
 import * as PIXIE from "pixi.js";
 
-import { Subject, merge } from "rxjs";
+import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
 import { Transform, Camera } from "../renderer/camera";
 import { drawHex } from "./utils";
 import { GameRenderer } from "./renderer";
-import { SeaLevel, Climate, TileDirection, Tile } from "../shared";
+import { SeaLevel, Climate, TileDirection } from "../shared";
 import { GameApi } from "../api";
-import { Area } from "../api/area";
+import { Tile } from "../api/tile.interface";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,

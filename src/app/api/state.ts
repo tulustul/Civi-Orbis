@@ -4,8 +4,8 @@ import { City } from "./city";
 import { TrackedPlayer } from "./tracked-player";
 import { makeCommand } from "./internal/commander";
 import { Subject, BehaviorSubject } from "rxjs";
-import { Area } from "./area";
-import { Tile, BaseTile } from "../shared";
+import { Area } from "../renderer/area";
+import { BaseTile } from "../shared";
 import { Player } from "./player";
 import {
   GameChanneled,
@@ -13,6 +13,7 @@ import {
   UnitDetailsChanneled,
   CityDetailsChanneled,
 } from "../core/serialization/channel";
+import { Tile } from "./tile.interface";
 
 export class GameState {
   private _turn$ = new BehaviorSubject<number>(0);
@@ -23,7 +24,6 @@ export class GameState {
   trackedPlayer: TrackedPlayer;
   units: Unit[] = [];
   cities: City[] = [];
-  areas: Area[] = [];
 
   unitsMap = new Map<number, Unit>();
   citiesMap = new Map<number, City>();
@@ -82,12 +82,10 @@ export class GameState {
     this.trackedPlayer = new TrackedPlayer(this, game.trackedPlayer);
 
     this.map.preprocess(this);
-
-    this.areas = this.restoreAreas(game);
   }
 
   private restorePlayers(game: GameChanneled): Player[] {
-    return game.players.map((player) => new Player(this, player));
+    return game.players.map((player) => new Player(player));
   }
 
   private restoreUnits(game: GameChanneled): Unit[] {
@@ -96,10 +94,6 @@ export class GameState {
 
   private restoreCities(game: GameChanneled): City[] {
     return game.cities.map((city) => new City(this, city));
-  }
-
-  private restoreAreas(game: GameChanneled): Area[] {
-    return game.areas.map((area) => Area.fromDetailsChanneled(this, area));
   }
 
   async setTrackedPlayer(playerId: number) {
@@ -142,7 +136,8 @@ export class GameState {
     return makeCommand<CityDetailsChanneled>("city.getDetails", cityId);
   }
 
-  addArea(area: Area) {
-    this._areaSpawned$.next(area);
+  async getAreaTiles(areaId: number) {
+    const tileIds = await makeCommand<number[]>("area.getTiles", areaId);
+    return tileIds.map((id) => this.map.tilesMap.get(id)!);
   }
 }

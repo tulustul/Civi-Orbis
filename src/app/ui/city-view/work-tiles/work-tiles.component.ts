@@ -13,8 +13,8 @@ import { Subject } from "rxjs";
 
 import { MapUi } from "../../map-ui";
 import { Camera } from "src/app/renderer/camera";
-import { Tile } from "src/app/shared";
 import { CityDetails } from "src/app/api/city-details";
+import { Tile } from "src/app/api/tile.interface";
 
 @Component({
   selector: "app-work-tiles",

@@ -18,13 +18,13 @@ import {
   Climate,
   LandForm,
   SeaLevel,
-  Tile,
   isForestable,
   areWetlandsPossible,
   isImprovementPossible,
 } from "src/app/shared";
 import { GameApi } from "src/app/api";
 import { getTilesInRange } from "src/app/shared/hex-math";
+import { Tile } from "src/app/api/tile.interface";
 
 const IGNORE_OPTION: Option = { label: "ignore", value: undefined };
 
@@ -95,17 +95,18 @@ export class TilePaintingComponent implements OnInit {
       this.mapUi.hoveredTile$.pipe(takeUntil(hidden)).subscribe((tile) => {
         if (tile) {
           const tiles = getTilesInRange(tile, this.paintData.size - 1);
-          this.mapUi.highlightTiles(tiles as Set<Tile>);
+          this.mapUi.editorArea.clear();
+          this.mapUi.editorArea.addTiles(Array.from(tiles as Set<Tile>));
           if (this.controls.mouseButton === 0) {
             this.paint();
           }
         } else {
-          this.mapUi.highlightTiles(null);
+          this.mapUi.editorArea.clear();
         }
       });
     });
 
-    hidden.subscribe(() => this.mapUi.highlightTiles(null));
+    hidden.subscribe(() => this.mapUi.editorArea.clear());
   }
 
   private paint() {

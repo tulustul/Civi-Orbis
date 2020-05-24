@@ -1,14 +1,12 @@
 import { TileCore } from "./tile";
 import { UnitCore } from "./unit";
 import { CityCore } from "./city";
-import { AreaCore } from "./area";
 import { PlayerCore } from "./player";
 import {
   tileToChannel,
   unitToChannel,
   cityToChannel,
   trackedPlayerToChannel,
-  areaToChannel,
 } from "./serialization/channel";
 
 class Collector {
@@ -20,8 +18,6 @@ class Collector {
   cities = new Set<CityCore>();
   citiesDestroyed = new Set<number>();
 
-  areas = new Set<AreaCore>();
-  areasDestroyed = new Set<number>();
   areaTilesAdded = new Map<number, TileCore[]>();
   areaTilesRemoved = new Map<number, TileCore[]>();
 
@@ -54,12 +50,6 @@ class Collector {
       });
     }
 
-    for (const area of this.areas) {
-      changes.push({ type: "area.updated", data: areaToChannel(area) });
-    }
-    for (const id of this.areasDestroyed) {
-      changes.push({ type: "area.destroyed", data: id });
-    }
     for (const [id, tiles] of this.areaTilesAdded.entries()) {
       changes.push({
         type: "area.tilesAdded",
@@ -98,8 +88,6 @@ class Collector {
     this.cities.clear();
     this.citiesDestroyed.clear();
 
-    this.areas.clear();
-    this.areasDestroyed.clear();
     this.areaTilesAdded.clear();
     this.areaTilesRemoved.clear();
 

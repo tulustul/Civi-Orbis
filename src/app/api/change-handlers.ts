@@ -1,17 +1,15 @@
 import { Unit } from "./unit";
 import { City } from "./city";
-import { Area } from "./area";
 import { TrackedPlayer } from "./tracked-player";
 import { setChangesHandlers } from "./internal/changes";
 import { GameState } from "./state";
 import {
   UnitChanneled,
   CityChanneled,
-  AreaDetailsChanneled,
   TrackedPlayerChanneled,
   TileChanneled,
 } from "../core/serialization/channel";
-import { Tile } from "../shared";
+import { Tile } from "./tile.interface";
 
 const HANDLERS = {
   "tiles.updated": onTilesUpdate,
@@ -23,7 +21,7 @@ const HANDLERS = {
 
   "game.turn": onTurn,
 
-  "area.updated": onAreaUpdate,
+  // "area.updated": onAreaUpdate,
   "area.destroyed": onAreaDestroyed,
   "area.tilesAdded": onAreaTilesAdded,
   "area.tilesRemoved": onAreaTilesRemoved,
@@ -72,16 +70,16 @@ function onTurn(state: GameState, turn: number) {
   state["_turn$"].next(turn);
 }
 
-function onAreaUpdate(state: GameState, areaChanneled: AreaDetailsChanneled) {
-  const area = state.areasMap.get(areaChanneled.id);
-  if (area) {
-    // TODO is update needed?
-  } else {
-    const newArea = Area.fromDetailsChanneled(state, areaChanneled);
-    state.areas.push(newArea);
-    state["_areaSpawned$"].next(newArea);
-  }
-}
+// function onAreaUpdate(state: GameState, areaChanneled: AreaDetailsChanneled) {
+//   const area = state.areasMap.get(areaChanneled.id);
+//   if (area) {
+//     // TODO is update needed?
+//   } else {
+//     const newArea = Area.fromDetailsChanneled(state, areaChanneled);
+//     state.areas.push(newArea);
+//     state["_areaSpawned$"].next(newArea);
+//   }
+// }
 
 function onAreaDestroyed(state: GameState, turn: number) {
   state["_turn$"].next(turn);

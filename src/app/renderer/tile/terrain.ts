@@ -7,9 +7,9 @@ import {
 import { TileContainer } from "../tile-container";
 import { GameRenderer } from "../renderer";
 import { TileImprovement } from "src/app/core/tile-improvements";
-import { SeaLevel, Climate, LandForm, Tile } from "src/app/shared";
-import { GameState } from "src/app/api/state";
+import { SeaLevel, Climate, LandForm } from "src/app/shared";
 import { GameApi } from "src/app/api";
+import { Tile } from "src/app/api/tile.interface";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),

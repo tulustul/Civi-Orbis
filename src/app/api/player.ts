@@ -1,6 +1,4 @@
 import { PlayerChanneled } from "../core/serialization/channel";
-import { Area } from "./area";
-import { GameState } from "./state";
 
 export class Player {
   id: number;
@@ -8,9 +6,9 @@ export class Player {
   cssColor: string;
   vec4Color: number[];
 
-  area: Area;
+  areaId: number;
 
-  constructor(game: GameState, player: PlayerChanneled) {
+  constructor(player: PlayerChanneled) {
     this.id = player.id;
     this.color = player.color;
     this.cssColor = "#" + this.color.toString(16).padStart(6, "0");
@@ -21,6 +19,6 @@ export class Player {
       1,
     ];
 
-    this.area = game.areasMap.get(player.areaId)!;
+    this.areaId = player.areaId;
   }
 }

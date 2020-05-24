@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 
 import { TILE_SIZE } from "./constants";
-import { Tile } from "../shared";
+import { Tile } from "../api/tile.interface";
 
 // prettier-ignore
 export const HEX_GEOMETRY = new PIXI.Geometry().addAttribute("aVertexPosition", [

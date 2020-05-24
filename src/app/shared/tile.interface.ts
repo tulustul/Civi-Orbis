@@ -1,7 +1,5 @@
 import { TileImprovement, TileRoad } from "../core/tile-improvements";
 import { Yields } from "../core/yields";
-import { City } from "../api/city";
-import { Unit } from "../api/unit";
 
 export enum TileDirection {
   NW,
@@ -51,16 +49,6 @@ export interface BaseTile {
   road: TileRoad | null;
 
   yields: Yields;
-}
-
-export interface Tile extends BaseTile {
-  areaOf: City | null;
-
-  neighbours: Tile[];
-  fullNeighbours: (Tile | null)[]; // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
-
-  city: City | null;
-  units: Unit[];
 }
 
 export const FORESTABLE_CLIMATES = new Set<Climate>([

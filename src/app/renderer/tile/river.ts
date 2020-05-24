@@ -1,9 +1,9 @@
 import * as PIXIE from "pixi.js";
 
 import { TileContainer } from "../tile-container";
-import { takeUntil } from "rxjs/operators";
-import { TileDirection, Tile } from "src/app/shared";
+import { TileDirection } from "src/app/shared";
 import { GameApi } from "src/app/api";
+import { Tile } from "src/app/api/tile.interface";
 
 export class RiverDrawer {
   constructor(game: GameApi, private container: TileContainer) {

@@ -46,7 +46,6 @@ export class CityViewComponent implements OnInit {
       this.city.tile.y,
     );
     this.camera.scaleToWithEasing(130, x, y);
-    this.mapUi.highlightTiles(this.city.tiles);
 
     this.mapUi.clickedTile$.pipe(takeUntil(this.quit$)).subscribe((tile) => {
       if (!this.city.tiles.has(tile)) {

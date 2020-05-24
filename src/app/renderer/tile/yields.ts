@@ -2,7 +2,7 @@ import * as PIXIE from "pixi.js";
 
 import { TileContainer } from "../tile-container";
 import { MapUi } from "src/app/ui/map-ui";
-import { Tile } from "src/app/shared";
+import { Tile } from "src/app/api/tile.interface";
 
 export class YiedsDrawer {
   constructor(private mapUi: MapUi, private container: TileContainer) {

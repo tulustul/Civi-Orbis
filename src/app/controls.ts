@@ -66,8 +66,7 @@ export class Controls {
           this.mapUi.setPath(selectedUnit.path);
           // to refresh the ui
           this.mapUi["_selectedUnit$"].next(selectedUnit);
-          this.mapUi.unitRangeArea.clear();
-          this.mapUi.unitRangeArea.addTiles(await selectedUnit.getRange());
+          this.mapUi.unitRangeArea.setTiles(await selectedUnit.getRange());
         });
       }
     }
