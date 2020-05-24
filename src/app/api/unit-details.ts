@@ -88,4 +88,12 @@ export class UnitDetails {
       action,
     });
   }
+
+  async refresh() {
+    const data = await makeCommand<UnitDetailsChanneled>(
+      "unit.getDetails",
+      this.id,
+    );
+    this.update(data);
+  }
 }

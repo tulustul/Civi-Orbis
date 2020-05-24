@@ -14,6 +14,7 @@ import { UnitAction, ACTIONS } from "src/app/core/unit-actions";
 import { MapUi } from "../map-ui";
 import { UnitDetails } from "src/app/api/unit-details";
 import { UnitOrder } from "src/app/core/unit";
+import { GameApi } from "src/app/api";
 
 @Component({
   selector: "app-unit-panel",
@@ -28,19 +29,34 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
 
   private ngUnsubscribe = new Subject<void>();
 
-  constructor(private cdr: ChangeDetectorRef, private mapUi: MapUi) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private game: GameApi,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
     this.mapUi.selectedUnit$
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(async (unit) => {
+      .subscribe((unit) => {
         this.unit = unit;
         this.cdr.markForCheck();
+      });
+
+    this.game
+      .state!.turn$.pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(async () => {
+        if (this.unit) {
+          await this.unit.refresh();
+          this.mapUi.unitRangeArea.setTiles(await this.unit.getRange());
+          this.cdr.markForCheck();
+        }
       });
   }
 
   ngOnDestroy() {
     this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   getActionName(action: UnitAction) {
