@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <button class="margin-h margin-top" (click)="city.optimizeYields()">
+  <button class="margin-h margin-top" (click)="optimizeYields()">
     Optimize yields
   </button>
 
@@ -153,7 +153,11 @@
   </div>
 </div>
 
-<app-work-tiles [city]="city"></app-work-tiles>
+<app-work-tiles
+  #workTiles
+  [city]="city"
+  [workedTiles]="city.workedTiles"
+></app-work-tiles>
 
 <ng-template #buildingTooltipTmpl let-building="building">
   <b>{{ building.name }}</b>

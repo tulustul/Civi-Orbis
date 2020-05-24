@@ -25,6 +25,8 @@ import { Tile } from "src/app/api/tile.interface";
 export class WorkTilesComponent implements OnInit, OnDestroy {
   @Input() city: CityDetails;
 
+  @Input() workedTiles: Set<Tile>;
+
   private ngUnsubscribe = new Subject<void>();
 
   constructor(
@@ -50,20 +52,21 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
   }
 
   async toggle(tile: Tile) {
-    if (this.city.workedTiles.has(tile)) {
+    if (this.workedTiles.has(tile)) {
       await this.city.unworkTile(tile);
     } else {
       await this.city.workTile(tile);
     }
 
     if (!this.ngUnsubscribe.isStopped) {
-      this.mapUi.cityWorkedTilesArea.setTiles(
-        Array.from(this.city.workedTiles),
-      );
-      this.mapUi.cityNotWorkedTilesArea.setTiles(this.city.getNotWorkedTiles());
-
+      this.updateWorkedTilesArea();
       this.cdr.markForCheck();
     }
+  }
+
+  updateWorkedTilesArea() {
+    this.mapUi.cityWorkedTilesArea.setTiles(Array.from(this.city.workedTiles));
+    this.mapUi.cityNotWorkedTilesArea.setTiles(this.city.getNotWorkedTiles());
   }
 
   getTransform(tile: Tile) {

@@ -138,8 +138,6 @@ export class CityDetails {
     return Math.ceil(remainingCulture / this.perTurn.culture);
   }
 
-  optimizeYields() {}
-
   async workTile(tile: Tile) {
     const cityData = await makeCommand<CityDetailsChanneled>("city.workTile", {
       cityId: this.id,
@@ -185,6 +183,14 @@ export class CityDetails {
       type: "idleProduct" as ProductType,
       productId: idleProduct.id,
     });
+    this.update(cityData);
+  }
+
+  async optimizeYields() {
+    const cityData = await makeCommand<CityDetailsChanneled>(
+      "city.optimizeYields",
+      this.id,
+    );
     this.update(cityData);
   }
 

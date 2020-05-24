@@ -49,6 +49,7 @@ const HANDLERS = {
   "city.getWorkTiles": cityGetWorkTiles,
   "city.workTile": cityWorkTile,
   "city.unworkTile": cityUnworkTile,
+  "city.optimizeYields": cityOptimizeYields,
 
   "area.getTiles": getAreaTiles,
 };
@@ -297,6 +298,18 @@ export function cityUnworkTile(data) {
   }
 
   city.unworkTile(tile);
+
+  return cityDetailsToChannel(city);
+}
+
+export function cityOptimizeYields(cityId: number) {
+  const city = game.citiesManager.citiesMap.get(cityId);
+
+  if (!city) {
+    return null;
+  }
+
+  city.optimizeYields();
 
   return cityDetailsToChannel(city);
 }

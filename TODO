@@ -13,7 +13,8 @@ Bugs:
   ✔ webworker: setting work tiles @done(20-05-24 14:50)
   ✔ webworker: highlighting city tiles @done(20-05-24 12:58)
   ☐ webworker: building improvements
-  ☐ webworker: optimizing yields
+  ✔ webworker: optimizing yields @done(20-05-24 15:00)
+  ☐ webworker: blocking next turn till no actions remained
 
 Performance:
   ✔ core running in webworker @done(20-05-23 18:09)

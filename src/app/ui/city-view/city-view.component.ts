@@ -4,6 +4,7 @@ import {
   Input,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  ViewChild,
 } from "@angular/core";
 
 import { Subject } from "rxjs";
@@ -15,6 +16,7 @@ import { IdleProduct } from "src/app/core/idle-product";
 import { MapUi } from "../map-ui";
 import { Camera } from "src/app/renderer/camera";
 import { CityDetails } from "src/app/api/city-details";
+import { WorkTilesComponent } from "./work-tiles/work-tiles.component";
 
 @Component({
   selector: "app-city-view",
@@ -23,6 +25,8 @@ import { CityDetails } from "src/app/api/city-details";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CityViewComponent implements OnInit {
+  @ViewChild("workTiles") workTilesComponent: WorkTilesComponent;
+
   private quit$ = new Subject<void>();
 
   private _city: CityDetails;
@@ -67,6 +71,12 @@ export class CityViewComponent implements OnInit {
 
   async workOnIdleProduct(idleProduct: IdleProduct) {
     await this.city.workOnIdleProduct(idleProduct);
+    this.cdr.markForCheck();
+  }
+
+  async optimizeYields() {
+    await this.city.optimizeYields();
+    this.workTilesComponent.updateWorkedTilesArea();
     this.cdr.markForCheck();
   }
 
