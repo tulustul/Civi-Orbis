@@ -9,7 +9,7 @@ import { collector } from "./core/collector";
 import { UnitAction } from "./core/unit-actions";
 import { UnitOrder, UNITS_MAP } from "./core/unit";
 import { findPath } from "./core/pathfinding";
-import { BaseTile } from "./shared";
+import { BaseTile, PlayerTask } from "./shared";
 import { BUILDINGS_MAP } from "./core/buildings";
 import { IDLE_PRODUCTS_MAP } from "./core/idle-product";
 import {
@@ -65,8 +65,32 @@ addEventListener("message", ({ data }) => {
 
   const changes = collector.flush();
 
-  postMessage({ result, changes });
+  game.trackedPlayer.updateCitiesWithoutProduction();
+  game.trackedPlayer.updateUnitsWithoutOrders();
+  const nextTask = getNextTask();
+
+  postMessage({ result, changes, nextTask });
 });
+
+function getNextTask(): PlayerTask | null {
+  const p = game.trackedPlayer;
+
+  if (p.citiesWithoutProduction.length) {
+    return {
+      task: "city",
+      id: p.citiesWithoutProduction[0].id,
+    };
+  }
+
+  if (p.unitsWithoutOrders.length) {
+    return {
+      task: "unit",
+      id: p.unitsWithoutOrders[0].id,
+    };
+  }
+
+  return null;
+}
 
 function newGameHandler(data: MapGeneratorOptions): GameChanneled {
   game = new Game();
@@ -125,9 +149,6 @@ function setTrackedPlayer(playerId: number) {
   const player = game.players.find((p) => p.id === playerId);
 
   if (!player) {
-    console.error(
-      `trackedPlayer.set: cannot find player with id "${playerId}".`,
-    );
     return;
   }
 

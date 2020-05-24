@@ -19,7 +19,7 @@ export class AIPlayer {
       }
     }
 
-    for (const city of this.player.cityWithoutProduction) {
+    for (const city of this.player.citiesWithoutProduction) {
       city.updateProductsList();
 
       if (!city.product) {

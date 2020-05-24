@@ -44,7 +44,7 @@ export class PlayerCore {
 
   cities: CityCore[] = [];
 
-  cityWithoutProduction: CityCore[] = [];
+  citiesWithoutProduction: CityCore[] = [];
 
   unitsWithoutOrders: UnitCore[] = [];
 
@@ -106,7 +106,7 @@ export class PlayerCore {
   }
 
   updateCitiesWithoutProduction() {
-    this.cityWithoutProduction = this.cities.filter((c) => !c.product);
+    this.citiesWithoutProduction = this.cities.filter((c) => !c.product);
   }
 
   updateUnitsWithoutOrders() {

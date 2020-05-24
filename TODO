@@ -14,13 +14,15 @@ Bugs:
   ✔ webworker: highlighting city tiles @done(20-05-24 12:58)
   ☐ webworker: building improvements
   ✔ webworker: optimizing yields @done(20-05-24 15:00)
-  ☐ webworker: blocking next turn till no actions remained
+  ✔ webworker: blocking next turn till no actions remained @done(20-05-24 15:56)
 
 Performance:
   ✔ core running in webworker @done(20-05-23 18:09)
   ✔ areas updating locality @done(20-05-23 18:09)
   ✔ showing a lot of city labels on map @done(20-05-23 18:09)
   ✔ pathfinding @done(20-05-23 18:09)
+  ☐ distinguish between commands that mutate the state and those which don't
+  ☐ disable collector while game is loading
 
 Minor features:
   ☐ ESC for closing current view

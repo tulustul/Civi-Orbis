@@ -1,28 +1,9 @@
-<button *ngIf="nextTurnService.waiting$ | async; else buttonsTmpl">
+<button *ngIf="nextTurnService.waiting$ | async; else buttonTmpl">
   <app-spinner></app-spinner> Wait for other players
 </button>
 
-<ng-template #buttonsTmpl>
-  <button
-    class="production-color"
-    *ngIf="nextTurnService.nextCity; else nextUnitTmpl"
-    (click)="nextTurnService.next()"
-  >
-    Choose production
+<ng-template #buttonTmpl>
+  <button [class]="cssClass" (click)="nextTurnService.next()">
+    {{ label }}
   </button>
-
-  <ng-template #nextUnitTmpl>
-    <button
-      *ngIf="nextTurnService.nextUnit; else nextTurnTmpl"
-      (click)="nextTurnService.next()"
-    >
-      Order unit
-    </button>
-  </ng-template>
-
-  <ng-template #nextTurnTmpl>
-    <button (click)="nextTurnService.next()">
-      Next turn
-    </button>
-  </ng-template>
 </ng-template>

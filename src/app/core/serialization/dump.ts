@@ -238,7 +238,6 @@ function loadPlayer(game: Game, data: PlayerSerialized) {
   }
   player.yieldsTotal = data.yieldsTotal;
   player.updateYields();
-  player.updateCitiesWithoutProduction();
   return player;
 }
 

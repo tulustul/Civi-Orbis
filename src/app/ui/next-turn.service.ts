@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
 
+import { BehaviorSubject } from "rxjs";
+
 import { MapUi } from "./map-ui";
 import { Camera } from "../renderer/camera";
 import { GameApi } from "../api";
-import { BehaviorSubject } from "rxjs";
 
 @Injectable()
 export class NextTurnService {
@@ -16,30 +17,33 @@ export class NextTurnService {
     private mapUi: MapUi,
   ) {}
 
-  get nextCity() {
-    // return this.game.state?.trackedPlayer!.cityWithoutProduction[0] || null;
-    return null;
-  }
-
-  get nextUnit() {
-    // return this.game.state?.trackedPlayer!.unitsWithoutOrders[0] || null;
-    return null;
-  }
-
   async next() {
     if (this._waiting$.value) {
       return;
     }
 
-    if (this.nextCity) {
-      this.mapUi.selectCity(this.nextCity);
-    } else if (this.nextUnit) {
-      // this.mapUi.selectUnit(this.nextUnit);
-      // this.camera.moveToTileWithEasing(this.nextUnit.tile);
-    } else {
+    const nextTask = this.game.nextTask;
+
+    if (!nextTask) {
       this._waiting$.next(true);
       await this.game.nextPlayer();
       this._waiting$.next(false);
+      return;
+    }
+
+    const state = this.game.state!;
+
+    switch (nextTask.task) {
+      case "city":
+        const city = state.citiesMap.get(nextTask.id)!;
+        this.mapUi.selectCity(city);
+        break;
+
+      case "unit":
+        const unit = state.unitsMap.get(nextTask.id)!;
+        this.mapUi.selectUnit(unit);
+        this.camera.moveToTileWithEasing(unit.tile);
+        break;
     }
   }
 }

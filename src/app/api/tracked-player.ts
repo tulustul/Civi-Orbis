@@ -5,6 +5,7 @@ import { Unit } from "./unit";
 import { City } from "./city";
 import { TrackedPlayerChanneled } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
+import { PlayerTask } from "../shared";
 
 export class TrackedPlayer {
   id: number;

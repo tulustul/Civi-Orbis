@@ -5,6 +5,7 @@ import { MapGeneratorOptions } from "./game.interface";
 import { makeCommand } from "./internal/commander";
 import { GameState } from "./state";
 import { GameChanneled } from "../core/serialization/channel";
+import { PlayerTask } from "../shared";
 
 export class GameApi {
   private _state$ = new BehaviorSubject<GameState | null>(null);
@@ -16,6 +17,9 @@ export class GameApi {
     filter((state) => !state),
     skip(1),
   );
+
+  private _nextTask$ = new BehaviorSubject<PlayerTask | null>(null);
+  nextTask$ = this._nextTask$.asObservable();
 
   async newGame(mapGeneratorOptions: MapGeneratorOptions): Promise<GameState> {
     if (this.state) {
@@ -55,6 +59,10 @@ export class GameApi {
 
   get state() {
     return this._state$.value;
+  }
+
+  get nextTask() {
+    return this._nextTask$.value;
   }
 }
 
