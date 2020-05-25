@@ -15,6 +15,10 @@
   pointer-events: none;
   transform-origin: top left;
   will-change: transform;
+  --color: rgb(255, 36, 36, 0.8);
+  &.have-moves {
+    --color: rgb(101, 234, 75, 0.8);
+  }
   .inner {
     width: 180px;
     height: 180px;
@@ -22,7 +26,7 @@
     margin-left: 24px;
     border-radius: 50%;
     border: 15px solid;
-    border-color: rgba(255, 255, 255, 0.8) transparent;
+    border-color: var(--color) transparent;
     animation: spin 3s linear infinite;
   }
 }

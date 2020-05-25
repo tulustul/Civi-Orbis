@@ -86,7 +86,9 @@ export class UnitCore {
       actionPointsLeftAtTile,
     );
 
-    result.delete(this.tile);
+    if (result.size === 1) {
+      result.delete(this.tile);
+    }
 
     return result;
   }

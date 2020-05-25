@@ -56,4 +56,9 @@ export class UnitMarkerComponent implements OnInit, OnDestroy {
       `translate(${screenX}px, ${screenY}px) scale(${scale})`,
     );
   }
+
+  @HostBinding("class.have-moves")
+  get haveMoves() {
+    return this.unit.actionPointsLeft > 0;
+  }
 }
