@@ -2,7 +2,6 @@ import * as PIXIE from "pixi.js";
 
 import { Injectable } from "@angular/core";
 
-import { Game } from "../core/game";
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
 import { MapDrawer } from "./map";
@@ -50,6 +49,9 @@ export class GameRenderer {
     this.mapDrawer = new MapDrawer(this.game, this, this.camera);
     this.overlays = new OverlaysRenderer(this.mapUi);
     this.path = new PathRenderer(this.game, this.camera, this.mapUi);
+
+    this.path.container.interactiveChildren = false;
+    this.overlays.container.interactiveChildren = false;
 
     this.app.stage.addChild(this.mapDrawer.container);
     this.app.stage.addChild(this.overlays.container);

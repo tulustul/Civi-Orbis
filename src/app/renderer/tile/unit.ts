@@ -1,4 +1,4 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { takeUntil } from "rxjs/operators";
 
@@ -7,9 +7,10 @@ import { TileContainer } from "../tile-container";
 import { GameApi } from "src/app/api";
 import { Unit } from "src/app/api/unit";
 import { GameRenderer } from "../renderer";
+import { Tile } from "src/app/api/tile.interface";
 
 export class UnitsDrawer {
-  unitGraphics = new Map<Unit, PIXIE.Sprite[]>();
+  unitGraphics = new Map<Unit, PIXI.Sprite[]>();
 
   constructor(
     private game: GameApi,
@@ -54,6 +55,8 @@ export class UnitsDrawer {
       unit.tile,
       backgroundTexture,
     );
+
+    // TODO don't need set position here as layoutTile will do it.
     this.container.addChild(backgroundSprite, unit.tile);
     objects.push(backgroundSprite);
     backgroundSprite.tint = unit.player.color;
@@ -64,10 +67,15 @@ export class UnitsDrawer {
 
     this.unitGraphics.set(unit, objects);
 
-    if (!this.game.state!.trackedPlayer.exploredTiles.has(unit.tile)) {
-      backgroundSprite.visible = false;
-      unitSprite.visible = false;
-    }
+    this.layoutTile(unit.tile);
+
+    backgroundSprite.interactive = true;
+
+    backgroundSprite.on("pointerdown", (event) => {
+      if (event.data.button === 0) {
+        this.renderer.mapUi.selectUnit(unit);
+      }
+    });
   }
 
   destroy(unit: Unit) {
@@ -86,14 +94,42 @@ export class UnitsDrawer {
   update(unit: Unit) {
     const objs = this.unitGraphics.get(unit)!;
 
-    for (const sprite of objs) {
-      putSpriteAtTileCentered(unit.tile, sprite);
+    const oldTile = this.container.childrenMap.get(objs[0]);
+    if (oldTile && oldTile.units.length) {
+      this.layoutTile(oldTile);
+    }
 
-      this.container.moveChild(sprite, unit.tile);
+    this.layoutTile(unit.tile);
+  }
 
-      sprite.visible = this.game.state!.trackedPlayer.exploredTiles.has(
-        unit.tile,
-      );
+  layoutTile(tile: Tile) {
+    const isVisible = this.game.state!.trackedPlayer.exploredTiles.has(tile);
+
+    let x = 1 / (tile.units.length + 1) - 0.5;
+    const xOffset = 1 / (tile.units.length + 1);
+
+    for (const unit of tile.units) {
+      const sprites = this.unitGraphics.get(unit);
+      if (!sprites) {
+        // the sprites may not be created yet.
+        continue;
+      }
+
+      for (const sprite of sprites) {
+        putSpriteAtTileCentered(unit.tile, sprite);
+        sprite.position.x += x;
+        if (
+          unit.id === this.renderer.mapUi.selectedUnit?.id &&
+          tile.units.length > 1
+        ) {
+          sprite.position.y -= 0.1;
+        }
+
+        this.container.moveChild(sprite, unit.tile);
+        sprite.visible = isVisible;
+      }
+
+      x += xOffset;
     }
   }
 

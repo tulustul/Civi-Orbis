@@ -1,11 +1,11 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { BoundingBox } from "./camera";
 import { TilesMap } from "../api/map";
 import { Tile } from "../api/tile.interface";
 
-export class TileWrapperContainer extends PIXIE.Container {
-  tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
+export class TileWrapperContainer extends PIXI.Container {
+  tilesMap = new Map<Tile, PIXI.DisplayObject[]>();
 
   bindToMap(map: TilesMap) {
     for (let x = 0; x < map.width; x++) {
@@ -16,22 +16,25 @@ export class TileWrapperContainer extends PIXIE.Container {
   }
 }
 
-export class TileContainer extends PIXIE.DisplayObject {
+export class TileContainer extends PIXI.DisplayObject {
   parent: TileWrapperContainer;
 
   private map: TilesMap;
 
-  private grid: PIXIE.DisplayObject[][][] = [];
-  private childrenMap = new Map<PIXIE.DisplayObject, Tile>();
+  private grid: PIXI.DisplayObject[][][] = [];
+  childrenMap = new Map<PIXI.DisplayObject, Tile>();
 
   // TODO can it be rewritten with tile ids? Map<number, ...>
-  private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
+  private tilesMap = new Map<Tile, PIXI.DisplayObject[]>();
+
+  // needed only for interactivity
+  children: PIXI.DisplayObject[] = [];
 
   constructor(private bBox: BoundingBox) {
     super();
   }
 
-  addChild<T extends PIXIE.DisplayObject>(child: T, tile: Tile): void {
+  addChild<T extends PIXI.DisplayObject>(child: T, tile: Tile): void {
     if (child.parent) {
       child.parent.removeChild(child);
     }
@@ -44,6 +47,8 @@ export class TileContainer extends PIXIE.DisplayObject {
     this.childrenMap.set(child, tile);
     this.tilesMap.get(tile)?.push(child);
 
+    this.children.push(child);
+
     (this as any)._boundsID++;
 
     this.parent.tilesMap.get(tile)!.push(child);
@@ -51,7 +56,7 @@ export class TileContainer extends PIXIE.DisplayObject {
     child.emit("added", this);
   }
 
-  removeChild(child: PIXIE.DisplayObject) {
+  removeChild(child: PIXI.DisplayObject) {
     if (this.childrenMap.has(child)) {
       // remove from childrenMap
       const tile = this.childrenMap.get(child)!;
@@ -77,10 +82,16 @@ export class TileContainer extends PIXIE.DisplayObject {
       if (index !== -1) {
         children.splice(index, 1);
       }
+
+      // remove from children
+      index = this.children.indexOf(child);
+      if (index !== -1) {
+        children.splice(index, 1);
+      }
     }
   }
 
-  moveChild(child: PIXIE.DisplayObject, tile: Tile) {
+  moveChild(child: PIXI.DisplayObject, tile: Tile) {
     this.removeChild(child);
     this.addChild(child, tile);
   }
@@ -122,7 +133,7 @@ export class TileContainer extends PIXIE.DisplayObject {
     }
   }
 
-  render(renderer: PIXIE.Renderer) {
+  render(renderer: PIXI.Renderer) {
     if (!this.visible || this.worldAlpha <= 0 || !this.renderable) {
       return;
     }

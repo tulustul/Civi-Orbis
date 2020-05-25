@@ -140,4 +140,8 @@ export class GameState {
     const tileIds = await makeCommand<number[]>("area.getTiles", areaId);
     return tileIds.map((id) => this.map.tilesMap.get(id)!);
   }
+
+  updateUnit(unitId: number) {
+    this._unitUpdated$.next(this.unitsMap.get(unitId));
+  }
 }

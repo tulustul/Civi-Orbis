@@ -63,7 +63,9 @@ export class MapUi {
       if (this.selectingTileEnabled) {
         this._selectedTile$.next(tile);
       } else if (tile.units.length) {
-        this.selectUnit(tile.units[0]);
+        if (this.selectedUnit?.tile !== tile) {
+          this.selectUnit(tile.units[0]);
+        }
       } else if (tile?.city) {
         this.selectCity(tile.city);
       } else {
@@ -239,9 +241,13 @@ export class MapUi {
   }
 
   async selectUnit(unit: Unit | null) {
+    if (unit?.id === this.selectedUnit?.id) {
+      return;
+    }
+
+    this.clearSelectedUnit(!unit);
+
     if (!unit) {
-      this._selectedUnit$.next(null);
-      this.unitRangeArea.clear();
       return;
     }
 
@@ -250,14 +256,23 @@ export class MapUi {
       if (data) {
         const unitDetails = new UnitDetails(this.game.state!, data);
         this._selectedUnit$.next(unitDetails);
+        this.game.state!.updateUnit(unitDetails.id);
         unitDetails
           .getRange()
           .then((tiles) => this.unitRangeArea.setTiles(tiles));
-      } else {
-        this._selectedUnit$.next(null);
-        this.unitRangeArea.clear();
       }
       this.setPath(this._selectedUnit$.value?.path || null);
+    }
+  }
+
+  private clearSelectedUnit(clearRange = true) {
+    const previousUnit = this.selectedUnit;
+    this._selectedUnit$.next(null);
+    if (clearRange) {
+      this.unitRangeArea.clear();
+    }
+    if (previousUnit) {
+      this.game.state!.updateUnit(previousUnit.id);
     }
   }
 

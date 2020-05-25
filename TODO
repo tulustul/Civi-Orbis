@@ -15,6 +15,7 @@ Bugs:
   ✔ webworker: building improvements @done(20-05-24 19:21)
   ✔ webworker: optimizing yields @done(20-05-24 15:00)
   ✔ webworker: blocking next turn till no actions remained @done(20-05-24 15:56)
+  ☐ yields change received when selecting a unit
 
 Performance:
   ✔ core running in webworker @done(20-05-23 18:09)

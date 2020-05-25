@@ -52,6 +52,14 @@ export class MapDrawer {
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
+    this.waterContainer["interactiveChildren"] = false;
+    this.terrainContainer["interactiveChildren"] = false;
+    this.riverContainer["interactiveChildren"] = false;
+    this.cityContainer["interactiveChildren"] = false;
+    this.yieldsContainer["interactiveChildren"] = false;
+    this.overlaysContainer["interactiveChildren"] = false;
+    this.areasContainer["interactiveChildren"] = false;
+
     this.container.addChild(this.waterContainer);
     this.container.addChild(this.terrainContainer);
     this.container.addChild(this.riverContainer);
