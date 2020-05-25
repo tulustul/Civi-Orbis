@@ -93,6 +93,9 @@ export class UnitsDrawer {
 
   update(unit: Unit) {
     const objs = this.unitGraphics.get(unit)!;
+    if (!objs) {
+      return;
+    }
 
     const oldTile = this.container.childrenMap.get(objs[0]);
     if (oldTile && oldTile.units.length) {
