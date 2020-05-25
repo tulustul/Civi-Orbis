@@ -17,7 +17,7 @@ export class PoliticsDrawer {
         container: this.renderer.mapDrawer.areasContainer,
         backgroundOpacity: 0.5,
         borderShadow: 0.7,
-        borderSize: 0.05,
+        borderSize: 0.08,
         borderShadowStrength: 1,
         visibleOnWater: false,
       });

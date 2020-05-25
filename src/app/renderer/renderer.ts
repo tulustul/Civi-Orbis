@@ -66,11 +66,16 @@ export class GameRenderer {
 
       const scale = this.camera.transform.scale;
       if (this.mapDrawer.politicsDrawer) {
+        const backgroundOpacity = Math.min(
+          0.4,
+          Math.max(0, (70 - scale) / 150),
+        );
+
+        const borderShadow = Math.max(0.4, Math.min(0.7, (150 - scale) / 100));
+
         for (const area of this.mapDrawer.politicsDrawer.areas) {
-          area.drawer.backgroundShader.uniforms.opacity = Math.min(
-            0.4,
-            Math.max(0, (70 - scale) / 150),
-          );
+          area.drawer.backgroundShader.uniforms.opacity = backgroundOpacity;
+          area.drawer.borderShader.uniforms.borderShadow = borderShadow;
         }
       }
     });
