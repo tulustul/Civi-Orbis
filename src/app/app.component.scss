@@ -20,6 +20,11 @@
       padding: 30px 100px;
     }
   }
+  .panel-top-left-corner {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
   .hidden {
     display: none !important;
   }

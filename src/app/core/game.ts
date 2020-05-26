@@ -12,6 +12,7 @@ export class Game {
   map: TilesMapCore;
 
   players: PlayerCore[] = [];
+  playersMap = new Map<number, PlayerCore>();
 
   activePlayerIndex = -1;
 
@@ -35,6 +36,7 @@ export class Game {
   addPlayer(player: PlayerCore) {
     player.id = this.players.length;
     this.players.push(player);
+    this.playersMap.set(player.id, player);
     if (!this.trackedPlayer) {
       this.trackedPlayer = player;
     }

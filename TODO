@@ -35,12 +35,13 @@ Minor features:
   ✔ when zoomed out display areas instead of borders @done(20-05-23 21:37)
   ☐ autosaving
   ✔ better city expansion @done(20-05-23 18:16)
-  ☐ differentiate between different units on the map
+  ✔ differentiate between different units on the map @done(20-05-26 17:06)
   ✔ city products can have requirements @done(20-05-07 20:42)
   ☐ city production queue
   ☐ previous/next city button in city view
   ☐ cities overview panel
   ✔ nicer borders @done(20-05-24 22:34)
+  ☐ keyboard shortcuts
 
 Major features:
   ✔ implement `city work on` (how to call it properly?). @done(20-05-07 22:31)
@@ -56,7 +57,7 @@ Major features:
   ☐ `fog of war` - grey out tiles not visible by units and cities
   ☐ AI :/
   ☐ armies
-  ☐ city conquest
+  ✔ city conquest @done(20-05-26 17:07)
   ☐ slavery
   ☐ statistics and charts
 

@@ -32,6 +32,7 @@ const HANDLERS = {
   "trackedPlayer.revealWorld": revealWorld,
   "trackedPlayer.set": setTrackedPlayer,
 
+  "unit.spawn": unitSpawn,
   "unit.getDetails": getUnitDetails,
   "unit.doAction": unitDoAction,
   "unit.setOrder": unitSetOrder,
@@ -159,6 +160,17 @@ function setTrackedPlayer(playerId: number) {
   game.trackedPlayer = player;
 
   return trackedPlayerToChannel(game.trackedPlayer);
+}
+
+function unitSpawn(data) {
+  const tile = game.map.tilesMap.get(data.tileId);
+  const player = game.playersMap.get(data.playerId);
+
+  if (!tile || !player) {
+    return;
+  }
+
+  game.unitsManager.spawn(data.definitionId, tile, player);
 }
 
 function getUnitDetails(unitId: number) {

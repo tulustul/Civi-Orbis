@@ -497,6 +497,8 @@ export class CityCore {
     // TODO explored area should be bigger then city tiles. Change this once fog of war is implement (probably a city should store it's visible tiles)
     newOwner.exploreTiles(this.tiles);
 
+    this.cancelProduction();
+
     collector.cities.add(this);
     for (const tile of this.tiles) {
       collector.tiles.add(tile);

@@ -17,14 +17,12 @@ import { TileEditorComponent } from "./ui/editor/tile-editor/tile-editor.compone
 import { RadioComponent } from "./ui/widgets/radio/radio.component";
 import { MultiselectComponent } from "./ui/widgets/multiselect/multiselect.component";
 import { ToggleComponent } from "./ui/widgets/toggle/toggle.component";
-import { TilePaintingComponent } from "./ui/editor/tile-painting/tile-painting.component";
 import { GameMenuComponent } from "./ui/game-menu/game-menu.component";
 import { SavesListComponent } from "./ui/game-menu/saves-list/saves-list.component";
 import { SaveViewComponent } from "./ui/game-menu/save-view/save-view.component";
 import { LoadViewComponent } from "./ui/game-menu/load-view/load-view.component";
 import { MainMenuViewComponent } from "./ui/game-menu/main-menu-view/main-menu-view.component";
 import { NewGameViewComponent } from "./ui/game-menu/new-game-view/new-game-view.component";
-import { UnitEditorComponent } from "./ui/editor/unit-editor/unit-editor.component";
 import { CityEditorComponent } from "./ui/editor/city-editor/city-editor.component";
 import { CitiesLayerComponent } from "./ui/cities-layer/cities-layer.component";
 import { CityInfoComponent } from "./ui/cities-layer/city-info/city-info.component";
@@ -48,10 +46,12 @@ import { UnitActionRequirementsComponent } from "./ui/unit-action-requirements/u
 import { GameApi, gameApi } from "./api/game";
 import { Game } from "./core/game";
 import { Camera } from "./renderer/camera";
-import { PlayersEditorComponent } from './ui/editor/players-editor/players-editor.component';
-import { SpinnerComponent } from './ui/widgets/spinner/spinner.component';
-import { ModalComponent } from './ui/widgets/modal/modal.component';
-import { UnitMarkerComponent } from './ui/unit-marker/unit-marker.component';
+import { PlayersEditorComponent } from "./ui/editor/players-editor/players-editor.component";
+import { SpinnerComponent } from "./ui/widgets/spinner/spinner.component";
+import { ModalComponent } from "./ui/widgets/modal/modal.component";
+import { UnitMarkerComponent } from "./ui/unit-marker/unit-marker.component";
+import { TilePainterComponent } from "./ui/editor/tile-painter/tile-painter.component";
+import { UnitPainterComponent } from "./ui/editor/unit-painter/unit-painter.component";
 
 @NgModule({
   declarations: [
@@ -69,14 +69,14 @@ import { UnitMarkerComponent } from './ui/unit-marker/unit-marker.component';
     RadioComponent,
     MultiselectComponent,
     ToggleComponent,
-    TilePaintingComponent,
+    TilePainterComponent,
     GameMenuComponent,
     SavesListComponent,
     SaveViewComponent,
     LoadViewComponent,
     MainMenuViewComponent,
     NewGameViewComponent,
-    UnitEditorComponent,
+    UnitPainterComponent,
     CityEditorComponent,
     CitiesLayerComponent,
     CityInfoComponent,

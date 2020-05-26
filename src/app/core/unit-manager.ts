@@ -82,7 +82,7 @@ export class UnitsManager {
     if (unit.definition.power) {
       if (
         tile.units.length &&
-        tile.units.find((u) => u.player !== unit.player)
+        tile.units.find((u) => u.definition.power && u.player !== unit.player)
       ) {
         // battle
       } else if (tile.city && tile.city.player !== unit.player) {

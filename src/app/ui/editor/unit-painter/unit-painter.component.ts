@@ -6,26 +6,24 @@ import { filter, takeUntil } from "rxjs/operators";
 import { Option } from "../../widgets/option.interface";
 import { UNITS_DEFINITIONS } from "src/app/data/units";
 import { MapUi } from "../../map-ui";
-import { UnitDetails } from "src/app/api/unit-details";
 import { UnitDefinition } from "src/app/core/unit.interface";
 import { GameApi } from "src/app/api";
 import { Tile } from "src/app/api/tile.interface";
+import { makeCommand } from "src/app/api/internal/commander";
 
 @Component({
-  selector: "app-unit-editor",
-  templateUrl: "./unit-editor.component.html",
-  styleUrls: ["./unit-editor.component.scss"],
+  selector: "app-unit-painter",
+  templateUrl: "./unit-painter.component.html",
+  styleUrls: ["./unit-painter.component.scss"],
 })
-export class UnitEditorComponent implements OnInit {
+export class UnitPainterComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;
-
-  spawnMode = false;
 
   definition: UnitDefinition | null = null;
 
-  unit: UnitDetails | null = null;
-
   definitionOptions: Option[] = [];
+
+  selectedPlayerId: number = this.game.state!.trackedPlayer.id;
 
   constructor(private game: GameApi, private mapUi: MapUi) {}
 
@@ -43,11 +41,7 @@ export class UnitEditorComponent implements OnInit {
         if (!tile) {
           return;
         }
-        // if (this.spawnMode) {
-        //   this.spawn(tile);
-        // } else {
-        //   this.selectTile(tile);
-        // }
+        this.spawn(tile);
       });
     });
 
@@ -59,23 +53,14 @@ export class UnitEditorComponent implements OnInit {
       return;
     }
 
-    // this.game.unitsManager.spawn(
-    //   this.definition.id,
-    //   tile,
-    //   this.game.players[0],
-    // );
+    makeCommand("unit.spawn", {
+      definitionId: this.definition.id,
+      tileId: tile.id,
+      playerId: this.selectedPlayerId,
+    });
   }
 
-  destroy() {
-    if (this.unit) {
-      // this.game.unitsManager.destroy(this.unit);
-    }
-  }
-
-  selectTile(tile: Tile) {
-    if (tile.units.length) {
-      // this.unit = tile.units[0];
-      // this.definition = this.unit.definition;
-    }
+  get players() {
+    return this.game.state!.players;
   }
 }

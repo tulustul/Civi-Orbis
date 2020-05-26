@@ -39,11 +39,11 @@ interface PaintData {
 }
 
 @Component({
-  selector: "app-tile-painting",
-  templateUrl: "./tile-painting.component.html",
-  styleUrls: ["./tile-painting.component.scss"],
+  selector: "app-tile-painter",
+  templateUrl: "./tile-painter.component.html",
+  styleUrls: ["./tile-painter.component.scss"],
 })
-export class TilePaintingComponent implements OnInit {
+export class TilePainterComponent implements OnInit {
   SIZE_OPTIONS: Option[] = [
     { label: "1x1", value: 1 },
     { label: "2x2", value: 2 },
