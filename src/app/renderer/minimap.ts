@@ -56,7 +56,7 @@ export class MinimapRenderer {
   ) {
     this.game.init$.subscribe((state) => {
       state.trackedPlayer$
-        .pipe(takeUntil(this.game.stop$))
+        .pipe(takeUntil(this.destroyed$))
         .subscribe((player) => {
           this.hideAllTiles();
           this.reveal(player.exploredTiles);
@@ -64,14 +64,14 @@ export class MinimapRenderer {
         });
 
       state.tilesExplored$
-        .pipe(takeUntil(this.game.stop$))
+        .pipe(takeUntil(this.destroyed$))
         .subscribe((tiles) => {
           this.reveal(tiles);
           this.updateMap();
         });
 
       state.tilesUpdated$
-        .pipe(takeUntil(this.game.stop$))
+        .pipe(takeUntil(this.destroyed$))
         .subscribe((tiles) => {
           for (const tile of tiles) {
             this.drawTile(tile);

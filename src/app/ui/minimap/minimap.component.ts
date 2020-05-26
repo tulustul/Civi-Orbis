@@ -1,8 +1,13 @@
 import * as PIXIE from "pixi.js";
 
-import { Component, ViewChild, ElementRef, AfterViewInit } from "@angular/core";
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  OnDestroy,
+} from "@angular/core";
 
-import { Game } from "src/app/core/game";
 import { MinimapRenderer } from "src/app/renderer/minimap";
 import { GameRenderer } from "src/app/renderer/renderer";
 import { Camera } from "src/app/renderer/camera";
@@ -13,7 +18,7 @@ import { GameApi } from "src/app/api";
   templateUrl: "./minimap.component.html",
   styleUrls: ["./minimap.component.scss"],
 })
-export class MinimapComponent implements AfterViewInit {
+export class MinimapComponent implements AfterViewInit, OnDestroy {
   app: PIXIE.Application | null = null;
 
   minimapRenderer: MinimapRenderer | null = null;
@@ -27,13 +32,15 @@ export class MinimapComponent implements AfterViewInit {
   ) {}
 
   ngAfterViewInit(): void {
-    this.game.init$.subscribe(() => this.create());
+    this.create();
+  }
+
+  ngOnDestroy() {
+    this.minimapRenderer?.destroy();
+    this.app?.destroy();
   }
 
   create() {
-    if (this.app) {
-      this.app.destroy();
-    }
     if (this.minimapRenderer) {
       this.minimapRenderer.destroy();
     }
