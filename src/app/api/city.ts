@@ -25,7 +25,6 @@ export class City {
 
   constructor(private game: GameState, city: CityChanneled) {
     this.id = city.id;
-    this.player = game.playersMap.get(city.playerId)!;
     this.tile = game.map.tilesMap.get(city.tileId)!;
 
     this.tile.city = this;
@@ -38,6 +37,8 @@ export class City {
   update(city: CityChanneled) {
     this.name = city.name;
     this.size = city.size;
+
+    this.player = this.game.playersMap.get(city.playerId)!;
 
     this.totalFood = city.totalFood;
     this.foodToGrow = city.foodToGrow;

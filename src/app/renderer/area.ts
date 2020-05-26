@@ -50,7 +50,7 @@ void main() {
   } else if (vUvs < (1.0 - borderSize)) {
     a = (vUvs - (1.0 - borderShadow)) * borderShadowStrength;
   }
-  
+
   gl_FragColor = vec4(c.r * a, c.g * a, c.b * a, a);
 }`;
 
@@ -186,11 +186,11 @@ export class Area {
   }
 
   removeTiles(tiles: Tile[]) {
+    this.drawer.removeTiles(tiles);
     for (const tile of tiles) {
       this.tiles.delete(tile);
     }
     this.computeBordersForTiles(tiles);
-    this.drawer.removeTiles(tiles);
   }
 
   private computeBordersForTiles(tiles: Tile[]) {
@@ -309,6 +309,11 @@ class AreaDrawer {
     if (mesh) {
       mesh.destroy();
     }
+
+    if (!this.area.tiles.has(tile)) {
+      return;
+    }
+
     const borders = this.area.borders.get(tile);
     if (borders) {
       this.drawTileBorders(tile, borders);

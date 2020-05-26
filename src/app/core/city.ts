@@ -470,4 +470,33 @@ export class CityCore {
 
     this.availableIdleProducts = IDLE_PRODUCTS;
   }
+
+  changeOwner(newOwner: PlayerCore) {
+    if (this.player === newOwner) {
+      return;
+    }
+
+    const oldOwner = this.player;
+
+    this.player = newOwner;
+
+    const cityTiles = Array.from(this.tiles);
+
+    let index = oldOwner.cities.indexOf(this);
+    if (index !== -1) {
+      oldOwner.cities.splice(index, 1);
+      oldOwner.area.removeBulk(cityTiles);
+    }
+
+    newOwner.cities.push(this);
+    newOwner.area.addBulk(cityTiles);
+
+    newOwner.updateYields();
+    oldOwner.updateYields();
+
+    // TODO explored area should be bigger then city tiles. Change this once fog of war is implement (probably a city should store it's visible tiles)
+    newOwner.exploreTiles(this.tiles);
+
+    collector.cities.add(this);
+  }
 }

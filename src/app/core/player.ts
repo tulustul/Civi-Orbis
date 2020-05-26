@@ -95,12 +95,7 @@ export class PlayerCore {
     subtractYields(this.yields.perTurn, this.yields.costs);
 
     if (this === this.game.trackedPlayer) {
-      collector.trackedPlayerYields = {
-        perTurn: this.yields.perTurn,
-        income: this.yields.income,
-        total: this.yields.total,
-        costs: this.yields.costs,
-      };
+      collector.trackedPlayerYields = this.yields;
     }
   }
 

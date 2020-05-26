@@ -37,7 +37,6 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const el = this.elementRef.nativeElement;
-    el.style.setProperty("--player-color", this.city.player.cssColor);
 
     const thisCity = this.game.state!.cityUpdated$.pipe(
       filter((c) => c.id === this.city.id),
@@ -45,7 +44,10 @@ export class CityInfoComponent implements OnInit, OnDestroy {
 
     merge(this.game.state!.turn$, thisCity)
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(() => this.cdr.markForCheck());
+      .subscribe(() => {
+        el.style.setProperty("--player-color", this.city.player.cssColor);
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy() {

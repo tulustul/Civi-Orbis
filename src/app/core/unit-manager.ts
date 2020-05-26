@@ -79,6 +79,17 @@ export class UnitsManager {
       return;
     }
 
+    if (unit.definition.power) {
+      if (
+        tile.units.length &&
+        tile.units.find((u) => u.player !== unit.player)
+      ) {
+        // battle
+      } else if (tile.city && tile.city.player !== unit.player) {
+        tile.city.changeOwner(unit.player);
+      }
+    }
+
     const index = unit.tile.units.indexOf(unit);
     if (index !== -1) {
       unit.tile.units.splice(index, 1);
