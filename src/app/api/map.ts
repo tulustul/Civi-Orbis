@@ -29,7 +29,7 @@ export class TilesMap {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         const tile: Tile = this.tiles[x][y];
-        if (tile.areaOf) {
+        if (tile.areaOf !== null) {
           tile.areaOf = game.citiesMap.get(tile.areaOf as any)!;
         }
       }
