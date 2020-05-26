@@ -42,7 +42,11 @@ export class CitiesLayerComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    merge(this.game.state.citySpawned$, this.game.state.cityDestroyed$)
+    merge(
+      this.game.state.citySpawned$,
+      this.game.state.cityDestroyed$,
+      this.game.state.tilesExplored$,
+    )
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(() => {
         this.updateCities();
