@@ -3,6 +3,7 @@ import { Component, ChangeDetectionStrategy } from "@angular/core";
 import { UIState } from "./ui/ui-state";
 import { MapUi } from "./ui/map-ui";
 import { GameApi } from "./api";
+import { GameRenderer } from "./renderer/renderer";
 
 @Component({
   selector: "app-root",
@@ -17,5 +18,6 @@ export class AppComponent {
     public game: GameApi,
     public uiState: UIState,
     public mapUi: MapUi,
+    public renderer: GameRenderer,
   ) {}
 }

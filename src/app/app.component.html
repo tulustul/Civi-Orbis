@@ -1,13 +1,22 @@
-<app-game-menu *ngIf="uiState.menuVisible$ | async"></app-game-menu>
+<div class="loader" *ngIf="renderer.loading$ | async; else loadedTmpl">
+  <div class="panel">
+    <h2>Loading...</h2>
+    <app-spinner></app-spinner>
+  </div>
+</div>
 
-<app-game-canvas></app-game-canvas>
+<ng-template #loadedTmpl>
+  <app-game-menu *ngIf="uiState.menuVisible$ | async"></app-game-menu>
 
-<ng-container *ngIf="game.state$ | async">
-  <app-editor
-    class="panel"
-    *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
-  ></app-editor>
-</ng-container>
+  <app-game-canvas></app-game-canvas>
+
+  <ng-container *ngIf="game.state$ | async">
+    <app-editor
+      class="panel"
+      *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
+    ></app-editor>
+  </ng-container>
+</ng-template>
 
 <ng-template #gameUiTmpl>
   <app-cities-layer *ngIf="mapUi.cityLabelsVisible$ | async"></app-cities-layer>

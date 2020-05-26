@@ -2,13 +2,14 @@ import * as PIXIE from "pixi.js";
 
 import { Injectable } from "@angular/core";
 
+import { Subject, BehaviorSubject } from "rxjs";
+
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
 import { MapDrawer } from "./map";
 import { MapUi } from "../ui/map-ui";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
-import { Subject } from "rxjs";
 
 @Injectable()
 export class GameRenderer {
@@ -27,6 +28,9 @@ export class GameRenderer {
   atlas = this.loader.add("assets/atlas.json").load(() => this.onLoad());
 
   textures: PIXIE.ITextureDictionary;
+
+  _loading$ = new BehaviorSubject<boolean>(true);
+  loading$ = this._loading$.asObservable();
 
   private _tick$ = new Subject<void>();
   tick$ = this._tick$.asObservable();
@@ -102,6 +106,7 @@ export class GameRenderer {
     if (this.canvas) {
       this.onReady();
     }
+    this._loading$.next(false);
   }
 
   clear() {
