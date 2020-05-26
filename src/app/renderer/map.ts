@@ -65,9 +65,9 @@ export class MapDrawer {
     this.container.addChild(this.riverContainer);
     this.container.addChild(this.cityContainer);
     this.container.addChild(this.yieldsContainer);
-    this.container.addChild(this.unitsContainer);
     this.container.addChild(this.overlaysContainer);
     this.container.addChild(this.areasContainer);
+    this.container.addChild(this.unitsContainer);
 
     this.game.init$.subscribe((state) => {
       state.trackedPlayer$
