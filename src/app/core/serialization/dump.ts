@@ -10,7 +10,7 @@ import { Climate, LandForm, SeaLevel, TileDirection } from "src/app/shared";
 import { TileImprovement, TileRoad } from "../tile-improvements";
 import { TileCore } from "../tile";
 import { TilesMapCore } from "../tiles-map";
-import { UnitCore } from "../unit";
+import { UnitCore, UnitOrder } from "../unit";
 
 export interface GameSerialized {
   turn: number;
@@ -73,6 +73,7 @@ interface UnitSerialized {
   definition: string;
   actionPointsLeft: number;
   player: number;
+  order: UnitOrder;
   path: number[][] | null;
 }
 
@@ -317,6 +318,7 @@ function dumpUnit(unit: UnitCore): UnitSerialized {
     definition: unit.definition.id,
     actionPointsLeft: unit.actionPointsLeft,
     player: unit.player.id,
+    order: unit.order,
     path: unit.path?.map((row) => row.map((tile) => tile.id)) || null,
   };
 }
@@ -326,7 +328,10 @@ function loadUnit(game: Game, unitData: UnitSerialized) {
   const player = game.players[unitData.player];
   const unit = game.unitsManager.spawn(unitData.definition, tile, player);
   unit.actionPointsLeft = unitData.actionPointsLeft;
+  unit.order = unitData.order;
 
-  // TODO path deserialization
-  // unit.path = unitData.path;
+  unit.path =
+    unitData.path?.map((row) =>
+      row.map((tileId) => game.map.tilesMap.get(tileId)!),
+    ) || null;
 }
