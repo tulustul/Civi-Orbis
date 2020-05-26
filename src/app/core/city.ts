@@ -32,11 +32,9 @@ export class CityCore {
   size: number;
 
   totalFood = 0;
-  foodToGrow = 20;
   foodConsumed = 1;
 
   totalCulture = 0;
-  cultureToExpand = 20;
 
   tileYields: Yields = { ...EMPTY_YIELDS };
   yields: Yields = { ...EMPTY_YIELDS };
@@ -107,31 +105,31 @@ export class CityCore {
 
   private progressGrowth() {
     this.totalFood += this.yields.food - this.foodConsumed;
-    if (this.totalFood >= this.foodToGrow) {
+    const foodToGrow = this.getFoodToGrow();
+    if (this.totalFood >= foodToGrow) {
       this.size++;
       this.changedSize = true;
       const bestWorkableTile = this.pickBestTileToWork(this.notWorkedTiles);
       if (bestWorkableTile) {
         this.workTile(bestWorkableTile);
       }
-      this.totalFood -= this.foodToGrow;
+      this.totalFood -= foodToGrow;
     } else if (this.totalFood < 0) {
       if (this.size > 1) {
         this.size--;
         this.changedSize = true;
-        this.totalFood += this.foodToGrow;
+        this.totalFood += foodToGrow;
       } else {
         this.totalFood = 0;
       }
     }
-    this.foodToGrow = 15 * Math.pow(1.2, this.size);
   }
 
   private progressExpansion() {
     this.totalCulture += this.perTurn.culture;
-    if (this.totalCulture >= this.cultureToExpand) {
-      this.totalCulture -= this.cultureToExpand;
-      this.cultureToExpand = 5 * Math.pow(1.2, this.tiles.size);
+    const cultureToExpand = this.getCultureToExpand();
+    if (this.totalCulture >= cultureToExpand) {
+      this.totalCulture -= cultureToExpand;
 
       const tile = this.pickBestTileToExpand(
         this.tile,
@@ -142,6 +140,14 @@ export class CityCore {
         tile.sweetSpotValue = 0;
       }
     }
+  }
+
+  getCultureToExpand() {
+    return Math.ceil(5 * Math.pow(1.2, this.tiles.size));
+  }
+
+  getFoodToGrow() {
+    return Math.ceil(15 * Math.pow(1.2, this.size));
   }
 
   produceUnit(unit: UnitDefinition) {
@@ -194,10 +200,10 @@ export class CityCore {
 
   get turnsToGrow() {
     if (this.perTurn.food >= 0) {
-      const remainingFood = this.foodToGrow - this.totalFood;
-      return Math.ceil(remainingFood / this.perTurn.food);
+      const remainingFood = this.getFoodToGrow() - this.totalFood;
+      return Math.max(0, Math.ceil(remainingFood / this.perTurn.food));
     } else {
-      return Math.ceil(this.totalFood / this.perTurn.food) - 1;
+      return Math.max(0, Math.ceil(this.totalFood / this.perTurn.food) - 1);
     }
   }
 
@@ -212,7 +218,7 @@ export class CityCore {
   }
 
   get turnsToExpand() {
-    const remainingCulture = this.cultureToExpand - this.totalCulture;
+    const remainingCulture = this.getCultureToExpand() - this.totalCulture;
     return Math.ceil(remainingCulture / this.perTurn.culture);
   }
 

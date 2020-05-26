@@ -130,12 +130,15 @@ export class CityDetails {
   }
 
   getTurnsToProduce(product: ProductDefinition) {
-    return Math.ceil(product.productionCost / this.yields.production);
+    return Math.max(
+      0,
+      Math.ceil(product.productionCost / this.yields.production),
+    );
   }
 
   get turnsToExpand() {
     const remainingCulture = this.cultureToExpand - this.totalCulture;
-    return Math.ceil(remainingCulture / this.perTurn.culture);
+    return Math.max(0, Math.ceil(remainingCulture / this.perTurn.culture));
   }
 
   async workTile(tile: Tile) {

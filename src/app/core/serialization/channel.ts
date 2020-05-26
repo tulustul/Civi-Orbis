@@ -179,7 +179,7 @@ export function cityToChannel(city: CityCore): CityChanneled {
     tileId: city.tile.id,
 
     totalFood: city.totalFood,
-    foodToGrow: city.foodToGrow,
+    foodToGrow: city.getFoodToGrow(),
     foodPerTurn: city.perTurn.food,
     turnsToGrow: city.turnsToGrow,
 
@@ -204,7 +204,7 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
     tileId: city.tile.id,
 
     totalFood: city.totalFood,
-    foodToGrow: city.foodToGrow,
+    foodToGrow: city.getFoodToGrow(),
     turnsToGrow: city.turnsToGrow,
 
     totalProduction: city.totalProduction,
@@ -213,7 +213,7 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
     availableIdleProducts: city.availableIdleProducts.map((p) => p.id),
     availableUnits: city.availableUnits.map((u) => u.id),
     buildingsIds: Array.from(city.buildingsIds),
-    cultureToExpand: city.cultureToExpand,
+    cultureToExpand: city.getCultureToExpand(),
     disabledBuildings: Array.from(city.disabledBuildings).map((b) => b.id),
     disabledIdleProducts: Array.from(city.disabledIdleProducts).map(
       (p) => p.id,

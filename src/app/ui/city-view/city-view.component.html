@@ -4,6 +4,7 @@
 
     <app-progress-bar
       class="growth-bar"
+      [appTooltip]="growthTooltipTmpl"
       [progress]="city.totalFood"
       [nextProgress]="city.totalFood + city.perTurn.food"
       [total]="city.foodToGrow"
@@ -52,6 +53,7 @@
 
   <app-progress-bar
     class="culture-bar margin"
+    [appTooltip]="expansionTooltipTmpl"
     [progress]="city.totalCulture"
     [nextProgress]="city.totalCulture + city.perTurn.culture"
     [total]="city.cultureToExpand"
@@ -181,4 +183,18 @@
 <ng-template #idleProductTooltipTmpl let-idleProduct="idleProduct">
   <b>{{ idleProduct.name }}</b>
   <app-bonuses [bonuses]="idleProduct.bonuses"></app-bonuses>
+</ng-template>
+
+<ng-template #growthTooltipTmpl>
+  <div class="growth-color">
+    {{ city.totalFood.toFixed(1) }} (+{{ city.yields.food }}) /
+    {{ city.foodToGrow }}
+  </div>
+</ng-template>
+
+<ng-template #expansionTooltipTmpl>
+  <div class="culture-color">
+    {{ city.totalCulture.toFixed(1) }} (+{{ city.yields.culture }}) /
+    {{ city.cultureToExpand }}
+  </div>
 </ng-template>
