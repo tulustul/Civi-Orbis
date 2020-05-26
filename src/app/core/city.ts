@@ -498,5 +498,8 @@ export class CityCore {
     newOwner.exploreTiles(this.tiles);
 
     collector.cities.add(this);
+    for (const tile of this.tiles) {
+      collector.tiles.add(tile);
+    }
   }
 }
