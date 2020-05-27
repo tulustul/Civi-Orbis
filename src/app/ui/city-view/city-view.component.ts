@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   ViewChild,
+  OnDestroy,
 } from "@angular/core";
 
 import { Subject } from "rxjs";
@@ -17,6 +18,8 @@ import { MapUi } from "../map-ui";
 import { Camera } from "src/app/renderer/camera";
 import { CityDetails } from "src/app/api/city-details";
 import { WorkTilesComponent } from "./work-tiles/work-tiles.component";
+import { UiView } from "../ui-view";
+import { UIState } from "../ui-state";
 
 @Component({
   selector: "app-city-view",
@@ -24,7 +27,7 @@ import { WorkTilesComponent } from "./work-tiles/work-tiles.component";
   styleUrls: ["./city-view.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CityViewComponent implements OnInit {
+export class CityViewComponent implements OnInit, OnDestroy, UiView {
   @ViewChild("workTiles") workTilesComponent: WorkTilesComponent;
 
   private quit$ = new Subject<void>();
@@ -35,10 +38,16 @@ export class CityViewComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private camera: Camera,
     private mapUi: MapUi,
+    private uiState: UIState,
   ) {}
 
   ngOnInit(): void {
+    this.uiState.activeView = this;
     this.mapUi.hoverCity(this.city.citySimple);
+  }
+
+  ngOnDestroy() {
+    this.uiState.activeView = null;
   }
 
   @Input() set city(city: CityDetails) {

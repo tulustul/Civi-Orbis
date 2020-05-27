@@ -40,7 +40,7 @@ Minor features:
   ☐ city production queue
   ☐ previous/next city button in city view
   ✔ nicer borders @done(20-05-24 22:34)
-  ☐ keyboard shortcuts
+  ✔ keyboard shortcuts @done(20-05-27 18:40)
   ☐ ai only matches with autoplay
   ☐ proper starting locations
   ☐ map generator: more realistic orogeny

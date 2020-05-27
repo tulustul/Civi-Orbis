@@ -107,10 +107,40 @@ export class Controls {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    if (event.key === "Enter") {
-      this.nextTurnService.next();
-    } else if (event.key === "Escape") {
-      this.uiState.menuVisible$.next(true);
+    if (this.uiState.activeView) {
+      if (event.key === "Escape") {
+        this.uiState.activeView.quit();
+      }
+    } else if (this.uiState.menuVisible$.value) {
+      if (event.key === "Escape" && this.game.state) {
+        this.uiState.menuVisible$.next(false);
+      }
+    } else {
+      if (event.key === "Enter") {
+        this.nextTurnService.next();
+      } else if (event.key === "Escape") {
+        this.uiState.menuVisible$.next(true);
+      } else if (this.mapUi.selectedUnit) {
+        if (event.key === "s" || event.key === "f") {
+          this.mapUi.selectedUnit
+            .setOrder("sleep")
+            .then(() =>
+              this.mapUi["_selectedUnit$"].next(this.mapUi.selectedUnit),
+            );
+        } else if (event.key === " ") {
+          this.mapUi.selectedUnit
+            .setOrder("skip")
+            .then(() =>
+              this.mapUi["_selectedUnit$"].next(this.mapUi.selectedUnit),
+            );
+        } else if (event.key === "b") {
+          this.mapUi.selectedUnit
+            .doAction("foundCity")
+            .then(() =>
+              this.mapUi["_selectedUnit$"].next(this.mapUi.selectedUnit),
+            );
+        }
+      }
     }
   }
 
