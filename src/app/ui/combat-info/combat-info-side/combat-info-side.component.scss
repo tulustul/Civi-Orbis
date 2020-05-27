@@ -1,0 +1,23 @@
+:host {
+  --positive-color: var(--growth-color);
+  --negative-color: var(--color-danger-text);
+  &.inverted-colors {
+    --positive-color: var(--color-danger-text);
+    --negative-color: var(--growth-color);
+  }
+  .modifiers {
+    .modifier {
+      color: var(--negative-color);
+      &.positive {
+        color: var(--positive-color);
+      }
+    }
+  }
+  h3 {
+    text-align: left;
+  }
+  .field {
+    display: flex;
+    justify-content: space-between;
+  }
+}

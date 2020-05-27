@@ -52,6 +52,8 @@ import { ModalComponent } from "./ui/widgets/modal/modal.component";
 import { UnitMarkerComponent } from "./ui/unit-marker/unit-marker.component";
 import { TilePainterComponent } from "./ui/editor/tile-painter/tile-painter.component";
 import { UnitPainterComponent } from "./ui/editor/unit-painter/unit-painter.component";
+import { CombatInfoComponent } from './ui/combat-info/combat-info.component';
+import { CombatInfoSideComponent } from './ui/combat-info/combat-info-side/combat-info-side.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +99,8 @@ import { UnitPainterComponent } from "./ui/editor/unit-painter/unit-painter.comp
     SpinnerComponent,
     ModalComponent,
     UnitMarkerComponent,
+    CombatInfoComponent,
+    CombatInfoSideComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [

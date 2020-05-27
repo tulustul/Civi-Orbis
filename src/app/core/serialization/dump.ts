@@ -72,6 +72,7 @@ interface UnitSerialized {
   tile: number;
   definition: string;
   actionPointsLeft: number;
+  health: number;
   player: number;
   order: UnitOrder;
   path: number[][] | null;
@@ -317,6 +318,7 @@ function dumpUnit(unit: UnitCore): UnitSerialized {
     tile: unit.tile.id,
     definition: unit.definition.id,
     actionPointsLeft: unit.actionPointsLeft,
+    health: unit.health,
     player: unit.player.id,
     order: unit.order,
     path: unit.path?.map((row) => row.map((tile) => tile.id)) || null,
@@ -328,6 +330,7 @@ function loadUnit(game: Game, unitData: UnitSerialized) {
   const player = game.players[unitData.player];
   const unit = game.unitsManager.spawn(unitData.definition, tile, player);
   unit.actionPointsLeft = unitData.actionPointsLeft;
+  unit.health = unitData.health;
   unit.order = unitData.order;
 
   unit.path =

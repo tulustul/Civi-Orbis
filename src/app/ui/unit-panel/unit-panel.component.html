@@ -1,35 +1,46 @@
-<div class="panel panel-top-right-corner" *ngIf="unit">
-  <h2>{{ unit.definition.name }}</h2>
-  <p>Moves: {{ unit.actionPointsLeft }}</p>
-  <p>Power: {{ unit.definition.power }}</p>
-  <p>Order: {{ unit.order }}</p>
+<div class="wrapper">
+  <app-combat-info
+    class="panel panel-top-right-corner"
+    *ngIf="unit && enemy && combatSimulation"
+    [attacker]="unit"
+    [defender]="enemy"
+    [simulation]="combatSimulation"
+  ></app-combat-info>
 
-  <div class="actions">
-    <button class="btn-danger" (click)="destroy()">Disband</button>
+  <div class="unit-panel panel panel-top-right-corner" *ngIf="unit">
+    <h2>{{ unit.definition.name }}</h2>
+    <p>Moves: {{ unit.actionPointsLeft }}</p>
+    <p>Strength: {{ unit.definition.strength }}</p>
+    <p>Order: {{ unit.order }}</p>
+    <p>Health: {{ unit.health }}</p>
 
-    <button (click)="setOrder('skip')">Skip move</button>
+    <div class="actions">
+      <button class="btn-danger" (click)="destroy()">Disband</button>
 
-    <button (click)="setOrder('sleep')">Sleep</button>
+      <button (click)="setOrder('skip')">Skip move</button>
+
+      <button (click)="setOrder('sleep')">Sleep</button>
+    </div>
+
+    <div class="actions">
+      <button
+        *ngFor="let action of unit.definition.actions"
+        [class.disabled]="!unit.canDoAction(action)"
+        [appTooltip]="unitActionsTooltipTmpl"
+        [tooltipContext]="{ action: action }"
+        (click)="unit.doAction(action)"
+      >
+        {{ getActionName(action) }}
+      </button>
+    </div>
   </div>
 
-  <div class="actions">
-    <button
-      *ngFor="let action of unit.definition.actions"
-      [class.disabled]="!unit.canDoAction(action)"
-      [appTooltip]="unitActionsTooltipTmpl"
-      [tooltipContext]="{ action: action }"
-      (click)="unit.doAction(action)"
-    >
-      {{ getActionName(action) }}
-    </button>
-  </div>
+  <ng-template #unitActionsTooltipTmpl let-action="action">
+    <app-unit-action-requirements
+      [unit]="unit"
+      [action]="action"
+    ></app-unit-action-requirements>
+  </ng-template>
 </div>
-
-<ng-template #unitActionsTooltipTmpl let-action="action">
-  <app-unit-action-requirements
-    [unit]="unit"
-    [action]="action"
-  ></app-unit-action-requirements>
-</ng-template>
 
 <app-unit-marker *ngIf="unit" [unit]="unit"></app-unit-marker>

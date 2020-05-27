@@ -5,7 +5,7 @@ export type UnitType = "military" | "civilian";
 
 export interface UnitDefinition extends ProductDefinition {
   actionPoints: number;
-  power: number;
+  strength: number;
   actions: UnitAction[];
   type: UnitType;
 }

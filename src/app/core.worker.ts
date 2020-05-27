@@ -12,6 +12,7 @@ import { findPath } from "./core/pathfinding";
 import { BaseTile, PlayerTask } from "./shared";
 import { BUILDINGS_MAP } from "./core/buildings";
 import { IDLE_PRODUCTS_MAP } from "./core/idle-product";
+import { CombatSimulation, simulateCombat } from "./core/combat";
 import {
   gameToChannel,
   trackedPlayerToChannel,
@@ -41,6 +42,7 @@ const HANDLERS = {
   "unit.moveAlongPath": unitMoveAlongPath,
   "unit.getRange": unitGetRange,
   "unit.getFailedActionRequirements": unitGetFailedActionRequirements,
+  "unit.simulateCombat": unitSimulateCombat,
 
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
@@ -254,6 +256,16 @@ function unitGetFailedActionRequirements(data): string[] {
   }
 
   return unit.getFailedActionRequirements(data.action);
+}
+
+function unitSimulateCombat(data): CombatSimulation | null {
+  const attacker = game.unitsManager.unitsMap.get(data.attackerId);
+  const defender = game.unitsManager.unitsMap.get(data.defenderId);
+  if (!attacker || !defender) {
+    return null;
+  }
+
+  return simulateCombat(attacker, defender);
 }
 
 export function tileUpdate(tile: Partial<BaseTile>) {

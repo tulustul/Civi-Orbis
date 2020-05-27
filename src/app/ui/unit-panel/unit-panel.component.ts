@@ -15,8 +15,8 @@ import { MapUi } from "../map-ui";
 import { UnitDetails } from "src/app/api/unit-details";
 import { UnitOrder } from "src/app/core/unit";
 import { GameApi } from "src/app/api";
-import { Camera } from "src/app/renderer/camera";
-import { DomSanitizer } from "@angular/platform-browser";
+import { Unit } from "src/app/api/unit";
+import { CombatSimulation } from "src/app/core/combat";
 
 @Component({
   selector: "app-unit-panel",
@@ -26,6 +26,8 @@ import { DomSanitizer } from "@angular/platform-browser";
 })
 export class UnitPanelComponent implements OnInit, OnDestroy {
   unit: UnitDetails | null = null;
+  enemy: Unit | null;
+  combatSimulation: CombatSimulation | null;
 
   requirementsTemplates = new Map<UnitAction, TemplateRef<any>>();
 
@@ -42,6 +44,19 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe((unit) => {
         this.unit = unit;
+        this.cdr.markForCheck();
+      });
+
+    this.mapUi.hoveredUnit$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(async (unit) => {
+        if (this.unit && unit && this.isEnemy(unit)) {
+          this.enemy = unit;
+          this.combatSimulation = await this.unit.simulateCombat(unit);
+        } else {
+          this.enemy = null;
+          this.combatSimulation = null;
+        }
         this.cdr.markForCheck();
       });
 
@@ -75,5 +90,14 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
       this.unit.disband();
       this.mapUi.selectUnit(null);
     }
+  }
+
+  isEnemy(unit: Unit | null) {
+    return (
+      this.unit &&
+      unit &&
+      this.unit.player.id !== unit.player.id &&
+      unit.definition.strength
+    );
   }
 }

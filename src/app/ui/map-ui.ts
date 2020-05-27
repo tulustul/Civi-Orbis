@@ -34,7 +34,10 @@ export class MapUi {
   yieldsVisible$ = this._yieldsVisible$.pipe(distinctUntilChanged());
 
   private _selectedUnit$ = new BehaviorSubject<UnitDetails | null>(null);
-  selectedUnit$ = this._selectedUnit$.pipe();
+  selectedUnit$ = this._selectedUnit$.asObservable();
+
+  private _hoveredUnit$ = new BehaviorSubject<Unit | null>(null);
+  hoveredUnit$ = this._hoveredUnit$.pipe(distinctUntilChanged());
 
   private selectingTileEnabled = false;
 
@@ -80,6 +83,12 @@ export class MapUi {
           this.hoverCity(tile.city);
         } else if (this.hoveredCity) {
           this.unhoverCity();
+        }
+
+        if (tile?.units.length) {
+          this._hoveredUnit$.next(tile.units[0]);
+        } else {
+          this._hoveredUnit$.next(null);
         }
       }
     });

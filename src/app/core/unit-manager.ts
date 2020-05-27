@@ -6,6 +6,7 @@ import { PlayerCore } from "./player";
 import { TileCore } from "./tile";
 import { Game } from "./game";
 import { collector } from "./collector";
+import { doCombat, BattleResult } from "./combat";
 
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
@@ -79,12 +80,18 @@ export class UnitsManager {
       return;
     }
 
-    if (unit.definition.power) {
-      if (
-        tile.units.length &&
-        tile.units.find((u) => u.definition.power && u.player !== unit.player)
-      ) {
-        // battle
+    if (unit.definition.strength) {
+      if (tile.units.length) {
+        const enemyUnit = tile.units.find(
+          (u) => u.definition.strength && u.player !== unit.player,
+        );
+        if (enemyUnit) {
+          unit.actionPointsLeft = Math.max(unit.actionPointsLeft - 3, 0);
+          const battleResult = doCombat(this, unit, enemyUnit);
+          if (battleResult !== BattleResult.victory) {
+            return;
+          }
+        }
       } else if (tile.city && tile.city.player !== unit.player) {
         tile.city.changeOwner(unit.player);
       }

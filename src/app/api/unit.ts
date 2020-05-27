@@ -10,12 +10,14 @@ export class Unit {
   definition: UnitDefinition;
   player: Player;
   tile: Tile;
+  health: number;
 
   constructor(game: GameState, unit: UnitChanneled) {
     this.id = unit.id;
     this.tile = game.map.tilesMap.get(unit.tileId)!;
     this.player = game.playersMap.get(unit.playerId)!;
     this.definition = UNITS_MAP.get(unit.definitionId)!;
+    this.health = unit.health;
 
     this.tile.units.push(this);
     game.unitsMap.set(this.id, this);

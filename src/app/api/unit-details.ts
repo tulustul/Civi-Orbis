@@ -6,6 +6,8 @@ import { Player } from "./player";
 import { makeCommand } from "./internal/commander";
 import { UnitDetailsChanneled } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
+import { CombatSimulation } from "../core/combat";
+import { Unit } from "./unit";
 
 export class UnitDetails {
   id: number;
@@ -13,6 +15,7 @@ export class UnitDetails {
   definition: UnitDefinition;
   player: Player;
   actionPointsLeft: number;
+  health: number;
   path: Tile[][] | null = null;
   order: UnitOrder;
 
@@ -26,6 +29,7 @@ export class UnitDetails {
     this.tile = this.game.map.tilesMap.get(unit.tileId)!;
     this.player = this.game.playersMap.get(unit.playerId)!;
     this.actionPointsLeft = unit.actionPointsLeft;
+    this.health = unit.health;
     this.order = unit.order;
 
     this.path = null;
@@ -95,5 +99,12 @@ export class UnitDetails {
       this.id,
     );
     this.update(data);
+  }
+
+  simulateCombat(unit: Unit) {
+    return makeCommand<CombatSimulation>("unit.simulateCombat", {
+      attackerId: this.id,
+      defenderId: unit.id,
+    });
   }
 }

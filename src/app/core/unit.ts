@@ -16,6 +16,7 @@ for (const definition of UNITS_DEFINITIONS) {
 export class UnitCore {
   id: number;
   actionPointsLeft: number;
+  health = 100;
   path: TileCore[][] | null;
 
   order: UnitOrder = null;
