@@ -24,7 +24,7 @@ export class Game {
 
   areasManager = new AreasManager();
 
-  unitsManager = new UnitsManager(this);
+  unitsManager = new UnitsManager();
 
   citiesManager = new CitiesManager();
 

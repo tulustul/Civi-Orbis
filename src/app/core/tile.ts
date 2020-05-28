@@ -74,6 +74,9 @@ export class TileCore implements BaseTile {
       if (neighbour.road === TileRoad.road) {
         cost /= 3;
       }
+      if (neighbour.forest) {
+        cost *= 2;
+      }
       this.neighboursCosts.set(neighbour, cost);
     }
   }

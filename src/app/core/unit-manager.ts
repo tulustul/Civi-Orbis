@@ -1,12 +1,9 @@
 import { UnitDefinition } from "./unit.interface";
 import { UnitCore } from "./unit";
-import { BehaviorSubject, Subject } from "rxjs";
 import { UNITS_DEFINITIONS } from "../data/units";
 import { PlayerCore } from "./player";
 import { TileCore } from "./tile";
-import { Game } from "./game";
 import { collector } from "./collector";
-import { doCombat, BattleResult } from "./combat";
 
 export class UnitsManager {
   definitions = new Map<string, UnitDefinition>();
@@ -17,7 +14,7 @@ export class UnitsManager {
 
   private lastId = 0;
 
-  constructor(private game: Game) {
+  constructor() {
     for (const definition of UNITS_DEFINITIONS) {
       this.definitions.set(definition.id, definition);
     }
@@ -29,7 +26,7 @@ export class UnitsManager {
       throw Error(`UnitsManager: No unit with id "${id}"`);
     }
 
-    const unit = new UnitCore(tile, definition, player);
+    const unit = new UnitCore(tile, definition, player, this);
     unit.id = this.lastId++;
 
     this.units.push(unit);
@@ -70,77 +67,10 @@ export class UnitsManager {
     collector.unitsDestroyed.add(unit.id);
   }
 
-  private move(unit: UnitCore, tile: TileCore) {
-    if (!unit.actionPointsLeft) {
-      return;
-    }
-
-    const cost = this.getMovementCost(unit, tile);
-    if (cost === Infinity) {
-      return;
-    }
-
-    if (unit.definition.strength) {
-      if (tile.units.length) {
-        const enemyUnit = tile.units.find(
-          (u) => u.definition.strength && u.player !== unit.player,
-        );
-        if (enemyUnit) {
-          unit.actionPointsLeft = Math.max(unit.actionPointsLeft - 3, 0);
-          const battleResult = doCombat(this, unit, enemyUnit);
-          if (battleResult !== BattleResult.victory) {
-            return;
-          }
-        }
-      } else if (tile.city && tile.city.player !== unit.player) {
-        tile.city.changeOwner(unit.player);
-      }
-    }
-
-    const index = unit.tile.units.indexOf(unit);
-    if (index !== -1) {
-      unit.tile.units.splice(index, 1);
-    }
-    tile.units.push(unit);
-    unit.tile = tile;
-
-    unit.actionPointsLeft = Math.max(unit.actionPointsLeft - cost, 0);
-
-    unit.player.exploreTiles(tile.getTilesInRange(2));
-  }
-
-  moveAlongPath(unit: UnitCore) {
-    if (!unit.path) {
-      unit.setOrder(null);
-      return;
-    }
-
-    unit.setOrder(unit.path.length ? "go" : null);
-
-    collector.units.add(unit);
-
-    while (unit.actionPointsLeft && unit.path.length) {
-      this.move(unit, unit.path[0][0]);
-      unit.path[0].shift();
-      if (!unit.path[0].length) {
-        unit.path.shift();
-      }
-      if (!unit.path.length) {
-        unit.path = null;
-        unit.setOrder(null);
-        return;
-      }
-    }
-  }
-
-  getMovementCost(unit: UnitCore, target: TileCore) {
-    return unit.tile.neighboursCosts.get(target) || Infinity;
-  }
-
   nextTurn() {
     for (const unit of this.units) {
       if (unit.path) {
-        this.moveAlongPath(unit);
+        unit.moveAlongPath();
       }
       if (unit.order === "skip") {
         unit.setOrder(null);

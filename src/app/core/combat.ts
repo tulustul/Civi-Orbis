@@ -33,29 +33,29 @@ export interface CombatSimulation {
   defender: CombatSimulationSide;
 }
 
-export function doCombat(
-  unitManager: UnitsManager,
-  attacker: UnitCore,
-  defender: UnitCore,
-): BattleResult {
+export function doCombat(attacker: UnitCore, defender: UnitCore): BattleResult {
   const sim = simulateCombat(attacker, defender);
 
   // TODO add small random variations
   attacker.health -= sim.attacker.damage;
   defender.health -= sim.defender.damage;
 
-  if (attacker.health < 0) {
-    unitManager.destroy(attacker);
-    return BattleResult.defeat;
-  } else {
+  if (attacker.health > 0) {
     collector.units.add(attacker);
   }
 
-  if (defender.health < 0) {
-    unitManager.destroy(defender);
-    return BattleResult.victory;
-  } else {
+  if (defender.health > 0) {
     collector.units.add(defender);
+  }
+
+  if (attacker.health <= 0) {
+    attacker.destroy();
+    return BattleResult.defeat;
+  }
+
+  if (defender.health <= 0) {
+    defender.destroy();
+    return BattleResult.victory;
   }
 
   return BattleResult.undecided;

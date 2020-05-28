@@ -45,7 +45,7 @@ export class AIPlayer {
     }
 
     if (unit.path) {
-      this.player.game.unitsManager.moveAlongPath(unit);
+      unit.moveAlongPath();
     }
   }
 

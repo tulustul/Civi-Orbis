@@ -4,6 +4,8 @@ import { PlayerCore } from "./player";
 import { UnitAction, ACTIONS } from "./unit-actions";
 import { UNITS_DEFINITIONS } from "../data/units";
 import { collector } from "./collector";
+import { doCombat, BattleResult } from "./combat";
+import { UnitsManager } from "./unit-manager";
 
 export type UnitOrder = "go" | "skip" | "sleep" | null;
 
@@ -25,6 +27,7 @@ export class UnitCore {
     public tile: TileCore,
     public definition: UnitDefinition,
     public player: PlayerCore,
+    private unitManager: UnitsManager,
   ) {
     this.actionPointsLeft = definition.actionPoints;
   }
@@ -129,5 +132,76 @@ export class UnitCore {
     }
 
     return result;
+  }
+
+  destroy() {
+    this.unitManager.destroy(this);
+  }
+
+  private move(tile: TileCore) {
+    if (!this.actionPointsLeft) {
+      return;
+    }
+
+    const cost = this.getMovementCost(tile);
+    if (cost === Infinity) {
+      return;
+    }
+
+    if (this.definition.strength) {
+      if (tile.units.length) {
+        const enemyUnit = tile.units.find(
+          (u) => u.definition.strength && u.player !== this.player,
+        );
+        if (enemyUnit) {
+          this.actionPointsLeft = Math.max(this.actionPointsLeft - 3, 0);
+          const battleResult = doCombat(this, enemyUnit);
+          if (battleResult !== BattleResult.victory) {
+            return;
+          }
+        }
+      } else if (tile.city && tile.city.player !== this.player) {
+        tile.city.changeOwner(this.player);
+      }
+    }
+
+    const index = this.tile.units.indexOf(this);
+    if (index !== -1) {
+      this.tile.units.splice(index, 1);
+    }
+    tile.units.push(this);
+    this.tile = tile;
+
+    this.actionPointsLeft = Math.max(this.actionPointsLeft - cost, 0);
+
+    this.player.exploreTiles(tile.getTilesInRange(2));
+  }
+
+  moveAlongPath() {
+    if (!this.path) {
+      this.setOrder(null);
+      return;
+    }
+
+    this.setOrder(this.path.length ? "go" : null);
+
+    collector.units.add(this);
+
+    while (this.actionPointsLeft && this.path.length) {
+      this.move(this.path[0][0]);
+      this.path[0].shift();
+      if (!this.path[0].length) {
+        this.path.shift();
+      }
+      if (!this.path.length) {
+        this.path = null;
+        this.setOrder(null);
+        return;
+      }
+    }
+  }
+
+  getMovementCost(target: TileCore) {
+    return this.tile.neighboursCosts.get(target) || Infinity;
   }
 }

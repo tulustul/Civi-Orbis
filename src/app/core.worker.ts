@@ -233,7 +233,7 @@ function unitMoveAlongPath(unitId: number) {
     return null;
   }
 
-  game.unitsManager.moveAlongPath(unit);
+  unit.moveAlongPath();
 
   return unitDetailsToChannel(unit);
 }

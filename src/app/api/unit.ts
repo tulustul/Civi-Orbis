@@ -24,6 +24,8 @@ export class Unit {
   }
 
   update(game: GameState, unit: UnitChanneled) {
+    this.health = unit.health;
+
     const index = this.tile.units.indexOf(this);
     if (index !== -1) {
       this.tile.units.splice(index, 1);
