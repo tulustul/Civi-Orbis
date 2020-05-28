@@ -69,6 +69,12 @@ export class UnitsManager {
 
   nextTurn() {
     for (const unit of this.units) {
+      // Heal unit if on friendly territory
+      if (unit.health < 100 && unit.tile.areaOf?.player === unit.player) {
+        unit.health = Math.min(100, unit.health + 10);
+        collector.units.add(unit);
+      }
+
       if (unit.path) {
         unit.moveAlongPath();
       }
