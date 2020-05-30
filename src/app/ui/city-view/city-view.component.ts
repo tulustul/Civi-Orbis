@@ -11,9 +11,11 @@ import {
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Building } from "src/app/core/buildings";
-import { UnitDefinition } from "src/app/core/unit.interface";
-import { IdleProduct } from "src/app/core/idle-product";
+import {
+  UnitDefinition,
+  Building,
+  IdleProduct,
+} from "src/app/core/data.interface";
 import { MapUi } from "../map-ui";
 import { Camera } from "src/app/renderer/camera";
 import { CityDetails } from "src/app/api/city-details";

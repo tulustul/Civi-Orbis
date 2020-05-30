@@ -1,16 +1,22 @@
 import { Player } from "./player";
 import { Product, ProductType } from "../core/city";
 import { Yields } from "../core/yields";
-import { Building, BUILDINGS_MAP } from "../core/buildings";
-import { UnitDefinition } from "../core/unit.interface";
-import { IdleProduct, IDLE_PRODUCTS_MAP } from "../core/idle-product";
+import {
+  UnitDefinition,
+  Building,
+  IdleProduct,
+  ProductDefinition,
+} from "../core/data.interface";
 import { GameState } from "./state";
-import { ProductDefinition } from "../core/product";
-import { UNITS_MAP } from "../core/unit";
 import { makeCommand } from "./internal/commander";
 import { CityDetailsChanneled } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
 import { City } from "./city";
+import {
+  getBuildingById,
+  getUnitById,
+  getIdleProductById,
+} from "../core/data-manager";
 
 export class CityDetails {
   id: number;
@@ -79,11 +85,11 @@ export class CityDetails {
     if (city.productId && city.productType) {
       let defition: ProductDefinition;
       if (city.productType === "building") {
-        defition = BUILDINGS_MAP.get(city.productId)!;
+        defition = getBuildingById(city.productId)!;
       } else if (city.productType === "unit") {
-        defition = UNITS_MAP.get(city.productId)!;
+        defition = getUnitById(city.productId)!;
       } else {
-        defition = IDLE_PRODUCTS_MAP.get(city.productId)!;
+        defition = getIdleProductById(city.productId)!;
       }
       this.product = {
         type: city.productType,
@@ -100,7 +106,7 @@ export class CityDetails {
     this.yields = city.yields;
     this.perTurn = city.perTurn;
 
-    this.buildings = city.buildingsIds.map((id) => BUILDINGS_MAP.get(id)!);
+    this.buildings = city.buildingsIds.map((id) => getBuildingById(id)!);
     this.buildingsIds = new Set(city.buildingsIds);
 
     this.tiles = new Set(
@@ -111,21 +117,21 @@ export class CityDetails {
     );
 
     this.availableBuildings = city.availableBuildings.map(
-      (id) => BUILDINGS_MAP.get(id)!,
+      (id) => getBuildingById(id)!,
     );
     this.availableIdleProducts = city.availableIdleProducts.map(
-      (id) => IDLE_PRODUCTS_MAP.get(id)!,
+      (id) => getIdleProductById(id)!,
     );
-    this.availableUnits = city.availableUnits.map((id) => UNITS_MAP.get(id)!);
+    this.availableUnits = city.availableUnits.map((id) => getUnitById(id)!);
 
     this.disabledBuildings = new Set(
-      city.disabledBuildings.map((id) => BUILDINGS_MAP.get(id)!),
+      city.disabledBuildings.map((id) => getBuildingById(id)!),
     );
     this.disabledUnits = new Set(
-      city.disabledUnits.map((id) => UNITS_MAP.get(id)!),
+      city.disabledUnits.map((id) => getUnitById(id)!),
     );
     this.disabledIdleProducts = new Set(
-      city.disabledIdleProducts.map((id) => IDLE_PRODUCTS_MAP.get(id)!),
+      city.disabledIdleProducts.map((id) => getIdleProductById(id)!),
     );
   }
 
@@ -205,5 +211,14 @@ export class CityDetails {
       }
     }
     return notWorkedTiles;
+  }
+
+  getFailedActionRequirements(
+    product: ProductDefinition,
+  ): Promise<[string, any][]> {
+    return makeCommand<[string, any][]>("entity.getFailedWeakRequirements", {
+      entityId: product.id,
+      cityId: this.id,
+    });
   }
 }

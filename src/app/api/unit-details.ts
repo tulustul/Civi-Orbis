@@ -1,13 +1,14 @@
 import { UnitAction } from "../core/unit-actions";
-import { UnitOrder, UNITS_MAP } from "../core/unit";
+import { UnitOrder } from "../core/unit";
 import { GameState } from "./state";
-import { UnitDefinition } from "../core/unit.interface";
+import { UnitDefinition } from "../core/data.interface";
 import { Player } from "./player";
 import { makeCommand } from "./internal/commander";
 import { UnitDetailsChanneled } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
 import { CombatSimulation } from "../core/combat";
 import { Unit } from "./unit";
+import { getUnitById } from "../core/data-manager";
 
 export class UnitDetails {
   id: number;
@@ -21,7 +22,7 @@ export class UnitDetails {
 
   constructor(private game: GameState, unit: UnitDetailsChanneled) {
     this.id = unit.id;
-    this.definition = UNITS_MAP.get(unit.definitionId)!;
+    this.definition = getUnitById(unit.definitionId)!;
     this.update(unit);
   }
 

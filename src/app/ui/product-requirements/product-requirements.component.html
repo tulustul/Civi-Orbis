@@ -1,20 +1,17 @@
-<ng-container *ngFor="let requirement of failedRequirements">
+<ng-container *ngFor="let r of failedRequirements">
   <ng-container
-    *ngTemplateOutlet="
-      templates.get(requirement.id);
-      context: { requirement: requirement }
-    "
+    *ngTemplateOutlet="templates.get(r[0]); context: r[1]"
   ></ng-container>
 </ng-container>
 
-<ng-template #buildingTmpl let-requirement="requirement">
+<ng-template #buildingTmpl let-buildingId="buildingId">
   <div>
-    <b>{{ getBuildingName(requirement.buildingId) }}</b> is required
+    <b>{{ getBuildingName(buildingId) }}</b> is required
   </div>
 </ng-template>
 
-<ng-template #sizeTmpl let-requirement="requirement">
+<ng-template #sizeTmpl let-size="size">
   <div>
-    City size <b>{{ requirement.size }}</b> is required
+    City size <b>{{ size }}</b> is required
   </div>
 </ng-template>

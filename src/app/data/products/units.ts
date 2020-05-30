@@ -1,52 +1,55 @@
-import { UnitDefinition } from "../core/unit.interface";
-import { BuildingRequirement, SizeRequirement } from "../core/product";
+import { UnitDefinition } from "src/app/core/data.interface";
+import {
+  CityHaveBuildingRequirement,
+  CitySizeRequirement,
+} from "src/app/core/requirements";
 
 export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
-    id: "settler",
+    id: "unit_settler",
     name: "Settler",
     type: "civilian",
     actionPoints: 2,
     strength: 0,
     actions: ["foundCity"],
     productionCost: 50,
-    requirements: [],
+    strongRequirements: [],
     weakRequirements: [
-      new BuildingRequirement("granary"),
-      new SizeRequirement(3),
+      new CityHaveBuildingRequirement("building_granary"),
+      new CitySizeRequirement(3),
     ],
   },
   {
-    id: "worker",
+    id: "unit_worker",
     name: "Worker",
     type: "civilian",
     actionPoints: 2,
     strength: 0,
     actions: ["buildFarm", "buildMine", "buildSawmill", "buildRoad"],
     productionCost: 20,
-    requirements: [],
-    weakRequirements: [new SizeRequirement(2)],
+    strongRequirements: [],
+    weakRequirements: [new CitySizeRequirement(2)],
   },
   {
-    id: "scout",
+    id: "unit_scout",
     name: "Scout",
     type: "military",
     actionPoints: 2,
     strength: 2,
     actions: [],
     productionCost: 10,
-    requirements: [],
+    strongRequirements: [],
     weakRequirements: [],
   },
   {
-    id: "warrior",
+    id: "unit_warrior",
     name: "Warrior",
     type: "military",
     actionPoints: 2,
     strength: 5,
     actions: [],
     productionCost: 30,
-    requirements: [],
+    strongRequirements: [],
     weakRequirements: [],
   },
 ];

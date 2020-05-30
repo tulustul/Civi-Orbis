@@ -4,12 +4,12 @@ import { Observable } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
 
 import { Option } from "../../widgets/option.interface";
-import { UNITS_DEFINITIONS } from "src/app/data/units";
 import { MapUi } from "../../map-ui";
-import { UnitDefinition } from "src/app/core/unit.interface";
+import { UnitDefinition } from "src/app/core/data.interface";
 import { GameApi } from "src/app/api";
 import { Tile } from "src/app/api/tile.interface";
 import { makeCommand } from "src/app/api/internal/commander";
+import { UNITS_DEFINITIONS } from "src/app/data/products/units";
 
 @Component({
   selector: "app-unit-painter",

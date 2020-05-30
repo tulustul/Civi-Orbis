@@ -12,6 +12,7 @@ import {
 } from "./yields";
 import { collector } from "./collector";
 import { PlayerYields } from "../shared";
+import { InternalPolitics } from "./internal-politics";
 
 export const PLAYER_COLORS: number[] = [
   0xff0000,
@@ -58,6 +59,8 @@ export class PlayerCore {
   area = this.game.areasManager.make();
 
   ai: AIPlayer | null = null;
+
+  internalPolitics = new InternalPolitics();
 
   constructor(public game: Game, public color: number) {}
 

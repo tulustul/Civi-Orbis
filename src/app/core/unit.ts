@@ -1,19 +1,12 @@
 import { TileCore } from "./tile";
-import { UnitDefinition } from "./unit.interface";
+import { UnitDefinition } from "./data.interface";
 import { PlayerCore } from "./player";
 import { UnitAction, ACTIONS } from "./unit-actions";
-import { UNITS_DEFINITIONS } from "../data/units";
 import { collector } from "./collector";
 import { doCombat, BattleResult } from "./combat";
 import { UnitsManager } from "./unit-manager";
 
 export type UnitOrder = "go" | "skip" | "sleep" | null;
-
-export const UNITS_MAP = new Map<string, UnitDefinition>();
-
-for (const definition of UNITS_DEFINITIONS) {
-  UNITS_MAP.set(definition.id, definition);
-}
 
 export class UnitCore {
   id: number;

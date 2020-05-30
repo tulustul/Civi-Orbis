@@ -1,8 +1,5 @@
 import { Game } from "../game";
-import { ProductDefinition } from "../product";
 import { ProductType, CityCore } from "../city";
-import { BUILDINGS_MAP } from "../buildings";
-import { IDLE_PRODUCTS_MAP } from "../idle-product";
 import { Yields } from "../yields";
 import { PlayerCore } from "../player";
 import { AIPlayer } from "src/app/ai/ai-player";
@@ -11,6 +8,12 @@ import { TileImprovement, TileRoad } from "../tile-improvements";
 import { TileCore } from "../tile";
 import { TilesMapCore } from "../tiles-map";
 import { UnitCore, UnitOrder } from "../unit";
+import { ProductDefinition } from "../data.interface";
+import {
+  getUnitById,
+  getBuildingById,
+  getIdleProductById,
+} from "../data-manager";
 
 export interface GameSerialized {
   turn: number;
@@ -270,13 +273,11 @@ function loadCity(game: Game, cityData: CitySerialized) {
     let productDefinition: ProductDefinition;
 
     if (cityData.product.type === "unit") {
-      productDefinition = game.unitsManager.definitions.get(
-        cityData.product.id,
-      )!;
+      productDefinition = getUnitById(cityData.product.id);
     } else if (cityData.product.type === "building") {
-      productDefinition = BUILDINGS_MAP.get(cityData.product.id)!;
+      productDefinition = getBuildingById(cityData.product.id)!;
     } else {
-      productDefinition = IDLE_PRODUCTS_MAP.get(cityData.product.id)!;
+      productDefinition = getIdleProductById(cityData.product.id)!;
     }
 
     city.product = {
@@ -285,7 +286,7 @@ function loadCity(game: Game, cityData: CitySerialized) {
     };
   }
 
-  city.buildings = cityData.buildings.map((b) => BUILDINGS_MAP.get(b)!);
+  city.buildings = cityData.buildings.map((b) => getBuildingById(b)!);
   city.buildingsIds = new Set(city.buildings.map((b) => b.id));
   city.updateYields();
 }

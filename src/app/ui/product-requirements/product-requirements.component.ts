@@ -4,21 +4,25 @@ import {
   ViewChild,
   TemplateRef,
   AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  OnInit,
 } from "@angular/core";
 
-import { ProductDefinition, ProductRequirement } from "src/app/core/product";
-import { CityCore } from "src/app/core/city";
-import { BUILDINGS_MAP } from "src/app/core/buildings";
+import { ProductDefinition } from "src/app/core/data.interface";
+import { getBuildingById } from "src/app/core/data-manager";
+import { CityDetails } from "src/app/api/city-details";
 
 @Component({
   selector: "app-product-requirements",
   templateUrl: "./product-requirements.component.html",
   styleUrls: ["./product-requirements.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductRequirementsComponent implements AfterViewInit {
+export class ProductRequirementsComponent implements OnInit, AfterViewInit {
   @Input() product: ProductDefinition;
 
-  @Input() city: CityCore;
+  @Input() city: CityDetails;
 
   @ViewChild("buildingTmpl") buildingRef: TemplateRef<any>;
 
@@ -26,22 +30,23 @@ export class ProductRequirementsComponent implements AfterViewInit {
 
   templates = new Map<string, TemplateRef<any>>();
 
-  failedRequirements: ProductRequirement[] = [];
+  failedRequirements: [string, any][] = [];
 
-  constructor() {}
+  constructor(private cdr: ChangeDetectorRef) {}
+
+  async ngOnInit() {
+    this.failedRequirements = await this.city.getFailedActionRequirements(
+      this.product,
+    );
+    this.cdr.markForCheck();
+  }
 
   ngAfterViewInit(): void {
     this.templates.set("building", this.buildingRef);
     this.templates.set("size", this.sizeRef);
-
-    for (const r of this.product.weakRequirements) {
-      if (!r.check(this.city)) {
-        this.failedRequirements.push(r);
-      }
-    }
   }
 
   getBuildingName(id: string) {
-    return BUILDINGS_MAP.get(id)!.name;
+    return getBuildingById(id).name;
   }
 }

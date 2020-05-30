@@ -1,9 +1,9 @@
 import { PlayerCore } from "../core/player";
-import { IDLE_PRODUCTS_MAP } from "../core/idle-product";
-import { UnitCore, UNITS_MAP } from "../core/unit";
 import { TileCore } from "../core/tile";
 import { findPath } from "../core/pathfinding";
 import { CityCore } from "../core/city";
+import { UnitCore } from "../core/unit";
+import { getUnitById, getIdleProductById } from "../core/data-manager";
 
 export class AIPlayer {
   constructor(private player: PlayerCore) {}
@@ -50,7 +50,7 @@ export class AIPlayer {
   }
 
   produceNext(city: CityCore) {
-    const settler = UNITS_MAP.get("settler")!;
+    const settler = getUnitById("settler")!;
     if (Math.random() > 0.7 && city.canProduce(settler)) {
       const newCityLocation = this.findCityLocation(city.tile);
       if (newCityLocation) {
@@ -65,7 +65,7 @@ export class AIPlayer {
     if (buildings.length) {
       city.produceBuilding(buildings[0]);
     } else {
-      city.workOnIdleProduct(IDLE_PRODUCTS_MAP.get("culture")!);
+      city.workOnIdleProduct(getIdleProductById("culture")!);
     }
   }
 

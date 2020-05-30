@@ -1,30 +1,18 @@
-import { UnitDefinition } from "./unit.interface";
 import { UnitCore } from "./unit";
-import { UNITS_DEFINITIONS } from "../data/units";
 import { PlayerCore } from "./player";
 import { TileCore } from "./tile";
 import { collector } from "./collector";
+import { getUnitById } from "./data-manager";
 
 export class UnitsManager {
-  definitions = new Map<string, UnitDefinition>();
-
   units: UnitCore[] = [];
 
   unitsMap = new Map<number, UnitCore>();
 
   private lastId = 0;
 
-  constructor() {
-    for (const definition of UNITS_DEFINITIONS) {
-      this.definitions.set(definition.id, definition);
-    }
-  }
-
   spawn(id: string, tile: TileCore, player: PlayerCore) {
-    const definition = this.definitions.get(id);
-    if (!definition) {
-      throw Error(`UnitsManager: No unit with id "${id}"`);
-    }
+    const definition = getUnitById(id);
 
     const unit = new UnitCore(tile, definition, player, this);
     unit.id = this.lastId++;

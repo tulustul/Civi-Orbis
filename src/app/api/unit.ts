@@ -1,9 +1,9 @@
-import { UnitDefinition } from "../core/unit.interface";
+import { UnitDefinition } from "../core/data.interface";
 import { GameState } from "./state";
-import { UNITS_MAP } from "../core/unit";
 import { Player } from "./player";
 import { UnitChanneled } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
+import { getUnitById } from "../core/data-manager";
 
 export class Unit {
   id: number;
@@ -16,7 +16,7 @@ export class Unit {
     this.id = unit.id;
     this.tile = game.map.tilesMap.get(unit.tileId)!;
     this.player = game.playersMap.get(unit.playerId)!;
-    this.definition = UNITS_MAP.get(unit.definitionId)!;
+    this.definition = getUnitById(unit.definitionId)!;
     this.health = unit.health;
 
     this.tile.units.push(this);

@@ -7,11 +7,9 @@ import { PlayerCore, PLAYER_COLORS } from "./core/player";
 import { AIPlayer } from "./ai/ai-player";
 import { collector } from "./core/collector";
 import { UnitAction } from "./core/unit-actions";
-import { UnitOrder, UNITS_MAP } from "./core/unit";
+import { UnitOrder } from "./core/unit";
 import { findPath } from "./core/pathfinding";
 import { BaseTile, PlayerTask } from "./shared";
-import { BUILDINGS_MAP } from "./core/buildings";
-import { IDLE_PRODUCTS_MAP } from "./core/idle-product";
 import { CombatSimulation, simulateCombat } from "./core/combat";
 import {
   gameToChannel,
@@ -21,6 +19,14 @@ import {
   GameChanneled,
 } from "./core/serialization/channel";
 import { dumpGame, loadGame } from "./core/serialization/dump";
+import {
+  getEntityById,
+  getBuildingById,
+  getUnitById,
+  getIdleProductById,
+} from "./core/data-manager";
+import { CityCore } from "./core/city";
+import { getFailedWeakRequirements } from "./core/requirements";
 
 let game: Game;
 
@@ -56,6 +62,8 @@ const HANDLERS = {
   "city.optimizeYields": cityOptimizeYields,
 
   "area.getTiles": getAreaTiles,
+
+  "entity.getFailedWeakRequirements": entityGetFailedWeakRequirements,
 };
 
 addEventListener("message", ({ data }) => {
@@ -120,11 +128,10 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
   game.map.precompute();
 
   for (let i = 0; i < game.players.length; i++) {
-    game.unitsManager.spawn(
-      "settler",
-      generator.getStartingLocations()[i],
-      game.players[i],
-    );
+    const startTile = generator.getStartingLocations()[i];
+    game.unitsManager.spawn("unit_settler", startTile, game.players[i]);
+    game.unitsManager.spawn("unit_scout", startTile, game.players[i]);
+    game.unitsManager.spawn("unit_warrior", startTile, game.players[i]);
   }
 
   game.start();
@@ -301,11 +308,11 @@ export function cityProduce(data) {
   }
 
   if (data.type === "building") {
-    city.produceBuilding(BUILDINGS_MAP.get(data.productId)!);
+    city.produceBuilding(getBuildingById(data.productId)!);
   } else if (data.type === "unit") {
-    city.produceUnit(UNITS_MAP.get(data.productId)!);
+    city.produceUnit(getUnitById(data.productId)!);
   } else {
-    city.workOnIdleProduct(IDLE_PRODUCTS_MAP.get(data.productId)!);
+    city.workOnIdleProduct(getIdleProductById(data.productId)!);
   }
 
   return cityDetailsToChannel(city);
@@ -379,4 +386,21 @@ export function getAreaTiles(areaId: number): number[] {
   }
 
   return Array.from(area.tiles).map((tile) => tile.id);
+}
+
+export function entityGetFailedWeakRequirements(data): [string, any][] {
+  const entityId: string = data.entityId;
+  const cityId: number | null = data.cityId;
+
+  const entity = getEntityById(entityId);
+  if (!entity) {
+    return [];
+  }
+
+  let city: CityCore | null = null;
+  if (cityId) {
+    city = game.citiesManager.citiesMap.get(cityId)!;
+  }
+
+  return getFailedWeakRequirements(entity, game.trackedPlayer, city);
 }

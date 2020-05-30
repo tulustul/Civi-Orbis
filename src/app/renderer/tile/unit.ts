@@ -48,7 +48,7 @@ export class UnitsDrawer {
     const backgroundTextureName = `unitBackground-${unit.definition.type}.png`;
     const backgroundTexture = this.textures[backgroundTextureName];
 
-    const unitTextureName = `unit-${unit.definition.id}.png`;
+    const unitTextureName = `${unit.definition.id}.png`;
     const unitTexture = this.textures[unitTextureName];
 
     const unitContainer = new PIXI.Container();

@@ -1,9 +1,11 @@
 import { TileCore } from "./tile";
 import { PlayerCore } from "./player";
-import { UnitDefinition } from "./unit.interface";
-import { Building } from "./buildings";
-import { ProductDefinition } from "./product";
-import { IdleProduct } from "./idle-product";
+import {
+  UnitDefinition,
+  ProductDefinition,
+  Building,
+  IdleProduct,
+} from "./data.interface";
 import { Bonuses } from "./bonus";
 import {
   EMPTY_YIELDS,
@@ -14,10 +16,11 @@ import {
   roundYields,
 } from "./yields";
 
-import { UNITS_DEFINITIONS } from "../data/units";
-import { BUILDINGS } from "../data/buildings";
-import { IDLE_PRODUCTS } from "../data/idle-products";
 import { collector } from "./collector";
+import { BUILDINGS } from "../data/products/buildings";
+import { UNITS_DEFINITIONS } from "../data/products/units";
+import { IDLE_PRODUCTS } from "../data/products/idle-products";
+import { checkRequirements } from "./requirements";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -400,30 +403,17 @@ export class CityCore {
   }
 
   canProduce(product: ProductDefinition): boolean {
-    for (const r of product.requirements) {
-      if (!r.check(this)) {
-        return false;
-      }
-    }
-
-    for (const r of product.weakRequirements) {
-      if (!r.check(this)) {
-        return false;
-      }
-    }
-
-    return true;
+    return checkRequirements(product, this.player, this);
   }
 
   private getAvailableProducts<T extends ProductDefinition>(
     products: T[],
-    city: CityCore,
   ): T[] {
     const results: T[] = [];
     for (const p of products) {
       let ok = true;
-      for (const r of p.requirements) {
-        if (!r.check(city)) {
+      for (const r of p.strongRequirements) {
+        if (!r.check(this.player, this)) {
           ok = false;
           break;
         }
@@ -437,12 +427,11 @@ export class CityCore {
 
   private getDisabledProducts<T extends ProductDefinition>(
     products: T[],
-    city: CityCore,
   ): Set<T> {
     const results = new Set<T>();
     for (const p of products) {
       for (const r of p.weakRequirements) {
-        if (!r.check(city)) {
+        if (!r.check(this.player, this)) {
           results.add(p);
         }
       }
@@ -453,11 +442,9 @@ export class CityCore {
   updateProductsList() {
     this.availableUnits = this.getAvailableProducts<UnitDefinition>(
       UNITS_DEFINITIONS,
-      this,
     );
     this.disabledUnits = this.getDisabledProducts<UnitDefinition>(
       this.availableUnits,
-      this,
     );
 
     const notBuildBuildings = BUILDINGS.filter(
@@ -467,11 +454,9 @@ export class CityCore {
 
     this.availableBuildings = this.getAvailableProducts<Building>(
       notBuildBuildings,
-      this,
     );
     this.disabledBuildings = this.getDisabledProducts<Building>(
       this.availableBuildings,
-      this,
     );
 
     this.availableIdleProducts = IDLE_PRODUCTS;
