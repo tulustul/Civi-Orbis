@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { SimplexMapGenerator } from "./map-generators/simplex";
+import { RealisticMapGenerator } from "./map-generators/realistic";
 import { MapGeneratorOptions } from "./api/game.interface";
 import { Game } from "./core/game";
 import { PlayerCore, PLAYER_COLORS } from "./core/player";
@@ -117,7 +117,7 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
     game.addPlayer(player);
   }
 
-  const generator = new SimplexMapGenerator(game.players.length);
+  const generator = new RealisticMapGenerator(game.players.length);
   game.map = generator.generate(
     data.width,
     data.height,

@@ -24,7 +24,7 @@ interface TileMetadata {
   temperature: number;
 }
 
-export class SimplexMapGenerator implements MapGenerator {
+export class RealisticMapGenerator implements MapGenerator {
   private map: TilesMapCore;
 
   private width: number;
@@ -75,6 +75,8 @@ export class SimplexMapGenerator implements MapGenerator {
     }
 
     this.generateHeightmap();
+
+    this.generateMountainRanges();
 
     this.generateTemperature();
 
@@ -169,7 +171,7 @@ export class SimplexMapGenerator implements MapGenerator {
     for (let [tile, value, _] of this.getNoisedTiles(coastlineNoise)) {
       let height = 0;
 
-      // Adjust horizontal edges to be more likely sea.
+      // Adjust horizontal map edges to be more likely sea.
       const distanceToEdge = Math.min(tile.x, this.width - tile.x);
       const edgeThrehold = this.width * 0.1;
       if (distanceToEdge < edgeThrehold) {
@@ -186,6 +188,7 @@ export class SimplexMapGenerator implements MapGenerator {
         }
         height = heightmapNoise.at(tile.x, tile.y);
       }
+
       this.metadata.get(tile)!.height = height;
     }
   }
@@ -224,6 +227,8 @@ export class SimplexMapGenerator implements MapGenerator {
       metadata.humidity = Math.max(0, Math.min(1, base * 0.8 + noise));
     }
   }
+
+  private generateMountainRanges() {}
 
   private *getNoisedTiles(
     noise: ComplexNoise,

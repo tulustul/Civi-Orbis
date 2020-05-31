@@ -1,65 +1,34 @@
 
 Bugs:
-  ✔ showing city's area should take player's explored tiles into account @done(20-05-24 13:32)
   ☐ next turn should hide city view
   ☐ map generator: fix rivers placement - loops, dead ends etc.
   ☐ unit path is showing wrong turns count
-  ✔ TileContainer raises exception when game is loaded @done(20-05-08 22:59)
-  ✔ minimap doesn't fully fill it's viewport @done(20-05-08 19:00)
-  ✔ selecting building to build should hide it from production list @done(20-05-07 21:38)
-  ✔ ExpressionChangedAfterItHasBeenCheckedError when opening city view @done(20-05-09 00:28)
-  ✔ starting new game for the second time: WebGL: INVALID_OPERATION: uniformMatrix3fv: location is not from current program @done(20-05-08 22:36)
   ☐ webgl fonts scaling
-  ✔ webworker: setting work tiles @done(20-05-24 14:50)
-  ✔ webworker: highlighting city tiles @done(20-05-24 12:58)
-  ✔ webworker: building improvements @done(20-05-24 19:21)
-  ✔ webworker: optimizing yields @done(20-05-24 15:00)
-  ✔ webworker: blocking next turn till no actions remained @done(20-05-24 15:56)
   ☐ yields change received when selecting a unit
 
 Performance:
-  ✔ core running in webworker @done(20-05-23 18:09)
-  ✔ areas updating locality @done(20-05-23 18:09)
-  ✔ showing a lot of city labels on map @done(20-05-23 18:09)
-  ✔ pathfinding @done(20-05-23 18:09)
   ☐ distinguish between commands that mutate the state and those which don't
   ☐ disable collector while game is loading
 
 Minor features:
-  ✔ ESC for closing current view @done(20-05-27 23:34)
   ☐ closing city view should restore previous camera transform
   ☐ nicer start game view
   ☐ tooltips for more ui elements
-  ✔ block next turn until all units/buildings have orders (and jump to them) @done(20-05-09 00:29)
-  ✔ hide city growth/production in foreign cities @done(20-05-24 13:31)
-  ✔ when zoomed out display areas instead of borders @done(20-05-23 21:37)
   ☐ autosaving
-  ✔ better city expansion @done(20-05-23 18:16)
-  ✔ differentiate between different units on the map @done(20-05-26 17:06)
-  ✔ city products can have requirements @done(20-05-07 20:42)
   ☐ city production queue
   ☐ previous/next city button in city view
-  ✔ nicer borders @done(20-05-24 22:34)
-  ✔ keyboard shortcuts @done(20-05-27 18:40)
   ☐ ai only matches with autoplay
   ☐ proper starting locations
   ☐ map generator: more realistic orogeny
   ☐ map generator: climate based on mountain ranges and sea currents
 
 Major features:
-  ✔ implement `city work on` (how to call it properly?). @done(20-05-07 22:31)
-    ✔ `food` transforms 25% of production into food @done(20-05-07 22:31)
-    ✔ `public works` produces `public works points` @done(20-05-08 16:32)
-  ✔ tile improvements: @done(20-05-09 22:32)
-    ✔ `farm` +1 food @done(20-05-09 22:32)
-    ✔ `mine` +1 production @done(20-05-09 22:32)
-    ✔ `sawmill` +1 production @done(20-05-09 22:32)
-    ✔ `road` 0.5 movement cost @done(20-05-09 23:33)
-  ✔ city conquest @done(20-05-26 17:07)
-  ✔ combat @done(20-05-27 23:35)
-  ☐ AI :/
+  ☐ naval units
+  ☐ AI combat
+  ☐ AI exploring
   ☐ statistics and charts
   ☐ resources - increase tile yields
+  ☐ happiness
   ☐ `fog of war` - grey out tiles not visible by units and cities
   ☐ tile improvements damaging when not enough public works
   ☐ armies
@@ -71,6 +40,38 @@ Major features:
   ☐ nations
   ☐ trade
 
-Long term ideas:
-
 Archive:
+  ✔ showing city's area should take player's explored tiles into account @done(20-05-24 13:32) @project(Bugs)
+  ✔ TileContainer raises exception when game is loaded @done(20-05-08 22:59) @project(Bugs)
+  ✔ minimap doesn't fully fill it's viewport @done(20-05-08 19:00) @project(Bugs)
+  ✔ selecting building to build should hide it from production list @done(20-05-07 21:38) @project(Bugs)
+  ✔ ExpressionChangedAfterItHasBeenCheckedError when opening city view @done(20-05-09 00:28) @project(Bugs)
+  ✔ starting new game for the second time: WebGL: INVALID_OPERATION: uniformMatrix3fv: location is not from current program @done(20-05-08 22:36) @project(Bugs)
+  ✔ webworker: setting work tiles @done(20-05-24 14:50) @project(Bugs)
+  ✔ webworker: highlighting city tiles @done(20-05-24 12:58) @project(Bugs)
+  ✔ webworker: building improvements @done(20-05-24 19:21) @project(Bugs)
+  ✔ webworker: optimizing yields @done(20-05-24 15:00) @project(Bugs)
+  ✔ webworker: blocking next turn till no actions remained @done(20-05-24 15:56) @project(Bugs)
+  ✔ core running in webworker @done(20-05-23 18:09) @project(Performance)
+  ✔ areas updating locality @done(20-05-23 18:09) @project(Performance)
+  ✔ showing a lot of city labels on map @done(20-05-23 18:09) @project(Performance)
+  ✔ pathfinding @done(20-05-23 18:09) @project(Performance)
+  ✔ ESC for closing current view @done(20-05-27 23:34) @project(Minor features)
+  ✔ block next turn until all units/buildings have orders (and jump to them) @done(20-05-09 00:29) @project(Minor features)
+  ✔ hide city growth/production in foreign cities @done(20-05-24 13:31) @project(Minor features)
+  ✔ when zoomed out display areas instead of borders @done(20-05-23 21:37) @project(Minor features)
+  ✔ better city expansion @done(20-05-23 18:16) @project(Minor features)
+  ✔ differentiate between different units on the map @done(20-05-26 17:06) @project(Minor features)
+  ✔ city products can have requirements @done(20-05-07 20:42) @project(Minor features)
+  ✔ nicer borders @done(20-05-24 22:34) @project(Minor features)
+  ✔ keyboard shortcuts @done(20-05-27 18:40) @project(Minor features)
+  ✔ implement `city work on` (how to call it properly?). @done(20-05-07 22:31) @project(Major features)
+  ✔ `food` transforms 25% of production into food @done(20-05-07 22:31) @project(Major features)
+  ✔ `public works` produces `public works points` @done(20-05-08 16:32) @project(Major features)
+  ✔ tile improvements: @done(20-05-09 22:32) @project(Major features)
+  ✔ `farm` +1 food @done(20-05-09 22:32) @project(Major features)
+  ✔ `mine` +1 production @done(20-05-09 22:32) @project(Major features)
+  ✔ `sawmill` +1 production @done(20-05-09 22:32) @project(Major features)
+  ✔ `road` 0.5 movement cost @done(20-05-09 23:33) @project(Major features)
+  ✔ city conquest @done(20-05-26 17:07) @project(Major features)
+  ✔ combat @done(20-05-27 23:35) @project(Major features)

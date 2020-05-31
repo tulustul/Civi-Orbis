@@ -50,7 +50,7 @@ export class AIPlayer {
   }
 
   produceNext(city: CityCore) {
-    const settler = getUnitById("settler")!;
+    const settler = getUnitById("unit_settler")!;
     if (Math.random() > 0.7 && city.canProduce(settler)) {
       const newCityLocation = this.findCityLocation(city.tile);
       if (newCityLocation) {
@@ -65,7 +65,7 @@ export class AIPlayer {
     if (buildings.length) {
       city.produceBuilding(buildings[0]);
     } else {
-      city.workOnIdleProduct(getIdleProductById("culture")!);
+      city.workOnIdleProduct(getIdleProductById("idle_product_culture")!);
     }
   }
 

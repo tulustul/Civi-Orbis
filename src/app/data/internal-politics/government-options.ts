@@ -13,6 +13,14 @@ export const GOVERNMENT_OPTIONS: GovernmentOption[] = [
     weakRequirements: [],
   },
   {
+    section: GovernmentSection.organization,
+    id: "government_organization_despotism",
+    name: "despotism",
+    bonuses: {},
+    strongRequirements: [],
+    weakRequirements: [],
+  },
+  {
     section: GovernmentSection.economics,
     id: "government_economics_barter",
     name: "barter",

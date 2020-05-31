@@ -45,3 +45,9 @@ export type GovernmentOption = Entity &
   HaveBonuses & {
     section: GovernmentSection;
   };
+
+export type Nation = Entity & {
+  parentNation: string | null;
+  bonuses: Bonuses;
+  citiesNames: string[];
+};

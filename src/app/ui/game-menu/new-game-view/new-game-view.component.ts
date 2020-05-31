@@ -1,12 +1,9 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 
-import { SimplexMapGenerator } from "src/app/map-generators/simplex";
-import { PlayerCore, PLAYER_COLORS } from "src/app/core/player";
-import { UIState } from "../../ui-state";
-import { AIPlayer } from "src/app/ai/ai-player";
 import { GameApi } from "src/app/api/game";
 import { MapGeneratorOptions } from "src/app/api/game.interface";
 import { Camera } from "src/app/renderer/camera";
+import { UIState } from "../../ui-state";
 
 @Component({
   selector: "app-new-game-view",

@@ -10,6 +10,7 @@ import {
 import { UnitCore } from "./unit";
 import { CityCore } from "./city";
 import { collector } from "./collector";
+import { Nation } from "./data.interface";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -44,6 +45,8 @@ export class TileCore implements BaseTile {
   areaOf: CityCore | null = null;
 
   yields: Yields = { ...EMPTY_YIELDS };
+
+  ethnicity = new Map<Nation, number>();
 
   // cached data
   neighbours: TileCore[] = [];
