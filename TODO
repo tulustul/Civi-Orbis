@@ -5,6 +5,7 @@ Bugs:
   ☐ unit path is showing wrong turns count
   ☐ webgl fonts scaling
   ☐ yields change received when selecting a unit
+  ☐ yields change received when using pathfinding
 
 Performance:
   ☐ distinguish between commands that mutate the state and those which don't

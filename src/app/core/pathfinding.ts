@@ -1,5 +1,6 @@
 import { TileCore } from "./tile";
 import { UnitCore } from "./unit";
+import { SeaLevel } from "../shared";
 
 export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
   const startTime = performance.now();
@@ -9,7 +10,11 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
     return null;
   }
 
-  if (start.passableArea !== end.passableArea) {
+  if (unit.definition.type === "naval") {
+    if (end.seaLevel === SeaLevel.none) {
+      return null;
+    }
+  } else if (start.passableArea !== end.passableArea) {
     return null;
   }
 

@@ -2,13 +2,14 @@ import { UnitDefinition } from "src/app/core/data.interface";
 import {
   CityHaveBuildingRequirement,
   CitySizeRequirement,
+  CoastlineCityRequirement,
 } from "src/app/core/requirements";
 
 export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_settler",
     name: "Settler",
-    type: "civilian",
+    type: "land",
     actionPoints: 2,
     strength: 0,
     actions: ["foundCity"],
@@ -22,7 +23,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_worker",
     name: "Worker",
-    type: "civilian",
+    type: "land",
     actionPoints: 2,
     strength: 0,
     actions: ["buildFarm", "buildMine", "buildSawmill", "buildRoad"],
@@ -33,7 +34,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_scout",
     name: "Scout",
-    type: "military",
+    type: "land",
     actionPoints: 2,
     strength: 2,
     actions: [],
@@ -44,12 +45,23 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_warrior",
     name: "Warrior",
-    type: "military",
+    type: "land",
     actionPoints: 2,
     strength: 5,
     actions: [],
     productionCost: 30,
     strongRequirements: [],
+    weakRequirements: [],
+  },
+  {
+    id: "unit_tireme",
+    name: "Tireme",
+    type: "naval",
+    actionPoints: 3,
+    strength: 5,
+    actions: [],
+    productionCost: 50,
+    strongRequirements: [new CoastlineCityRequirement()],
     weakRequirements: [],
   },
 ];

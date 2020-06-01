@@ -61,8 +61,8 @@ export class TileCore implements BaseTile {
     for (const neighbour of this.neighbours) {
       const dir = this.getDirectionTo(neighbour);
       let cost = 1;
-      if (neighbour.seaLevel !== SeaLevel.none) {
-        cost = Infinity;
+      if (this.isLand !== neighbour.isLand) {
+        cost = this.city || neighbour.city ? 1 : Infinity;
       } else if (neighbour.landForm === LandForm.mountains) {
         cost = Infinity;
       } else if (neighbour.landForm === LandForm.hills) {
@@ -196,5 +196,13 @@ export class TileCore implements BaseTile {
       neighbour.computeMovementCosts();
     }
     collector.tiles.add(this);
+  }
+
+  get isWater() {
+    return this.seaLevel !== SeaLevel.none;
+  }
+
+  get isLand() {
+    return !this.isWater;
   }
 }

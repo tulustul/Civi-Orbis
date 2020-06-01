@@ -105,6 +105,18 @@ export class UnitCore {
     for (const neighbour of tile.neighbours) {
       const oldActionPointsLeft = actionPointsLeftAtTile.get(neighbour);
 
+      if (this.definition.type === "land") {
+        if (!neighbour.isLand) {
+          continue;
+        }
+      }
+
+      if (this.definition.type === "naval") {
+        if (!neighbour.isWater) {
+          continue;
+        }
+      }
+
       const cost = tile.neighboursCosts.get(neighbour)!;
       if (cost === Infinity) {
         continue;

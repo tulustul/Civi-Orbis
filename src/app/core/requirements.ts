@@ -1,6 +1,7 @@
 import { CityCore } from "./city";
 import { PlayerCore } from "./player";
 import { HaveRequirements } from "./data.interface";
+import { SeaLevel } from "../shared";
 
 export abstract class Requirement {
   static id: string;
@@ -67,5 +68,16 @@ export class CitySizeRequirement extends Requirement {
       return false;
     }
     return city.size >= this.context.size;
+  }
+}
+
+export class CoastlineCityRequirement extends Requirement {
+  id = "coastlineCity";
+
+  check(player: PlayerCore, city: CityCore | null) {
+    if (!city) {
+      return false;
+    }
+    return !!city.tile.neighbours.find((n) => n.seaLevel !== SeaLevel.none);
   }
 }

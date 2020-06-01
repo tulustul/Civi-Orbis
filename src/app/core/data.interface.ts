@@ -23,7 +23,7 @@ export interface ProductDefinition extends Entity, HaveRequirements {
   productionCost: number;
 }
 
-export type UnitType = "military" | "civilian";
+export type UnitType = "land" | "naval";
 
 export interface UnitDefinition extends ProductDefinition {
   actionPoints: number;

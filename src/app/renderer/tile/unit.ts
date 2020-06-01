@@ -45,7 +45,9 @@ export class UnitsDrawer {
   }
 
   spawn(unit: Unit) {
-    const backgroundTextureName = `unitBackground-${unit.definition.type}.png`;
+    const backgroundType =
+      unit.definition.strength > 0 ? "military" : "civilian";
+    const backgroundTextureName = `unitBackground-${backgroundType}.png`;
     const backgroundTexture = this.textures[backgroundTextureName];
 
     const unitTextureName = `${unit.definition.id}.png`;
