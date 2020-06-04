@@ -11,7 +11,7 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
   }
 
   if (unit.definition.type === "naval") {
-    if (end.seaLevel === SeaLevel.none) {
+    if (end.seaLevel === SeaLevel.none && !end.city) {
       return null;
     }
   } else if (start.passableArea !== end.passableArea) {
@@ -64,6 +64,12 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
 
         if (moveCost === Infinity) {
           continue;
+        }
+
+        if (unit.definition.type === "naval") {
+          if (neighbour.seaLevel === SeaLevel.none && !neighbour.city) {
+            continue;
+          }
         }
 
         let newActionPointsLeft = Math.max(0, actionPointsLeft - moveCost);

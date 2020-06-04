@@ -112,7 +112,7 @@ export class UnitCore {
       }
 
       if (this.definition.type === "naval") {
-        if (!neighbour.isWater) {
+        if (!neighbour.isWater && !neighbour.city) {
           continue;
         }
       }
