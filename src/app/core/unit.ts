@@ -31,7 +31,10 @@ export class UnitCore {
     }
 
     ACTIONS[action].fn(this.player.game, this);
-    collector.units.add(this);
+
+    if (!collector.unitsDestroyed.has(this.id)) {
+      collector.units.add(this);
+    }
   }
 
   canDoAction(action: UnitAction): boolean {
@@ -179,7 +182,8 @@ export class UnitCore {
 
     this.actionPointsLeft = Math.max(this.actionPointsLeft - cost, 0);
 
-    this.player.exploreTiles(tile.getTilesInRange(2));
+    // TODO update also visibleTiles
+    this.player.exploreTiles(this.getVisibleTiles());
   }
 
   moveAlongPath() {
@@ -208,5 +212,9 @@ export class UnitCore {
 
   getMovementCost(target: TileCore) {
     return this.tile.neighboursCosts.get(target) || Infinity;
+  }
+
+  getVisibleTiles(): Set<TileCore> {
+    return this.tile.getTilesInRange(2);
   }
 }

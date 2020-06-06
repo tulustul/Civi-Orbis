@@ -1,4 +1,4 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { takeUntil } from "rxjs/operators";
 
@@ -19,21 +19,15 @@ import { Tile } from "../api/tile.interface";
 export class MapDrawer {
   container = new TileWrapperContainer();
 
-  waterContainer = new TileContainer(this.camera.tileBoundingBox);
-
-  terrainContainer = new TileContainer(this.camera.tileBoundingBox);
-
-  riverContainer = new TileContainer(this.camera.tileBoundingBox);
-
-  cityContainer = new TileContainer(this.camera.tileBoundingBox);
-
-  yieldsContainer = new TileContainer(this.camera.tileBoundingBox);
+  tilesContainer = new TileContainer(this.camera.tileBoundingBox);
 
   unitsContainer = new TileContainer(this.camera.tileBoundingBox);
 
   areasContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  overlaysContainer = new PIXIE.Container();
+  overlaysContainer = new PIXI.Container();
+
+  tileContainers = new Map<Tile, PIXI.Container>();
 
   terrainDrawer: TerrainDrawer;
 
@@ -52,22 +46,13 @@ export class MapDrawer {
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
-    this.waterContainer["interactiveChildren"] = false;
-    this.terrainContainer["interactiveChildren"] = false;
-    this.riverContainer["interactiveChildren"] = false;
-    this.cityContainer["interactiveChildren"] = false;
-    this.yieldsContainer["interactiveChildren"] = false;
-    this.overlaysContainer["interactiveChildren"] = false;
+    this.tilesContainer["interactiveChildren"] = false;
     this.areasContainer["interactiveChildren"] = false;
 
-    this.container.addChild(this.waterContainer);
-    this.container.addChild(this.terrainContainer);
-    this.container.addChild(this.riverContainer);
-    this.container.addChild(this.cityContainer);
-    this.container.addChild(this.yieldsContainer);
-    this.container.addChild(this.overlaysContainer);
-    this.container.addChild(this.areasContainer);
+    this.container.addChild(this.tilesContainer);
     this.container.addChild(this.unitsContainer);
+    this.container.addChild(this.areasContainer);
+    this.container.addChild(this.overlaysContainer);
 
     this.game.init$.subscribe((state) => {
       state.trackedPlayer$
@@ -86,18 +71,39 @@ export class MapDrawer {
           }
         });
 
+      // cities
+      state.citySpawned$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((city) => this.updateTile(city.tile));
+
+      state.cityUpdated$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((city) => this.updateTile(city.tile));
+
+      state.cityDestroyed$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((city) => this.cityDrawer.destroy(city));
+
+      // units
+      state.unitSpawned$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((unit) => this.unitsDrawer.draw(unit));
+
+      state.unitUpdated$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((unit) => this.unitsDrawer.update(unit));
+
+      state.unitDestroyed$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((unit) => this.unitsDrawer.destroy(unit));
+
       this.build(state);
     });
 
     this.game.stop$.subscribe(() => this.clear());
 
     // Drawers must be created after init$ subscription?. Race condition will occur otherwise.
-    this.terrainDrawer = new TerrainDrawer(
-      this.renderer,
-      this.game,
-      this.terrainContainer,
-      this.waterContainer,
-    );
+    this.terrainDrawer = new TerrainDrawer(this.renderer, this.game);
 
     this.unitsDrawer = new UnitsDrawer(
       this.game,
@@ -105,19 +111,11 @@ export class MapDrawer {
       this.unitsContainer,
     );
 
-    this.yieldsDrawer = new YiedsDrawer(
-      this.game,
-      this.renderer.mapUi,
-      this.yieldsContainer,
-    );
+    this.yieldsDrawer = new YiedsDrawer(this.renderer.mapUi);
 
-    this.riverDrawer = new RiverDrawer(this.game, this.riverContainer);
+    this.riverDrawer = new RiverDrawer();
 
-    this.cityDrawer = new CityDrawer(
-      this.game,
-      this.renderer,
-      this.cityContainer,
-    );
+    this.cityDrawer = new CityDrawer(this.renderer);
   }
 
   hideAllTiles() {
@@ -140,12 +138,10 @@ export class MapDrawer {
   }
 
   clear() {
+    this.tilesContainer.destroyAllChildren();
     if (this.terrainDrawer) {
-      this.terrainDrawer.clear();
-      this.riverDrawer.clear();
       this.cityDrawer.clear();
       this.unitsDrawer.clear();
-      this.yieldsDrawer.clear();
       this.politicsDrawer.clear();
     }
   }
@@ -154,23 +150,21 @@ export class MapDrawer {
     this.politicsDrawer = new PoliticsDrawer(gameState, this.renderer);
     this.container.bindToMap(gameState.map);
 
-    this.waterContainer.bindToMap(gameState.map);
-    this.terrainContainer.bindToMap(gameState.map);
-    this.cityContainer.bindToMap(gameState.map);
-    this.yieldsContainer.bindToMap(gameState.map);
-    this.riverContainer.bindToMap(gameState.map);
+    this.tilesContainer.bindToMap(gameState.map);
     this.unitsContainer.bindToMap(gameState.map);
     this.areasContainer.bindToMap(gameState.map);
 
-    this.unitsDrawer.build();
-    this.cityDrawer.build();
-
-    for (let y = 0; y < gameState.map.height; y++) {
-      for (let x = 0; x < gameState.map.width; x++) {
+    for (let x = 0; x < gameState.map.width; x++) {
+      for (let y = 0; y < gameState.map.height; y++) {
         const tile = gameState.map.tiles[x][y];
-        this.drawTile(tile);
+        const container = new PIXI.Container();
+        this.tileContainers.set(tile, container);
+        this.tilesContainer.addChild(container, tile);
+        this.drawTile(tile, container);
       }
     }
+
+    this.unitsDrawer.build();
 
     if (this.game.state?.trackedPlayer) {
       this.limitViewToPlayer(this.game.state?.trackedPlayer);
@@ -178,20 +172,23 @@ export class MapDrawer {
   }
 
   private updateTile(tile: Tile) {
-    this.clearTile(tile);
-    this.drawTile(tile);
+    const container = this.tileContainers.get(tile);
+    if (container) {
+      for (const child of container.children) {
+        child.destroy();
+      }
+      this.drawTile(tile, container);
+    }
   }
 
-  private drawTile(tile: Tile) {
-    this.terrainDrawer.drawTile(tile);
-    this.yieldsDrawer.drawTile(tile);
-    this.riverDrawer.drawTile(tile);
-  }
+  private drawTile(tile: Tile, container: PIXI.Container) {
+    this.terrainDrawer.drawTile(tile, container);
+    this.riverDrawer.drawTile(tile, container);
+    this.yieldsDrawer.drawTile(tile, container);
 
-  private clearTile(tile: Tile) {
-    this.terrainDrawer.clearTile(tile);
-    this.yieldsDrawer.clearTile(tile);
-    this.riverContainer.clearTile(tile);
+    if (tile.city) {
+      this.cityDrawer.draw(tile.city, container);
+    }
   }
 
   private limitViewToPlayer(player: TrackedPlayer) {

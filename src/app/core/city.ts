@@ -51,6 +51,8 @@ export class CityCore {
 
   tiles = new Set<TileCore>();
 
+  visibleTiles = new Set<TileCore>();
+
   workedTiles = new Set<TileCore>();
 
   notWorkedTiles = new Set<TileCore>();

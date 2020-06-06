@@ -75,6 +75,17 @@ export class PlayerCore {
     }
   }
 
+  showTiles(tiles: Iterable<TileCore>) {
+    for (const tile of tiles) {
+      if (!this.visibleTiles.has(tile)) {
+        this.visibleTiles.add(tile);
+        if (this.id === this.game.trackedPlayer.id) {
+          collector.tilesShowed.add(tile.id);
+        }
+      }
+    }
+  }
+
   updateYields() {
     zeroYields(this.yields.income);
     zeroYields(this.yields.costs);
@@ -109,6 +120,22 @@ export class PlayerCore {
 
     this.updateCitiesWithoutProduction();
     this.updateUnitsWithoutOrders();
+    this.updateVisibleTiles();
+  }
+
+  updateVisibleTiles() {
+    this.visibleTiles.clear();
+    for (const city of this.cities) {
+      // TODO replace with city.visibleTiles
+      for (const tile of city.tiles) {
+        this.visibleTiles.add(tile);
+      }
+    }
+    for (const unit of this.units) {
+      for (const tile of unit.getVisibleTiles()) {
+        this.visibleTiles.add(tile);
+      }
+    }
   }
 
   updateCitiesWithoutProduction() {

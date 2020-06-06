@@ -207,7 +207,6 @@ export class MapUi {
   selectCity(city: City | null) {
     if (!city) {
       this.uiState.selectedCity$.next(null);
-      this._cityLabelsVisible$.next(true);
       this.allowMapPanning = true;
       return;
     }
@@ -216,7 +215,6 @@ export class MapUi {
       this.game.state.getCityDetails(city.id).then((data) => {
         const cityDetails = new CityDetails(this.game.state!, data);
         this.uiState.selectedCity$.next(cityDetails);
-        this._cityLabelsVisible$.next(false);
         this.cityRangeArea.setTiles(Array.from(cityDetails.tiles));
         this.allowMapPanning = false;
       });

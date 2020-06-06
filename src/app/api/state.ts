@@ -142,6 +142,9 @@ export class GameState {
   }
 
   updateUnit(unitId: number) {
-    this._unitUpdated$.next(this.unitsMap.get(unitId));
+    const unit = this.unitsMap.get(unitId);
+    if (unit) {
+      this._unitUpdated$.next(unit);
+    }
   }
 }

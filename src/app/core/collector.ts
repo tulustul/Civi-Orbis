@@ -25,6 +25,7 @@ class Collector {
   trackedPlayer: PlayerCore | undefined;
   trackedPlayerYields: PlayerYields | undefined;
   tilesExplored = new Set<number>();
+  tilesShowed = new Set<number>();
 
   turn = 0;
 
@@ -87,6 +88,12 @@ class Collector {
         data: Array.from(this.tilesExplored),
       });
     }
+    if (this.tilesShowed.size) {
+      changes.push({
+        type: "trackedPlayer.tilesShowed",
+        data: Array.from(this.tilesShowed),
+      });
+    }
 
     this.tiles.clear();
 
@@ -101,6 +108,7 @@ class Collector {
 
     this.trackedPlayer = undefined;
     this.tilesExplored.clear();
+    this.tilesShowed.clear();
 
     this.turn = 0;
 

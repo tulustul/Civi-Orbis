@@ -10,6 +10,7 @@ export class TrackedPlayer {
   id: number;
   color: number;
   exploredTiles = new Set<Tile>();
+  showedTiles = new Set<Tile>();
 
   units: Unit[] = [];
   cities: City[] = [];
@@ -32,6 +33,12 @@ export class TrackedPlayer {
   exploreTiles(tiles: Tile[]) {
     for (const tile of tiles) {
       this.exploredTiles.add(tile);
+    }
+  }
+
+  showTiles(tiles: Tile[]) {
+    for (const tile of tiles) {
+      this.showedTiles.add(tile);
     }
   }
 

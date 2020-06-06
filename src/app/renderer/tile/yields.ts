@@ -1,27 +1,21 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
-import { TileContainer } from "../tile-container";
 import { MapUi } from "src/app/ui/map-ui";
 import { Tile } from "src/app/api/tile.interface";
-import { GameApi } from "src/app/api";
 
 export class YiedsDrawer {
-  constructor(
-    private game: GameApi,
-    private mapUi: MapUi,
-    private container: TileContainer,
-  ) {
-    this.mapUi.yieldsVisible$.subscribe(
-      (visible) => (this.container.visible = visible),
-    );
+  tilesMap = new Map<Tile, PIXI.Graphics>();
+
+  constructor(private mapUi: MapUi) {
+    this.mapUi.yieldsVisible$.subscribe((visible) => {
+      for (const g of this.tilesMap.values()) {
+        g.visible = visible;
+      }
+    });
   }
 
-  clearTile(tile: Tile) {
-    this.container.clearTile(tile);
-  }
-
-  drawTile(tile: Tile) {
-    const g = new PIXIE.Graphics();
+  drawTile(tile: Tile, container: PIXI.Container) {
+    const g = new PIXI.Graphics();
 
     g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
     g.position.y = tile.y * 0.75;
@@ -29,15 +23,12 @@ export class YiedsDrawer {
     this.drawYield(g, 0.55, tile.yields.food, 0x00ff00);
     this.drawYield(g, 0.65, tile.yields.production, 0xffaa00);
 
-    this.container.addChild(g, tile);
-
-    if (!this.game.state!.trackedPlayer.exploredTiles.has(tile)) {
-      g.visible = false;
-    }
+    container.addChild(g);
+    this.tilesMap.set(tile, g);
   }
 
   private drawYield(
-    g: PIXIE.Graphics,
+    g: PIXI.Graphics,
     y: number,
     quantity: number,
     color: number,
@@ -48,9 +39,5 @@ export class YiedsDrawer {
       g.drawRect(x, y, 0.05, 0.05);
     }
     g.endFill();
-  }
-
-  clear() {
-    this.container.destroyAllChildren();
   }
 }

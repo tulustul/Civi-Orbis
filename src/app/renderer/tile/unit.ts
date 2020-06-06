@@ -1,38 +1,24 @@
 import * as PIXI from "pixi.js";
 
-import { takeUntil } from "rxjs/operators";
-
-import { TileContainer } from "../tile-container";
-import { GameApi } from "src/app/api";
 import { Unit } from "src/app/api/unit";
 import { GameRenderer } from "../renderer";
 import { Tile } from "src/app/api/tile.interface";
 import { TILE_SIZE } from "../constants";
+import { GameApi } from "src/app/api";
+import { TileContainer } from "../tile-container";
 
 export class UnitsDrawer {
-  unitContainers = new Map<Unit, PIXI.Container>();
+  tilesMap = new Map<Unit, Tile>();
 
-  healthBars = new Map<Unit, PIXI.Container>();
+  unitContainerMap = new Map<Unit, PIXI.Container>();
+
+  healthBarsMap = new Map<Unit, PIXI.Container>();
 
   constructor(
     private game: GameApi,
     private renderer: GameRenderer,
     private container: TileContainer,
-  ) {
-    game.init$.subscribe((state) => {
-      state.unitSpawned$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((unit) => this.spawn(unit));
-
-      state.unitUpdated$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((unit) => this.update(unit));
-
-      state.unitDestroyed$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((unit) => this.destroy(unit));
-    });
-  }
+  ) {}
 
   build() {
     if (!this.game.state) {
@@ -40,11 +26,11 @@ export class UnitsDrawer {
     }
 
     for (const unit of this.game.state.units) {
-      this.spawn(unit);
+      this.draw(unit);
     }
   }
 
-  spawn(unit: Unit) {
+  draw(unit: Unit) {
     const backgroundType =
       unit.definition.strength > 0 ? "military" : "civilian";
     const backgroundTextureName = `unitBackground-${backgroundType}.png`;
@@ -68,7 +54,7 @@ export class UnitsDrawer {
     unitSprite.position.y = backgroundSprite.height / 2 - unitSprite.height / 2;
     unitContainer.addChild(unitSprite);
 
-    this.unitContainers.set(unit, unitContainer);
+    this.unitContainerMap.set(unit, unitContainer);
 
     this.layoutTile(unit.tile);
 
@@ -84,23 +70,25 @@ export class UnitsDrawer {
   }
 
   destroy(unit: Unit) {
-    const unitContainer = this.unitContainers.get(unit);
+    const unitContainer = this.unitContainerMap.get(unit);
     if (!unitContainer) {
       return;
     }
 
-    this.unitContainers.delete(unit);
+    this.unitContainerMap.delete(unit);
+    this.tilesMap.delete(unit);
+    this.healthBarsMap.delete(unit);
 
     unitContainer.destroy();
   }
 
   update(unit: Unit) {
-    const objs = this.unitContainers.get(unit)!;
+    const objs = this.unitContainerMap.get(unit)!;
     if (!objs) {
       return;
     }
 
-    const oldTile = this.container.childrenMap.get(objs[0]);
+    const oldTile = this.tilesMap.get(unit);
     if (oldTile && oldTile.units.length) {
       this.layoutTile(oldTile);
     }
@@ -111,13 +99,12 @@ export class UnitsDrawer {
   }
 
   layoutTile(tile: Tile) {
-    const isVisible = this.game.state!.trackedPlayer.exploredTiles.has(tile);
-
     let x = 1 / (tile.units.length + 1) - 0.5;
     const xOffset = 1 / (tile.units.length + 1);
 
     for (const unit of tile.units) {
-      const unitContainer = this.unitContainers.get(unit);
+      this.tilesMap.set(unit, unit.tile);
+      const unitContainer = this.unitContainerMap.get(unit);
       if (!unitContainer) {
         // the unitContainer may not be created yet.
         continue;
@@ -135,20 +122,22 @@ export class UnitsDrawer {
         unitContainer.position.y -= 0.1;
       }
 
-      this.container.moveChild(unitContainer, unit.tile);
-      unitContainer.visible = isVisible;
+      if (unitContainer.parent) {
+        unitContainer.parent.removeChild(unitContainer);
+      }
+      this.container.addChild(unitContainer, tile);
 
       x += xOffset;
     }
   }
 
   drawHealthBar(unit: Unit) {
-    const unitContainer = this.unitContainers.get(unit);
+    const unitContainer = this.unitContainerMap.get(unit);
     if (!unitContainer) {
       return;
     }
 
-    const existingHealthBar = this.healthBars.get(unit);
+    const existingHealthBar = this.healthBarsMap.get(unit);
     if (existingHealthBar) {
       existingHealthBar.destroy();
     }
@@ -158,7 +147,7 @@ export class UnitsDrawer {
     }
 
     const healthBarContainer = new PIXI.Container();
-    this.healthBars.set(unit, healthBarContainer);
+    this.healthBarsMap.set(unit, healthBarContainer);
     unitContainer.addChild(healthBarContainer);
 
     const maxBarWidth = 0.4;
@@ -188,7 +177,7 @@ export class UnitsDrawer {
 
   clear() {
     this.container.destroyAllChildren();
-    this.unitContainers.clear();
+    this.unitContainerMap.clear();
   }
 
   protected get textures() {
