@@ -10,6 +10,7 @@ import { MapDrawer } from "./map";
 import { MapUi } from "../ui/map-ui";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
+import { filter } from "rxjs/operators";
 
 @Injectable()
 export class GameRenderer {
@@ -31,6 +32,7 @@ export class GameRenderer {
 
   _loading$ = new BehaviorSubject<boolean>(true);
   loading$ = this._loading$.asObservable();
+  ready$ = this._loading$.pipe(filter((loading) => !loading));
 
   private _tick$ = new Subject<void>();
   tick$ = this._tick$.asObservable();
@@ -106,6 +108,7 @@ export class GameRenderer {
     if (this.canvas) {
       this.onReady();
     }
+
     this._loading$.next(false);
   }
 

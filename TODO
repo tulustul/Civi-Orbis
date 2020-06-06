@@ -11,6 +11,8 @@ Performance:
   ☐ distinguish between commands that mutate the state and those which don't
   ☐ disable collector while game is loading
 
+Refactor:
+
 Minor features:
   ☐ closing city view should restore previous camera transform
   ☐ nicer start game view
@@ -24,7 +26,7 @@ Minor features:
   ☐ map generator: climate based on mountain ranges and sea currents
 
 Major features:
-  ☐ naval units
+  ✔ naval units @done(20-06-06 15:05)
   ☐ AI combat
   ☐ AI exploring
   ☐ statistics and charts
@@ -32,6 +34,7 @@ Major features:
   ☐ happiness
   ☐ `fog of war` - grey out tiles not visible by units and cities
   ☐ tile improvements damaging when not enough public works
+  ☐ embarkment
   ☐ armies
   ☐ cities overview panel
   ☐ slavery

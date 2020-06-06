@@ -77,6 +77,20 @@
       }
     }
 
+    .progress-bar-content {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .product-name-and-icon {
+      display: flex;
+      align-items: center;
+      app-icon {
+        margin-right: 8px;
+      }
+    }
+
     .product {
       padding: 5px 15px;
       display: flex;

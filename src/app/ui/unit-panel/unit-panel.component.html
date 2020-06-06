@@ -8,7 +8,10 @@
   ></app-combat-info>
 
   <div class="unit-panel panel panel-top-right-corner" *ngIf="unit">
-    <h2>{{ unit.definition.name }}</h2>
+    <div class="header">
+      <h2>{{ unit.definition.name }}</h2>
+      <app-icon [name]="unit.definition.id"></app-icon>
+    </div>
     <p>Moves: {{ unit.actionPointsLeft }}</p>
     <p>Strength: {{ unit.definition.strength }}</p>
     <p>Order: {{ unit.order }}</p>

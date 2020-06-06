@@ -46,5 +46,5 @@ testem.log
 Thumbs.db
 
 # Generated assets
-/src/assets/atlas.png
-/src/assets/atlas.json
+/src/assets/atlas*.png
+/src/assets/atlas*.json

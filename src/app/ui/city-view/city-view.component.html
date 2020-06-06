@@ -76,9 +76,15 @@
     [nextProgress]="city.totalProduction + city.perTurn.production"
     [total]="city.product?.productDefinition.productionCost"
   >
-    <div>
-      <span class="name">
-        {{ city.product?.productDefinition.name || "-" }}
+    <div class="progress-bar-content">
+      <span class="product-name-and-icon">
+        <app-icon
+          [name]="city.product?.productDefinition.id"
+          [scale]="0.3"
+        ></app-icon>
+        <span class="name">
+          {{ city.product?.productDefinition.name || "-" }}
+        </span>
       </span>
       <span class="turns" *ngIf="city.product">
         {{ city.turnsToProductionEnd | turns }} turns
@@ -96,8 +102,11 @@
         [tooltipContext]="{ unit: unit }"
         (click)="produceUnit(unit)"
       >
-        <span class="name">
-          {{ unit.name }}
+        <span class="product-name-and-icon">
+          <app-icon [name]="unit.id" [scale]="0.3"></app-icon>
+          <span class="name">
+            {{ unit.name }}
+          </span>
         </span>
         <span class="turns small">
           {{ city.getTurnsToProduce(unit) }} turns
@@ -114,9 +123,12 @@
         [tooltipContext]="{ building: building }"
         (click)="produceBuilding(building)"
       >
-        <span class="name">
-          {{ building.name }}
-        </span>
+        <span class="product-name-and-icon">
+          <app-icon [name]="building.id" [scale]="0.3"></app-icon>
+          <span class="name">
+            {{ building.name }}
+          </span></span
+        >
         <span class="turns small">
           {{ city.getTurnsToProduce(building) }} turns
         </span>
@@ -131,7 +143,10 @@
         [tooltipContext]="{ idleProduct: idleProduct }"
         (click)="workOnIdleProduct(idleProduct)"
       >
-        {{ idleProduct.name }}
+        <span class="product-name-and-icon">
+          <app-icon [name]="idleProduct.id" [scale]="0.3"></app-icon>
+          {{ idleProduct.name }}
+        </span>
       </div>
     </app-tab>
   </app-tabs>

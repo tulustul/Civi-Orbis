@@ -9,6 +9,11 @@
     .unit-panel {
       max-width: 400px;
       padding: 20px;
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
       .actions {
         justify-content: flex-start;
         flex-wrap: wrap;
