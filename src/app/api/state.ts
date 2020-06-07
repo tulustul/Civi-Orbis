@@ -64,6 +64,12 @@ export class GameState {
   private _tilesExplored$ = new Subject<Tile[]>();
   tilesExplored$ = this._tilesExplored$.asObservable();
 
+  private _tilesShowed$ = new Subject<Tile[]>();
+  tilesShowed$ = this._tilesShowed$.asObservable();
+
+  private _tilesShowedAdded$ = new Subject<Tile[]>();
+  tilesShowedAdded$ = this._tilesShowedAdded$.asObservable();
+
   private _trackedPlayer$ = new Subject<TrackedPlayer>();
   trackedPlayer$ = this._trackedPlayer$.asObservable();
 

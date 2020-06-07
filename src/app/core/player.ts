@@ -80,7 +80,7 @@ export class PlayerCore {
       if (!this.visibleTiles.has(tile)) {
         this.visibleTiles.add(tile);
         if (this.id === this.game.trackedPlayer.id) {
-          collector.tilesShowed.add(tile.id);
+          collector.tilesShowedAdded.add(tile.id);
         }
       }
     }
@@ -135,6 +135,10 @@ export class PlayerCore {
       for (const tile of unit.getVisibleTiles()) {
         this.visibleTiles.add(tile);
       }
+    }
+
+    if (this === this.game.trackedPlayer) {
+      collector.setVisibleTiles(this.visibleTiles);
     }
   }
 

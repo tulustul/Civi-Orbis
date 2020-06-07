@@ -14,7 +14,7 @@ export class PoliticsDrawer {
       const tiles = await this.state.getAreaTiles(player.areaId);
       const area = new Area(this.state, {
         color: player.color,
-        container: this.renderer.mapDrawer.areasContainer,
+        container: this.renderer.overlays.tilesContainer,
         backgroundOpacity: 0.5,
         borderShadow: 0.7,
         borderSize: 0.08,

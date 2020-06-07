@@ -111,7 +111,7 @@ export class MapUi {
 
       this.game.state!.turn$.subscribe(() => this.setPath(null));
 
-      const areasContainer = this.camera["renderer"].mapDrawer.areasContainer;
+      const areasContainer = this.camera["renderer"].overlays.tilesContainer;
 
       this.unitRangeArea = new Area(this.game.state!, {
         color: 0xffffff,

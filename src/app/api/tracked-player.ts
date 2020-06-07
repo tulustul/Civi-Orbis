@@ -10,7 +10,7 @@ export class TrackedPlayer {
   id: number;
   color: number;
   exploredTiles = new Set<Tile>();
-  showedTiles = new Set<Tile>();
+  visibleTiles = new Set<Tile>();
 
   units: Unit[] = [];
   cities: City[] = [];
@@ -22,6 +22,9 @@ export class TrackedPlayer {
     this.color = player.color;
     this.exploredTiles = new Set(
       player.exploredTiles.map((id) => game.map.tilesMap.get(id)!),
+    );
+    this.visibleTiles = new Set(
+      player.visibleTiles.map((id) => game.map.tilesMap.get(id)!),
     );
 
     this.units = player.units.map((id) => game.unitsMap.get(id)!);
@@ -38,8 +41,12 @@ export class TrackedPlayer {
 
   showTiles(tiles: Tile[]) {
     for (const tile of tiles) {
-      this.showedTiles.add(tile);
+      this.visibleTiles.add(tile);
     }
+  }
+
+  clearShowedTiles() {
+    this.visibleTiles.clear();
   }
 
   revealWorld() {

@@ -2,26 +2,24 @@ import * as PIXI from "pixi.js";
 
 import { takeUntil } from "rxjs/operators";
 
-import { TileWrapperContainer, TileContainer } from "./tile-container";
-import { TerrainDrawer } from "./tile/terrain";
-import { UnitsDrawer } from "./tile/unit";
-import { YiedsDrawer } from "./tile/yields";
-import { RiverDrawer } from "./tile/river";
-import { CityDrawer } from "./tile/city";
-import { GameRenderer } from "./renderer";
-import { Camera } from "./camera";
-import { GameApi } from "../api";
-import { GameState } from "../api/state";
-import { TrackedPlayer } from "../api/tracked-player";
-import { PoliticsDrawer } from "./politics";
-import { Tile } from "../api/tile.interface";
+import { TileWrapperContainer, TileContainer } from "../tile-container";
+import { TerrainDrawer } from "../tile/terrain";
+import { UnitsDrawer } from "../tile/unit";
+import { YiedsDrawer } from "../tile/yields";
+import { RiverDrawer } from "../tile/river";
+import { CityDrawer } from "../tile/city";
+import { GameRenderer } from "../renderer";
+import { Camera } from "../camera";
+import { GameApi } from "../../api";
+import { GameState } from "../../api/state";
+import { TrackedPlayer } from "../../api/tracked-player";
+import { PoliticsDrawer } from "../politics";
+import { Tile } from "../../api/tile.interface";
 
 export class MapDrawer {
-  container = new TileWrapperContainer();
+  wrapperContainer = new TileWrapperContainer();
 
   tilesContainer = new TileContainer(this.camera.tileBoundingBox);
-
-  unitsContainer = new TileContainer(this.camera.tileBoundingBox);
 
   areasContainer = new TileContainer(this.camera.tileBoundingBox);
 
@@ -42,19 +40,23 @@ export class MapDrawer {
   politicsDrawer: PoliticsDrawer;
 
   constructor(
+    private container: PIXI.Container,
     private game: GameApi,
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
+    this.container.addChild(this.wrapperContainer);
+
     this.tilesContainer["interactiveChildren"] = false;
     this.areasContainer["interactiveChildren"] = false;
 
-    this.container.addChild(this.tilesContainer);
-    this.container.addChild(this.unitsContainer);
-    this.container.addChild(this.areasContainer);
-    this.container.addChild(this.overlaysContainer);
+    this.wrapperContainer.addChild(this.tilesContainer);
+    this.wrapperContainer.addChild(this.areasContainer);
+    this.wrapperContainer.addChild(this.overlaysContainer);
 
     this.game.init$.subscribe((state) => {
+      this.build(state);
+
       state.trackedPlayer$
         .pipe(takeUntil(this.game.stop$))
         .subscribe((player) => this.limitViewToPlayer(player));
@@ -83,21 +85,6 @@ export class MapDrawer {
       state.cityDestroyed$
         .pipe(takeUntil(game.stop$))
         .subscribe((city) => this.cityDrawer.destroy(city));
-
-      // units
-      state.unitSpawned$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((unit) => this.unitsDrawer.draw(unit));
-
-      state.unitUpdated$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((unit) => this.unitsDrawer.update(unit));
-
-      state.unitDestroyed$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((unit) => this.unitsDrawer.destroy(unit));
-
-      this.build(state);
     });
 
     this.game.stop$.subscribe(() => this.clear());
@@ -105,11 +92,7 @@ export class MapDrawer {
     // Drawers must be created after init$ subscription?. Race condition will occur otherwise.
     this.terrainDrawer = new TerrainDrawer(this.renderer, this.game);
 
-    this.unitsDrawer = new UnitsDrawer(
-      this.game,
-      this.renderer,
-      this.unitsContainer,
-    );
+    this.unitsDrawer = new UnitsDrawer(this.game, this.renderer, this.camera);
 
     this.yieldsDrawer = new YiedsDrawer(this.renderer.mapUi);
 
@@ -119,7 +102,7 @@ export class MapDrawer {
   }
 
   hideAllTiles() {
-    for (const objects of this.container.tilesMap.values()) {
+    for (const objects of this.wrapperContainer.tilesMap.values()) {
       for (const obj of objects) {
         obj.visible = false;
       }
@@ -128,12 +111,16 @@ export class MapDrawer {
 
   reveal(tiles: Iterable<Tile>) {
     for (const tile of tiles) {
-      const displayObjects = this.container.tilesMap.get(tile);
-      if (displayObjects) {
-        for (const obj of displayObjects) {
-          obj.visible = true;
-        }
+      const container = this.tileContainers.get(tile);
+      if (container) {
+        container.visible = true;
       }
+      // const displayObjects = this.wrapperContainer.tilesMap.get(tile);
+      // if (displayObjects) {
+      //   for (const obj of displayObjects) {
+      //     obj.visible = true;
+      //   }
+      // }
     }
   }
 
@@ -148,10 +135,9 @@ export class MapDrawer {
 
   private build(gameState: GameState) {
     this.politicsDrawer = new PoliticsDrawer(gameState, this.renderer);
-    this.container.bindToMap(gameState.map);
+    this.wrapperContainer.bindToMap(gameState.map);
 
     this.tilesContainer.bindToMap(gameState.map);
-    this.unitsContainer.bindToMap(gameState.map);
     this.areasContainer.bindToMap(gameState.map);
 
     for (let x = 0; x < gameState.map.width; x++) {
@@ -164,7 +150,7 @@ export class MapDrawer {
       }
     }
 
-    this.unitsDrawer.build();
+    this.unitsDrawer.build(gameState);
 
     if (this.game.state?.trackedPlayer) {
       this.limitViewToPlayer(this.game.state?.trackedPlayer);

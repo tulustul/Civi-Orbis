@@ -1,4 +1,3 @@
-
 Bugs:
   ☐ next turn should hide city view
   ☐ map generator: fix rivers placement - loops, dead ends etc.
@@ -12,6 +11,7 @@ Performance:
   ☐ disable collector while game is loading
 
 Refactor:
+  ☐ renderer is still a mess
 
 Minor features:
   ☐ closing city view should restore previous camera transform
@@ -24,6 +24,8 @@ Minor features:
   ☐ proper starting locations
   ☐ map generator: more realistic orogeny
   ☐ map generator: climate based on mountain ranges and sea currents
+  ☐ improve unit visibility range
+  ☐ improve city visibility range
 
 Major features:
   ✔ naval units @done(20-06-06 15:05)
@@ -32,7 +34,7 @@ Major features:
   ☐ statistics and charts
   ☐ resources - increase tile yields
   ☐ happiness
-  ☐ `fog of war` - grey out tiles not visible by units and cities
+  ✔ `fog of war` - grey out tiles not visible by units and cities @done(20-06-07 23:03)
   ☐ tile improvements damaging when not enough public works
   ☐ embarkment
   ☐ armies

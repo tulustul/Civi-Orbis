@@ -29,8 +29,18 @@ export class Game {
   citiesManager = new CitiesManager();
 
   start() {
+    this.preprocessEntities();
     this.activePlayerIndex = -1;
     this.nextPlayer();
+  }
+
+  preprocessEntities() {
+    for (const player of this.players) {
+      player.updateCitiesWithoutProduction();
+      player.updateUnitsWithoutOrders();
+      player.updateYields();
+      player.updateVisibleTiles();
+    }
   }
 
   addPlayer(player: PlayerCore) {
@@ -55,6 +65,7 @@ export class Game {
       if (this.trackedPlayer !== this.activePlayer) {
         this.trackedPlayer = this.activePlayer;
         collector.trackedPlayer = this.trackedPlayer;
+        collector.setVisibleTiles(this.trackedPlayer.visibleTiles);
       }
     }
   }

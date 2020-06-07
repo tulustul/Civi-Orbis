@@ -182,8 +182,9 @@ export class UnitCore {
 
     this.actionPointsLeft = Math.max(this.actionPointsLeft - cost, 0);
 
-    // TODO update also visibleTiles
-    this.player.exploreTiles(this.getVisibleTiles());
+    const visibleTiles = this.getVisibleTiles();
+    this.player.exploreTiles(visibleTiles);
+    this.player.showTiles(visibleTiles);
   }
 
   moveAlongPath() {

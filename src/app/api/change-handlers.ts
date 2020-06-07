@@ -30,6 +30,7 @@ const HANDLERS = {
   "trackedPlayer.yields": onPlayerYieldsUpdate,
   "trackedPlayer.tilesExplored": onTilesExplored,
   "trackedPlayer.tilesShowed": onTilesShowed,
+  "trackedPlayer.tilesShowedAdded": onTilesShowedAdded,
 };
 
 export function initChangeHandlers() {
@@ -106,8 +107,15 @@ function onTilesExplored(state: GameState, tilesIds: number[]) {
 
 function onTilesShowed(state: GameState, tilesIds: number[]) {
   const tiles = tilesIds.map((id) => state.map.tilesMap.get(id)!);
+  state.trackedPlayer.clearShowedTiles();
   state.trackedPlayer.showTiles(tiles);
   state["_tilesShowed$"].next(tiles);
+}
+
+function onTilesShowedAdded(state: GameState, tilesIds: number[]) {
+  const tiles = tilesIds.map((id) => state.map.tilesMap.get(id)!);
+  state.trackedPlayer.showTiles(tiles);
+  state["_tilesShowedAdded$"].next(tiles);
 }
 
 function onTrackedPlayerSet(

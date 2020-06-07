@@ -26,6 +26,7 @@ class Collector {
   trackedPlayerYields: PlayerYields | undefined;
   tilesExplored = new Set<number>();
   tilesShowed = new Set<number>();
+  tilesShowedAdded = new Set<number>();
 
   turn = 0;
 
@@ -94,6 +95,12 @@ class Collector {
         data: Array.from(this.tilesShowed),
       });
     }
+    if (this.tilesShowedAdded.size) {
+      changes.push({
+        type: "trackedPlayer.tilesShowedAdded",
+        data: Array.from(this.tilesShowedAdded),
+      });
+    }
 
     this.tiles.clear();
 
@@ -109,6 +116,7 @@ class Collector {
     this.trackedPlayer = undefined;
     this.tilesExplored.clear();
     this.tilesShowed.clear();
+    this.tilesShowedAdded.clear();
 
     this.turn = 0;
 
@@ -128,6 +136,18 @@ class Collector {
       this.areaTilesRemoved.set(areaId, tiles);
     } else {
       this.areaTilesRemoved.get(areaId)!.push(...tiles);
+    }
+  }
+
+  setVisibleTiles(tiles: Set<TileCore>) {
+    for (const tile of tiles) {
+      this.tilesShowed.add(tile.id);
+    }
+  }
+
+  addVisibleTiles(tiles: Set<TileCore>) {
+    for (const tile of tiles) {
+      this.tilesShowedAdded.add(tile.id);
     }
   }
 }

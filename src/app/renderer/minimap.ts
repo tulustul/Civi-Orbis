@@ -1,4 +1,4 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -33,19 +33,19 @@ export class MinimapRenderer {
   height = 0;
   scale = 1;
 
-  public container = new PIXIE.Container();
+  public container = new PIXI.Container();
 
-  private mapScene = new PIXIE.Container();
+  private mapScene = new PIXI.Container();
 
-  private cameraGraphics = new PIXIE.Graphics();
+  private cameraGraphics = new PIXI.Graphics();
 
-  private mapSprite = new PIXIE.Sprite();
+  private mapSprite = new PIXI.Sprite();
 
-  private mapTexture: PIXIE.RenderTexture;
+  private mapTexture: PIXI.RenderTexture;
 
-  private tilesMap = new Map<Tile, PIXIE.DisplayObject[]>();
+  private tilesMap = new Map<Tile, PIXI.DisplayObject[]>();
 
-  private app: PIXIE.Application;
+  private app: PIXI.Application;
 
   private destroyed$ = new Subject<void>();
 
@@ -103,14 +103,14 @@ export class MinimapRenderer {
     this.height *= 0.75;
   }
 
-  create(app: PIXIE.Application) {
+  create(app: PIXI.Application) {
     if (!this.game.state) {
       return;
     }
 
     this.app = app;
 
-    this.mapTexture = PIXIE.RenderTexture.create({
+    this.mapTexture = PIXI.RenderTexture.create({
       width: this.width,
       height: this.height,
     });
@@ -211,7 +211,7 @@ export class MinimapRenderer {
       color = CLIMATE_COLORS[tile.climate];
     }
 
-    const g = new PIXIE.Graphics();
+    const g = new PIXI.Graphics();
     g.beginFill(color);
     drawHex(g);
     g.endFill();
@@ -231,7 +231,7 @@ export class MinimapRenderer {
     }
   }
 
-  private renderRivers(tile: Tile, graphics: PIXIE.Graphics) {
+  private renderRivers(tile: Tile, graphics: PIXI.Graphics) {
     if (!tile.riverParts.length) {
       return;
     }

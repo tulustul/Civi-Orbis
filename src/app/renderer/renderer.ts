@@ -1,34 +1,46 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { Injectable } from "@angular/core";
 
 import { Subject, BehaviorSubject } from "rxjs";
+import { filter } from "rxjs/operators";
 
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
-import { MapDrawer } from "./map";
+import { MapDrawer } from "./layers/map";
+import { FogOfWarDrawer } from "./layers/fog-of-war";
 import { MapUi } from "../ui/map-ui";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
-import { filter } from "rxjs/operators";
+import { Layer } from "./layer";
+import { FogOfWarFilter } from "./filters/fog-of-war-filter";
+import { TileContainer, TileWrapperContainer } from "./tile-container";
 
 @Injectable()
 export class GameRenderer {
-  app: PIXIE.Application;
+  app: PIXI.Application;
 
   canvas: HTMLCanvasElement;
 
   mapDrawer: MapDrawer;
 
+  fogOfWarDrawer: FogOfWarDrawer;
+
   overlays: OverlaysRenderer;
 
   path: PathRenderer;
 
-  loader = new PIXIE.Loader();
+  mapLayer: Layer;
+
+  fogOfWarLayer: Layer;
+
+  overlaysContainer = new PIXI.Container();
+
+  loader = new PIXI.Loader();
 
   atlas = this.loader.add("assets/atlas.json").load(() => this.onLoad());
 
-  textures: PIXIE.ITextureDictionary;
+  textures: PIXI.ITextureDictionary;
 
   _loading$ = new BehaviorSubject<boolean>(true);
   loading$ = this._loading$.asObservable();
@@ -43,25 +55,57 @@ export class GameRenderer {
     private camera: Camera,
   ) {
     this.camera.setRenderer(this);
+
+    this.game.stop$.subscribe(() => this.clear());
   }
 
   setCanvas(canvas: HTMLCanvasElement) {
     const [width, height] = [window.innerWidth, window.innerHeight];
 
-    this.app = new PIXIE.Application({ view: canvas, width, height });
+    this.app = new PIXI.Application({ view: canvas, width, height });
 
     this.canvas = canvas;
 
-    this.mapDrawer = new MapDrawer(this.game, this, this.camera);
-    this.overlays = new OverlaysRenderer(this.mapUi);
-    this.path = new PathRenderer(this.game, this.camera, this.mapUi);
+    this.mapLayer = new Layer(this.app);
+    this.fogOfWarLayer = new Layer(this.app);
 
-    this.path.container.interactiveChildren = false;
-    this.overlays.container.interactiveChildren = false;
+    this.mapDrawer = new MapDrawer(
+      this.mapLayer.stage,
+      this.game,
+      this,
+      this.camera,
+    );
 
-    this.app.stage.addChild(this.mapDrawer.container);
-    this.app.stage.addChild(this.overlays.container);
-    this.app.stage.addChild(this.path.container);
+    this.fogOfWarDrawer = new FogOfWarDrawer(
+      this.fogOfWarLayer.stage,
+      this.game,
+      this,
+      this.camera,
+    );
+
+    this.overlays = new OverlaysRenderer(
+      this.overlaysContainer,
+      this.game,
+      this.camera,
+      this.mapUi,
+    );
+
+    this.path = new PathRenderer(
+      this.overlaysContainer,
+      this.game,
+      this.camera,
+      this.mapUi,
+    );
+
+    this.overlaysContainer.interactiveChildren = false;
+
+    this.app.stage.addChild(this.mapLayer.sprite);
+    this.app.stage.addChild(this.mapDrawer.unitsDrawer.container);
+    this.app.stage.addChild(this.overlaysContainer);
+
+    this.mapLayer.sprite.filters = [
+      new FogOfWarFilter(this.fogOfWarLayer.texture),
+    ];
 
     if (this.isLoaded) {
       this.onReady();
@@ -86,24 +130,38 @@ export class GameRenderer {
           area.drawer.borderShader.uniforms.borderShadow = borderShadow;
         }
       }
+
+      this.mapLayer.renderToTarget();
+      this.fogOfWarLayer.renderToTarget();
     });
   }
 
   resize(width: number, height: number) {
     this.app.renderer.resize(width, height);
+    this.mapLayer.resize(width, height);
+    this.fogOfWarLayer.resize(width, height);
+
+    // A new texture is created when resizing, need to update the filter. Could just update uniforms but whatever.
+    this.mapLayer.sprite.filters = [
+      new FogOfWarFilter(this.fogOfWarLayer.texture),
+    ];
   }
 
   onReady() {
     this.camera.transform$.subscribe((t) => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
-      this.app.stage.setTransform(x, y, t.scale, t.scale);
+
+      this.mapDrawer.unitsDrawer.container.setTransform(x, y, t.scale, t.scale);
+      this.overlaysContainer.setTransform(x, y, t.scale, t.scale);
+      this.mapLayer.stage.setTransform(x, y, t.scale, t.scale);
+      this.fogOfWarLayer.stage.setTransform(x, y, t.scale, t.scale);
     });
   }
 
   onLoad() {
     const atlas = this.atlas.resources["assets/atlas.json"];
-    atlas.spritesheet!.baseTexture.mipmap = PIXIE.MIPMAP_MODES.POW2;
+    atlas.spritesheet!.baseTexture.mipmap = PIXI.MIPMAP_MODES.POW2;
     this.textures = atlas.textures!;
     if (this.canvas) {
       this.onReady();
@@ -116,6 +174,7 @@ export class GameRenderer {
     this.mapDrawer.clear();
     this.path.clear();
     this.overlays.clear();
+    this.fogOfWarDrawer.clear();
   }
 
   get isLoaded() {

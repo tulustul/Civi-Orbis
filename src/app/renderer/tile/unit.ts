@@ -5,10 +5,18 @@ import { GameRenderer } from "../renderer";
 import { Tile } from "src/app/api/tile.interface";
 import { TILE_SIZE } from "../constants";
 import { GameApi } from "src/app/api";
-import { TileContainer } from "../tile-container";
+import { TileContainer, TileWrapperContainer } from "../tile-container";
+import { Camera } from "../camera";
+import { GameState } from "src/app/api/state";
+import { takeUntil } from "rxjs/operators";
+import { merge } from "rxjs";
 
 export class UnitsDrawer {
   tilesMap = new Map<Unit, Tile>();
+
+  container = new TileWrapperContainer();
+
+  tileContainer = new TileContainer(this.camera.tileBoundingBox);
 
   unitContainerMap = new Map<Unit, PIXI.Container>();
 
@@ -17,15 +25,33 @@ export class UnitsDrawer {
   constructor(
     private game: GameApi,
     private renderer: GameRenderer,
-    private container: TileContainer,
-  ) {}
+    private camera: Camera,
+  ) {
+    game.init$.subscribe((state) => {
+      state.unitSpawned$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((unit) => this.draw(unit));
 
-  build() {
-    if (!this.game.state) {
-      return;
-    }
+      state.unitUpdated$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((unit) => this.update(unit));
 
-    for (const unit of this.game.state.units) {
+      state.unitDestroyed$
+        .pipe(takeUntil(game.stop$))
+        .subscribe((unit) => this.destroy(unit));
+
+      merge(state.trackedPlayer$, state.tilesShowedAdded$, state.tilesShowed$)
+        .pipe(takeUntil(game.stop$))
+        .subscribe(() => this.updateUnitVisibility());
+    });
+  }
+
+  build(state: GameState) {
+    this.container.addChild(this.tileContainer);
+    this.container.bindToMap(state.map);
+    this.tileContainer.bindToMap(state.map);
+
+    for (const unit of state.units) {
       this.draw(unit);
     }
   }
@@ -40,7 +66,7 @@ export class UnitsDrawer {
     const unitTexture = this.textures[unitTextureName];
 
     const unitContainer = new PIXI.Container();
-    this.container.addChild(unitContainer, unit.tile);
+    this.tileContainer.addChild(unitContainer, unit.tile);
 
     const backgroundSprite = new PIXI.Sprite(backgroundTexture);
     backgroundSprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
@@ -99,6 +125,8 @@ export class UnitsDrawer {
   }
 
   layoutTile(tile: Tile) {
+    const isVisible = this.game.state!.trackedPlayer.visibleTiles.has(tile);
+
     let x = 1 / (tile.units.length + 1) - 0.5;
     const xOffset = 1 / (tile.units.length + 1);
 
@@ -122,10 +150,9 @@ export class UnitsDrawer {
         unitContainer.position.y -= 0.1;
       }
 
-      if (unitContainer.parent) {
-        unitContainer.parent.removeChild(unitContainer);
-      }
-      this.container.addChild(unitContainer, tile);
+      this.tileContainer.moveChild(unitContainer, unit.tile);
+
+      unitContainer.visible = isVisible;
 
       x += xOffset;
     }
@@ -175,8 +202,17 @@ export class UnitsDrawer {
     healthBarContainer.addChild(g);
   }
 
+  updateUnitVisibility() {
+    console.log("updateUnitVisibility");
+    const visibleTiles = this.game.state!.trackedPlayer.visibleTiles;
+
+    for (const [unit, container] of this.unitContainerMap.entries()) {
+      container.visible = visibleTiles.has(unit.tile);
+    }
+  }
+
   clear() {
-    this.container.destroyAllChildren();
+    this.tileContainer.destroyAllChildren();
     this.unitContainerMap.clear();
   }
 

@@ -116,11 +116,7 @@ export function loadGame(data: GameSerialized) {
     loadCity(game, city);
   }
 
-  for (const player of game.players) {
-    player.updateCitiesWithoutProduction();
-    player.updateUnitsWithoutOrders();
-    player.updateYields();
-  }
+  game.preprocessEntities();
 
   return game;
 }

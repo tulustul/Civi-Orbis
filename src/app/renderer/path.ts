@@ -7,13 +7,12 @@ import { GameApi } from "../api";
 import { Tile } from "../api/tile.interface";
 
 export class PathRenderer {
-  container = new PIXIE.Container();
-
   pathGraphics = new PIXIE.Graphics();
 
   labels: PIXIE.Text[] = [];
 
   constructor(
+    private container: PIXI.Container,
     private game: GameApi,
     private camera: Camera,
     private mapUi: MapUi,
@@ -35,14 +34,15 @@ export class PathRenderer {
   buildPath(path: Tile[][] | null) {
     this.clear();
 
+    const g = this.pathGraphics;
+
     const unit = this.mapUi.selectedUnit;
     if (!path || !path.length || !unit) {
-      this.container.visible = false;
+      g.visible = false;
       return;
     }
 
-    this.container.visible = true;
-    const g = this.pathGraphics;
+    g.visible = true;
 
     g.lineStyle(0.1, 0xff0000);
     g.moveTo(...getTileCenter(unit.tile));

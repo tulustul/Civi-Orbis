@@ -99,6 +99,7 @@ export interface TrackedPlayerChanneled {
   id: number;
   color: number;
   exploredTiles: number[];
+  visibleTiles: number[];
   units: number[];
   cities: number[];
 
@@ -248,6 +249,7 @@ export function trackedPlayerToChannel(
     id: player.id,
     color: player.color,
     exploredTiles: Array.from(player.exploredTiles).map((t) => t.id),
+    visibleTiles: Array.from(player.visibleTiles).map((t) => t.id),
     units: player.units.map((u) => u.id),
     cities: player.cities.map((c) => c.id),
     yields: player.yields,
