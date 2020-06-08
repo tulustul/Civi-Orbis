@@ -156,21 +156,15 @@ export class UnitCore {
       return;
     }
 
+    let canMove: boolean;
     if (this.definition.strength) {
-      if (tile.units.length) {
-        const enemyUnit = tile.units.find(
-          (u) => u.definition.strength && u.player !== this.player,
-        );
-        if (enemyUnit) {
-          this.actionPointsLeft = Math.max(this.actionPointsLeft - 3, 0);
-          const battleResult = doCombat(this, enemyUnit);
-          if (battleResult !== BattleResult.victory) {
-            return;
-          }
-        }
-      } else if (tile.city && tile.city.player !== this.player) {
-        tile.city.changeOwner(this.player);
-      }
+      canMove = this.processMilitaryUnitMove(tile);
+    } else {
+      canMove = this.processCivilianUnitMove(tile);
+    }
+
+    if (!canMove) {
+      return;
     }
 
     const index = this.tile.units.indexOf(this);
@@ -185,6 +179,68 @@ export class UnitCore {
     const visibleTiles = this.getVisibleTiles();
     this.player.exploreTiles(visibleTiles);
     this.player.showTiles(visibleTiles);
+  }
+
+  // Returns true if the unit can move to the tile
+  private processMilitaryUnitMove(tile: TileCore): boolean {
+    if (!tile.units.length) {
+      return true;
+    }
+
+    // TODO implement war state between players
+    const enemyUnit = tile.units.find(
+      (u) => u.definition.strength && u.player !== this.player,
+    );
+
+    if (enemyUnit) {
+      this.actionPointsLeft = Math.max(this.actionPointsLeft - 3, 0);
+      const battleResult = doCombat(this, enemyUnit);
+      if (battleResult !== BattleResult.victory) {
+        return false;
+      }
+
+      const anotherEnemyUnit = tile.units.find(
+        (u) => u.definition.strength && u.player !== this.player,
+      );
+
+      if (anotherEnemyUnit) {
+        return false;
+      }
+    }
+
+    const enemyCivilianUnits = tile.units.filter(
+      (u) => u.player !== this.player,
+    );
+    for (const enemyCivilian of enemyCivilianUnits) {
+      // TODO implement slaves
+      enemyCivilian.destroy();
+    }
+
+    if (tile.city && tile.city.player !== this.player) {
+      tile.city.changeOwner(this.player);
+    }
+
+    return true;
+  }
+
+  private processCivilianUnitMove(tile: TileCore): boolean {
+    if (tile.city && tile.city.player !== this.player) {
+      return false;
+    }
+
+    if (!tile.units.length) {
+      return true;
+    }
+
+    const enemyUnit = tile.units.find(
+      (u) => u.definition.strength && u.player !== this.player,
+    );
+
+    if (enemyUnit) {
+      return false;
+    }
+
+    return true;
   }
 
   moveAlongPath() {

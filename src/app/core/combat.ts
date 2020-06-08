@@ -1,6 +1,5 @@
 import { UnitCore } from "./unit";
 import { collector } from "./collector";
-import { UnitsManager } from "./unit-manager";
 import { LandForm } from "../shared";
 
 export enum CombatModifierType {
