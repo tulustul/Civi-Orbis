@@ -203,7 +203,6 @@ export class UnitsDrawer {
   }
 
   updateUnitVisibility() {
-    console.log("updateUnitVisibility");
     const visibleTiles = this.game.state!.trackedPlayer.visibleTiles;
 
     for (const [unit, container] of this.unitContainerMap.entries()) {

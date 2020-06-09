@@ -3,8 +3,8 @@ Bugs:
   ☐ map generator: fix rivers placement - loops, dead ends etc.
   ☐ unit path is showing wrong turns count
   ☐ webgl fonts scaling
-  ☐ yields change received when selecting a unit
-  ☐ yields change received when using pathfinding
+  ✔ yields change received when selecting a unit @done(20-06-09 20:01)
+  ✔ yields change received when using pathfinding @done(20-06-09 20:01)
 
 Performance:
   ☐ distinguish between commands that mutate the state and those which don't

@@ -28,7 +28,7 @@ class Collector {
   tilesShowed = new Set<number>();
   tilesShowedAdded = new Set<number>();
 
-  turn = 0;
+  turn: number | undefined;
 
   flush() {
     const changes: any[] = [];
@@ -114,11 +114,12 @@ class Collector {
     this.areaTilesRemoved.clear();
 
     this.trackedPlayer = undefined;
+    this.trackedPlayerYields = undefined;
     this.tilesExplored.clear();
     this.tilesShowed.clear();
     this.tilesShowedAdded.clear();
 
-    this.turn = 0;
+    this.turn = undefined;
 
     return changes;
   }
