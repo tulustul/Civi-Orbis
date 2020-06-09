@@ -12,8 +12,8 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
   }
 
   const isSameArea =
-    unit.player.exploredTiles.has(end) &&
-    start.passableArea !== end.passableArea;
+    !unit.player.exploredTiles.has(end) ||
+    start.passableArea === end.passableArea;
 
   if (unit.definition.type === "naval") {
     if (
@@ -22,8 +22,19 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
     ) {
       return null;
     }
-  } else if (!isSameArea) {
-    return null;
+  } else {
+    if (end.isWater) {
+      // check embarkment
+      const canEmbarkToTile = !!end.neighbours.find(
+        (n) => n.passableArea === start.passableArea,
+      );
+      const embarkmentTarget = end.getEmbarkmentTarget(unit);
+      if (!(canEmbarkToTile && embarkmentTarget)) {
+        return null;
+      }
+    } else if (!isSameArea) {
+      return null;
+    }
   }
 
   const visitedTiles = new Set<TileCore>();
@@ -82,6 +93,16 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
         let moveCost = isExplored
           ? nextTile.neighboursCosts.get(neighbour)!
           : 1;
+
+        if (unit.definition.type === "land" && neighbour.isWater) {
+          const embarkmentTarget = neighbour.getEmbarkmentTarget(unit);
+          if (embarkmentTarget) {
+            // something to eat all action points
+            moveCost = 10;
+          } else {
+            continue;
+          }
+        }
 
         if (moveCost === Infinity) {
           continue;

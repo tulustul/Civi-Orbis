@@ -13,6 +13,7 @@ export class UnitCore {
   actionPointsLeft: number;
   health = 100;
   path: TileCore[][] | null;
+  children: UnitCore[] = [];
 
   order: UnitOrder = null;
 
@@ -183,34 +184,32 @@ export class UnitCore {
 
   // Returns true if the unit can move to the tile
   private processMilitaryUnitMove(tile: TileCore): boolean {
-    if (!tile.units.length) {
-      return true;
-    }
+    if (tile.units.length) {
+      const enemyUnit = tile.getFirstEnemyUnit(this);
 
-    const enemyUnit = tile.getFirstEnemyUnit(this);
+      if (enemyUnit) {
+        this.actionPointsLeft = Math.max(this.actionPointsLeft - 3, 0);
+        const battleResult = doCombat(this, enemyUnit);
+        if (battleResult !== BattleResult.victory) {
+          return false;
+        }
 
-    if (enemyUnit) {
-      this.actionPointsLeft = Math.max(this.actionPointsLeft - 3, 0);
-      const battleResult = doCombat(this, enemyUnit);
-      if (battleResult !== BattleResult.victory) {
-        return false;
+        const anotherEnemyUnit = tile.units.find(
+          (u) => u.definition.strength && u.player !== this.player,
+        );
+
+        if (anotherEnemyUnit) {
+          return false;
+        }
       }
 
-      const anotherEnemyUnit = tile.units.find(
-        (u) => u.definition.strength && u.player !== this.player,
+      const enemyCivilianUnits = tile.units.filter(
+        (u) => u.player !== this.player,
       );
-
-      if (anotherEnemyUnit) {
-        return false;
+      for (const enemyCivilian of enemyCivilianUnits) {
+        // TODO implement slaves
+        enemyCivilian.destroy();
       }
-    }
-
-    const enemyCivilianUnits = tile.units.filter(
-      (u) => u.player !== this.player,
-    );
-    for (const enemyCivilian of enemyCivilianUnits) {
-      // TODO implement slaves
-      enemyCivilian.destroy();
     }
 
     if (tile.city && tile.city.player !== this.player) {

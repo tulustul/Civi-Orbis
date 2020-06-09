@@ -61,9 +61,8 @@ export class TileCore implements BaseTile {
     for (const neighbour of this.neighbours) {
       const dir = this.getDirectionTo(neighbour);
       let cost = 1;
-      if (this.isLand !== neighbour.isLand) {
-        cost = this.city || neighbour.city ? 1 : Infinity;
-      } else if (neighbour.landForm === LandForm.mountains) {
+
+      if (neighbour.landForm === LandForm.mountains) {
         cost = Infinity;
       } else if (neighbour.landForm === LandForm.hills) {
         cost = 2;
@@ -74,6 +73,7 @@ export class TileCore implements BaseTile {
           cost = 0.5;
         }
       }
+
       if (neighbour.road === TileRoad.road) {
         cost /= 3;
       }
@@ -210,6 +210,15 @@ export class TileCore implements BaseTile {
     // TODO implement war state between players
     return this.units.find(
       (u) => u.definition.strength && u.player !== unit.player,
+    );
+  }
+
+  getEmbarkmentTarget(unit: UnitCore): UnitCore | undefined {
+    return this.units.find(
+      (u) =>
+        u.player === unit.player &&
+        u.definition.capacity &&
+        u.children.length < u.definition.capacity,
     );
   }
 }

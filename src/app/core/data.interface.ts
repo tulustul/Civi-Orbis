@@ -30,6 +30,7 @@ export interface UnitDefinition extends ProductDefinition {
   strength: number;
   actions: UnitAction[];
   type: UnitType;
+  capacity: number;
 }
 
 export type Building = ProductDefinition & HaveBonuses;
