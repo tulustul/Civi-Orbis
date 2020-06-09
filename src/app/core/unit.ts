@@ -187,10 +187,7 @@ export class UnitCore {
       return true;
     }
 
-    // TODO implement war state between players
-    const enemyUnit = tile.units.find(
-      (u) => u.definition.strength && u.player !== this.player,
-    );
+    const enemyUnit = tile.getFirstEnemyUnit(this);
 
     if (enemyUnit) {
       this.actionPointsLeft = Math.max(this.actionPointsLeft - 3, 0);
@@ -232,11 +229,7 @@ export class UnitCore {
       return true;
     }
 
-    const enemyUnit = tile.units.find(
-      (u) => u.definition.strength && u.player !== this.player,
-    );
-
-    if (enemyUnit) {
+    if (tile.getFirstEnemyUnit(this)) {
       return false;
     }
 

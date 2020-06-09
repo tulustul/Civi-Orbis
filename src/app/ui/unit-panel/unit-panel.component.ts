@@ -50,14 +50,23 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
     this.mapUi.hoveredUnit$
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(async (unit) => {
-        if (this.unit && unit && this.isEnemy(unit)) {
+        this.enemy = null;
+        this.combatSimulation = null;
+
+        this.cdr.markForCheck();
+
+        if (!unit || !this.unit) {
+          return;
+        }
+
+        if (!this.game.state?.trackedPlayer.visibleTiles.has(unit.tile)) {
+          return;
+        }
+
+        if (this.isEnemy(unit)) {
           this.enemy = unit;
           this.combatSimulation = await this.unit.simulateCombat(unit);
-        } else {
-          this.enemy = null;
-          this.combatSimulation = null;
         }
-        this.cdr.markForCheck();
       });
 
     this.game

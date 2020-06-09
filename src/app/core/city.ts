@@ -68,6 +68,8 @@ export class CityCore {
 
   changedSize = false;
 
+  isCoastline = false;
+
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
   }

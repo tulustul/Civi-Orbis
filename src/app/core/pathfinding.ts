@@ -4,17 +4,25 @@ import { SeaLevel } from "../shared";
 
 export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
   const startTime = performance.now();
+
   const start = unit.tile;
 
   if (start === end) {
     return null;
   }
 
+  const isSameArea =
+    unit.player.exploredTiles.has(end) &&
+    start.passableArea !== end.passableArea;
+
   if (unit.definition.type === "naval") {
-    if (end.seaLevel === SeaLevel.none && !end.city) {
+    if (
+      end.seaLevel === SeaLevel.none &&
+      (!end.city?.isCoastline || !isSameArea)
+    ) {
       return null;
     }
-  } else if (start.passableArea !== end.passableArea) {
+  } else if (!isSameArea) {
     return null;
   }
 
@@ -51,13 +59,26 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
 
     if (nextTile === end) {
       const endTime = performance.now();
-      console.debug(`pathfinding took ${Math.round(endTime - startTime)}ms`);
+      console.debug(`pathfinding took ${(endTime - startTime).toFixed(3)}ms`);
       return reconstructPath(cameFrom, end);
     }
 
     for (const neighbour of nextTile.neighbours) {
       if (!visitedTiles.has(neighbour)) {
         const isExplored = unit.player.exploredTiles.has(neighbour);
+
+        if (neighbour !== end) {
+          if (unit.player.visibleTiles.has(neighbour)) {
+            if (neighbour.getFirstEnemyUnit(unit)) {
+              continue;
+            }
+          }
+
+          if (neighbour.city && neighbour.city.player !== unit.player) {
+            continue;
+          }
+        }
+
         let moveCost = isExplored
           ? nextTile.neighboursCosts.get(neighbour)!
           : 1;

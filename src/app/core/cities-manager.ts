@@ -29,6 +29,9 @@ export class CitiesManager {
     city.size = 1;
     city.name = `City ${city.id}`;
     city.tile = tile;
+    city.isCoastline = !!city.tile.neighbours.find(
+      (n) => n.seaLevel !== SeaLevel.none,
+    );
     this.cities.push(city);
     this.citiesMap.set(city.id, city);
 
