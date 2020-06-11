@@ -206,11 +206,16 @@ export class TileCore implements BaseTile {
     return !this.isWater;
   }
 
-  getFirstEnemyUnit(unit: UnitCore): UnitCore | undefined {
+  getFirstEnemyMilitaryUnit(unit: UnitCore): UnitCore | undefined {
     // TODO implement war state between players
     return this.units.find(
       (u) => u.definition.strength && u.player !== unit.player,
     );
+  }
+
+  getFirstEnemyUnit(unit: UnitCore): UnitCore | undefined {
+    // TODO implement war state between players
+    return this.units.find((u) => u.player !== unit.player);
   }
 
   getEmbarkmentTarget(unit: UnitCore): UnitCore | undefined {

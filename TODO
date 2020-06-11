@@ -26,6 +26,7 @@ Minor features:
   ☐ map generator: climate based on mountain ranges and sea currents
   ☐ improve unit visibility range
   ☐ improve city visibility range
+  ☐ pathfinding: verify path each turn
 
 Major features:
   ✔ naval units @done(20-06-06 15:05)

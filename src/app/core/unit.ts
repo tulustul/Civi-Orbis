@@ -3,8 +3,8 @@ import { UnitDefinition } from "./data.interface";
 import { PlayerCore } from "./player";
 import { UnitAction, ACTIONS } from "./unit-actions";
 import { collector } from "./collector";
-import { doCombat, BattleResult } from "./combat";
 import { UnitsManager } from "./unit-manager";
+import { getMoveCost, getMoveResult, MoveResult } from "./movement";
 
 export type UnitOrder = "go" | "skip" | "sleep" | null;
 
@@ -77,7 +77,7 @@ export class UnitCore {
   }
 
   getRange(): Set<TileCore> {
-    const result = new Set<TileCore>();
+    const result = new Set<TileCore>([this.tile]);
     const actionPointsLeftAtTile = new Map<TileCore, number>();
 
     this._getRange(
@@ -100,43 +100,34 @@ export class UnitCore {
     result: Set<TileCore>,
     actionPointsLeftAtTile: Map<TileCore, number>,
   ) {
-    result.add(tile);
-
     if (actionPointsLeft <= 0) {
       return result;
     }
 
     for (const neighbour of tile.neighbours) {
-      const oldActionPointsLeft = actionPointsLeftAtTile.get(neighbour);
+      const moveResult = getMoveResult(this, tile, neighbour);
+      const cost = getMoveCost(this, moveResult, tile, neighbour);
 
-      if (this.definition.type === "land") {
-        if (!neighbour.isLand) {
-          continue;
-        }
-      }
-
-      if (this.definition.type === "naval") {
-        if (!neighbour.isWater && !neighbour.city) {
-          continue;
-        }
-      }
-
-      const cost = tile.neighboursCosts.get(neighbour)!;
-      if (cost === Infinity) {
+      if (moveResult === MoveResult.none) {
         continue;
       }
 
+      const oldActionPointsLeft = actionPointsLeftAtTile.get(neighbour);
       const newActionPointsLeft = actionPointsLeft - cost;
 
       if (!oldActionPointsLeft || newActionPointsLeft > oldActionPointsLeft) {
         actionPointsLeftAtTile.set(neighbour, newActionPointsLeft);
 
-        this._getRange(
-          neighbour,
-          newActionPointsLeft,
-          result,
-          actionPointsLeftAtTile,
-        );
+        result.add(neighbour);
+
+        if (moveResult !== MoveResult.attack) {
+          this._getRange(
+            neighbour,
+            newActionPointsLeft,
+            result,
+            actionPointsLeftAtTile,
+          );
+        }
       }
     }
 
@@ -145,122 +136,6 @@ export class UnitCore {
 
   destroy() {
     this.unitManager.destroy(this);
-  }
-
-  private move(tile: TileCore) {
-    if (!this.actionPointsLeft) {
-      return;
-    }
-
-    const cost = this.getMovementCost(tile);
-    if (cost === Infinity) {
-      return;
-    }
-
-    let canMove: boolean;
-    if (this.definition.strength) {
-      canMove = this.processMilitaryUnitMove(tile);
-    } else {
-      canMove = this.processCivilianUnitMove(tile);
-    }
-
-    if (!canMove) {
-      return;
-    }
-
-    const index = this.tile.units.indexOf(this);
-    if (index !== -1) {
-      this.tile.units.splice(index, 1);
-    }
-    tile.units.push(this);
-    this.tile = tile;
-
-    this.actionPointsLeft = Math.max(this.actionPointsLeft - cost, 0);
-
-    const visibleTiles = this.getVisibleTiles();
-    this.player.exploreTiles(visibleTiles);
-    this.player.showTiles(visibleTiles);
-  }
-
-  // Returns true if the unit can move to the tile
-  private processMilitaryUnitMove(tile: TileCore): boolean {
-    if (tile.units.length) {
-      const enemyUnit = tile.getFirstEnemyUnit(this);
-
-      if (enemyUnit) {
-        this.actionPointsLeft = Math.max(this.actionPointsLeft - 3, 0);
-        const battleResult = doCombat(this, enemyUnit);
-        if (battleResult !== BattleResult.victory) {
-          return false;
-        }
-
-        const anotherEnemyUnit = tile.units.find(
-          (u) => u.definition.strength && u.player !== this.player,
-        );
-
-        if (anotherEnemyUnit) {
-          return false;
-        }
-      }
-
-      const enemyCivilianUnits = tile.units.filter(
-        (u) => u.player !== this.player,
-      );
-      for (const enemyCivilian of enemyCivilianUnits) {
-        // TODO implement slaves
-        enemyCivilian.destroy();
-      }
-    }
-
-    if (tile.city && tile.city.player !== this.player) {
-      tile.city.changeOwner(this.player);
-    }
-
-    return true;
-  }
-
-  private processCivilianUnitMove(tile: TileCore): boolean {
-    if (tile.city && tile.city.player !== this.player) {
-      return false;
-    }
-
-    if (!tile.units.length) {
-      return true;
-    }
-
-    if (tile.getFirstEnemyUnit(this)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  moveAlongPath() {
-    if (!this.path) {
-      this.setOrder(null);
-      return;
-    }
-
-    this.setOrder(this.path.length ? "go" : null);
-
-    collector.units.add(this);
-
-    while (this.actionPointsLeft && this.path.length) {
-      this.move(this.path[0][0]);
-      this.path[0].shift();
-      if (!this.path[0].length) {
-        this.path.shift();
-      }
-      if (!this.path.length) {
-        this.path = null;
-        this.setOrder(null);
-        return;
-      }
-    }
-  }
-
-  getMovementCost(target: TileCore) {
-    return this.tile.neighboursCosts.get(target) || Infinity;
   }
 
   getVisibleTiles(): Set<TileCore> {

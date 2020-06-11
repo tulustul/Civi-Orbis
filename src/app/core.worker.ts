@@ -27,6 +27,7 @@ import {
 } from "./core/data-manager";
 import { CityCore } from "./core/city";
 import { getFailedWeakRequirements } from "./core/requirements";
+import { moveAlongPath } from "./core/movement";
 
 let game: Game;
 
@@ -240,7 +241,7 @@ function unitMoveAlongPath(unitId: number) {
     return null;
   }
 
-  unit.moveAlongPath();
+  moveAlongPath(unit);
 
   return unitDetailsToChannel(unit);
 }

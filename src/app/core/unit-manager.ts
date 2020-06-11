@@ -3,6 +3,7 @@ import { PlayerCore } from "./player";
 import { TileCore } from "./tile";
 import { collector } from "./collector";
 import { getUnitById } from "./data-manager";
+import { moveAlongPath } from "./movement";
 
 export class UnitsManager {
   units: UnitCore[] = [];
@@ -64,7 +65,7 @@ export class UnitsManager {
       }
 
       if (unit.path) {
-        unit.moveAlongPath();
+        moveAlongPath(unit);
       }
       if (unit.order === "skip") {
         unit.setOrder(null);

@@ -1,6 +1,7 @@
 import { UnitCore } from "./unit";
 import { collector } from "./collector";
 import { LandForm } from "../shared";
+import { TileCore } from "./tile";
 
 export enum CombatModifierType {
   hills,
@@ -32,7 +33,38 @@ export interface CombatSimulation {
   defender: CombatSimulationSide;
 }
 
-export function doCombat(attacker: UnitCore, defender: UnitCore): BattleResult {
+// Returns true if the unit can move to the tile
+export function attack(unit: UnitCore, tile: TileCore): boolean {
+  const enemyUnit = tile.getFirstEnemyUnit(unit);
+
+  if (enemyUnit) {
+    unit.actionPointsLeft = Math.max(unit.actionPointsLeft - 3, 0);
+    const battleResult = doCombat(unit, enemyUnit);
+    if (battleResult !== BattleResult.victory) {
+      return false;
+    }
+
+    const anotherEnemyUnit = tile.getFirstEnemyMilitaryUnit(unit);
+
+    if (anotherEnemyUnit) {
+      return false;
+    }
+  }
+
+  const enemyCivilianUnits = tile.units.filter((u) => u.player !== unit.player);
+  for (const enemyCivilian of enemyCivilianUnits) {
+    // TODO implement slaves
+    enemyCivilian.destroy();
+  }
+
+  if (tile.city && tile.city.player !== unit.player) {
+    tile.city.changeOwner(unit.player);
+  }
+
+  return true;
+}
+
+function doCombat(attacker: UnitCore, defender: UnitCore): BattleResult {
   const sim = simulateCombat(attacker, defender);
 
   // TODO add small random variations

@@ -4,6 +4,7 @@ import { findPath } from "../core/pathfinding";
 import { CityCore } from "../core/city";
 import { UnitCore } from "../core/unit";
 import { getUnitById, getIdleProductById } from "../core/data-manager";
+import { moveAlongPath } from "../core/movement";
 
 export class AIPlayer {
   constructor(private player: PlayerCore) {}
@@ -45,7 +46,7 @@ export class AIPlayer {
     }
 
     if (unit.path) {
-      unit.moveAlongPath();
+      moveAlongPath(unit);
     }
   }
 
