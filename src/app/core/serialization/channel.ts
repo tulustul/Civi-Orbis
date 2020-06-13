@@ -111,6 +111,7 @@ export interface UnitChanneled {
   tileId: number;
   definitionId: string;
   playerId: number;
+  actionPointsLeft: number;
   health: number;
 }
 
@@ -263,6 +264,7 @@ export function unitToChannel(unit: UnitCore): UnitChanneled {
     definitionId: unit.definition.id,
     playerId: unit.player.id,
     health: unit.health,
+    actionPointsLeft: unit.actionPointsLeft,
   };
 }
 

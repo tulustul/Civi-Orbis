@@ -1,0 +1,10 @@
+<app-progress-bar
+  *ngIf="isDamaged"
+  [total]="100"
+  [progress]="unit.health"
+></app-progress-bar>
+
+<app-icon [name]="unitBackground" [scale]="0.5" [tint]="tint"></app-icon>
+<app-icon [name]="unit.definition.id" [scale]="0.5"></app-icon>
+
+<i class="moves-available"></i>

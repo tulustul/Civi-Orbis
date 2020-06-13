@@ -1,9 +1,10 @@
 import {
   Component,
-  OnInit,
   Input,
   ChangeDetectionStrategy,
   ElementRef,
+  HostBinding,
+  OnChanges,
 } from "@angular/core";
 
 import * as atlasIcons from "../../../assets/atlas-icons.json";
@@ -14,31 +15,20 @@ import * as atlasIcons from "../../../assets/atlas-icons.json";
   styleUrls: ["./icon.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IconComponent implements OnInit {
-  private _name: string;
+export class IconComponent implements OnChanges {
+  @HostBinding("class.tint")
+  @Input()
+  tint: string | undefined;
 
-  private _scale = 1;
+  @Input()
+  name: string;
+
+  @Input() scale = 1;
 
   constructor(private elementRef: ElementRef<HTMLElement>) {}
 
-  ngOnInit(): void {}
-
-  @Input() set name(name: string) {
-    this._name = name;
+  ngOnChanges() {
     this.update();
-  }
-  get name() {
-    return this._name;
-  }
-
-  @Input() set scale(scale: number) {
-    this._scale = scale;
-    if (this.name) {
-      this.update();
-    }
-  }
-  get scale() {
-    return this._scale;
   }
 
   private update() {
@@ -56,6 +46,14 @@ export class IconComponent implements OnInit {
     el.style.backgroundSize = `${atlasIcons.meta.size.w * this.scale}px ${
       atlasIcons.meta.size.h * this.scale
     }px`;
+
+    if (this.tint) {
+      el.style.backgroundColor = this.tint;
+      el.style.webkitMaskPosition = el.style.backgroundPosition;
+      el.style.webkitMaskSize = el.style.backgroundSize;
+    } else {
+      el.style.backgroundColor = "";
+    }
   }
 
   private getFrame(name: string) {

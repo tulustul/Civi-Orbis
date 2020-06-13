@@ -66,6 +66,7 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
         if (this.isEnemy(unit)) {
           this.enemy = unit;
           this.combatSimulation = await this.unit.simulateCombat(unit);
+          this.cdr.markForCheck();
         }
       });
 

@@ -252,9 +252,10 @@ export class MapUi {
       return;
     }
 
-    this.clearSelectedUnit(!unit);
+    // this.clearSelectedUnit(!unit);
 
     if (!unit) {
+      this.clearSelectedUnit(!unit);
       return;
     }
 

@@ -1,4 +1,9 @@
 :host {
+  display: inline-block;
   background-image: url("/assets/atlas-icons.png");
   background-repeat: no-repeat;
+  &.tint {
+    mask: url(/assets/atlas-icons.png);
+    background-blend-mode: multiply;
+  }
 }

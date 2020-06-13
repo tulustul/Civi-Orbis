@@ -1,0 +1,5 @@
+<app-unit
+  *ngFor="let unit of tile.units"
+  [class.is-selected]="unit.id === selectedUnit?.id"
+  [unit]="unit"
+></app-unit>

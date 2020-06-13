@@ -11,6 +11,7 @@ export class Unit {
   player: Player;
   tile: Tile;
   health: number;
+  actionPointsLeft: number;
 
   constructor(game: GameState, unit: UnitChanneled) {
     this.id = unit.id;
@@ -18,6 +19,7 @@ export class Unit {
     this.player = game.playersMap.get(unit.playerId)!;
     this.definition = getUnitById(unit.definitionId)!;
     this.health = unit.health;
+    this.actionPointsLeft = unit.actionPointsLeft;
 
     this.tile.units.push(this);
     game.unitsMap.set(this.id, this);
@@ -25,6 +27,7 @@ export class Unit {
 
   update(game: GameState, unit: UnitChanneled) {
     this.health = unit.health;
+    this.actionPointsLeft = unit.actionPointsLeft;
 
     const index = this.tile.units.indexOf(this);
     if (index !== -1) {

@@ -55,6 +55,8 @@ import { UnitPainterComponent } from "./ui/editor/unit-painter/unit-painter.comp
 import { CombatInfoComponent } from "./ui/combat-info/combat-info.component";
 import { CombatInfoSideComponent } from "./ui/combat-info/combat-info-side/combat-info-side.component";
 import { IconComponent } from "./ui/icon/icon.component";
+import { UnitComponent } from './ui/unit/unit.component';
+import { TileUnitsComponent } from './ui/tile-units/tile-units.component';
 
 @NgModule({
   declarations: [
@@ -103,6 +105,8 @@ import { IconComponent } from "./ui/icon/icon.component";
     CombatInfoComponent,
     CombatInfoSideComponent,
     IconComponent,
+    UnitComponent,
+    TileUnitsComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [

@@ -1,42 +1,49 @@
-<div class="wrapper">
-  <app-combat-info
-    class="panel panel-top-right-corner"
-    *ngIf="unit && enemy && combatSimulation"
-    [attacker]="unit"
-    [defender]="enemy"
-    [simulation]="combatSimulation"
-  ></app-combat-info>
+<div class="wrapper" *ngIf="unit">
+  <div>
+    <app-combat-info
+      class="panel panel-top-right-corner"
+      *ngIf="enemy && combatSimulation"
+      [attacker]="unit"
+      [defender]="enemy"
+      [simulation]="combatSimulation"
+    ></app-combat-info>
 
-  <div class="unit-panel panel panel-top-right-corner" *ngIf="unit">
-    <div class="header">
-      <h2>{{ unit.definition.name }}</h2>
-      <app-icon [name]="unit.definition.id"></app-icon>
-    </div>
-    <p>Moves: {{ unit.actionPointsLeft }}</p>
-    <p>Strength: {{ unit.definition.strength }}</p>
-    <p>Order: {{ unit.order }}</p>
-    <p>Health: {{ unit.health }}</p>
+    <div class="unit-panel panel panel-top-right-corner">
+      <div class="header">
+        <h2>{{ unit.definition.name }}</h2>
+        <app-icon [name]="unit.definition.id"></app-icon>
+      </div>
+      <p>Moves: {{ unit.actionPointsLeft }}</p>
+      <p>Strength: {{ unit.definition.strength }}</p>
+      <p>Order: {{ unit.order }}</p>
+      <p>Health: {{ unit.health }}</p>
 
-    <div class="actions">
-      <button class="btn-danger" (click)="destroy()">Disband</button>
+      <div class="actions">
+        <button class="btn-danger" (click)="destroy()">Disband</button>
 
-      <button (click)="setOrder('skip')">Skip move</button>
+        <button (click)="setOrder('skip')">Skip move</button>
 
-      <button (click)="setOrder('sleep')">Sleep</button>
-    </div>
+        <button (click)="setOrder('sleep')">Sleep</button>
+      </div>
 
-    <div class="actions">
-      <button
-        *ngFor="let action of unit.definition.actions"
-        [class.disabled]="!unit.canDoAction(action)"
-        [appTooltip]="unitActionsTooltipTmpl"
-        [tooltipContext]="{ action: action }"
-        (click)="unit.doAction(action)"
-      >
-        {{ getActionName(action) }}
-      </button>
+      <div class="actions">
+        <button
+          *ngFor="let action of unit.definition.actions"
+          [class.disabled]="!unit.canDoAction(action)"
+          [appTooltip]="unitActionsTooltipTmpl"
+          [tooltipContext]="{ action: action }"
+          (click)="unit.doAction(action)"
+        >
+          {{ getActionName(action) }}
+        </button>
+      </div>
     </div>
   </div>
+
+  <app-tile-units
+    *ngIf="unit.tile.units.length > 1"
+    [tile]="unit.tile"
+  ></app-tile-units>
 
   <ng-template #unitActionsTooltipTmpl let-action="action">
     <app-unit-action-requirements
