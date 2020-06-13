@@ -7,6 +7,7 @@ export enum MoveResult {
   none,
   move,
   embark,
+  disembark,
   attack,
 }
 
@@ -40,7 +41,10 @@ export function getMoveResult(
     if (to.isWater && to.getEmbarkmentTarget(unit)) {
       return MoveResult.embark;
     }
-    if (from.passableArea !== to.passableArea) {
+    if (unit.parent && from.isWater && to.isLand) {
+      return MoveResult.disembark;
+    }
+    if (from.passableArea !== to.passableArea || to.isWater) {
       return MoveResult.none;
     }
   }
@@ -76,7 +80,7 @@ export function getMoveCost(
     return cost * 3;
   }
 
-  if (moveResult === MoveResult.embark) {
+  if (moveResult === MoveResult.embark || moveResult === MoveResult.disembark) {
     return Math.max(1, unit.actionPointsLeft);
   }
 
@@ -97,6 +101,11 @@ export function move(unit: UnitCore, tile: TileCore) {
 
   if (moveResult === MoveResult.embark) {
     // TODO implement embarkment
+    const embarkmentTarget = tile.getEmbarkmentTarget(unit);
+    embarkmentTarget?.addChild(unit);
+    _move(unit, tile, cost);
+  } else if (moveResult === MoveResult.disembark) {
+    unit.parent?.removeChild(unit);
     _move(unit, tile, cost);
   } else if (moveResult === MoveResult.attack) {
     if (attack(unit, tile)) {
@@ -120,6 +129,10 @@ function _move(unit: UnitCore, tile: TileCore, cost: number) {
   const visibleTiles = unit.getVisibleTiles();
   unit.player.exploreTiles(visibleTiles);
   unit.player.showTiles(visibleTiles);
+  for (const child of unit.children) {
+    _move(child, tile, 0);
+    collector.units.add(child);
+  }
 }
 
 export function moveAlongPath(unit: UnitCore) {

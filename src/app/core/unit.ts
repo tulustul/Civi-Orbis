@@ -13,6 +13,7 @@ export class UnitCore {
   actionPointsLeft: number;
   health = 100;
   path: TileCore[][] | null;
+  parent: UnitCore | null = null;
   children: UnitCore[] = [];
 
   order: UnitOrder = null;
@@ -132,6 +133,25 @@ export class UnitCore {
     }
 
     return result;
+  }
+
+  addChild(unit: UnitCore) {
+    if (this.children.includes(unit)) {
+      return;
+    }
+    if (unit.parent) {
+      unit.parent.removeChild(unit);
+    }
+    this.children.push(unit);
+    unit.parent = this;
+  }
+
+  removeChild(unit: UnitCore) {
+    const index = this.children.findIndex((u) => u === unit);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+      unit.parent = null;
+    }
   }
 
   destroy() {

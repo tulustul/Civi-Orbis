@@ -79,6 +79,7 @@ interface UnitSerialized {
   player: number;
   order: UnitOrder;
   path: number[][] | null;
+  parent: number | null;
 }
 
 export function dumpGame(game: Game): GameSerialized {
@@ -108,8 +109,17 @@ export function loadGame(data: GameSerialized) {
   }
   game.activePlayerIndex = data.activePlayerIndex;
 
-  for (const unit of data.units) {
-    loadUnit(game, unit);
+  for (const unitData of data.units) {
+    loadUnit(game, unitData);
+  }
+  for (const unitData of data.units) {
+    if (unitData.parent) {
+      const parent = game.unitsManager.unitsMap.get(unitData.parent);
+      const child = game.unitsManager.unitsMap.get(unitData.id);
+      if (parent && child) {
+        parent.addChild(child);
+      }
+    }
   }
 
   for (const city of data.cities) {
@@ -319,6 +329,7 @@ function dumpUnit(unit: UnitCore): UnitSerialized {
     player: unit.player.id,
     order: unit.order,
     path: unit.path?.map((row) => row.map((tile) => tile.id)) || null,
+    parent: unit.parent ? unit.parent.id : null,
   };
 }
 
