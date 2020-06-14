@@ -30,6 +30,7 @@ export class NextTurnService {
         }
       }
       this._isAiOnlyMatch$.next(isAiOnlyMatch);
+      this.autoplayEnabled = false;
     });
   }
 
