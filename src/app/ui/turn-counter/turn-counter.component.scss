@@ -9,6 +9,7 @@
   opacity: 0;
   transition: 1s linear;
   pointer-events: none;
+  z-index: 50;
   &.is-visible {
     opacity: 1;
     transition: 0s;

@@ -17,9 +17,9 @@ export class AIPlayer {
 
       if (unit.definition.actions.includes("foundCity")) {
         this.processSettler(unit);
+      } else {
+        unit.setOrder("sleep");
       }
-
-      unit.setOrder("sleep");
     }
 
     for (const city of this.player.citiesWithoutProduction) {
