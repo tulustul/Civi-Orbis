@@ -16,6 +16,7 @@ export class TrackedPlayer {
   cities: City[] = [];
 
   yields: PlayerYields;
+  isAi: boolean;
 
   constructor(game: GameState, player: TrackedPlayerChanneled) {
     this.id = player.id;
@@ -31,6 +32,7 @@ export class TrackedPlayer {
     this.cities = player.cities.map((id) => game.citiesMap.get(id)!);
 
     this.yields = player.yields;
+    this.isAi = player.isAi;
   }
 
   exploreTiles(tiles: Tile[]) {

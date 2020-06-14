@@ -104,7 +104,8 @@ export class MapUi {
 
     this.game.init$.subscribe(() => {
       this.game.state!.citySpawned$.subscribe((city) => {
-        if (city.player.id === this.game.state!.trackedPlayer.id) {
+        const trackedPlayer = this.game.state!.trackedPlayer;
+        if (city.player.id === trackedPlayer.id && !trackedPlayer.isAi) {
           this.selectCity(city);
         }
       });

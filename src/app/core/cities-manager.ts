@@ -55,6 +55,8 @@ export class CitiesManager {
       city.optimizeYields();
     }
 
+    player.updateCitiesWithoutProduction();
+
     collector.cities.add(city);
 
     return city;

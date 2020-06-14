@@ -88,6 +88,11 @@ addEventListener("message", ({ data }) => {
 function getNextTask(): PlayerTask | null {
   const p = game.trackedPlayer;
 
+  if (p.ai) {
+    // Don't force the player to do anything if we are just observing AI playing.
+    return null;
+  }
+
   if (p.citiesWithoutProduction.length) {
     return {
       task: "city",

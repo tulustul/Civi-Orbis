@@ -20,7 +20,7 @@ Minor features:
   ☐ autosaving
   ☐ city production queue
   ☐ previous/next city button in city view
-  ☐ ai only matches with autoplay
+  ✔ ai only matches with autoplay @done(20-06-14 19:50)
   ☐ proper starting locations
   ☐ map generator: more realistic orogeny
   ☐ map generator: climate based on mountain ranges and sea currents
@@ -37,7 +37,7 @@ Major features:
   ☐ happiness
   ✔ `fog of war` - grey out tiles not visible by units and cities @done(20-06-07 23:03)
   ☐ tile improvements damaging when not enough public works
-  ☐ embarkment
+  ✔ embarkment @done(20-06-14 19:50)
   ☐ armies
   ☐ cities overview panel
   ☐ slavery

@@ -60,9 +60,11 @@ export class Game {
     }
     if (this.activePlayer.ai) {
       this.activePlayer.ai.nextTurn();
-      this.nextPlayer();
+      if (this.activePlayer !== this.trackedPlayer) {
+        this.nextPlayer();
+      }
     } else {
-      if (this.trackedPlayer !== this.activePlayer) {
+      if (this.activePlayer !== this.trackedPlayer) {
         this.trackedPlayer = this.activePlayer;
         collector.trackedPlayer = this.trackedPlayer;
         collector.setVisibleTiles(this.trackedPlayer.visibleTiles);

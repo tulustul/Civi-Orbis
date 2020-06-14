@@ -8,6 +8,8 @@ export class Player {
 
   areaId: number;
 
+  isAi: boolean;
+
   constructor(player: PlayerChanneled) {
     this.id = player.id;
     this.color = player.color;
@@ -20,5 +22,6 @@ export class Player {
     ];
 
     this.areaId = player.areaId;
+    this.isAi = player.isAi;
   }
 }

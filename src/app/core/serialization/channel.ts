@@ -93,6 +93,7 @@ export interface PlayerChanneled {
   id: number;
   color: number;
   areaId: number;
+  isAi: boolean;
 }
 
 export interface TrackedPlayerChanneled {
@@ -104,6 +105,7 @@ export interface TrackedPlayerChanneled {
   cities: number[];
 
   yields: PlayerYields;
+  isAi: boolean;
 }
 
 export interface UnitChanneled {
@@ -236,6 +238,7 @@ export function playerToChannel(player: PlayerCore): PlayerChanneled {
     id: player.id,
     color: player.color,
     areaId: player.area.id,
+    isAi: !!player.ai,
   };
 }
 
@@ -250,6 +253,7 @@ export function trackedPlayerToChannel(
     units: player.units.map((u) => u.id),
     cities: player.cities.map((c) => c.id),
     yields: player.yields,
+    isAi: !!player.ai,
   };
 }
 

@@ -11,11 +11,27 @@ export class NextTurnService {
   private _waiting$ = new BehaviorSubject<boolean>(false);
   waiting$ = this._waiting$.asObservable();
 
+  private _isAiOnlyMatch$ = new BehaviorSubject<boolean>(false);
+  isAiOnlyMatch$ = this._isAiOnlyMatch$.asObservable();
+
+  autoplayEnabled = false;
+
   constructor(
     public game: GameApi,
     private camera: Camera,
     private mapUi: MapUi,
-  ) {}
+  ) {
+    game.init$.subscribe(() => {
+      let isAiOnlyMatch = true;
+      for (const player of game.state!.players) {
+        if (!player.isAi) {
+          isAiOnlyMatch = false;
+          break;
+        }
+      }
+      this._isAiOnlyMatch$.next(isAiOnlyMatch);
+    });
+  }
 
   async next() {
     if (this._waiting$.value) {
@@ -44,6 +60,22 @@ export class NextTurnService {
         this.mapUi.selectUnit(unit);
         this.camera.moveToTileWithEasing(unit.tile);
         break;
+    }
+  }
+
+  enableAutoplay() {
+    this.autoplayEnabled = true;
+    this.autoplay();
+  }
+
+  stopAutoplay() {
+    this.autoplayEnabled = false;
+  }
+
+  private autoplay() {
+    this.next();
+    if (this.autoplayEnabled) {
+      setTimeout(() => this.autoplay());
     }
   }
 }
