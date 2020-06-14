@@ -4,13 +4,17 @@ import {
   Input,
   ChangeDetectionStrategy,
   HostListener,
-  HostBinding,
   OnChanges,
   ElementRef,
+  HostBinding,
+  ChangeDetectorRef,
+  Optional,
+  OnDestroy,
 } from "@angular/core";
 
 import { Unit } from "src/app/api/unit";
 import { MapUi } from "../map-ui";
+import { UnitsLayerService } from "../units-layer/units-layer.service";
 
 @Component({
   selector: "app-unit",
@@ -18,27 +22,56 @@ import { MapUi } from "../map-ui";
   styleUrls: ["./unit.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UnitComponent implements OnInit, OnChanges {
+export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   @Input() unit: Unit;
 
+  @Input()
+  showMovesIndicator = true;
+
   constructor(
-    private elementRef: ElementRef<HTMLElement>,
+    private cdr: ChangeDetectorRef,
+    public elementRef: ElementRef<HTMLElement>,
     private mapUi: MapUi,
+    @Optional() private unitsLayerService: UnitsLayerService | null,
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit() {
+    if (this.unitsLayerService) {
+      this.unitsLayerService.addUnitComponent(this);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.unitsLayerService) {
+      this.unitsLayerService.removeUnitComponent(this);
+    }
+  }
 
   ngOnChanges() {
-    const el = this.elementRef.nativeElement;
-    el.classList.remove("moves-all", "moves-some", "moves-none");
-    el.classList.remove("health-healthy", "health-injured", "health-severe");
-    el.classList.add(`moves-${this.movesStatus}`);
-    el.classList.add(`health-${this.healthStatus}`);
+    this.updateClasses();
   }
 
   @HostListener("click")
   onClick() {
     this.mapUi.selectUnit(this.unit);
+  }
+
+  @HostListener("contextmenu", ["$event"])
+  onContextMenu(event: Event) {
+    event.preventDefault();
+  }
+
+  update() {
+    this.updateClasses();
+    this.cdr.markForCheck();
+  }
+
+  private updateClasses() {
+    const el = this.elementRef.nativeElement;
+    el.classList.remove("moves-all", "moves-some", "moves-none");
+    el.classList.remove("health-healthy", "health-injured", "health-severe");
+    el.classList.add(`moves-${this.movesStatus}`);
+    el.classList.add(`health-${this.healthStatus}`);
   }
 
   get tint() {

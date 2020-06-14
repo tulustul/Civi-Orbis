@@ -29,7 +29,7 @@ export class MapDrawer {
 
   terrainDrawer: TerrainDrawer;
 
-  unitsDrawer: UnitsDrawer;
+  // unitsDrawer: UnitsDrawer;
 
   yieldsDrawer: YiedsDrawer;
 
@@ -92,7 +92,7 @@ export class MapDrawer {
     // Drawers must be created after init$ subscription?. Race condition will occur otherwise.
     this.terrainDrawer = new TerrainDrawer(this.renderer, this.game);
 
-    this.unitsDrawer = new UnitsDrawer(this.game, this.renderer, this.camera);
+    // this.unitsDrawer = new UnitsDrawer(this.game, this.renderer, this.camera);
 
     this.yieldsDrawer = new YiedsDrawer(this.renderer.mapUi);
 
@@ -128,7 +128,7 @@ export class MapDrawer {
     this.tilesContainer.destroyAllChildren();
     if (this.terrainDrawer) {
       this.cityDrawer.clear();
-      this.unitsDrawer.clear();
+      // this.unitsDrawer.clear();
       this.politicsDrawer.clear();
     }
   }
@@ -150,7 +150,7 @@ export class MapDrawer {
       }
     }
 
-    this.unitsDrawer.build(gameState);
+    // this.unitsDrawer.build(gameState);
 
     if (this.game.state?.trackedPlayer) {
       this.limitViewToPlayer(this.game.state?.trackedPlayer);

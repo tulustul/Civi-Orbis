@@ -1,0 +1,7 @@
+<app-unit
+  *ngFor="let unit of tile.units"
+  [class.is-selected]="unit.id === selectedUnit?.id"
+  [class.allow-interaction]="unit.player.id === trackedPlayer.id"
+  [unit]="unit"
+  [showMovesIndicator]="unit.player.id === trackedPlayer.id"
+></app-unit>

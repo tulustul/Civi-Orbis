@@ -11,7 +11,7 @@
     <div class="unit-panel panel panel-top-right-corner">
       <div class="header">
         <h2>{{ unit.definition.name }}</h2>
-        <app-icon [name]="unit.definition.id"></app-icon>
+        <app-unit #unitComponent [unit]="unit"></app-unit>
       </div>
       <p>Moves: {{ unit.actionPointsLeft }}</p>
       <p>Strength: {{ unit.definition.strength }}</p>

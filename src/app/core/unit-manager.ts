@@ -70,7 +70,11 @@ export class UnitsManager {
       if (unit.order === "skip") {
         unit.setOrder(null);
       }
-      unit.actionPointsLeft = unit.definition.actionPoints;
+
+      if (unit.actionPointsLeft < unit.definition.actionPoints) {
+        unit.actionPointsLeft = unit.definition.actionPoints;
+        collector.units.add(unit);
+      }
     }
   }
 }

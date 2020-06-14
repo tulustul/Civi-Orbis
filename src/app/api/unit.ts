@@ -29,13 +29,15 @@ export class Unit {
     this.health = unit.health;
     this.actionPointsLeft = unit.actionPointsLeft;
 
-    const index = this.tile.units.indexOf(this);
-    if (index !== -1) {
-      this.tile.units.splice(index, 1);
-    }
+    if (this.tile.id !== unit.tileId) {
+      const index = this.tile.units.indexOf(this);
+      if (index !== -1) {
+        this.tile.units.splice(index, 1);
+      }
 
-    this.tile = game.map.tilesMap.get(unit.tileId)!;
-    this.tile.units.push(this);
+      this.tile = game.map.tilesMap.get(unit.tileId)!;
+      this.tile.units.push(this);
+    }
   }
 
   destroy(game: GameState) {

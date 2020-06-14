@@ -100,7 +100,7 @@ export class GameRenderer {
     this.overlaysContainer.interactiveChildren = false;
 
     this.app.stage.addChild(this.mapLayer.sprite);
-    this.app.stage.addChild(this.mapDrawer.unitsDrawer.container);
+    // this.app.stage.addChild(this.mapDrawer.unitsDrawer.container);
     this.app.stage.addChild(this.overlaysContainer);
 
     this.mapLayer.sprite.filters = [
@@ -152,7 +152,7 @@ export class GameRenderer {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
 
-      this.mapDrawer.unitsDrawer.container.setTransform(x, y, t.scale, t.scale);
+      // this.mapDrawer.unitsDrawer.container.setTransform(x, y, t.scale, t.scale);
       this.overlaysContainer.setTransform(x, y, t.scale, t.scale);
       this.mapLayer.stage.setTransform(x, y, t.scale, t.scale);
       this.fogOfWarLayer.stage.setTransform(x, y, t.scale, t.scale);

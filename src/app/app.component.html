@@ -15,11 +15,15 @@
       class="panel"
       *ngIf="uiState.editorEnabled$ | async; else gameUiTmpl"
     ></app-editor>
+
+    <app-cities-layer
+      *ngIf="mapUi.cityLabelsVisible$ | async"
+    ></app-cities-layer>
+    <app-units-layer *ngIf="mapUi.cityLabelsVisible$ | async"></app-units-layer>
   </ng-container>
 </ng-template>
 
 <ng-template #gameUiTmpl>
-  <app-cities-layer *ngIf="mapUi.cityLabelsVisible$ | async"></app-cities-layer>
   <app-turn-counter></app-turn-counter>
 
   <app-city-view

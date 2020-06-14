@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   TemplateRef,
+  ViewChild,
 } from "@angular/core";
 
 import { Subject } from "rxjs";
@@ -17,6 +18,7 @@ import { UnitOrder } from "src/app/core/unit";
 import { GameApi } from "src/app/api";
 import { Unit } from "src/app/api/unit";
 import { CombatSimulation } from "src/app/core/combat";
+import { UnitComponent } from "../unit/unit.component";
 
 @Component({
   selector: "app-unit-panel",
@@ -25,6 +27,8 @@ import { CombatSimulation } from "src/app/core/combat";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnitPanelComponent implements OnInit, OnDestroy {
+  @ViewChild("unitComponent") unitComponent: UnitComponent | undefined;
+
   unit: UnitDetails | null = null;
   enemy: Unit | null;
   combatSimulation: CombatSimulation | null;
@@ -45,6 +49,9 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
       .subscribe((unit) => {
         this.unit = unit;
         this.cdr.markForCheck();
+        if (this.unitComponent) {
+          this.unitComponent.update();
+        }
       });
 
     this.mapUi.hoveredUnit$

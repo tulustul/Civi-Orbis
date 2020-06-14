@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
   OnDestroy,
   ChangeDetectorRef,
+  ViewChildren,
 } from "@angular/core";
 
 import { Subject } from "rxjs";
@@ -12,6 +13,7 @@ import { takeUntil } from "rxjs/operators";
 
 import { Tile } from "src/app/api/tile.interface";
 import { MapUi } from "../map-ui";
+import { UnitComponent } from "../unit/unit.component";
 
 @Component({
   selector: "app-tile-units",
@@ -22,6 +24,8 @@ import { MapUi } from "../map-ui";
 export class TileUnitsComponent implements OnInit, OnDestroy {
   @Input() tile: Tile;
 
+  @ViewChildren(UnitComponent) unitComponents: UnitComponent[] = [];
+
   private ngUnsubscribe = new Subject<void>();
 
   constructor(private cdr: ChangeDetectorRef, private mapUi: MapUi) {}
@@ -29,7 +33,15 @@ export class TileUnitsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.mapUi.selectedUnit$
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(() => this.cdr.markForCheck());
+      .subscribe((unit) => {
+        this.cdr.markForCheck();
+        const unitComponent = this.unitComponents.find(
+          (c) => c.unit.id === unit?.id,
+        );
+        if (unitComponent) {
+          unitComponent.update();
+        }
+      });
   }
 
   ngOnDestroy() {
