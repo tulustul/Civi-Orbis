@@ -100,9 +100,10 @@ export function move(unit: UnitCore, tile: TileCore) {
   }
 
   if (moveResult === MoveResult.embark) {
-    // TODO implement embarkment
     const embarkmentTarget = tile.getEmbarkmentTarget(unit);
-    embarkmentTarget?.addChild(unit);
+    if (embarkmentTarget) {
+      embarkmentTarget.addChild(unit);
+    }
     _move(unit, tile, cost);
   } else if (moveResult === MoveResult.disembark) {
     unit.parent?.removeChild(unit);

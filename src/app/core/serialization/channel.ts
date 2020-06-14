@@ -111,17 +111,13 @@ export interface UnitChanneled {
   tileId: number;
   definitionId: string;
   playerId: number;
+  parentId: number | null;
+  childrenIds: number[];
   actionPointsLeft: number;
   health: number;
 }
 
-export interface UnitDetailsChanneled {
-  id: number;
-  tileId: number;
-  definitionId: string;
-  playerId: number;
-  actionPointsLeft: number;
-  health: number;
+export interface UnitDetailsChanneled extends UnitChanneled {
   order: UnitOrder;
   path: number[][] | null;
 }
@@ -263,6 +259,8 @@ export function unitToChannel(unit: UnitCore): UnitChanneled {
     tileId: unit.tile.id,
     definitionId: unit.definition.id,
     playerId: unit.player.id,
+    parentId: unit.parent?.id || null,
+    childrenIds: unit.children.map((c) => c.id),
     health: unit.health,
     actionPointsLeft: unit.actionPointsLeft,
   };
@@ -274,6 +272,8 @@ export function unitDetailsToChannel(unit: UnitCore): UnitDetailsChanneled {
     tileId: unit.tile.id,
     definitionId: unit.definition.id,
     playerId: unit.player.id,
+    parentId: unit.parent?.id || null,
+    childrenIds: unit.children.map((c) => c.id),
     actionPointsLeft: unit.actionPointsLeft,
     health: unit.health,
     order: unit.order,

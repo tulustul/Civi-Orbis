@@ -10,10 +10,12 @@ export class Unit {
   definition: UnitDefinition;
   player: Player;
   tile: Tile;
+  parent: Unit | null;
+  children: Unit[] = [];
   health: number;
   actionPointsLeft: number;
 
-  constructor(game: GameState, unit: UnitChanneled) {
+  constructor(private game: GameState, unit: UnitChanneled) {
     this.id = unit.id;
     this.tile = game.map.tilesMap.get(unit.tileId)!;
     this.player = game.playersMap.get(unit.playerId)!;
@@ -37,6 +39,19 @@ export class Unit {
 
       this.tile = game.map.tilesMap.get(unit.tileId)!;
       this.tile.units.push(this);
+    }
+
+    this.updateParentAndChildren(unit);
+  }
+
+  updateParentAndChildren(unit: UnitChanneled) {
+    this.parent = null;
+    if (unit.parentId) {
+      this.parent = this.game.unitsMap.get(unit.parentId) || null;
+    }
+    this.children = [];
+    if (unit.childrenIds) {
+      this.children = unit.childrenIds.map((id) => this.game.unitsMap.get(id)!);
     }
   }
 

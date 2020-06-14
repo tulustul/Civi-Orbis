@@ -67,7 +67,7 @@ export class MapUi {
         this._selectedTile$.next(tile);
       } else if (tile.units.length) {
         if (this.selectedUnit?.tile !== tile) {
-          this.selectUnit(tile.units[0]);
+          this.selectFirstUnitFromTile(tile);
         }
       } else if (tile?.city) {
         this.selectCity(tile.city);
@@ -279,6 +279,16 @@ export class MapUi {
     }
     if (previousUnit) {
       this.game.state!.updateUnit(previousUnit.id);
+    }
+  }
+
+  private selectFirstUnitFromTile(tile: Tile) {
+    const trackedPlayerId = this.game.state!.trackedPlayer.id;
+    for (const unit of tile.units) {
+      if (!unit.parent && unit.player.id === trackedPlayerId) {
+        this.selectUnit(unit);
+        return;
+      }
     }
   }
 

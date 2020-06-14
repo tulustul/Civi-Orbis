@@ -95,7 +95,14 @@ export class GameState {
   }
 
   private restoreUnits(game: GameChanneled): Unit[] {
-    return game.units.map((unit) => new Unit(this, unit));
+    const units = game.units.map((unitData) => new Unit(this, unitData));
+    for (const unitData of game.units) {
+      const unit = this.unitsMap.get(unitData.id);
+      if (unit) {
+        unit.updateParentAndChildren(unitData);
+      }
+    }
+    return units;
   }
 
   private restoreCities(game: GameChanneled): City[] {

@@ -148,7 +148,7 @@ export class PlayerCore {
 
   updateUnitsWithoutOrders() {
     this.unitsWithoutOrders = this.units.filter(
-      (c) => !c.order && c.actionPointsLeft,
+      (c) => !c.order && !c.parent && c.actionPointsLeft,
     );
   }
 

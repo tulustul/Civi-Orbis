@@ -72,4 +72,19 @@
     height: 11px;
     background-color: var(--moves-color);
   }
+
+  .children-count {
+    position: absolute;
+    top: 32px;
+    left: -7px;
+    border-radius: 50%;
+    border: 1px solid black;
+    width: 20px;
+    height: 20px;
+    background-color: #555;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }

@@ -9,4 +9,8 @@
   <app-icon [name]="unit.definition.id" [scale]="0.7"></app-icon>
 
   <i class="moves-available" *ngIf="showMovesIndicator"></i>
+
+  <span class="children-count" *ngIf="unit.children.length > 0">{{
+    unit.children.length
+  }}</span>
 </div>

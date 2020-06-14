@@ -15,6 +15,8 @@ export class UnitDetails {
   tile: Tile;
   definition: UnitDefinition;
   player: Player;
+  parent: Unit | null;
+  children: Unit[] = [];
   actionPointsLeft: number;
   health: number;
   path: Tile[][] | null = null;
@@ -38,6 +40,15 @@ export class UnitDetails {
       this.path = unit.path.map((turn) =>
         turn.map((id) => this.game.map.tilesMap.get(id)!),
       );
+    }
+
+    this.parent = null;
+    if (unit.parentId) {
+      this.parent = this.game.unitsMap.get(unit.parentId) || null;
+    }
+    this.children = [];
+    if (unit.childrenIds) {
+      this.children = unit.childrenIds.map((id) => this.game.unitsMap.get(id)!);
     }
   }
 

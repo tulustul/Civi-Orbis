@@ -144,6 +144,7 @@ export class UnitCore {
     }
     this.children.push(unit);
     unit.parent = this;
+    collector.units.add(this);
   }
 
   removeChild(unit: UnitCore) {
@@ -151,6 +152,7 @@ export class UnitCore {
     if (index !== -1) {
       this.children.splice(index, 1);
       unit.parent = null;
+      collector.units.add(this);
     }
   }
 
