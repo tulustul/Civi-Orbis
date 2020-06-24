@@ -5,11 +5,29 @@ import { CityCore } from "../core/city";
 import { UnitCore } from "../core/unit";
 import { getUnitById, getIdleProductById } from "../core/data-manager";
 import { moveAlongPath } from "../core/movement";
+import { SettlingAI } from "./ai-settling";
+import { CityAI } from "./ai-city";
+import { ExploringAI } from "./ai-exploring";
+import { AiPlanner } from "./ai-planner";
 
 export class AIPlayer {
-  constructor(private player: PlayerCore) {}
+  settlingAi = new SettlingAI(this);
+  cityAi = new CityAI(this);
+  exploringAi = new ExploringAI(this);
+
+  planner = new AiPlanner();
+
+  constructor(public player: PlayerCore) {}
 
   nextTurn() {
+    // new ai
+    let operations = this.exploringAi.plan();
+    operations.push(...this.settlingAi.plan());
+    operations.push(...this.cityAi.plan());
+
+    this.planner.schedule(operations);
+
+    // old ai
     for (const unit of this.player.unitsWithoutOrders) {
       if (unit.order) {
         continue;
