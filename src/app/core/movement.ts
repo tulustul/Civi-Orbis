@@ -2,6 +2,7 @@ import { TileCore } from "./tile";
 import { UnitCore } from "./unit";
 import { attack } from "./combat";
 import { collector } from "./collector";
+import { UnitType, UnitTrait } from "./data.interface";
 
 export enum MoveResult {
   none,
@@ -20,7 +21,7 @@ export function getMoveResult(
     return MoveResult.move;
   }
 
-  if (unit.definition.type === "naval") {
+  if (unit.definition.type === UnitType.naval) {
     if (from.passableArea !== to.passableArea) {
       if (
         to.isLand &&
@@ -37,7 +38,7 @@ export function getMoveResult(
     if (to.isLand) {
       return MoveResult.none;
     }
-  } else if (unit.definition.type === "land") {
+  } else if (unit.definition.type === UnitType.land) {
     if (to.isWater && to.getEmbarkmentTarget(unit)) {
       return MoveResult.embark;
     }
@@ -53,7 +54,7 @@ export function getMoveResult(
     const enemyUnit = to.getFirstEnemyUnit(unit);
     const enemyCity = to.city && to.city.player !== unit.player;
     if (enemyUnit || enemyCity) {
-      if (unit.definition.strength) {
+      if (unit.definition.trait === UnitTrait.military) {
         return MoveResult.attack;
       } else {
         return MoveResult.none;

@@ -7,4 +7,8 @@ export abstract class AISystem {
   constructor(protected ai: AIPlayer) {}
 
   abstract plan(): AiOperation[];
+
+  get player() {
+    return this.ai.player;
+  }
 }

@@ -23,13 +23,24 @@ export interface ProductDefinition extends Entity, HaveRequirements {
   productionCost: number;
 }
 
-export type UnitType = "land" | "naval";
+export enum UnitType {
+  land,
+  naval,
+}
+
+export enum UnitTrait {
+  settler,
+  explorer,
+  worker,
+  military,
+}
 
 export interface UnitDefinition extends ProductDefinition {
   actionPoints: number;
   strength: number;
   actions: UnitAction[];
   type: UnitType;
+  trait: UnitTrait;
   capacity: number;
 }
 

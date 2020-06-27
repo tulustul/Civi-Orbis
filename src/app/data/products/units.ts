@@ -1,4 +1,8 @@
-import { UnitDefinition } from "src/app/core/data.interface";
+import {
+  UnitDefinition,
+  UnitType,
+  UnitTrait,
+} from "src/app/core/data.interface";
 import {
   CityHaveBuildingRequirement,
   CitySizeRequirement,
@@ -9,7 +13,8 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_settler",
     name: "Settler",
-    type: "land",
+    type: UnitType.land,
+    trait: UnitTrait.settler,
     actionPoints: 2,
     strength: 0,
     actions: ["foundCity"],
@@ -24,7 +29,8 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_worker",
     name: "Worker",
-    type: "land",
+    type: UnitType.land,
+    trait: UnitTrait.worker,
     actionPoints: 2,
     strength: 0,
     actions: ["buildFarm", "buildMine", "buildSawmill", "buildRoad"],
@@ -36,7 +42,8 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_scout",
     name: "Scout",
-    type: "land",
+    type: UnitType.land,
+    trait: UnitTrait.explorer,
     actionPoints: 2,
     strength: 2,
     actions: [],
@@ -48,7 +55,8 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_warrior",
     name: "Warrior",
-    type: "land",
+    type: UnitType.land,
+    trait: UnitTrait.military,
     actionPoints: 2,
     strength: 5,
     actions: [],
@@ -60,7 +68,8 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_tireme",
     name: "Tireme",
-    type: "naval",
+    type: UnitType.naval,
+    trait: UnitTrait.military,
     actionPoints: 3,
     strength: 5,
     actions: [],
@@ -72,12 +81,26 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_galley",
     name: "Galley",
-    type: "naval",
+    type: UnitType.naval,
+    trait: UnitTrait.military,
     actionPoints: 3,
     strength: 3,
     actions: [],
     productionCost: 50,
     capacity: 2,
+    strongRequirements: [new CoastlineCityRequirement()],
+    weakRequirements: [],
+  },
+  {
+    id: "unit_scout_ship",
+    name: "Scout vessel",
+    type: UnitType.naval,
+    trait: UnitTrait.explorer,
+    actionPoints: 3,
+    strength: 2,
+    actions: [],
+    productionCost: 30,
+    capacity: 0,
     strongRequirements: [new CoastlineCityRequirement()],
     weakRequirements: [],
   },
