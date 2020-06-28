@@ -12,6 +12,8 @@ export class ProduceOperation extends AiOperation {
   // TODO
   locationPreference: TileCore | null = null;
 
+  passableArea: number | null = null;
+
   perform() {}
 }
 

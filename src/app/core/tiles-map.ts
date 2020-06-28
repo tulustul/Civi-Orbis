@@ -19,12 +19,10 @@ export class TilesMapCore {
 
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
-        this.tiles[x][y].neighbours = getTileNeighbours(this.tiles, x, y);
-        this.tiles[x][y].fullNeighbours = getTileFullNeighbours(
-          this.tiles,
-          x,
-          y,
-        );
+        const tile = this.tiles[x][y];
+        tile.neighbours = getTileNeighbours(this.tiles, x, y);
+        tile.fullNeighbours = getTileFullNeighbours(this.tiles, x, y);
+        tile.isMapEdge = tile.neighbours.length !== 6;
       }
     }
   }

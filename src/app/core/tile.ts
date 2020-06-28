@@ -54,6 +54,7 @@ export class TileCore implements BaseTile {
   neighboursCosts = new Map<TileCore, number>();
   sweetSpotValue = 0; // used by ai to find good city location
   passableArea = 0; // used by pathfinding to quickly decide if a path between two tiles exists
+  isMapEdge = false;
 
   constructor(public id: number, public x: number, public y: number) {}
 

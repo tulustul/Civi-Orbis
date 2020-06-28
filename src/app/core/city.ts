@@ -70,8 +70,15 @@ export class CityCore {
 
   isCoastline = false;
 
+  passableAreas = new Set<number>();
+
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
+
+    this.passableAreas.add(tile.passableArea);
+    for (const neighbour of tile.neighbours) {
+      this.passableAreas.add(neighbour.passableArea);
+    }
   }
 
   nextTurn() {
