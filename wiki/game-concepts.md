@@ -13,38 +13,86 @@ Tile improvements consume some `public work points` per turn. When run out of `p
 All military units have the following attributes:
 
 - power
-- movement points
-- health points
-- supply points
+- movement points (**MP**)
+- health points (**HP**)
+- supply points (**SP**)
 - ...various bonuses
 
-Military units can stack together creating armies. The speed of the army is limited by it's slowest unit. Big armies have movement penalties.
-
-#### **Supplies**:
+#### **Supplies**
 
 Supplies is the concept that limits the power of stacks of doom and adds a bit of tactics and deep to the combat. It also limits the potential of military units being used as scouts and explorers.
 
-- Supply points will deteriorate when there is no clear path to a friendly city.
-- Supply lines (paths) cannot go in vicinity of enemy units.
-- Automatic supply lines work only for close distances. For long distances a special `supply cargo` unit must be built.
+- Each unit have supply points.
+- Supply points will deteriorate when in foreign territory.
 - When supplies are deteriorated, the health points will start to decrease which can lead to the unit being disbanded.
 - Supply points can be replenished by pillaging tile improvements or cities, by defeating enemy army and taking over their supplies or by intercepting enemy supply units.
+- To take care of the supply lines the player must build a special supply unit.
+- Supply units also have supply points, though much more of them. They replenish some amount of other units SP when they are in range. The equivalent amount of SP is taken from the supply unit.
+- Supply units can replenish the SP in cities.
 
-TODO the combat algorithm.
+#### **Zone of control (ZOC)**
+
+Each military unit establishes zone of control which consists of neighbouring tiles (naval or land depending on unit type). If an enemy controls a particular tile:
+
+- Moving to that tile costs twice as much.
+- City cannot work on this tile.
+- Supply lines are blocked.
+- When a unit is surrounded by enemy ZOC then it starts to lose SP even if it's on a friendly territory.
+
+#### Unit stacking
+
+- Military units can stack together.
+- The maximum stack size is based on player's bonuses.
+- When attacking stacked units the defenders issue the best unit.
+- Stacked units can be grouped together and move as one.
+- The speed of the group is limited by it's slowest unit.
+
+#### Armies
+
+- A general can transform a group into an army.
+- An army fights as one unit.
+- Damage to an army is distributed evenly across all units (with small random variations)
+- Generals gain experience in fights. Higher level generals provide better bonuses and can operate larger armies.
+- TODO combat algorithm
+- TODO how to recruit generals?
 
 ## Slavery
 
-TODO
+Early economies can greatly benefit from slavery. Later in the game slavery generates more and more unhapinness and it become beneficial to ban slavery. By picking the right bonuses the players can keep the slavery to the end of the game and it will still be profitable.
 
-## Science
+Each city have it's slavery output per turn. The player also have global slavery points.
 
-TODO
+Slaves are part of cities population and are taken into account when processing city population logic.
+
+#### Slavery sources
+
+- Defeating enemy units.
+- Pillaging.
+- Sacking cities.
+- Trade routes.
+- Buildings e.g. slave market
+
+#### Slavery usage
+
+- Part of slavery output in a city is added to production when constructing buildings.
+- Global slavery points can used to speed up production in a city.
+- TODO Public works, how?
 
 ## Economy
+
+### Yields
+
+At the beginning of the game tile yields are very poor. River valleys are the only sensible sources of food and resources are the only source of production and gold + they can yield some extra food. Various bonuses later in the game increases the yields making other areas worth colonizing.
+
+A great deal of production can be aquired from slavery. In case of gold, trade routes can do tremendous job.
 
 TODO
 
 ## Trade
+
+TODO
+
+## Science
 
 TODO
 
