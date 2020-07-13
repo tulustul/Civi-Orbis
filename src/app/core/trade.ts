@@ -52,8 +52,8 @@ export class TradeEdge {
 
   routes: TradeRoute[] = [];
 
-  toAYields: Yields = { ...EMPTY_YIELDS };
-  toBYields: Yields = { ...EMPTY_YIELDS };
+  toAGoods: TradeGoods[] = [];
+  toBGoods: TradeGoods[] = [];
 
   constructor(public nodeA: CityCore, public nodeB: CityCore) {
     this.path = this.buildPath();
@@ -67,5 +67,13 @@ export class TradeEdge {
 
   removeRoute(route: TradeRoute) {}
 
-  computeYields() {}
+  computeGoods() {}
+}
+
+export class TradeGoods {
+  from: CityCore;
+
+  yields: Yields = { ...EMPTY_YIELDS };
+
+  // TODO resources, culture, faith, nation, science, slavery.
 }

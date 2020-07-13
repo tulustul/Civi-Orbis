@@ -18,7 +18,7 @@ All military units have the following attributes:
 - supply points (**SP**)
 - ...various bonuses
 
-#### **Training**
+#### **Recruting**
 
 #### **Supplies**
 
@@ -81,6 +81,19 @@ Slaves are part of cities population and are taken into account when processing 
 - Speeding up building production by consuming global slavery points + some food/population
 - TODO Public works, how?
 
+## Resources
+
+There is no distinction between strategic and luxury resources. Each resource have it's own bonuses which can be extended with buildings, techs and other bonuses.
+
+Each resource has:
+
+- yields bonuses
+- quantity
+- other bonuses (health, happiness)
+
+Resources can be traded using trade network. Players can prevent certain resources from going into trade network if they want to keep those resources for themselfs.
+They can also embarg certain players from getting certain resources from you.
+
 ## Economy
 
 ### Yields
@@ -103,6 +116,14 @@ Trade is represented as a graph with cities as nodes and trade routes as edges.
 - Trade routes can stack if they occupy the same edge.
 - A market is required to join the city into trade network.
 - Land trade routes require a road or river connection.
+- Each edge carries goods from a list of cities.
+
+#### Resources
+
+- If a city needs a particular resource it takes it from the route and put some gold in the opposite direction.
+- Each edge in the network define a resource demand which is calculated by the needs of the cities which are connected to that edge.
+- A city put all excessive resources to the trade network. It is ditributed proportionally to the edges's demand.
+- The bigger the city the larger quantity of the resource a city require.
 
 ## Science
 
@@ -131,3 +152,5 @@ TODO
 ## Nation
 
 TODO
+
+## Health
