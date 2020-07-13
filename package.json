@@ -1,6 +1,6 @@
 {
-  "name": "civ",
-  "version": "0.0.0",
+  "name": "civi-orbis",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "deploy": "ng deploy --base-href=/civ/"
+    "deploy": "ng deploy --base-href=/civi-orbis/"
   },
   "private": true,
   "dependencies": {

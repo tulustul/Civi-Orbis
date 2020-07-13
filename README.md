@@ -1,8 +1,8 @@
-# Welcome to Civ
+# Welcome to Civi Orbis
 
-## A civilization game clone for the browsers.
+## A turn-based strategy game inspired by Civilization series for the web.
 
-- Try it [here](https://tulustul.github.io/civ/).
+- Try it [here](https://tulustul.github.io/civi-orbis/).
 
 - Learn about basic [game concepts](wiki/game-concepts.md).
 

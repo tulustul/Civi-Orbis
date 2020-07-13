@@ -12,7 +12,7 @@ import { GameRenderer } from "./renderer/renderer";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  title = "civ";
+  title = "Civi Orbis";
 
   constructor(
     public game: GameApi,
