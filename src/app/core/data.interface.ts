@@ -1,6 +1,7 @@
 import { UnitAction } from "./unit-actions";
 import { Bonuses } from "./bonus";
 import { Requirement } from "./requirements";
+import { TileImprovement } from "./tile-improvements";
 
 export interface Entity {
   id: string;
@@ -63,3 +64,9 @@ export type Nation = Entity & {
   bonuses: Bonuses;
   citiesNames: string[];
 };
+
+export interface ResourceDefinition extends Entity {
+  requiredImprovement: TileImprovement;
+  bonuses: Bonuses;
+  bonusesWhenWorked: Bonuses;
+}
