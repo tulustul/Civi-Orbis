@@ -108,6 +108,7 @@ export class TerrainDrawer {
 
     this.drawRoads(tile, container);
     this.drawImprovement(tile, container);
+    this.drawResource(tile, container);
   }
 
   private drawImprovement(tile: Tile, container: PIXI.Container) {
@@ -127,6 +128,17 @@ export class TerrainDrawer {
     }
 
     return sprite;
+  }
+
+  private drawResource(tile: Tile, container: PIXI.Container) {
+    if (!tile.resource) {
+      return;
+    }
+
+    const textureName = `${tile.resource.id}.png`;
+    const sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
+    sprite.y += 0.3;
+    container.addChild(sprite);
   }
 
   private drawRoads(tile: Tile, container: PIXI.Container) {

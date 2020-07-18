@@ -70,6 +70,15 @@
       (changed)="updateRoad($event)"
     ></app-radio>
   </div>
+
+  <div>
+    <h4>Resource</h4>
+    <app-radio
+      [options]="RESOURCE_OPTIONS"
+      [value]="tile.resource?.id || null"
+      (changed)="updateResource($event)"
+    ></app-radio>
+  </div>
 </div>
 
 <ng-template #selectTilePromptTmpl>

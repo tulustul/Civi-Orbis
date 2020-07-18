@@ -6,6 +6,7 @@ import { BaseTile, PlayerYields } from "src/app/shared";
 import { TilesMapCore } from "../tiles-map";
 import { UnitOrder, UnitCore } from "../unit";
 import { TileCore } from "../tile";
+import { ResourceCore } from "../resources";
 
 export interface GameChanneled {
   turn: number;
@@ -26,6 +27,7 @@ export interface TileChanneled extends BaseTile {
   areaOf: number | null;
   cityId: number | null;
   unitsIds: number[];
+  resource: ResourceChanneled | null;
 }
 
 export interface CityChanneled {
@@ -124,6 +126,12 @@ export interface UnitDetailsChanneled extends UnitChanneled {
   path: number[][] | null;
 }
 
+export interface ResourceChanneled {
+  id: string;
+  name: string;
+  quantity: number;
+}
+
 export function gameToChannel(game: Game): GameChanneled {
   return {
     turn: game.turn,
@@ -169,6 +177,15 @@ export function tileToChannel(tile: TileCore): TileChanneled {
     areaOf: tile.areaOf ? tile.areaOf.id : null,
     unitsIds: tile.units.map((u) => u.id),
     cityId: tile.city ? tile.city.id : null,
+    resource: tile.resource ? resourceToChannel(tile.resource) : null,
+  };
+}
+
+export function resourceToChannel(resource: ResourceCore): ResourceChanneled {
+  return {
+    id: resource.definition.id,
+    name: resource.definition.name,
+    quantity: resource.quantity,
   };
 }
 

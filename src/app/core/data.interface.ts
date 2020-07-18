@@ -2,6 +2,7 @@ import { UnitAction } from "./unit-actions";
 import { Bonuses } from "./bonus";
 import { Requirement } from "./requirements";
 import { TileImprovement } from "./tile-improvements";
+import { SeaLevel, Climate, LandForm } from "../shared";
 
 export interface Entity {
   id: string;
@@ -65,8 +66,28 @@ export type Nation = Entity & {
   citiesNames: string[];
 };
 
+export interface ResourceDistribution {
+  // tile requirements
+  seaLevel?: SeaLevel;
+  climates?: Climate[];
+  forest?: boolean;
+
+  // the higher the more close together the resource is placed.
+  clasterize?: number;
+
+  // quantity distribution
+  quantityMedian: number;
+  quantityStddev: number;
+
+  landFormProbability: {
+    [LandForm.plains]: number;
+    [LandForm.hills]: number;
+  };
+}
+
 export interface ResourceDefinition extends Entity {
   requiredImprovement: TileImprovement;
   bonuses: Bonuses;
   bonusesWhenWorked: Bonuses;
+  distribution: ResourceDistribution;
 }

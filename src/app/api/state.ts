@@ -13,7 +13,7 @@ import {
   UnitDetailsChanneled,
   CityDetailsChanneled,
 } from "../core/serialization/channel";
-import { Tile } from "./tile.interface";
+import { Tile, Resource } from "./tile.interface";
 
 export class GameState {
   private _turn$ = new BehaviorSubject<number>(0);
@@ -124,6 +124,14 @@ export class GameState {
 
   updateTile(tile: Tile) {
     return makeCommand("tile.update", this.serializeTileToUpdate(tile));
+  }
+
+  setTileResource(tile: Tile, resource: Resource | null) {
+    return makeCommand("tile.setResource", {
+      tileId: tile.id,
+      resourceId: resource?.id,
+      resourceQuantity: resource?.quantity,
+    });
   }
 
   private serializeTileToUpdate(tile: Tile) {

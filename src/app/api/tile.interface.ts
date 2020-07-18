@@ -2,6 +2,12 @@ import { BaseTile } from "../shared";
 import { City } from "./city";
 import { Unit } from "./unit";
 
+export interface Resource {
+  id: string;
+  name: string;
+  quantity: number;
+}
+
 export interface Tile extends BaseTile {
   areaOf: City | null;
 
@@ -10,4 +16,6 @@ export interface Tile extends BaseTile {
 
   city: City | null;
   units: Unit[];
+
+  resource: Resource | null;
 }

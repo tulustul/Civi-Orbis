@@ -5,6 +5,7 @@ import {
   ProductDefinition,
   Building,
   IdleProduct,
+  ResourceDefinition,
 } from "./data.interface";
 import { Bonuses } from "./bonus";
 import {
@@ -71,6 +72,8 @@ export class CityCore {
   isCoastline = false;
 
   passableAreas = new Set<number>();
+
+  resources: ResourceDefinition[] = [];
 
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);

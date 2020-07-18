@@ -1,5 +1,7 @@
 import { TileImprovement, TileRoad } from "../core/tile-improvements";
 import { Yields } from "../core/yields";
+import { ResourceDefinition } from "../core/data.interface";
+import { ResourceCore } from "../core/resources";
 
 export enum TileDirection {
   NW,
@@ -108,4 +110,29 @@ export function isRoadPossible(tile: BaseTile) {
   return (
     tile.seaLevel === SeaLevel.none && tile.landForm !== LandForm.mountains
   );
+}
+
+export function isResourcePossible(
+  tile: BaseTile,
+  resourceDef: ResourceDefinition | null,
+) {
+  if (!resourceDef) {
+    return true;
+  }
+
+  const dis = resourceDef.distribution;
+
+  if (dis.seaLevel !== undefined && dis.seaLevel !== tile.seaLevel) {
+    return false;
+  }
+
+  if (dis.climates !== undefined && !dis.climates.includes(tile.climate)) {
+    return false;
+  }
+
+  if (dis.forest !== undefined && dis.forest !== tile.forest) {
+    return false;
+  }
+
+  return true;
 }

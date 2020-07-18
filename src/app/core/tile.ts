@@ -1,4 +1,4 @@
-import { Yields, EMPTY_YIELDS } from "./yields";
+import { Yields, EMPTY_YIELDS, addYields } from "./yields";
 import { TileImprovement, TileRoad } from "./tile-improvements";
 import {
   Climate,
@@ -11,6 +11,7 @@ import { UnitCore } from "./unit";
 import { CityCore } from "./city";
 import { collector } from "./collector";
 import { Nation } from "./data.interface";
+import { ResourceCore } from "./resources";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -39,6 +40,7 @@ export class TileCore implements BaseTile {
   wetlands = false;
   improvement: TileImprovement | null = null;
   road: TileRoad | null = null;
+  resource: ResourceCore | null = null;
 
   units: UnitCore[] = [];
   city: CityCore | null = null;
@@ -48,12 +50,20 @@ export class TileCore implements BaseTile {
 
   ethnicity = new Map<Nation, number>();
 
-  // cached data
+  // cached data below
   neighbours: TileCore[] = [];
-  fullNeighbours: (TileCore | null)[] = []; // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
+
+  // keeps neighbours in all directions, null if map border, can be indexed with TileDirection
+  fullNeighbours: (TileCore | null)[] = [];
+
   neighboursCosts = new Map<TileCore, number>();
-  sweetSpotValue = 0; // used by ai to find good city location
-  passableArea = 0; // used by pathfinding to quickly decide if a path between two tiles exists
+
+  // used by ai to find good city location
+  sweetSpotValue = 0;
+
+  // used by pathfinding to quickly decide if a path between two tiles exists
+  passableArea = 0;
+
   isMapEdge = false;
 
   constructor(public id: number, public x: number, public y: number) {}
@@ -150,6 +160,11 @@ export class TileCore implements BaseTile {
 
       this.yields.food = Math.max(0, this.yields.food);
       this.yields.production = Math.max(0, this.yields.production);
+    }
+
+    if (this.resource) {
+      this.resource.computeYields();
+      addYields(this.yields, this.resource.yields);
     }
   }
 

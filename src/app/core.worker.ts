@@ -24,10 +24,13 @@ import {
   getBuildingById,
   getUnitById,
   getIdleProductById,
+  getResourceDefinitionById,
 } from "./core/data-manager";
 import { CityCore } from "./core/city";
 import { getFailedWeakRequirements } from "./core/requirements";
 import { moveAlongPath } from "./core/movement";
+import { ResourceCore } from "./core/resources";
+import { ResourceDefinition } from "./core/data.interface";
 
 let game: Game;
 
@@ -53,6 +56,7 @@ const HANDLERS = {
 
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
+  "tile.setResource": tileSetResource,
 
   "city.getDetails": getCityDetails,
   "city.produce": cityProduce,
@@ -295,6 +299,25 @@ export function tileBulkUpdate(tiles: Partial<BaseTile>[]) {
   for (const tile of tiles) {
     tileUpdate(tile);
   }
+}
+
+export function tileSetResource(data) {
+  const tile = game.map.tilesMap.get(data.tileId);
+  if (!tile) {
+    return;
+  }
+
+  let resource: ResourceDefinition | null = null;
+  if (data.resourceId) {
+    resource = getResourceDefinitionById(data.resourceId);
+  }
+
+  if (resource) {
+    tile.resource = new ResourceCore(resource, tile, data.quantity);
+  } else {
+    tile.resource = null;
+  }
+  tile.update();
 }
 
 export function getCityDetails(cityId: number) {

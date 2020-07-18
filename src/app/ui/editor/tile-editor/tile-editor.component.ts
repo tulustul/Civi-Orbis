@@ -22,10 +22,15 @@ import {
   areWetlandsPossible,
   isImprovementPossible,
   isRoadPossible,
+  isResourcePossible,
 } from "src/app/shared";
 import { GameApi } from "src/app/api";
 import { getDirectionTo } from "src/app/shared/hex-math";
-import { Tile } from "src/app/api/tile.interface";
+import { Tile, Resource } from "src/app/api/tile.interface";
+import { RESOURCES_DEFINITIONS } from "src/app/data/resources";
+import { Option } from "../../widgets/option.interface";
+import { ResourceDefinition } from "src/app/core/data.interface";
+import { getResourceDefinitionById } from "src/app/core/data-manager";
 
 @Component({
   selector: "app-tile-editor",
@@ -45,6 +50,12 @@ export class TileEditorComponent implements OnInit {
   WETLANDS_OPTIONS = WETLANDS_OPTIONS;
   IMPROVEMENT_OPTIONS = IMPROVEMENT_OPTIONS;
   ROAD_OPTIONS = ROAD_OPTIONS;
+
+  RESOURCE_OPTIONS = [{ label: "None", value: null }].concat(
+    RESOURCES_DEFINITIONS.map((r) => {
+      return { label: r.name, value: r.id } as Option;
+    }),
+  );
 
   constructor(private game: GameApi, private mapUi: MapUi) {}
 
@@ -98,6 +109,30 @@ export class TileEditorComponent implements OnInit {
       for (const neighbour of this.tile.neighbours) {
         this.game.state!.updateTile(neighbour);
       }
+    }
+  }
+
+  async updateResource(resourceId: string | null) {
+    if (!this.tile) {
+      return;
+    }
+
+    let resourceDef: ResourceDefinition | null = null;
+    if (resourceId) {
+      resourceDef = getResourceDefinitionById(resourceId);
+    }
+
+    if (isResourcePossible(this.tile, resourceDef)) {
+      if (resourceDef) {
+        this.tile.resource = {
+          id: resourceDef.id,
+          name: resourceDef.name,
+          quantity: 1,
+        };
+      } else {
+        this.tile.resource = null;
+      }
+      await this.game.state!.setTileResource(this.tile, this.tile.resource);
     }
   }
 
