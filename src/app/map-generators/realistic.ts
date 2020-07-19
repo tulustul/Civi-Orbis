@@ -15,8 +15,12 @@ import {
   TileDirection,
   areWetlandsPossible,
   isForestable,
+  isResourcePossible,
 } from "../shared";
 import { getTileInDirection } from "../shared/hex-math";
+import { RESOURCES_DEFINITIONS } from "../data/resources";
+import { ResourceCore } from "../core/resources";
+import { randomNormal } from "../core/random";
 
 interface TileMetadata {
   height: number;
@@ -37,6 +41,8 @@ export class RealisticMapGenerator implements MapGenerator {
 
   private seaLevel: number;
 
+  private resources: number;
+
   private startingLocations: TileCore[] = [];
 
   private riversSources: TileCore[] = [];
@@ -55,6 +61,7 @@ export class RealisticMapGenerator implements MapGenerator {
     seed: string | undefined = undefined,
     uniformity: number = 0.5,
     seaLevel = 0,
+    resources = 0.2,
   ) {
     this.map = new TilesMapCore(width, height);
     this.width = width;
@@ -62,6 +69,7 @@ export class RealisticMapGenerator implements MapGenerator {
     this.seed = seed;
     this.uniformity = uniformity;
     this.seaLevel = seaLevel;
+    this.resources = resources;
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
@@ -137,6 +145,8 @@ export class RealisticMapGenerator implements MapGenerator {
     this.placeRivers();
 
     this.placeWetlands();
+
+    this.placeResources();
 
     this.findStartingPositions();
 
@@ -394,6 +404,29 @@ export class RealisticMapGenerator implements MapGenerator {
         this.startingLocations.push(tile);
       }
       tries++;
+    }
+  }
+
+  placeResources() {
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        if (Math.random() > this.resources) {
+          continue;
+        }
+
+        // TODO take more distributions settings into account
+        const resourceIndex = Math.floor(
+          Math.random() * RESOURCES_DEFINITIONS.length,
+        );
+        const resourceDef = RESOURCES_DEFINITIONS[resourceIndex];
+        const tile = this.map.tiles[x][y];
+
+        if (isResourcePossible(tile, resourceDef)) {
+          const dis = resourceDef.distribution;
+          const quantity = randomNormal(dis.quantityMedian, dis.quantityStddev);
+          tile.resource = new ResourceCore(resourceDef, tile, quantity);
+        }
+      }
     }
   }
 }

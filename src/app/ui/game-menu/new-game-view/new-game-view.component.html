@@ -25,6 +25,12 @@
 </label>
 
 <label>
+  Resources:
+  <input type="range" [(ngModel)]="resources" min="0.05" max="1" step="0.05" />
+  {{ resources }}
+</label>
+
+<label>
   Human players count:
   <input type="range" [(ngModel)]="humanPlayersCount" min="0" max="16" />
   {{ humanPlayersCount }}

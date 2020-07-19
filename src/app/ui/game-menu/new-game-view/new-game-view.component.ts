@@ -21,6 +21,8 @@ export class NewGameViewComponent implements OnInit {
 
   seaLevel = 0;
 
+  resources = 0.2;
+
   humanPlayersCount = 1;
 
   aiPlayersCount = 5;
@@ -43,6 +45,7 @@ export class NewGameViewComponent implements OnInit {
       height: this.height,
       uniformity: this.uniformity,
       seaLevel: this.seaLevel,
+      resources: this.resources,
       aiPlayersCount: this.aiPlayersCount,
       humanPlayersCount: this.humanPlayersCount,
       seed: this.seed ? this.seed?.toString() : undefined,

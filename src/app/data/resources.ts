@@ -125,6 +125,26 @@ export const RESOURCES_DEFINITIONS: ResourceDefinition[] = [
     },
   },
   {
+    id: "resource_fish",
+    name: "Fish",
+    requiredImprovement: TileImprovement.farm,
+    bonuses: {
+      yieldValue: { food: 1 },
+    },
+    bonusesWhenWorked: {
+      yieldValue: { food: 3 },
+    },
+    distribution: {
+      seaLevel: SeaLevel.shallow,
+      landFormProbability: {
+        [LandForm.plains]: 1,
+        [LandForm.hills]: 1,
+      },
+      quantityMedian: 3,
+      quantityStddev: 2,
+    },
+  },
+  {
     id: "resource_gold",
     name: "Gold",
     requiredImprovement: TileImprovement.mine,

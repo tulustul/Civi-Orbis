@@ -134,6 +134,7 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
     data.seed,
     data.uniformity,
     data.seaLevel,
+    data.resources,
   );
   game.map.precompute();
 
