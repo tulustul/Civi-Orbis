@@ -1,6 +1,15 @@
-# Basic game concepts
+# Table of contents
 
-Below you can find a short high level overview of basic game concepts.
+- [Public works](#Public-works)
+- [Military](#Military)
+  - [Supplies](#Supplies)
+  - [Zone of control (ZOC)](<#Zone-of-control-(ZOC)>)
+  - [Unit stacking](#Unit-stacking)
+  - [Armies](#Armies)
+- [Slavery](#Slavery)
+- [Resources](#Resources)
+- [Economy](#Economy)
+- [Trade](#Trade)
 
 ## Public works
 

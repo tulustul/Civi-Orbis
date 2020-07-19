@@ -4,7 +4,7 @@
 
 - Try it [here](https://tulustul.github.io/Civi-Orbis/).
 
-- Learn about basic [game concepts](wiki/game-concepts.md).
+- Read [game design document](wiki/gdd.md).
 
 - Learn how to [build the project](wiki/development.md).
 
