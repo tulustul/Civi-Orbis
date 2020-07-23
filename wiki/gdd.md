@@ -1,16 +1,18 @@
 # Table of contents
 
 - [Overview](#Overview)
-- [Public works](#Public-works)
 - [Military](#Military)
   - [Supplies](#Supplies)
   - [Zone of control (ZOC)](<#Zone-of-control-(ZOC)>)
   - [Unit stacking](#Unit-stacking)
   - [Armies](#Armies)
-- [Slavery](#Slavery)
 - [Resources](#Resources)
 - [Economy](#Economy)
 - [Trade](#Trade)
+- [Knowledge](#Knowledge)
+- [Nation](#Nation)
+- [Slavery](#Slavery)
+- [Public works](#Public-works)
 
 ## Overview
 
@@ -40,12 +42,6 @@ A decision making in a classic civ game is a choice between one benefit and the 
 ### Game title
 
 `Civi orbis` means `People of the world`. At least I hope so because I don't know latin :) First and foremost it sounds cool. It also corresponds with one the game's main distinct features -> nations.
-
-## Public works
-
-Player accumulates `public work points` by specialized buildings or `slavery`. Then he can spend those points to build various tile improvements.
-
-Tile improvements consume some `public work points` per turn. When run out of `public work points` random tile improvement is damaged.
 
 ## Military
 
@@ -97,29 +93,6 @@ Each military unit establishes zone of control which consists of neighbouring ti
 - TODO combat algorithm
 - TODO how to recruit generals?
 
-## Slavery
-
-Early economies can greatly benefit from slavery. Later in the game slavery generates more and more unhapinness and it become beneficial to abolish slavery. By picking the right bonuses the players can keep the slavery to the end of the game and it will still be profitable.
-
-Each city have it's slavery output per turn. The player also have global slavery points.
-
-Slaves are part of cities population and are taken into account when processing city population logic.
-
-### Slavery sources
-
-- Defeating enemy units.
-- Pillaging.
-- Sacking cities.
-- Trade routes.
-- Buildings e.g. slave market
-
-### Slavery usage
-
-- Part of slavery output in a city is added to production when constructing buildings.
-- Global slavery points can used be to speed up a production in a city.
-- Speeding up building production by consuming global slavery points + some food/population
-- TODO Public works, how?
-
 ## Resources
 
 There is no distinction between strategic and luxury resources. Each resource have it's own bonuses which can be extended with buildings, techs and other bonuses.
@@ -166,7 +139,15 @@ Trade is represented as a graph with cities as nodes and trade routes as edges.
 
 ## Knowledge
 
-TODO
+Knowledge is the equivalent of science is the classic civ games. Knowledge seems to be a better metaphor though since in old times there was no science and scientist but there was knowledge and wise mans. It also sounds more proper that civilization accumulate knowledge than accumulate science. In later stages of the game players can transfer some gold into knowledge which is a good enough metaphor of modern scientific research.
+
+The mechanic is pretty much the same as in civ games. Various buildings/politics/trade routes/tiles generate knowledge points. These points are used to research technologies in the tech tree.
+
+### Tech tree
+
+- New tech unlocks new staff and grant bonuses.
+- The tech may have specific requirements like resources or politics
+- Some technologies are optional
 
 ## Diplomacy
 
@@ -190,6 +171,53 @@ TODO
 
 ## Nation
 
-TODO
+Nation is a mechanism that steers centrifugal forces of a state and adds an organic feeling to the game.
+
+- The game starts with a few tribes.
+- Several players can share the same tribe.
+- Culture points are used to enhance a tribe into a nation.
+- Each nation have specific bonuses.
+- There is a specific "tech" tree for nations called `culture tree`, culture points are used to progress through that tree.
+- The `culture tree` is not linear like the `tech tree`. It starts in the center and branches in all directions. It's up to the player how the nation will develop, some branches might never even be started.
+- The city will use bonuses of a nation with most representatives in the city. (Maybe use bonuses proportional to population?)
+- Each tile have a distribution of population
+- Each nation and each city have a `culture strength` and
+
+#### Some general clues
+
+- Some nations may be resistant to occupation and rebel often, other may be artistic, some are traders...
+- A typical empire consists of many conquered nations, each with it's own traits meaning that different parts of empires may have very different needs and require special treatment.
+- Maybe it's worth to have a federal government or grant autonomy to some trouble nations?
+- City or whole nations can rebel if treated badly.
+- Sometimes a genocide on a nation might be a solution :)
 
 ## Health
+
+## Slavery
+
+Early economies can greatly benefit from slavery. Later in the game slavery generates more and more unhapinness and it become beneficial to abolish slavery. By picking the right bonuses the players can keep the slavery to the end of the game and it will still be profitable.
+
+Each city have it's slavery output per turn. The player also have global slavery points.
+
+Slaves are part of cities population and are taken into account when processing city population logic.
+
+### Slavery sources
+
+- Defeating enemy units.
+- Pillaging.
+- Sacking cities.
+- Trade routes.
+- Buildings e.g. slave market
+
+### Slavery usage
+
+- Part of slavery output in a city is added to production when constructing buildings.
+- Global slavery points can used be to speed up a production in a city.
+- Speeding up building production by consuming global slavery points + some food/population
+- TODO Public works, how?
+
+## Public works
+
+Player accumulates `public work points` by specialized buildings or `slavery`. Then he can spend those points to build various tile improvements.
+
+Tile improvements consume some `public work points` per turn. When run out of `public work points` random tile improvement is damaged.
