@@ -1,0 +1,21 @@
+{
+  "grammarly.overrides": [
+    {
+      "files": [
+        "**/wiki/gdd.md"
+      ],
+      "config": {
+        "audience": "knowledgeable",
+        "dialect": "american",
+        "domain": "business",
+        "emotions": [],
+        "goals": [],
+        "emotion": "mild"
+      }
+    }
+  ],
+  "grammarly.userWords": [
+    "Civi",
+    "civi"
+  ]
+}
