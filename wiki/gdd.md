@@ -63,6 +63,48 @@ TODO
 
 ## Cities
 
+- Founded by settlers.
+- Each population point spawns one worker in the city.
+- The worker works on a selected city tile adding its yields to city yields.
+- The production in the city is used to construct buildings and recruit units.
+- Each building adds various bonuses to the city.
+
+### Attributes
+
+- Population
+- Yields (food, production, etc.)
+- Manpower - adds to global manpower
+- [Happiness](#Happiness)
+- [Health](#Health)
+- Defense
+- Health points?
+- List of buildings
+- Main religion
+- Main nation
+
+### Growth
+
+- City population increments when enough food is accumulated.
+- Each city worker consumes some food, specialists consume double the food.
+- When food per turn is not enough to feed city workers, the accumulated food deteriorates.
+- When accumulated food is lower than zero, the city shrinks.
+- TODO take unhealth into account.
+
+### Specialists
+
+- Some buildings have specialist slots (artists, scientists, priests, etc.).
+- City workers can be appointed as specialists.
+- The specialists cannot work on city tiles but grant some bonuses (e.g. scientists grants extra knowledge points).
+
+### Border expansion
+
+- When enough culture is accumulated, a new tile is added to the city from the pool of available tiles. The tile must have a majority population of a nation most represented in the city.
+- The pool of available tiles consists of tiles neighboring current city tiles not yet owned by any other state.
+- The player can buy the land. The less nation's representation there is in the tile the more expansive this tile is.
+- The maximum distance of available tiles is limited by the city size. (how exactly?)
+
+### Capturing a city
+
 TODO
 
 ## Military
@@ -267,7 +309,6 @@ Slaves are part of the cities population and are taken into account when process
 ### Slavery usage
 
 - Part of slavery output in a city is added to production when constructing buildings.
-- Global slavery points can used be to speed up production in a city.
 - Speeding up building production by consuming global slavery points + some food/population
 - TODO Public works, how?
 
