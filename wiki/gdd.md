@@ -11,6 +11,7 @@
   - [Zone of control (ZOC)](<#Zone-of-control-(ZOC)>)
   - [Unit stacking](#Unit-stacking)
   - [Armies](#Armies)
+  - [Generals](#Generals)
 - [Resources](#Resources)
 - [Economy](#Economy)
 - [Trade](#Trade)
@@ -26,6 +27,8 @@
 - [Diplomacy](#Diplomacy)
 - [Internal politics](#Internal-politics)
 - [Espionage](#Espionage)
+- [Barbarians](#Barbarians)
+- [The beginning of the game](#The-beginning-of-the-game)
 
 ## Overview
 
@@ -68,6 +71,7 @@ TODO
 - The worker works on a selected city tile adding its yields to city yields.
 - The production in the city is used to construct buildings and recruit units.
 - Each building adds various bonuses to the city.
+- Instead of units or buildings the city can focus (?) to transfer part of it's production to e.g. food, production or knowledge. TODO need a name for it.
 
 ### Attributes
 
@@ -152,12 +156,17 @@ Each military unit establishes a zone of control that consists of neighboring ti
 
 ### Armies
 
-- A general can transform a group into an army.
+- A [general](#Generals) can transform a group into an army.
 - An army fights as one unit.
 - Damage to an army is distributed evenly across all units (with small random variations)
-- Generals gain experience in fights. Higher-level generals provide better bonuses and can operate larger armies.
 - TODO combat algorithm
-- TODO how to recruit generals?
+
+### Generals
+
+- Generals move like an ordinary unit.
+- There's a limit to how many generals a player can own.
+- Generals gain experience in fights. Higher-level generals provide better bonuses and can operate larger armies.
+- Let's say for now that generals are trained in the cities just like normal units. One of the alternatives is to gain them through combat like in Civ games. Imo training a general and letting him gain experience in combat so that he becomes great better mimics the real world.
 
 ## Resources
 
@@ -333,3 +342,20 @@ TODO
 ## Espionage
 
 TODO
+
+## Barbarians
+
+- Barbarians reside in encampments which spawn randomly in no mans land.
+- Barbarian units spawn in the encampments and they belong to this specific encampent.
+- Each encampment belongs to a tribe.
+- (?) Encampments work like a mini-civilizations. They train units, can be in a war or peace state with other encampments or civilizations.
+- When encampment lives for long enough and it has a contact with a civilization then it can progress into a city and play as a new player.
+- Barbarians cannot occupy cities, they can only sack them.
+
+# The beginning of the game
+
+Defining the number of civilizations at the start of the game, like in the Civ games, is highly artficial and makes the game predictable. `Civi Orbis` takes another approach.
+
+- The player can set "civilization density" at the map creation phase.
+- The game starts only with the settler which can found an encampment.
+- In the encampment, which basically is a city with a size of 0, the player can train units and construct buildings.
