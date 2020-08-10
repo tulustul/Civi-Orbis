@@ -297,7 +297,9 @@ Happiness is calculated per city so parts of a state can be happy and parts can 
 
 ## Culture
 
-TODO
+- Culture points are accumulated per city and allow [border expansion](#Border-expansion).
+- Culture points are accumulated globally and are used to progress through [culture tree](#Nation).
+- Culture points influence [nation pressure power](#Nation).
 
 ## Slavery
 
@@ -333,9 +335,30 @@ TODO
 
 ## Internal politics
 
-TODO
+Some loose ideas of what to include:
+
+- Taxing (the higher taxing, the more money, more unhappiness and less productivity)
+- Form of rule:
+  - Tribalism
+  - Despotism
+  - Monarchy
+  - Democracy
+  - Republic
+  - ...
+- Economy
+  - Free market
+  - Communism
+  - ...
+- Welfare state
+- Dealing with minorities
+- Relation to religion
+- [Nolan Chart](https://en.wikipedia.org/wiki/Nolan_Chart)
 
 ## Diplomacy
+
+TODO
+
+### Leagues
 
 TODO
 
@@ -345,17 +368,18 @@ TODO
 
 ## Barbarians
 
-- Barbarians reside in encampments which spawn randomly in no mans land.
-- Barbarian units spawn in the encampments and they belong to this specific encampent.
+- Barbarians reside in encampments which spawn randomly in no man's land.
+- Barbarian units spawn in the encampments and they belong to this specific encampment.
 - Each encampment belongs to a tribe.
 - (?) Encampments work like a mini-civilizations. They train units, can be in a war or peace state with other encampments or civilizations.
-- When encampment lives for long enough and it has a contact with a civilization then it can progress into a city and play as a new player.
+- When encampment lives for long enough and it has contact with civilization then it can progress into a city and play as a new player.
 - Barbarians cannot occupy cities, they can only sack them.
 
 # The beginning of the game
 
-Defining the number of civilizations at the start of the game, like in the Civ games, is highly artficial and makes the game predictable. `Civi Orbis` takes another approach.
+Defining the number of civilizations at the start of the game, like in the Civ games, is highly artificial and makes the game predictable. `Civi Orbis` takes another approach.
 
 - The player can set "civilization density" at the map creation phase.
 - The game starts only with the settler which can found an encampment.
 - In the encampment, which basically is a city with a size of 0, the player can train units and construct buildings.
+- TODO
