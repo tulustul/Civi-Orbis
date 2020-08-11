@@ -338,6 +338,8 @@ TODO
 Some loose ideas of what to include:
 
 - Taxing (the higher taxing, the more money, more unhappiness and less productivity)
+- Science spendings (in the late game)
+- Federacy
 - Form of rule:
   - Tribalism
   - Despotism
@@ -352,7 +354,37 @@ Some loose ideas of what to include:
 - Welfare state
 - Dealing with minorities
 - Relation to religion
+- Picking a state religion
 - [Nolan Chart](https://en.wikipedia.org/wiki/Nolan_Chart)
+
+### Social structure
+
+There are several areas where each state needs to pick a solution for. Changing the social structure results in a couple of turns of anarchy during which the player has no control of the cities.
+
+#### Government
+
+- Autocracy
+- Oligarchy
+- Republic
+- Democracy
+
+#### Economy
+
+- Tribalism
+- Despotism
+- Feudalism
+- Capitalism
+- Communism
+- Socialism
+- Anarchism
+
+#### Religion
+
+TODO
+
+#### Lawmaking
+
+Each area has several law slots which can be filled with laws. Some laws require specific social structures. A few turns of a gap is required between changing the laws.
 
 ## Diplomacy
 

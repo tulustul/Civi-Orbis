@@ -1,13 +1,16 @@
-import { GovernmentSection, GovernmentOption } from "./data.interface";
-import { getGovernmentOptionById } from "./data-manager";
+import { PolicyArea, PolicyOption, Law } from "./data.interface";
+
+export interface Policy {
+  option: PolicyOption;
+  laws: Law[];
+}
 
 export class InternalPolitics {
-  governmentSections: Record<GovernmentSection, GovernmentOption> = {
-    [GovernmentSection.organization]: getGovernmentOptionById(
-      "government_organization_tribalism",
-    ),
-    [GovernmentSection.economics]: getGovernmentOptionById(
-      "government_economics_barter",
-    ),
-  };
+  policyAreas = new Map<PolicyArea, Policy>();
+
+  stateReligion: any | null; // TODO
+
+  taxing: number; // [0-1]
+
+  scienceSpending: number; // [0-1]
 }

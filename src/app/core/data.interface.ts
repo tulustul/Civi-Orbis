@@ -91,3 +91,9 @@ export interface ResourceDefinition extends Entity {
   bonusesWhenWorked: Bonuses;
   distribution: ResourceDistribution;
 }
+
+export type PolicyArea = Entity & { options: PolicyArea[] };
+
+export type PolicyOption = Entity & HaveBonuses & HaveRequirements;
+
+export type Law = Entity & HaveBonuses & HaveRequirements;
