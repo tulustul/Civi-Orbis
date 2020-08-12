@@ -166,7 +166,7 @@ Each military unit establishes a zone of control that consists of neighboring ti
 - Generals move like an ordinary unit.
 - There's a limit to how many generals a player can own.
 - Generals gain experience in fights. Higher-level generals provide better bonuses and can operate larger armies.
-- Let's say for now that generals are trained in the cities just like normal units. One of the alternatives is to gain them through combat like in Civ games. Imo training a general and letting him gain experience in combat so that he becomes great better mimics the real world.
+- Let's say for now that generals are trained in the cities just like normal units. One of the alternatives is to gain them through combat like in Civ games. Training a general and letting him gain experience in combat so that he becomes great seems to be better mimicking the real world.
 
 ## Resources
 
@@ -335,31 +335,14 @@ TODO
 
 ## Internal politics
 
-Some loose ideas of what to include:
-
 - Taxing (the higher taxing, the more money, more unhappiness and less productivity)
 - Science spendings (in the late game)
-- Federacy
-- Form of rule:
-  - Tribalism
-  - Despotism
-  - Monarchy
-  - Democracy
-  - Republic
-  - ...
-- Economy
-  - Free market
-  - Communism
-  - ...
-- Welfare state
-- Dealing with minorities
-- Relation to religion
-- Picking a state religion
+- Picking a state [religion](#Religion)
 - [Nolan Chart](https://en.wikipedia.org/wiki/Nolan_Chart)
 
-### Social structure
+### Policies
 
-There are several areas where each state needs to pick a solution for. Changing the social structure results in a couple of turns of anarchy during which the player has no control of the cities.
+There are several areas where each state needs to pick a solution for. Changing the policies results in a couple of turns of anarchy during which the player has no control of the cities.
 
 #### Government
 
@@ -380,11 +363,13 @@ There are several areas where each state needs to pick a solution for. Changing 
 
 #### Religion
 
-TODO
+Religion is similar to how [nations](#Nation) work. You accumulate `faith` points which enables you to found religion and progress through the religion tree. Every tile on the map has a distribution of religions. Each city generate `religion pressure power` and in each turn the distribution is recalculated.
 
-#### Lawmaking
+Each player can pick a state religion if his policies allow that. Cities with a majority of this religion get extra happiness and cities with foreign religion get extra unhappiness. Some of the religion bonuses are active only if the religion is a state religion. You get better relations with states with the same state religion.
 
-Each area has several law slots which can be filled with laws. Some laws require specific social structures. A few turns of a gap is required between changing the laws.
+### Lawmaking
+
+Each policy area has several law slots which can be filled with laws. Some laws require specific policies. A few turns of a gap is required between changing the law.
 
 ## Diplomacy
 
