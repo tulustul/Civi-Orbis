@@ -1,6 +1,5 @@
 import { TileCore } from "./tile";
 import { UnitCore } from "./unit";
-import { SeaLevel } from "../shared";
 import { getMoveCost, getMoveResult, MoveResult } from "./movement";
 
 export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
@@ -16,32 +15,6 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
   if (moveResult === MoveResult.none) {
     return null;
   }
-
-  // const isSameArea =
-  //   !unit.player.exploredTiles.has(end) ||
-  //   start.passableArea === end.passableArea;
-
-  // if (unit.definition.type === "naval") {
-  //   if (
-  //     end.seaLevel === SeaLevel.none &&
-  //     (!end.city?.isCoastline || !isSameArea)
-  //   ) {
-  //     return null;
-  //   }
-  // } else {
-  //   if (end.isWater) {
-  //     // check embarkment
-  //     const canEmbarkToTile = !!end.neighbours.find(
-  //       (n) => n.passableArea === start.passableArea,
-  //     );
-  //     const embarkmentTarget = end.getEmbarkmentTarget(unit);
-  //     if (!(canEmbarkToTile && embarkmentTarget)) {
-  //       return null;
-  //     }
-  //   } else if (!isSameArea) {
-  //     return null;
-  //   }
-  // }
 
   const visitedTiles = new Set<TileCore>();
   const tilesToVisit = new Map<TileCore, number>();

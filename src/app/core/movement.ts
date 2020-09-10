@@ -71,7 +71,7 @@ export function getMoveCost(
   from: TileCore,
   to: TileCore,
 ): number {
-  const cost = from.neighboursCosts.get(to) || Infinity;
+  const cost = from.neighboursCosts.get(to) ?? Infinity;
 
   if (moveResult === MoveResult.move) {
     return cost;

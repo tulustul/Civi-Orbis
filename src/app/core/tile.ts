@@ -188,6 +188,25 @@ export class TileCore implements BaseTile {
     return result;
   }
 
+  *getTilesAndDistanceInRange(range: number): Generator<[TileCore, number]> {
+    yield [this, 0];
+    const visited = new Set<TileCore>([this]);
+    for (let i = 0; i < range; i++) {
+      let neighbours = new Set<TileCore>();
+      for (const tile of visited) {
+        for (const neighbour of tile.neighbours) {
+          neighbours.add(neighbour);
+        }
+      }
+      for (const tile of neighbours) {
+        if (!visited.has(tile)) {
+          visited.add(tile);
+          yield [tile, i];
+        }
+      }
+    }
+  }
+
   computeSweetSpotValue() {
     this.sweetSpotValue = 0;
     if (
