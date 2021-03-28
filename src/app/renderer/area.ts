@@ -240,9 +240,9 @@ export class Area {
 }
 
 class AreaDrawer {
-  borderShader: PIXI.Shader;
+  borderShader: PIXI.MeshMaterial;
 
-  backgroundShader: PIXI.Shader;
+  backgroundShader: PIXI.MeshMaterial;
 
   bordersMap = new Map<Tile, PIXI.Mesh>();
 
@@ -264,16 +264,24 @@ class AreaDrawer {
       1,
     ];
 
-    this.borderShader = new PIXI.Shader(borderProgram, {
-      color: this.vec4Color,
-      borderSize: this.options.borderSize,
-      borderShadow: this.options.borderShadow,
-      borderShadowStrength: this.options.borderShadowStrength,
+    const emptyTexture = new PIXI.Texture(new PIXI.BaseTexture());
+
+    this.borderShader = new PIXI.MeshMaterial(emptyTexture, {
+      program: borderProgram,
+      uniforms: {
+        color: this.vec4Color,
+        borderSize: this.options.borderSize,
+        borderShadow: this.options.borderShadow,
+        borderShadowStrength: this.options.borderShadowStrength,
+      },
     });
 
-    this.backgroundShader = new PIXI.Shader(backgroundProgram, {
-      color: this.vec4Color,
-      opacity: this.options.backgroundOpacity,
+    this.backgroundShader = new PIXI.MeshMaterial(emptyTexture, {
+      program: backgroundProgram,
+      uniforms: {
+        color: this.vec4Color,
+        opacity: this.options.backgroundOpacity,
+      },
     });
   }
 

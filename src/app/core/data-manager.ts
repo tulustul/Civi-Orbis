@@ -9,7 +9,6 @@ import {
   GovernmentOption,
   ResourceDefinition,
 } from "./data.interface";
-import { GOVERNMENT_OPTIONS } from "../data/internal-politics/government-options";
 import { Entity, HaveRequirements } from "./data.interface";
 import { RESOURCES_DEFINITIONS } from "../data/resources";
 
@@ -30,12 +29,6 @@ for (const definition of BUILDINGS) {
 const IDLE_PRODUCTS_MAP = new Map<string, IdleProduct>();
 for (const definition of IDLE_PRODUCTS) {
   IDLE_PRODUCTS_MAP.set(definition.id, definition);
-  ENTITIES_MAP.set(definition.id, definition);
-}
-
-const GOVERNMENT_OPTIONS_MAP = new Map<string, GovernmentOption>();
-for (const definition of GOVERNMENT_OPTIONS) {
-  GOVERNMENT_OPTIONS_MAP.set(definition.id, definition);
   ENTITIES_MAP.set(definition.id, definition);
 }
 
@@ -74,14 +67,6 @@ export function getIdleProductById(id: string): IdleProduct {
     throw Error(`DataManager: No idle product with id "${id}"`);
   }
   return idleProductDef;
-}
-
-export function getGovernmentOptionById(id: string): GovernmentOption {
-  const governmentOption = GOVERNMENT_OPTIONS_MAP.get(id);
-  if (!governmentOption) {
-    throw Error(`DataManager: No government option with id "${id}"`);
-  }
-  return governmentOption;
 }
 
 export function getResourceDefinitionById(id: string): ResourceDefinition {

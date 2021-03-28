@@ -141,7 +141,7 @@ export class TileContainer extends PIXI.DisplayObject {
     for (let x = this.bBox.xStart; x < this.bBox.xEnd; x++) {
       for (let y = this.bBox.yStart; y < this.bBox.yEnd; y++) {
         for (const child of this.grid[x][y]) {
-          child.render(renderer);
+          (child as any).render(renderer);
         }
       }
     }

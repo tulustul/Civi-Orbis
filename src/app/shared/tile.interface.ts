@@ -1,7 +1,6 @@
 import { TileImprovement, TileRoad } from "../core/tile-improvements";
 import { Yields } from "../core/yields";
 import { ResourceDefinition } from "../core/data.interface";
-import { ResourceCore } from "../core/resources";
 
 export enum TileDirection {
   NW,
