@@ -148,8 +148,16 @@ export function moveAlongPath(unit: UnitCore) {
   collector.units.add(unit);
 
   while (unit.actionPointsLeft && unit.path.length) {
-    if (unit.path[0][0] !== unit.tile) {
-      move(unit, unit.path[0][0]);
+    const targetTile = unit.path[0][0];
+    if (targetTile !== unit.tile) {
+      const moveResult = getMoveResult(unit, unit.tile, targetTile);
+      // TODO should results other then move be allowed?
+      if (moveResult !== MoveResult.move) {
+        unit.path = null;
+        unit.setOrder(null);
+        return;
+      }
+      move(unit, targetTile);
     }
 
     unit.path[0].shift();

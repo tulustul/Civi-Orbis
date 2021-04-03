@@ -5,13 +5,17 @@ Bugs:
   ☐ webgl fonts scaling
   ✔ yields change received when selecting a unit @done(20-06-09 20:01)
   ✔ yields change received when using pathfinding @done(20-06-09 20:01)
+  ✔ land units can access sea and vice versa under some cirmumstances @done(21-04-03 12:41)
 
 Performance:
-  ☐ distinguish between commands that mutate the state and those which don't
-  ☐ disable collector while game is loading
+  ☐ core: distinguish between commands that mutate the state and those which don't
+  ☐ core: disable collector while game is loading
+  ☐ renderer: render terrain to texture so that not the entire view have to been rerendered each frame
+  ☐ core: pathfinding is not optimized yet
 
 Refactor:
-  ☐ renderer is still a mess
+  ☐ renderer: still a mess
+  ☐ core: minimize boilerplate in serialization (decorators?)
 
 Minor features:
   ☐ closing city view should restore previous camera transform
@@ -19,7 +23,7 @@ Minor features:
   ☐ tooltips for more ui elements
   ☐ autosaving
   ☐ city production queue
-  ☐ previous/next city button in city view
+  ☐ previous/next city button in the city view
   ✔ ai only matches with autoplay @done(20-06-14 19:50)
   ☐ proper starting locations
   ☐ map generator: more realistic orogeny
@@ -27,6 +31,7 @@ Minor features:
   ☐ improve unit visibility range
   ☐ improve city visibility range
   ☐ pathfinding: verify path each turn
+  ☐ unit animations
 
 Major features:
   ✔ naval units @done(20-06-06 15:05)
@@ -38,7 +43,8 @@ Major features:
   ✔ `fog of war` - grey out tiles not visible by units and cities @done(20-06-07 23:03)
   ☐ tile improvements damaging when not enough public works
   ✔ embarkment @done(20-06-14 19:50)
-  ☐ armies
+  ☐ armies/generals
+  ☐ supply lines
   ☐ cities overview panel
   ☐ slavery
   ☐ tribes and civ traits
