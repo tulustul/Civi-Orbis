@@ -30,6 +30,12 @@ export interface TileChanneled extends BaseTile {
   resource: ResourceChanneled | null;
 }
 
+export interface TileDetailsChanneled extends TileChanneled {
+  zocPlayerId: number | null;
+  zocNoMansLand: boolean;
+  isSupplied: boolean;
+}
+
 export interface CityChanneled {
   id: number;
   name: string;
@@ -119,11 +125,13 @@ export interface UnitChanneled {
   childrenIds: number[];
   actionPointsLeft: number;
   health: number;
+  supplies: number;
 }
 
 export interface UnitDetailsChanneled extends UnitChanneled {
   order: UnitOrder;
   path: number[][] | null;
+  isSupplied: boolean;
 }
 
 export interface ResourceChanneled {
@@ -283,6 +291,7 @@ export function unitToChannel(unit: UnitCore): UnitChanneled {
     parentId: unit.parent?.id || null,
     childrenIds: unit.children.map((c) => c.id),
     health: unit.health,
+    supplies: unit.supplies,
     actionPointsLeft: unit.actionPointsLeft,
   };
 }
@@ -297,7 +306,21 @@ export function unitDetailsToChannel(unit: UnitCore): UnitDetailsChanneled {
     childrenIds: unit.children.map((c) => c.id),
     actionPointsLeft: unit.actionPointsLeft,
     health: unit.health,
+    supplies: unit.supplies,
     order: unit.order,
     path: unit.path?.map((row) => row.map((tile) => tile.id)) || null,
+    isSupplied: unit.isSupplied,
+  };
+}
+
+export function tileDetailsToChannel(
+  tile: TileCore,
+  forPlayer: PlayerCore,
+): TileDetailsChanneled {
+  return {
+    ...tileToChannel(tile),
+    zocPlayerId: tile.zocPlayer?.id ?? null,
+    zocNoMansLand: tile.zocNoMansLand,
+    isSupplied: tile.isSuppliedByPlayer(forPlayer),
   };
 }

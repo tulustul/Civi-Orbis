@@ -59,6 +59,7 @@ import { UnitComponent } from './ui/unit/unit.component';
 import { TileUnitsComponent } from './ui/tile-units/tile-units.component';
 import { UnitsLayerComponent } from './ui/units-layer/units-layer.component';
 import { UnitsStackComponent } from './ui/units-layer/units-stack/units-stack.component';
+import { TileTooltipComponent } from './ui/tile-tooltip/tile-tooltip.component';
 
 @NgModule({
   declarations: [
@@ -111,6 +112,7 @@ import { UnitsStackComponent } from './ui/units-layer/units-stack/units-stack.co
     TileUnitsComponent,
     UnitsLayerComponent,
     UnitsStackComponent,
+    TileTooltipComponent,
   ],
   imports: [BrowserModule, FormsModule, OverlayModule],
   providers: [

@@ -12,6 +12,7 @@ import { UnitDetails } from "../api/unit-details";
 import { CityDetails } from "../api/city-details";
 import { Area } from "../renderer/area";
 import { Tile } from "../api/tile.interface";
+import { UnitTrait } from "../core/data.interface";
 
 @Injectable()
 export class MapUi {
@@ -54,6 +55,7 @@ export class MapUi {
   cityBordersOnlyArea: Area;
   cityWorkedTilesArea: Area;
   cityNotWorkedTilesArea: Area;
+  suppliesRangeArea: Area;
 
   editorArea: Area;
 
@@ -173,6 +175,16 @@ export class MapUi {
         borderShadowStrength: 1,
         visibleOnWater: true,
       });
+
+      this.suppliesRangeArea = new Area(this.game.state!, {
+        color: 0xffffff,
+        container: areasContainer,
+        backgroundOpacity: 0.25,
+        borderShadow: 0.5,
+        borderSize: 0.05,
+        borderShadowStrength: 1,
+        visibleOnWater: true,
+      });
     });
 
     this.game.stop$.subscribe(() => this.clear());
@@ -256,6 +268,16 @@ export class MapUi {
     if (!unit) {
       this.clearSelectedUnit(!unit);
       return;
+    }
+
+    if (
+      unit.definition.trait === UnitTrait.military ||
+      unit.definition.trait === UnitTrait.supply
+    ) {
+      unit.player.getSuppliedTiles().then((tiles) => {
+        console.log(tiles);
+        this.suppliesRangeArea.setTiles(tiles);
+      });
     }
 
     if (unit.player.id === this.game.state?.trackedPlayer.id) {

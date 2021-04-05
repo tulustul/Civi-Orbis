@@ -13,6 +13,7 @@ export class Unit {
   parent: Unit | null;
   children: Unit[] = [];
   health: number;
+  supplies: number;
   actionPointsLeft: number;
 
   constructor(private game: GameState, unit: UnitChanneled) {
@@ -21,6 +22,7 @@ export class Unit {
     this.player = game.playersMap.get(unit.playerId)!;
     this.definition = getUnitById(unit.definitionId)!;
     this.health = unit.health;
+    this.supplies = unit.supplies;
     this.actionPointsLeft = unit.actionPointsLeft;
 
     this.tile.units.push(this);
@@ -29,6 +31,7 @@ export class Unit {
 
   update(game: GameState, unit: UnitChanneled) {
     this.health = unit.health;
+    this.supplies = unit.supplies;
     this.actionPointsLeft = unit.actionPointsLeft;
 
     if (this.tile.id !== unit.tileId) {

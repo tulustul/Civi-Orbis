@@ -17,6 +17,8 @@ import {
   unitDetailsToChannel,
   cityDetailsToChannel,
   GameChanneled,
+  tileDetailsToChannel,
+  TileDetailsChanneled,
 } from "./core/serialization/channel";
 import { dumpGame, loadGame } from "./core/serialization/dump";
 import {
@@ -43,6 +45,8 @@ const HANDLERS = {
   "trackedPlayer.revealWorld": revealWorld,
   "trackedPlayer.set": setTrackedPlayer,
 
+  "player.getSuppliedTiles": getSuppliedTiles,
+
   "unit.spawn": unitSpawn,
   "unit.getDetails": getUnitDetails,
   "unit.doAction": unitDoAction,
@@ -54,6 +58,7 @@ const HANDLERS = {
   "unit.getFailedActionRequirements": unitGetFailedActionRequirements,
   "unit.simulateCombat": unitSimulateCombat,
 
+  "tile.getDetails": tileGetDetails,
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
   "tile.setResource": tileSetResource,
@@ -182,6 +187,15 @@ function setTrackedPlayer(playerId: number) {
   return trackedPlayerToChannel(game.trackedPlayer);
 }
 
+function getSuppliedTiles(playerId: number): number[] {
+  const player = game.playersMap.get(playerId);
+  if (!player) {
+    return [];
+  }
+
+  return Array.from(player.suppliedTiles).map((t) => t.id);
+}
+
 function unitSpawn(data) {
   const tile = game.map.tilesMap.get(data.tileId);
   const player = game.playersMap.get(data.playerId);
@@ -284,6 +298,23 @@ function unitSimulateCombat(data): CombatSimulation | null {
   }
 
   return simulateCombat(attacker, defender);
+}
+
+export function tileGetDetails(data: {
+  tileId: number;
+  playerId: number;
+}): TileDetailsChanneled | null {
+  const tile = game.map.tilesMap.get(data.tileId);
+  if (!tile) {
+    return null;
+  }
+
+  const player = game.playersMap.get(data.playerId);
+  if (!player) {
+    return null;
+  }
+
+  return tileDetailsToChannel(tile, player);
 }
 
 export function tileUpdate(tile: Partial<BaseTile>) {

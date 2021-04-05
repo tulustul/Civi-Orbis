@@ -15,7 +15,7 @@ Performance:
 
 Refactor:
   ☐ renderer: still a mess
-  ☐ core: minimize boilerplate in serialization (decorators?)
+  ☐ core: minimize boilerplate in serialization
 
 Minor features:
   ☐ closing city view should restore previous camera transform
@@ -52,6 +52,9 @@ Major features:
   ☐ diplomacy
   ☐ nations
   ☐ trade
+
+Others:
+  ☐ think about unit tests (how to nicely mock the map?)
 
 Archive:
   ✔ showing city's area should take player's explored tiles into account @done(20-05-24 13:32) @project(Bugs)

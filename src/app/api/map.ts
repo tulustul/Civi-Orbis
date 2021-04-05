@@ -1,7 +1,12 @@
 import { getTileNeighbours, getTileFullNeighbours } from "../shared/hex-math";
-import { MapChanneled } from "../core/serialization/channel";
+import {
+  MapChanneled,
+  TileDetailsChanneled,
+} from "../core/serialization/channel";
 import { GameState } from "./state";
 import { Tile } from "./tile.interface";
+import { makeCommand } from "./internal/commander";
+import { TileDetails } from "./tile-details";
 
 export class TilesMap {
   width = 0;
@@ -9,7 +14,7 @@ export class TilesMap {
   tiles: Tile[][] = [];
   tilesMap = new Map<number, Tile>();
 
-  constructor(map: MapChanneled) {
+  constructor(private game: GameState, map: MapChanneled) {
     this.width = map.width;
     this.height = map.height;
     this.tiles = (map.tiles as unknown) as Tile[][];
@@ -25,12 +30,12 @@ export class TilesMap {
     }
   }
 
-  preprocess(game: GameState) {
+  preprocess() {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         const tile: Tile = this.tiles[x][y];
         if (tile.areaOf !== null) {
-          tile.areaOf = game.citiesMap.get(tile.areaOf as any)!;
+          tile.areaOf = this.game.citiesMap.get(tile.areaOf as any)!;
         }
       }
     }
@@ -45,5 +50,16 @@ export class TilesMap {
 
   getTilesFromIds(ids: number[]): Tile[] {
     return ids.map((id) => this.tilesMap.get(id)!);
+  }
+
+  async getTileDetails(tile: Tile, playerId: number) {
+    const tileData = await makeCommand<TileDetailsChanneled>(
+      "tile.getDetails",
+      {
+        tileId: tile.id,
+        playerId,
+      },
+    );
+    return new TileDetails(this.game, tileData);
   }
 }

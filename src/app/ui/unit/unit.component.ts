@@ -6,7 +6,6 @@ import {
   HostListener,
   OnChanges,
   ElementRef,
-  HostBinding,
   ChangeDetectorRef,
   Optional,
   OnDestroy,
@@ -110,5 +109,9 @@ export class UnitComponent implements OnInit, OnDestroy, OnChanges {
 
   get isDamaged() {
     return this.unit.health < 100;
+  }
+
+  get suppliesDiminishing() {
+    return this.unit.supplies < 100;
   }
 }

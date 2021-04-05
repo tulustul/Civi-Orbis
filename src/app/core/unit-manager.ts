@@ -4,6 +4,8 @@ import { TileCore } from "./tile";
 import { collector } from "./collector";
 import { getUnitById } from "./data-manager";
 import { moveAlongPath } from "./movement";
+import { zocAddUnit, zocForgetUnit } from "./zoc";
+import { suppliesAddUnit, suppliesForgetUnit } from "./supplies";
 
 export class UnitsManager {
   units: UnitCore[] = [];
@@ -29,12 +31,14 @@ export class UnitsManager {
 
     collector.units.add(unit);
 
+    zocAddUnit(unit);
+    suppliesAddUnit(unit);
+
     return unit;
   }
 
   destroy(unit: UnitCore) {
     // TODO rewrite to sets for better performance?
-
     this.unitsMap.delete(unit.id);
 
     let index = this.units.indexOf(unit);
@@ -52,6 +56,9 @@ export class UnitsManager {
       unit.tile.units.splice(index, 1);
     }
 
+    zocForgetUnit(unit);
+    suppliesForgetUnit(unit);
+
     unit.player.updateUnitsWithoutOrders();
     collector.unitsDestroyed.add(unit.id);
   }
@@ -59,7 +66,11 @@ export class UnitsManager {
   nextTurn() {
     for (const unit of this.units) {
       // Heal unit if on friendly territory
-      if (unit.health < 100 && unit.tile.areaOf?.player === unit.player) {
+      if (
+        unit.health < 100 &&
+        unit.tile.areaOf?.player === unit.player &&
+        unit.supplies >= 100
+      ) {
         unit.health = Math.min(100, unit.health + 10);
         collector.units.add(unit);
       }
@@ -73,6 +84,22 @@ export class UnitsManager {
 
       if (unit.actionPointsLeft < unit.definition.actionPoints) {
         unit.actionPointsLeft = unit.definition.actionPoints;
+        collector.units.add(unit);
+      }
+
+      if (unit.isSupplied) {
+        if (unit.supplies < 100) {
+          unit.supplies = 100;
+          collector.units.add(unit);
+        }
+      } else {
+        unit.supplies = Math.max(0, unit.supplies - 20);
+        if (!unit.supplies) {
+          unit.health -= 10;
+          if (unit.health <= 0) {
+            this.destroy(unit);
+          }
+        }
         collector.units.add(unit);
       }
     }

@@ -47,15 +47,22 @@
     }
   }
 
-  app-progress-bar {
-    --progress-bar-color: var(--health-color);
-    --progress-bar-total-color: #666;
+  .bars {
     position: absolute;
-    height: 6px;
     top: 0;
     width: 80%;
     padding: 0;
     border: 1px solid #333;
+    app-progress-bar {
+      &.health {
+        --progress-bar-color: var(--health-color);
+      }
+      &.supplies {
+        --progress-bar-color: #55aaff;
+      }
+      --progress-bar-total-color: #666;
+      height: 6px;
+    }
   }
 
   app-icon {

@@ -1,9 +1,19 @@
 <div class="unit">
-  <app-progress-bar
-    *ngIf="isDamaged"
-    [total]="100"
-    [progress]="unit.health"
-  ></app-progress-bar>
+  <div class="bars" *ngIf="isDamaged || suppliesDiminishing">
+    <app-progress-bar
+      class="health"
+      *ngIf="isDamaged"
+      [total]="100"
+      [progress]="unit.health"
+    ></app-progress-bar>
+  
+    <app-progress-bar
+      class="supplies"
+      *ngIf="suppliesDiminishing"
+      [total]="100"
+      [progress]="unit.supplies"
+    ></app-progress-bar>
+  </div>
 
   <app-icon [name]="unitBackground" [scale]="0.7" [tint]="tint"></app-icon>
   <app-icon [name]="unit.definition.id" [scale]="0.7"></app-icon>

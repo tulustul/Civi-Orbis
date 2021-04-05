@@ -1,5 +1,5 @@
 import { TileCore } from "./tile";
-import { UnitDefinition } from "./data.interface";
+import { UnitDefinition, UnitTrait } from "./data.interface";
 import { PlayerCore } from "./player";
 import { UnitAction, ACTIONS } from "./unit-actions";
 import { collector } from "./collector";
@@ -12,11 +12,16 @@ export class UnitCore {
   id: number;
   actionPointsLeft: number;
   health = 100;
+  supplies = 100;
   path: TileCore[][] | null;
   parent: UnitCore | null = null;
   children: UnitCore[] = [];
 
   order: UnitOrder = null;
+
+  zoc: TileCore[] = [];
+
+  suppliesTiles = new Set<TileCore>();
 
   constructor(
     public tile: TileCore,
@@ -162,5 +167,12 @@ export class UnitCore {
 
   getVisibleTiles(): Set<TileCore> {
     return this.tile.getTilesInRange(2);
+  }
+
+  get isSupplied() {
+    if (this.definition.trait !== UnitTrait.military) {
+      return true;
+    }
+    return this.tile.isSuppliedByPlayer(this.player);
   }
 }

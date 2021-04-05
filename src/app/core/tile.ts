@@ -12,6 +12,7 @@ import { CityCore } from "./city";
 import { collector } from "./collector";
 import { Nation } from "./data.interface";
 import { ResourceCore } from "./resources";
+import { PlayerCore } from "./player";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -65,6 +66,16 @@ export class TileCore implements BaseTile {
   passableArea = 0;
 
   isMapEdge = false;
+
+  // Zone of control. Which player is militarly in control of the tile.
+  zocPlayer: PlayerCore | null = null;
+  zocUnits = new Set<UnitCore>();
+
+  // In case of more then one player competing to control the tile, we mark it as no man's land. Such tile cannot be worked on. Supply lines cannot pass it.
+  zocNoMansLand = false;
+
+  suppliedByCities = new Set<CityCore>();
+  suppliedByUnits = new Set<UnitCore>();
 
   constructor(public id: number, public x: number, public y: number) {}
 
@@ -260,5 +271,21 @@ export class TileCore implements BaseTile {
         u.definition.capacity &&
         u.children.length < u.definition.capacity,
     );
+  }
+
+  isSuppliedByPlayer(player: PlayerCore): boolean {
+    for (const city of this.suppliedByCities) {
+      if (city.player === player) {
+        return true;
+      }
+    }
+
+    for (const unit of this.suppliedByUnits) {
+      if (unit.player === player) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

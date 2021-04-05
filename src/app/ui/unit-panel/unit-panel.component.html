@@ -17,6 +17,8 @@
       <p>Strength: {{ unit.definition.strength }}</p>
       <p>Order: {{ unit.order }}</p>
       <p>Health: {{ unit.health }}</p>
+      <p>Supplies: {{ unit.supplies }}</p>
+      <p *ngIf="!unit.isSupplied">Out of range of supply lines</p>
 
       <div class="actions">
         <button class="btn-danger" (click)="destroy()">Disband</button>

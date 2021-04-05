@@ -3,6 +3,8 @@ import { UnitCore } from "./unit";
 import { attack } from "./combat";
 import { collector } from "./collector";
 import { UnitType, UnitTrait } from "./data.interface";
+import { zocAddUnit, zocForgetUnit } from "./zoc";
+import { suppliesAddUnit, suppliesForgetUnit } from "./supplies";
 
 export enum MoveResult {
   none,
@@ -88,7 +90,7 @@ export function getMoveCost(
   return Infinity;
 }
 
-export function move(unit: UnitCore, tile: TileCore) {
+function move(unit: UnitCore, tile: TileCore) {
   if (!unit.actionPointsLeft) {
     return;
   }
@@ -119,6 +121,9 @@ export function move(unit: UnitCore, tile: TileCore) {
 }
 
 function _move(unit: UnitCore, tile: TileCore, cost: number) {
+  zocForgetUnit(unit);
+  suppliesForgetUnit(unit);
+
   const index = unit.tile.units.indexOf(unit);
   if (index !== -1) {
     unit.tile.units.splice(index, 1);
@@ -135,6 +140,9 @@ function _move(unit: UnitCore, tile: TileCore, cost: number) {
     _move(child, tile, 0);
     collector.units.add(child);
   }
+
+  zocAddUnit(unit);
+  suppliesAddUnit(unit);
 }
 
 export function moveAlongPath(unit: UnitCore) {
@@ -151,8 +159,7 @@ export function moveAlongPath(unit: UnitCore) {
     const targetTile = unit.path[0][0];
     if (targetTile !== unit.tile) {
       const moveResult = getMoveResult(unit, unit.tile, targetTile);
-      // TODO should results other then move be allowed?
-      if (moveResult !== MoveResult.move) {
+      if (moveResult === MoveResult.none) {
         unit.path = null;
         unit.setOrder(null);
         return;

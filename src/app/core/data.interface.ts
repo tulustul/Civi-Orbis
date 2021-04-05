@@ -35,6 +35,7 @@ export enum UnitTrait {
   explorer,
   worker,
   military,
+  supply,
 }
 
 export interface UnitDefinition extends ProductDefinition {
@@ -44,6 +45,7 @@ export interface UnitDefinition extends ProductDefinition {
   type: UnitType;
   trait: UnitTrait;
   capacity: number;
+  supplyRange: number;
 }
 
 export type Building = ProductDefinition & HaveBonuses;

@@ -1,0 +1,13 @@
+:host {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  .panel {
+    padding: 10px;
+    pointer-events: all;
+    position: absolute;
+  }
+}

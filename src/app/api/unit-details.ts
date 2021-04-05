@@ -19,8 +19,10 @@ export class UnitDetails {
   children: Unit[] = [];
   actionPointsLeft: number;
   health: number;
+  supplies: number;
   path: Tile[][] | null = null;
   order: UnitOrder;
+  isSupplied: boolean;
 
   constructor(private game: GameState, unit: UnitDetailsChanneled) {
     this.id = unit.id;
@@ -33,7 +35,9 @@ export class UnitDetails {
     this.player = this.game.playersMap.get(unit.playerId)!;
     this.actionPointsLeft = unit.actionPointsLeft;
     this.health = unit.health;
+    this.supplies = unit.supplies;
     this.order = unit.order;
+    this.isSupplied = unit.isSupplied;
 
     this.path = null;
     if (unit.path) {

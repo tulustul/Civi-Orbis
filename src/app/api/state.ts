@@ -75,7 +75,7 @@ export class GameState {
 
   constructor(game: GameChanneled) {
     this._turn$.next(game.turn);
-    this.map = new TilesMap(game.map);
+    this.map = new TilesMap(this, game.map);
 
     this.players = this.restorePlayers(game);
     for (const player of this.players) {
@@ -87,11 +87,11 @@ export class GameState {
 
     this.trackedPlayer = new TrackedPlayer(this, game.trackedPlayer);
 
-    this.map.preprocess(this);
+    this.map.preprocess();
   }
 
   private restorePlayers(game: GameChanneled): Player[] {
-    return game.players.map((player) => new Player(player));
+    return game.players.map((player) => new Player(this, player));
   }
 
   private restoreUnits(game: GameChanneled): Unit[] {

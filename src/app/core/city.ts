@@ -22,6 +22,7 @@ import { BUILDINGS } from "../data/products/buildings";
 import { UNITS_DEFINITIONS } from "../data/products/units";
 import { IDLE_PRODUCTS } from "../data/products/idle-products";
 import { checkRequirements } from "./requirements";
+import { suppliesAddCity, suppliesForgetCity } from "./supplies";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -74,6 +75,10 @@ export class CityCore {
   passableAreas = new Set<number>();
 
   resources: ResourceDefinition[] = [];
+
+  supplyRange = 5;
+
+  suppliesTiles = new Set<TileCore>();
 
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
@@ -481,6 +486,8 @@ export class CityCore {
       return;
     }
 
+    suppliesForgetCity(this);
+
     const oldOwner = this.player;
 
     this.player = newOwner;
@@ -503,6 +510,8 @@ export class CityCore {
     newOwner.exploreTiles(this.tiles);
 
     this.cancelProduction();
+
+    suppliesAddCity(this);
 
     collector.cities.add(this);
     for (const tile of this.tiles) {

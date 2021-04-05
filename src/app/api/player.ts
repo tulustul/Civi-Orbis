@@ -1,4 +1,6 @@
 import { PlayerChanneled } from "../core/serialization/channel";
+import { makeCommand } from "./internal/commander";
+import { GameState } from "./state";
 
 export class Player {
   id: number;
@@ -10,7 +12,7 @@ export class Player {
 
   isAi: boolean;
 
-  constructor(player: PlayerChanneled) {
+  constructor(private game: GameState, player: PlayerChanneled) {
     this.id = player.id;
     this.color = player.color;
     this.cssColor = "#" + this.color.toString(16).padStart(6, "0");
@@ -23,5 +25,13 @@ export class Player {
 
     this.areaId = player.areaId;
     this.isAi = player.isAi;
+  }
+
+  async getSuppliedTiles() {
+    const tilesIds = await makeCommand<number[]>(
+      "player.getSuppliedTiles",
+      this.id,
+    );
+    return this.game.map.getTilesFromIds(tilesIds);
   }
 }
