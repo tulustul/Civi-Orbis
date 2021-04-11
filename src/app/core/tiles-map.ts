@@ -50,6 +50,7 @@ export class TilesMapCore {
         }
 
         if (tile.landForm === LandForm.mountains) {
+          tile.passableArea = -1;
           continue;
         }
 

@@ -1,6 +1,7 @@
-import { TileCore, TileDirection } from "../core/tile";
-import { getTileNeighbours } from "../core/hex-math";
-import { TilesMapCore } from "./tiles-map";
+import { TileCore } from "../core/tile";
+import { TilesMapCore } from "../core/tiles-map";
+import { getTileNeighbours } from "./hex-math";
+import { TileDirection } from "./tile.interface";
 
 describe("hex-math:utils", () => {
   it("#getTileNeighbours", () => {
@@ -107,48 +108,72 @@ describe("hex-math:utils", () => {
 
   it("#getTileDirection", () => {
     // EVEN row
-    const startEven = new TileCore(2, 2);
+    const startEven = new TileCore(0, 2, 2);
 
-    expect(startEven.getDirectionTo(new TileCore(1, 1))).toBe(TileDirection.NW);
+    expect(startEven.getDirectionTo(new TileCore(0, 1, 1))).toBe(
+      TileDirection.NW,
+    );
 
-    expect(startEven.getDirectionTo(new TileCore(2, 1))).toBe(TileDirection.NE);
+    expect(startEven.getDirectionTo(new TileCore(0, 2, 1))).toBe(
+      TileDirection.NE,
+    );
 
-    expect(startEven.getDirectionTo(new TileCore(3, 2))).toBe(TileDirection.E);
+    expect(startEven.getDirectionTo(new TileCore(0, 3, 2))).toBe(
+      TileDirection.E,
+    );
 
-    expect(startEven.getDirectionTo(new TileCore(2, 3))).toBe(TileDirection.SE);
+    expect(startEven.getDirectionTo(new TileCore(0, 2, 3))).toBe(
+      TileDirection.SE,
+    );
 
-    expect(startEven.getDirectionTo(new TileCore(1, 3))).toBe(TileDirection.SW);
+    expect(startEven.getDirectionTo(new TileCore(0, 1, 3))).toBe(
+      TileDirection.SW,
+    );
 
-    expect(startEven.getDirectionTo(new TileCore(1, 2))).toBe(TileDirection.W);
+    expect(startEven.getDirectionTo(new TileCore(0, 1, 2))).toBe(
+      TileDirection.W,
+    );
 
-    expect(startEven.getDirectionTo(new TileCore(2, 2))).toBe(
+    expect(startEven.getDirectionTo(new TileCore(0, 2, 2))).toBe(
       TileDirection.NONE,
     );
 
-    expect(startEven.getDirectionTo(new TileCore(3, 1))).toBe(
+    expect(startEven.getDirectionTo(new TileCore(0, 3, 1))).toBe(
       TileDirection.NONE,
     );
 
     // ODD ROW
-    const startOdd = new TileCore(2, 3);
+    const startOdd = new TileCore(0, 2, 3);
 
-    expect(startOdd.getDirectionTo(new TileCore(2, 2))).toBe(TileDirection.NW);
+    expect(startOdd.getDirectionTo(new TileCore(0, 2, 2))).toBe(
+      TileDirection.NW,
+    );
 
-    expect(startOdd.getDirectionTo(new TileCore(3, 2))).toBe(TileDirection.NE);
+    expect(startOdd.getDirectionTo(new TileCore(0, 3, 2))).toBe(
+      TileDirection.NE,
+    );
 
-    expect(startOdd.getDirectionTo(new TileCore(3, 3))).toBe(TileDirection.E);
+    expect(startOdd.getDirectionTo(new TileCore(0, 3, 3))).toBe(
+      TileDirection.E,
+    );
 
-    expect(startOdd.getDirectionTo(new TileCore(3, 4))).toBe(TileDirection.SE);
+    expect(startOdd.getDirectionTo(new TileCore(0, 3, 4))).toBe(
+      TileDirection.SE,
+    );
 
-    expect(startOdd.getDirectionTo(new TileCore(2, 4))).toBe(TileDirection.SW);
+    expect(startOdd.getDirectionTo(new TileCore(0, 2, 4))).toBe(
+      TileDirection.SW,
+    );
 
-    expect(startOdd.getDirectionTo(new TileCore(1, 3))).toBe(TileDirection.W);
+    expect(startOdd.getDirectionTo(new TileCore(0, 1, 3))).toBe(
+      TileDirection.W,
+    );
 
-    expect(startOdd.getDirectionTo(new TileCore(2, 3))).toBe(
+    expect(startOdd.getDirectionTo(new TileCore(0, 2, 3))).toBe(
       TileDirection.NONE,
     );
 
-    expect(startOdd.getDirectionTo(new TileCore(1, 2))).toBe(
+    expect(startOdd.getDirectionTo(new TileCore(0, 1, 2))).toBe(
       TileDirection.NONE,
     );
   });

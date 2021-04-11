@@ -1,4 +1,4 @@
-import { Entity } from "./data.interface";
+/* import { Entity } from "./data.interface";
 import { InfluenceField, InfluenceFieldEmitter } from "./influence-field";
 import { TilesMapCore } from "./tiles-map";
 
@@ -88,3 +88,4 @@ describe("influenceField", () => {
     ]);
   });
 });
+ */

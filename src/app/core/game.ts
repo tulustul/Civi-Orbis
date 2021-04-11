@@ -5,7 +5,6 @@ import { Debug } from "./debug";
 import { CitiesManager } from "./cities-manager";
 import { AreasManager } from "./areas-manager";
 import { collector } from "./collector";
-import { zocPrecompute } from "./zoc";
 import { suppliesPrecompute } from "./supplies";
 
 export class Game {
@@ -37,8 +36,6 @@ export class Game {
   }
 
   preprocessEntities() {
-    zocPrecompute(this.unitsManager.units);
-
     for (const player of this.players) {
       player.updateCitiesWithoutProduction();
       player.updateUnitsWithoutOrders();
