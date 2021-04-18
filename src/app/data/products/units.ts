@@ -121,7 +121,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     actions: [],
     productionCost: 30,
     capacity: 0,
-    supplyRange: 5,
+    supplyRange: 4,
     strongRequirements: [],
     weakRequirements: [],
   },

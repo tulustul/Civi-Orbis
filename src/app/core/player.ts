@@ -63,6 +63,7 @@ export class PlayerCore {
   internalPolitics = new InternalPolitics();
 
   suppliedTiles = new Set<TileCore>();
+  poterntialSuppliedTiles = new Set<TileCore>();
 
   constructor(public game: Game, public color: number) {}
 

@@ -22,6 +22,7 @@ export class UnitCore {
   zoc: TileCore[] = [];
 
   suppliesTiles = new Set<TileCore>();
+  suppliesPotentialTiles = new Set<TileCore>();
 
   constructor(
     public tile: TileCore,

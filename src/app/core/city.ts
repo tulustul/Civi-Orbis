@@ -78,7 +78,8 @@ export class CityCore {
 
   supplyRange = 5;
 
-  suppliesTiles = new Set<TileCore>();
+  canSupplyTiles = new Set<TileCore>();
+  supplyTiles = new Set<TileCore>();
 
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);

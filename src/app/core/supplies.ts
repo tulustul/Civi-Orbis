@@ -20,20 +20,23 @@ export function suppliesPrecompute(player: PlayerCore) {
 }
 
 export function suppliesForgetCity(city: CityCore) {
-  for (const tile of city.suppliesTiles) {
-    tile.suppliedByCities.delete(city);
-    if (!tile.isSuppliedByPlayer(city.player)) {
+  for (const tile of city.canSupplyTiles) {
+    tile.canBeSuppliedByCities.delete(city);
+    if (!tile.isSuppliedByPlayerFullCheck(city.player)) {
       city.player.suppliedTiles.delete(tile);
     }
   }
-  city.suppliesTiles.clear();
+  city.canSupplyTiles.clear();
 }
 
 export function suppliesAddCity(city: CityCore) {
-  const tiles = addTilesInRange(city.player, city.tile, city.supplyRange);
-  city.suppliesTiles = tiles;
-  for (const tile of tiles) {
-    tile.suppliedByCities.add(city);
+  city.canSupplyTiles = getPotentialTilesRange(
+    city.player,
+    city.tile,
+    city.supplyRange,
+  );
+  for (const tile of city.canSupplyTiles) {
+    tile.canBeSuppliedByCities.add(city);
   }
 }
 
@@ -66,26 +69,33 @@ export function suppliesAddUnit(unit: UnitCore) {
 }
 
 function addSupplyUnit(unit: UnitCore) {
-  const tiles = addTilesInRange(
+  unit.suppliesPotentialTiles = getPotentialTilesRange(
     unit.player,
     unit.tile,
     unit.definition.supplyRange,
   );
-  unit.suppliesTiles = tiles;
-  for (const tile of tiles) {
+  unit.suppliesTiles = getActualTilesRange(
+    unit.player,
+    unit.tile,
+    unit.definition.supplyRange,
+  );
+
+  for (const tile of unit.suppliesPotentialTiles) {
     tile.suppliedByUnits.add(unit);
   }
 }
 
 function recalcForMilitaryUnit(unit: UnitCore) {
-  for (const city of unit.tile.suppliedByCities) {
+  const cities = [...unit.tile.canBeSuppliedByCities];
+  for (const city of cities) {
     if (city.player !== unit.player) {
       suppliesForgetCity(city);
       suppliesAddCity(city);
     }
   }
 
-  for (const supplyUnit of unit.tile.suppliedByUnits) {
+  const units = [...unit.tile.suppliedByUnits];
+  for (const supplyUnit of units) {
     if (supplyUnit.player !== unit.player) {
       suppliesForgetUnit(supplyUnit);
       addSupplyUnit(supplyUnit);
@@ -93,34 +103,95 @@ function recalcForMilitaryUnit(unit: UnitCore) {
   }
 }
 
-function addTilesInRange(
+function getPotentialTilesRange(
   player: PlayerCore,
   tile: TileCore,
   range: number,
 ): Set<TileCore> {
-  const addedTiles = new Set<TileCore>();
+  const result = new Set<TileCore>();
+  const actionPointsAtTile = new Map<TileCore, number>();
+  _getPotentialRange(player, tile, range, result, actionPointsAtTile);
+  return result;
+}
 
-  let toVisit = new Set<TileCore>([tile]);
-  const visited = new Set<TileCore>();
-  for (let i = 0; i < range; i++) {
-    let neighbours = new Set<TileCore>();
-    for (const tile of toVisit) {
-      visited.add(tile);
-      for (const neighbour of tile.neighbours) {
-        if (
-          !neighbour.zocPlayer ||
-          (neighbour.zocPlayer === player && !visited.has(neighbour))
-        ) {
-          neighbours.add(neighbour);
-          player.suppliedTiles.add(neighbour);
-          addedTiles.add(neighbour);
-        }
-      }
-    }
-    toVisit = neighbours;
+function getActualTilesRange(
+  player: PlayerCore,
+  tile: TileCore,
+  range: number,
+): Set<TileCore> {
+  const result = new Set<TileCore>();
+  const actionPointsAtTile = new Map<TileCore, number>();
+  _getActualRange(player, tile, range, result, actionPointsAtTile);
+  return result;
+}
+
+function _getPotentialRange(
+  player: PlayerCore,
+  tile: TileCore,
+  actionPointsLeft: number,
+  result: Set<TileCore>,
+  actionPointsLeftAtTile: Map<TileCore, number>,
+) {
+  result.add(tile);
+  player.poterntialSuppliedTiles.add(tile);
+
+  if (actionPointsLeft <= 0) {
+    return result;
   }
 
-  return addedTiles;
+  for (const neighbour of tile.neighbours) {
+    const cost = tile.neighboursCosts.get(neighbour)!;
+
+    const oldActionPointsLeft = actionPointsLeftAtTile.get(neighbour);
+    const newActionPointsLeft = actionPointsLeft - cost;
+
+    if (!oldActionPointsLeft || newActionPointsLeft > oldActionPointsLeft) {
+      actionPointsLeftAtTile.set(neighbour, newActionPointsLeft);
+      _getPotentialRange(
+        player,
+        neighbour,
+        newActionPointsLeft,
+        result,
+        actionPointsLeftAtTile,
+      );
+    }
+  }
+}
+
+function _getActualRange(
+  player: PlayerCore,
+  tile: TileCore,
+  actionPointsLeft: number,
+  result: Set<TileCore>,
+  actionPointsLeftAtTile: Map<TileCore, number>,
+) {
+  result.add(tile);
+  player.suppliedTiles.add(tile);
+
+  if (actionPointsLeft <= 0) {
+    return result;
+  }
+
+  for (const neighbour of tile.neighbours) {
+    const cost = tile.neighboursCosts.get(neighbour)!;
+
+    const oldActionPointsLeft = actionPointsLeftAtTile.get(neighbour);
+    const newActionPointsLeft = actionPointsLeft - cost;
+
+    if (
+      (!oldActionPointsLeft || newActionPointsLeft > oldActionPointsLeft) &&
+      (!neighbour.zocPlayer || neighbour.zocPlayer === player)
+    ) {
+      actionPointsLeftAtTile.set(neighbour, newActionPointsLeft);
+      _getActualRange(
+        player,
+        neighbour,
+        newActionPointsLeft,
+        result,
+        actionPointsLeftAtTile,
+      );
+    }
+  }
 }
 
 // TODO add forts/supply points?

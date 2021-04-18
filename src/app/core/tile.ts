@@ -74,7 +74,7 @@ export class TileCore implements BaseTile {
   // In case of more then one player competing to control the tile, we mark it as no man's land. Such tile cannot be worked on. Supply lines cannot pass it.
   zocNoMansLand = false;
 
-  suppliedByCities = new Set<CityCore>();
+  canBeSuppliedByCities = new Set<CityCore>();
   suppliedByUnits = new Set<UnitCore>();
 
   constructor(public id: number, public x: number, public y: number) {}
@@ -274,7 +274,11 @@ export class TileCore implements BaseTile {
   }
 
   isSuppliedByPlayer(player: PlayerCore): boolean {
-    for (const city of this.suppliedByCities) {
+    return player.suppliedTiles.has(this);
+  }
+
+  isSuppliedByPlayerFullCheck(player: PlayerCore): boolean {
+    for (const city of this.canBeSuppliedByCities) {
       if (city.player === player) {
         return true;
       }
