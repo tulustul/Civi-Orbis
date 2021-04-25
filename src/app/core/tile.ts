@@ -13,6 +13,7 @@ import { collector } from "./collector";
 import { Nation } from "./data.interface";
 import { ResourceCore } from "./resources";
 import { PlayerCore } from "./player";
+import { SuppliesProducer } from "./supplies";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -74,8 +75,10 @@ export class TileCore implements BaseTile {
   // In case of more then one player competing to control the tile, we mark it as no man's land. Such tile cannot be worked on. Supply lines cannot pass it.
   zocNoMansLand = false;
 
-  canBeSuppliedByCities = new Set<CityCore>();
-  suppliedByUnits = new Set<UnitCore>();
+  potentiallySuppliedBy = new Set<SuppliesProducer>();
+  suppliedBy = new Set<SuppliesProducer>();
+  // canBeSuppliedByCities = new Set<CityCore>();
+  // suppliedByUnits = new Set<UnitCore>();
 
   constructor(public id: number, public x: number, public y: number) {}
 
@@ -277,15 +280,9 @@ export class TileCore implements BaseTile {
     return player.suppliedTiles.has(this);
   }
 
-  isSuppliedByPlayerFullCheck(player: PlayerCore): boolean {
-    for (const city of this.canBeSuppliedByCities) {
-      if (city.player === player) {
-        return true;
-      }
-    }
-
-    for (const unit of this.suppliedByUnits) {
-      if (unit.player === player) {
+  isPotentiallySuppliedByPlayer(player: PlayerCore): boolean {
+    for (const suppliesProducer of this.potentiallySuppliedBy) {
+      if (suppliesProducer.player === player) {
         return true;
       }
     }

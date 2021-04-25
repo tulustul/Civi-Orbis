@@ -5,7 +5,8 @@ import { collector } from "./collector";
 import { getUnitById } from "./data-manager";
 import { moveAlongPath } from "./movement";
 import { zocAddUnit, zocForgetUnit } from "./zoc";
-import { suppliesAddUnit, suppliesForgetUnit } from "./supplies";
+import { SuppliesBlocker, SuppliesProducer } from "./supplies";
+import { UnitTrait } from "./data.interface";
 
 export class UnitsManager {
   units: UnitCore[] = [];
@@ -32,7 +33,18 @@ export class UnitsManager {
     collector.units.add(unit);
 
     zocAddUnit(unit);
-    suppliesAddUnit(unit);
+
+    if (unit.definition.trait === UnitTrait.military) {
+      unit.suppliesBlocker = new SuppliesBlocker(tile, player);
+    }
+
+    if (unit.definition.trait === UnitTrait.supply) {
+      unit.suppliesProducer = new SuppliesProducer(
+        tile,
+        player,
+        unit.definition.supplyRange,
+      );
+    }
 
     return unit;
   }
@@ -57,7 +69,9 @@ export class UnitsManager {
     }
 
     zocForgetUnit(unit);
-    suppliesForgetUnit(unit);
+
+    unit.suppliesBlocker?.update(unit.suppliesBlocker.tile);
+    unit.suppliesProducer?.forget();
 
     unit.player.updateUnitsWithoutOrders();
     collector.unitsDestroyed.add(unit.id);

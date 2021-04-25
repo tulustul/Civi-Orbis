@@ -5,6 +5,7 @@ import { UnitAction, ACTIONS } from "./unit-actions";
 import { collector } from "./collector";
 import { UnitsManager } from "./unit-manager";
 import { getMoveCost, getMoveResult, MoveResult } from "./movement";
+import { SuppliesBlocker, SuppliesProducer } from "./supplies";
 
 export type UnitOrder = "go" | "skip" | "sleep" | null;
 
@@ -21,8 +22,8 @@ export class UnitCore {
 
   zoc: TileCore[] = [];
 
-  suppliesTiles = new Set<TileCore>();
-  suppliesPotentialTiles = new Set<TileCore>();
+  suppliesProducer: SuppliesProducer | null = null;
+  suppliesBlocker: SuppliesBlocker | null = null;
 
   constructor(
     public tile: TileCore,

@@ -22,7 +22,7 @@ import { BUILDINGS } from "../data/products/buildings";
 import { UNITS_DEFINITIONS } from "../data/products/units";
 import { IDLE_PRODUCTS } from "../data/products/idle-products";
 import { checkRequirements } from "./requirements";
-import { suppliesAddCity, suppliesForgetCity } from "./supplies";
+import { SuppliesProducer } from "./supplies";
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
@@ -76,10 +76,7 @@ export class CityCore {
 
   resources: ResourceDefinition[] = [];
 
-  supplyRange = 5;
-
-  canSupplyTiles = new Set<TileCore>();
-  supplyTiles = new Set<TileCore>();
+  suppliesProducers = new SuppliesProducer(this.tile, this.player, 5);
 
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
@@ -487,7 +484,7 @@ export class CityCore {
       return;
     }
 
-    suppliesForgetCity(this);
+    this.suppliesProducers.forget();
 
     const oldOwner = this.player;
 
@@ -512,7 +509,7 @@ export class CityCore {
 
     this.cancelProduction();
 
-    suppliesAddCity(this);
+    this.suppliesProducers.add();
 
     collector.cities.add(this);
     for (const tile of this.tiles) {

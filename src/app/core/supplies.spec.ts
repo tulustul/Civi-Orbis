@@ -2,12 +2,7 @@ import { LandForm, SeaLevel, TileDirection } from "../shared";
 import { Game } from "./game";
 import { moveAlongPath } from "./movement";
 import { PlayerCore } from "./player";
-import {
-  suppliesAddCity,
-  suppliesAddUnit,
-  suppliesForgetCity,
-  suppliesForgetUnit,
-} from "./supplies";
+import {} from "./supplies";
 import {
   makeGame,
   SymbolCallbacks,
@@ -67,7 +62,7 @@ describe("supply lines", () => {
     ]);
 
     const city = game.citiesManager.cities[0];
-    suppliesForgetCity(city);
+    city.suppliesProducers.forget();
 
     expect(dumpSupplies(game, game.players[0])).toEqual([
       ". . . . . . . .",
@@ -80,7 +75,7 @@ describe("supply lines", () => {
       " . . . . . . . .",
     ]);
 
-    suppliesAddCity(city);
+    city.suppliesProducers.add();
 
     expect(dumpSupplies(game, game.players[0])).toEqual([
       "x x x x x x x .",
@@ -120,7 +115,7 @@ describe("supply lines", () => {
     ]);
 
     const unit = game.unitsManager.units[0];
-    suppliesForgetUnit(unit);
+    unit.suppliesProducer?.forget();
 
     expect(dumpSupplies(game, game.players[0])).toEqual([
       ". . . . . . . .",
@@ -133,7 +128,7 @@ describe("supply lines", () => {
       " . . . . . . . .",
     ]);
 
-    suppliesAddUnit(unit);
+    unit.suppliesProducer?.add();
 
     expect(dumpSupplies(game, game.players[0])).toEqual([
       "x x x x x x . .",
@@ -168,7 +163,7 @@ describe("supply lines", () => {
       " x x . . . . . .",
       "x x . . . . . .",
       " x x . . . . . .",
-      "x x . . . . . .",
+      "x x x . . . . .",
       " . . . . . . . .",
     ]);
 
@@ -182,11 +177,11 @@ describe("supply lines", () => {
       " x x . . x x . .",
       "x x . . . x . .",
       " x x . . . . . .",
-      "x x . . . . . .",
+      "x x x . . . . .",
       " . . . . . . . .",
     ]);
 
-    // Move the other unit.
+    // // Move the other unit.
     unit = game.unitsManager.units[0];
     unit.path = [[unit.tile.fullNeighbours[TileDirection.NW]!]];
     moveAlongPath(unit);

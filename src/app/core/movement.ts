@@ -4,7 +4,6 @@ import { attack } from "./combat";
 import { collector } from "./collector";
 import { UnitType, UnitTrait } from "./data.interface";
 import { zocAddUnit, zocForgetUnit } from "./zoc";
-import { suppliesAddUnit, suppliesForgetUnit } from "./supplies";
 
 export enum MoveResult {
   none,
@@ -122,7 +121,7 @@ function move(unit: UnitCore, tile: TileCore) {
 
 function _move(unit: UnitCore, tile: TileCore, cost: number) {
   zocForgetUnit(unit);
-  suppliesForgetUnit(unit);
+  unit.suppliesProducer?.forget();
 
   const index = unit.tile.units.indexOf(unit);
   if (index !== -1) {
@@ -142,7 +141,11 @@ function _move(unit: UnitCore, tile: TileCore, cost: number) {
   }
 
   zocAddUnit(unit);
-  suppliesAddUnit(unit);
+  if (unit.suppliesProducer) {
+    unit.suppliesProducer.tile = tile;
+    unit.suppliesProducer.add();
+  }
+  unit.suppliesBlocker?.update(tile);
 }
 
 export function moveAlongPath(unit: UnitCore) {

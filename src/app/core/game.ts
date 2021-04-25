@@ -5,7 +5,6 @@ import { Debug } from "./debug";
 import { CitiesManager } from "./cities-manager";
 import { AreasManager } from "./areas-manager";
 import { collector } from "./collector";
-import { suppliesPrecompute } from "./supplies";
 
 export class Game {
   debug = new Debug();
@@ -41,7 +40,6 @@ export class Game {
       player.updateUnitsWithoutOrders();
       player.updateYields();
       player.updateVisibleTiles();
-      suppliesPrecompute(player);
     }
   }
 

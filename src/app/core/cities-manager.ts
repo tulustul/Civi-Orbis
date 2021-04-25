@@ -4,7 +4,6 @@ import { TileRoad } from "./tile-improvements";
 import { TileCore } from "./tile";
 import { LandForm, SeaLevel } from "../shared";
 import { collector } from "./collector";
-import { suppliesAddCity, suppliesForgetCity } from "./supplies";
 
 export class CitiesManager {
   cities: CityCore[] = [];
@@ -58,7 +57,7 @@ export class CitiesManager {
 
     player.updateCitiesWithoutProduction();
 
-    suppliesAddCity(city);
+    city.suppliesProducers.add();
 
     collector.cities.add(city);
 
@@ -66,7 +65,7 @@ export class CitiesManager {
   }
 
   destroy(city: CityCore) {
-    suppliesForgetCity(city);
+    city.suppliesProducers.forget();
 
     // TODO rewrite to sets for better performance?
     let index = this.cities.indexOf(city);

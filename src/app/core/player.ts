@@ -63,7 +63,7 @@ export class PlayerCore {
   internalPolitics = new InternalPolitics();
 
   suppliedTiles = new Set<TileCore>();
-  poterntialSuppliedTiles = new Set<TileCore>();
+  potentialSuppliedTiles = new Set<TileCore>();
 
   constructor(public game: Game, public color: number) {}
 
@@ -157,5 +157,10 @@ export class PlayerCore {
 
   addCity(city: CityCore) {
     this.cities.push(city);
+  }
+
+  isEnemyWith(player: PlayerCore) {
+    // It's a deathmatch for now.
+    return this !== player;
   }
 }
