@@ -97,6 +97,7 @@ function _getRange(
 
     if (
       (!oldActionPointsLeft || newActionPointsLeft > oldActionPointsLeft) &&
+      tile.passableArea === neighbour.passableArea &&
       (potentialRange || !neighbour.zocPlayer?.isEnemyWith(player))
     ) {
       actionPointsLeftAtTile.set(neighbour, newActionPointsLeft);

@@ -14,6 +14,7 @@ Performance:
   ☐ core: pathfinding is not optimized yet
   ☐ core: avoid zoc and supplies recalculations when initializing the game. Those should be handled in a single precomputation pass.
   ☐ core: update zoc and supplies once in moveAlongPath instead of in _move
+  ☐ partial collector flush (make max buffer size of 10)
 
 Refactor:
   ☐ renderer: still a mess

@@ -5,6 +5,12 @@ import { GameState } from "src/app/api/state";
 import { TileContainer } from "./tile-container";
 import { HEX_GEOMETRY } from "./utils";
 import { Tile } from "../api/tile.interface";
+import { programs as areaPrograms } from "./shaders/area-shaders";
+
+export interface AreaPrograms {
+  background: PIXI.Program;
+  border: PIXI.Program;
+}
 
 export interface AreaOptions {
   color: number;
@@ -14,68 +20,8 @@ export interface AreaOptions {
   backgroundOpacity: number;
   visibleOnWater: boolean;
   container: TileContainer;
+  programs?: AreaPrograms;
 }
-
-const VS_BORDER_PROGRAM = `
-precision mediump float;
-
-attribute vec2 aVertexPosition;
-attribute float aUvs;
-
-uniform mat3 translationMatrix;
-uniform mat3 projectionMatrix;
-
-varying float vUvs;
-
-void main() {
-  vUvs = aUvs;
-  gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-}`;
-
-const FRAG_BORDER_PROGRAM = `
-precision mediump float;
-
-varying float vUvs;
-
-uniform vec4 color;
-uniform float borderSize;
-uniform float borderShadow;
-uniform float borderShadowStrength;
-
-void main() {
-  vec4 c = color;
-  float a = 1.0;
-  if (vUvs < borderSize) {
-    a = 0.0;
-  } else if (vUvs < (1.0 - borderSize)) {
-    a = (vUvs - (1.0 - borderShadow)) * borderShadowStrength;
-  }
-
-  gl_FragColor = vec4(c.r * a, c.g * a, c.b * a, a);
-}`;
-
-const VS_BACKGROUND_PROGRAM = `
-precision mediump float;
-
-attribute vec2 aVertexPosition;
-
-uniform mat3 translationMatrix;
-uniform mat3 projectionMatrix;
-
-void main() {
-  gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-}`;
-
-const FRAG_BACKGROUND_PROGRAM = `
-precision mediump float;
-
-uniform vec4 color;
-uniform float opacity;
-
-void main() {
-  float a = 0.5;
-  gl_FragColor = vec4(color.r * opacity, color.g * opacity, color.b * opacity, opacity);
-}`;
 
 const TRIANGLES: number[][] = [
   [0.5, 0.5, 0, 0.25, 0.5, 0],
@@ -105,12 +51,6 @@ const RIGHT_SIDE_TRIANGLES: number[][] = [
 ];
 
 const borderGeometries = new Map<string, PIXI.Geometry>();
-
-const borderProgram = PIXI.Program.from(VS_BORDER_PROGRAM, FRAG_BORDER_PROGRAM);
-const backgroundProgram = PIXI.Program.from(
-  VS_BACKGROUND_PROGRAM,
-  FRAG_BACKGROUND_PROGRAM,
-);
 
 function makeBorderGeometry(borders: string): PIXI.Geometry {
   const vertices: number[] = [];
@@ -257,6 +197,8 @@ class AreaDrawer {
   ) {
     const cssColor = "#" + options.color.toString(16).padStart(6, "0");
 
+    const programs = options.programs ?? areaPrograms;
+
     this.vec4Color = [
       parseInt(cssColor[1] + cssColor[2], 16) / 255,
       parseInt(cssColor[3] + cssColor[4], 16) / 255,
@@ -267,7 +209,7 @@ class AreaDrawer {
     const emptyTexture = new PIXI.Texture(new PIXI.BaseTexture());
 
     this.borderShader = new PIXI.MeshMaterial(emptyTexture, {
-      program: borderProgram,
+      program: programs.border,
       uniforms: {
         color: this.vec4Color,
         borderSize: this.options.borderSize,
@@ -277,7 +219,7 @@ class AreaDrawer {
     });
 
     this.backgroundShader = new PIXI.MeshMaterial(emptyTexture, {
-      program: backgroundProgram,
+      program: programs.background,
       uniforms: {
         color: this.vec4Color,
         opacity: this.options.backgroundOpacity,

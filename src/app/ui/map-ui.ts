@@ -13,6 +13,7 @@ import { CityDetails } from "../api/city-details";
 import { Area } from "../renderer/area";
 import { Tile } from "../api/tile.interface";
 import { UnitTrait } from "../core/data.interface";
+import { programs as suppliesPrograms } from "../renderer/shaders/supplies-shaders";
 
 @Injectable()
 export class MapUi {
@@ -184,6 +185,7 @@ export class MapUi {
         borderSize: 0.05,
         borderShadowStrength: 1,
         visibleOnWater: true,
+        programs: suppliesPrograms,
       });
     });
 
@@ -275,7 +277,6 @@ export class MapUi {
       unit.definition.trait === UnitTrait.supply
     ) {
       unit.player.getSuppliedTiles().then((tiles) => {
-        console.log(tiles);
         this.suppliesRangeArea.setTiles(tiles);
       });
     }
