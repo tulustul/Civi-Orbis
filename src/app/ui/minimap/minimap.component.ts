@@ -63,16 +63,25 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
   }
 
   moveViewport(event: MouseEvent) {
+    if (event.buttons === 1) {
+      this.moveTo(event.clientX, event.clientY);
+    }
+  }
+
+  onPan(event: HammerInput) {
+    this.moveTo(event.center.x, event.center.y);
+  }
+
+  private moveTo(x: number, y: number) {
     if (!this.minimapRenderer) {
       return;
     }
 
-    if (event.buttons === 1) {
-      const canvasRect = this.canvas.nativeElement.getBoundingClientRect();
-      this.camera.moveTo(
-        (event.clientX - canvasRect.x) / this.minimapRenderer.scale,
-        (event.clientY - canvasRect.y) / this.minimapRenderer.scale,
-      );
-    }
+    const canvasRect = this.canvas.nativeElement.getBoundingClientRect();
+
+    this.camera.moveTo(
+      (x - canvasRect.x) / this.minimapRenderer.scale,
+      (y - canvasRect.y) / this.minimapRenderer.scale,
+    );
   }
 }

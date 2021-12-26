@@ -26,9 +26,7 @@
         <button (click)="setOrder('skip')">Skip move</button>
 
         <button (click)="setOrder('sleep')">Sleep</button>
-      </div>
 
-      <div class="actions">
         <button
           *ngFor="let action of unit.definition.actions"
           [class.disabled]="!unit.canDoAction(action)"

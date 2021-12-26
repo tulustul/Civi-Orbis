@@ -1,7 +1,14 @@
-import { BrowserModule } from "@angular/platform-browser";
+import {
+  BrowserModule,
+  HammerGestureConfig,
+  HammerModule,
+  HAMMER_GESTURE_CONFIG,
+} from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { OverlayModule } from "@angular/cdk/overlay";
+
+import * as Hammer from "hammerjs";
 
 import { AppComponent } from "./app.component";
 import { GameCanvasComponent } from "./game-canvas/game-canvas.component";
@@ -55,11 +62,19 @@ import { UnitPainterComponent } from "./ui/editor/unit-painter/unit-painter.comp
 import { CombatInfoComponent } from "./ui/combat-info/combat-info.component";
 import { CombatInfoSideComponent } from "./ui/combat-info/combat-info-side/combat-info-side.component";
 import { IconComponent } from "./ui/icon/icon.component";
-import { UnitComponent } from './ui/unit/unit.component';
-import { TileUnitsComponent } from './ui/tile-units/tile-units.component';
-import { UnitsLayerComponent } from './ui/units-layer/units-layer.component';
-import { UnitsStackComponent } from './ui/units-layer/units-stack/units-stack.component';
-import { TileTooltipComponent } from './ui/tile-tooltip/tile-tooltip.component';
+import { UnitComponent } from "./ui/unit/unit.component";
+import { TileUnitsComponent } from "./ui/tile-units/tile-units.component";
+import { UnitsLayerComponent } from "./ui/units-layer/units-layer.component";
+import { UnitsStackComponent } from "./ui/units-layer/units-stack/units-stack.component";
+import { TileTooltipComponent } from "./ui/tile-tooltip/tile-tooltip.component";
+
+export class MyHammerConfig extends HammerGestureConfig {
+  overrides = <any>{
+    swipe: { direction: Hammer.DIRECTION_ALL },
+    pan: { direction: Hammer.DIRECTION_ALL },
+    pinch: { direction: Hammer.DIRECTION_ALL },
+  };
+}
 
 @NgModule({
   declarations: [
@@ -114,8 +129,12 @@ import { TileTooltipComponent } from './ui/tile-tooltip/tile-tooltip.component';
     UnitsStackComponent,
     TileTooltipComponent,
   ],
-  imports: [BrowserModule, FormsModule, OverlayModule],
+  imports: [BrowserModule, FormsModule, OverlayModule, HammerModule],
   providers: [
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig,
+    },
     Game,
     { provide: GameApi, useValue: gameApi },
     UIState,

@@ -1,4 +1,9 @@
-import { Component, ChangeDetectionStrategy } from "@angular/core";
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnInit,
+  HostListener,
+} from "@angular/core";
 
 import { UIState } from "./ui/ui-state";
 import { MapUi } from "./ui/map-ui";
@@ -20,4 +25,15 @@ export class AppComponent {
     public mapUi: MapUi,
     public renderer: GameRenderer,
   ) {}
+
+  @HostListener("click")
+  makeFullScreen() {
+    // This is a temporary solution. We need a button for enabling fullscreen.
+    document.documentElement.requestFullscreen();
+  }
+
+  @HostListener("window:fullscreenchange", ["$event"])
+  onFullscreen(event: Event) {
+    screen.orientation.lock("landscape");
+  }
 }

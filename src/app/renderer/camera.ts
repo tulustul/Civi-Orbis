@@ -96,15 +96,18 @@ export class Camera {
     );
   }
 
+  scaleBy(scaleFactor: number, screenPivotX: number, screenPivotY: number) {
+    const newScale = this.getNewScale(scaleFactor);
+    this.scaleTo(newScale, screenPivotX, screenPivotY);
+  }
+
   scaleByWithEasing(
     scaleFactor: number,
     screenPivotX: number,
     screenPivotY: number,
     duration = 600,
   ) {
-    const t = this.transform;
-    const currentScale = this.scaleAnimation?.end || t.scale;
-    const newScale = currentScale * scaleFactor;
+    const newScale = this.getNewScale(scaleFactor);
     this.scaleToWithEasing(newScale, screenPivotX, screenPivotY, duration);
   }
 
@@ -120,6 +123,12 @@ export class Camera {
     t.y += y1 - y2;
 
     this.transformChanged = true;
+  }
+
+  private getNewScale(scaleFactor: number) {
+    const t = this.transform;
+    const currentScale = this.scaleAnimation?.end || t.scale;
+    return currentScale * scaleFactor;
   }
 
   moveToTile(tile: Tile) {

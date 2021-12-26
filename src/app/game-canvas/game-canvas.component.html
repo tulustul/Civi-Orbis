@@ -1,9 +1,16 @@
 <canvas
   #canvas
   (click)="controls.onClick($event)"
+  (tap)="controls.onTap($event)"
   (mousedown)="controls.onMouseDown($event)"
   (mouseup)="controls.onMouseUp($event)"
   (mousemove)="controls.onMouseMove($event)"
   (wheel)="controls.onWheel($event)"
   (contextmenu)="onContextMenu($event)"
+  (panStart)="controls.onPanStart($event)"
+  (pan)="controls.onPan($event)"
+  (panMove)="controls.onPanMove($event)"
+  (pinchStart)="controls.onPinchStart($event)"
+  (pinch)="controls.onPinch($event)"
+  (pinchEnd)="controls.onPinchEnd($event)"
 ></canvas>

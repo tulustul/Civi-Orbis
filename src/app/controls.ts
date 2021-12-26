@@ -15,6 +15,11 @@ export class Controls {
   private _mouseButton$ = new BehaviorSubject<number | null>(null);
   mouseButton$ = this._mouseButton$.asObservable();
 
+  lastPanDeltaX = 0;
+  lastPanDeltaY = 0;
+  lastScale = 1;
+  isPinching = false;
+
   constructor(
     private game: GameApi,
     private camera: Camera,
@@ -26,11 +31,9 @@ export class Controls {
   onMouseDown(event: MouseEvent) {
     this.isMousePressed = true;
     this._mouseButton$.next(event.button);
-    event.preventDefault();
-    event.stopPropagation();
 
     if (this.mapUi.selectedUnit && this.mouseButton === 2) {
-      const tile = this.getTileFromMouseEvent(event);
+      const tile = this.getTileFromScreenCoords(event.clientX, event.clientY);
       if (tile) {
         this.mapUi.selectedUnit.findPath(tile).then(() => {
           if (this.mapUi.selectedUnit) {
@@ -44,12 +47,19 @@ export class Controls {
   }
 
   onClick(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-
     const hoveredTile = this.mapUi.hoveredTile;
     if (hoveredTile) {
       this.mapUi.clickTile(hoveredTile);
+    }
+
+    return false;
+  }
+
+  onTap(event: HammerInput) {
+    const tile = this.getTileFromScreenCoords(event.center.x, event.center.y);
+
+    if (tile) {
+      this.mapUi.clickTile(tile);
     }
 
     return false;
@@ -76,7 +86,7 @@ export class Controls {
   }
 
   onMouseMove(event: MouseEvent) {
-    const tile = this.getTileFromMouseEvent(event);
+    const tile = this.getTileFromScreenCoords(event.clientX, event.clientY);
 
     if (tile !== this.mapUi.hoveredTile) {
       this.mapUi.hoverTile(tile);
@@ -146,8 +156,56 @@ export class Controls {
 
   onKeyUp(event: KeyboardEvent) {}
 
-  getTileFromMouseEvent(event: MouseEvent) {
-    const [x, y] = this.camera.screenToGame(event.clientX, event.clientY);
+  onPanStart(event: HammerInput) {
+    this.lastPanDeltaX = 0;
+    this.lastPanDeltaY = 0;
+  }
+
+  onPan(event: HammerInput) {
+    console.log("onPan", event.isFinal);
+
+    if (event.isFinal) {
+      return;
+    }
+
+    this.camera.moveBy(
+      event.deltaX - this.lastPanDeltaX,
+      event.deltaY - this.lastPanDeltaY,
+    );
+    this.lastPanDeltaX = event.deltaX;
+    this.lastPanDeltaY = event.deltaY;
+  }
+
+  onPanMove(event: HammerInput) {
+    console.log("onPanMove");
+  }
+
+  onPanRotate(event: HammerInput) {
+    console.log("onRotate");
+  }
+
+  onPinchStart(event: HammerInput) {
+    this.lastScale = 1;
+    this.onPanStart(event);
+  }
+
+  onPinch(event: HammerInput) {
+    console.log("onPinch");
+    this.camera.scaleBy(
+      event.scale - this.lastScale + 1,
+      event.center.x,
+      event.center.y,
+    );
+    this.lastScale = event.scale;
+    this.onPan(event);
+  }
+  onPinchEnd(event: HammerInput) {
+    console.log("onPinchEnd");
+    // this.isPinching = false;
+  }
+
+  getTileFromScreenCoords(screenX: number, screenY: number) {
+    const [x, y] = this.camera.screenToGame(screenX, screenY);
     return this.game.state!.map.get(x, y);
   }
 

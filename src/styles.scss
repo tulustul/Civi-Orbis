@@ -116,8 +116,10 @@ button {
 }
 
 .panel {
-  --border-radius: 20px;
-  background-color: var(--color-primary-1);
+  --border-radius: 3px;
+  --border-width: 1px;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(7px);
   color: white;
   border-radius: var(--border-radius);
   overflow: hidden;
@@ -125,23 +127,25 @@ button {
     0 0 30px 5px var(--color-primary-4);
   border-style: solid;
   border-color: var(--color-primary-0);
-  border-width: 3px;
+  border-width: var(--border-width);
   z-index: 10;
+  overflow-y: auto;
+  max-height: 100%;
   &.panel-bottom-right-corner {
     border-radius: 0 0 var(--border-radius) 0;
-    border-width: 0 3px 3px 0;
+    border-width: 0 var(--border-width) var(--border-width) 0;
   }
   &.panel-bottom-left-corner {
     border-radius: 0 0 0 var(--border-radius);
-    border-width: 0 0 3px 3px;
+    border-width: 0 0 var(--border-width) var(--border-width);
   }
   &.panel-top-right-corner {
     border-radius: 0 var(--border-radius) 0 0;
-    border-width: 3px 3px 0 0;
+    border-width: var(--border-width) var(--border-width) 0 0;
   }
   &.panel-top-left-corner {
     border-radius: var(--border-radius) 0 0 0;
-    border-width: 3px 0 0 3px;
+    border-width: var(--border-width) 0 0 var(--border-width);
   }
 }
 

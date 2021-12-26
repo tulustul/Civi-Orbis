@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-
-
 const os = require("os");
-os.tmpDir = os.tmpdir
+
+// Fix deprecation issue in newer node versions.
+os.tmpDir = os.tmpdir;
 
 const spritesheet = require("spritesheet-js");
 

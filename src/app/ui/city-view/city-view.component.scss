@@ -112,18 +112,6 @@
     }
   }
 
-  .city-name {
-    grid-area: city-name;
-    justify-self: center;
-    align-self: flex-start;
-    text-align: center;
-    margin-top: 50px;
-    h2 {
-      padding: 8px 100px;
-      border-radius: 30px;
-    }
-  }
-
   .right {
     grid-area: right;
     justify-self: flex-end;
