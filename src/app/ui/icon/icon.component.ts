@@ -31,6 +31,9 @@ export class IconComponent implements OnChanges {
     this.update();
   }
 
+  get icons() {
+    return atlasIcons
+  }
   private update() {
     const el = this.elementRef.nativeElement;
 
@@ -43,8 +46,8 @@ export class IconComponent implements OnChanges {
     el.style.width = `${frame.w * this.scale}px`;
     el.style.height = `${frame.h * this.scale}px`;
 
-    el.style.backgroundSize = `${atlasIcons.meta.size.w * this.scale}px ${
-      atlasIcons.meta.size.h * this.scale
+    el.style.backgroundSize = `${this.icons.meta.size.w * this.scale}px ${
+      this.icons.meta.size.h * this.scale
     }px`;
 
     if (this.tint) {
@@ -57,6 +60,6 @@ export class IconComponent implements OnChanges {
   }
 
   private getFrame(name: string) {
-    return atlasIcons.frames[name + ".png"]?.frame;
+    return this.icons.frames[name + ".png"]?.frame;
   }
 }

@@ -1,4 +1,4 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { getTileCenter } from "./utils";
 import { MapUi } from "../ui/map-ui";
@@ -7,9 +7,9 @@ import { GameApi } from "../api";
 import { Tile } from "../api/tile.interface";
 
 export class PathRenderer {
-  pathGraphics = new PIXIE.Graphics();
+  pathGraphics = new PIXI.Graphics();
 
-  labels: PIXIE.Text[] = [];
+  labels: PIXI.Text[] = [];
 
   constructor(
     private container: PIXI.Container,
@@ -55,18 +55,18 @@ export class PathRenderer {
     for (let turn = 0; turn < path.length; turn++) {
       if (path[turn][0]) {
         const scale = this.camera.transform.scale;
-        const label = new PIXIE.Text(turn.toString(), {
+        const label = new PIXI.Text(turn.toString(), {
           align: "center",
           fill: "white",
           dropShadow: true,
           dropShadowBlur: 5,
           dropShadowDistance: 0,
           fontSize: scale * 0.7,
-        } as PIXIE.TextStyle);
+        } as PIXI.TextStyle);
         label.scale.set(1 / scale, 1 / scale);
         this.container.addChild(label);
         this.labels.push(label);
-        const metrics = PIXIE.TextMetrics.measureText(
+        const metrics = PIXI.TextMetrics.measureText(
           turn.toString(),
           label.style,
         );

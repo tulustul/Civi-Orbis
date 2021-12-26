@@ -203,7 +203,6 @@ export class Camera {
   }
 
   updateProjectionMatrix() {
-    // const m = this.renderer.app.renderer.globalUniforms.uniforms
     const m = this.renderer.app.renderer.projection.projectionMatrix;
 
     m.tx = this.transform.x;

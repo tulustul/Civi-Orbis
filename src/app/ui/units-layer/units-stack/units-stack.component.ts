@@ -44,7 +44,7 @@ export class UnitsStackComponent implements OnInit {
   }
 
   @HostListener("wheel", ["$event"])
-  onWheel(event: MouseWheelEvent) {
+  onWheel(event: WheelEvent) {
     this.controls.onWheel(event);
   }
 

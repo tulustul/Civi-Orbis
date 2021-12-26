@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
-var spritesheet = require("spritesheet-js");
+
+const os = require("os");
+os.tmpDir = os.tmpdir
+
+const spritesheet = require("spritesheet-js");
 
 spritesheet(
   "src/assets-src/**/*.png",

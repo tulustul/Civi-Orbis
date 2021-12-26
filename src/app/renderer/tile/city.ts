@@ -1,4 +1,4 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { getTileVariants, pickRandom, drawTileSprite } from "../utils";
 import { GameRenderer } from "../renderer";
@@ -8,7 +8,7 @@ const SMALL_CITY_TEXTURES = getTileVariants("villageSmall", 4);
 const BIG_CITY_TEXTURES = getTileVariants("village", 4);
 
 export class CityDrawer {
-  citiesGraphics = new Map<City, PIXIE.Sprite>();
+  citiesGraphics = new Map<City, PIXI.Sprite>();
 
   constructor(private renderer: GameRenderer) {}
 

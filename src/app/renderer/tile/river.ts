@@ -1,4 +1,4 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { TileDirection } from "src/app/shared";
 import { Tile } from "src/app/api/tile.interface";
@@ -11,7 +11,7 @@ export class RiverDrawer {
 
     // TODO avoid rendering the same river twice.
 
-    const g = new PIXIE.Graphics();
+    const g = new PIXI.Graphics();
     g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     g.position.y = tile.y * 0.75;
     container.addChild(g);

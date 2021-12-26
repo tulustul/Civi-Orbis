@@ -1,10 +1,10 @@
+import * as PIXI from "pixi.js";
 import {
   getTileVariants,
   drawTileSprite,
   pickRandom,
   drawTileSpriteCentered,
 } from "../utils";
-import { TileContainer } from "../tile-container";
 import { GameRenderer } from "../renderer";
 import { TileImprovement } from "src/app/core/tile-improvements";
 import { SeaLevel, Climate, LandForm } from "src/app/shared";

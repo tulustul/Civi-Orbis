@@ -1,4 +1,4 @@
-import * as PIXIE from "pixi.js";
+import * as PIXI from "pixi.js";
 
 import { drawClosedHex, getTileCoords, drawHex } from "./utils";
 import { MapUi } from "../ui/map-ui";
@@ -14,11 +14,11 @@ export class OverlaysRenderer {
 
   tilesContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  hoveredTileGraphics = new PIXIE.Graphics();
+  hoveredTileGraphics = new PIXI.Graphics();
 
-  selectedTileGraphics = new PIXIE.Graphics();
+  selectedTileGraphics = new PIXI.Graphics();
 
-  highlightedTilesGraphics = new PIXIE.Graphics();
+  highlightedTilesGraphics = new PIXI.Graphics();
 
   constructor(
     private container: PIXI.Container,
@@ -60,7 +60,7 @@ export class OverlaysRenderer {
     this.tilesContainer.bindToMap(state.map);
   }
 
-  private displayAtTile(obj: PIXIE.DisplayObject, tile: Tile | null) {
+  private displayAtTile(obj: PIXI.DisplayObject, tile: Tile | null) {
     if (tile) {
       const [x, y] = getTileCoords(tile);
       obj.position.x = x;
