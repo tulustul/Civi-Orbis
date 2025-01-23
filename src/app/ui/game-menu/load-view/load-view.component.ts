@@ -13,9 +13,10 @@ import { GameApi } from "src/app/api";
 import { Camera } from "src/app/renderer/camera";
 
 @Component({
-  selector: "app-load-view",
-  templateUrl: "./load-view.component.html",
-  styleUrls: ["./load-view.component.scss"],
+    selector: "app-load-view",
+    templateUrl: "./load-view.component.html",
+    styleUrls: ["./load-view.component.scss"],
+    standalone: false
 })
 export class LoadViewComponent implements OnInit {
   @Output() return = new EventEmitter<void>();

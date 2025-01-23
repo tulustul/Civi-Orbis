@@ -1,6 +1,6 @@
-import * as PIXI from "pixi.js";
+import { Filter, GlProgram, Texture, defaultFilterVert } from "pixi.js";
 
-const FRAG_PROGRAM = `
+const fragment = `
 precision mediump float;
 
 #define FILTER_SIZE 2
@@ -26,11 +26,11 @@ vec3 setContrast(in vec3 color, in float contrast) {
   return ((color - 0.5) * contrast) + 0.5;
 }
 
-vec3 makeSepia(in vec3 color, in float strength) { 
+vec3 makeSepia(in vec3 color, in float strength) {
   vec3 sepia;
 
   sepia.r = dot(color, vec3(0.393, 0.769, 0.189));
-  sepia.g = dot(color, vec3(0.349, 0.686, 0.168));   
+  sepia.g = dot(color, vec3(0.349, 0.686, 0.168));
   sepia.b = dot(color, vec3(0.272, 0.534, 0.131));
 
   vec3 diff = (color - sepia) * strength;
@@ -44,7 +44,7 @@ void main() {
 
   if (mask.r < 0.5) {
     vec3 outColor = makeSepia(color.rgb, 0.6);
-    // outColor = setContrast(outColor, 0.4); 
+    // outColor = setContrast(outColor, 0.4);
     outColor = blendNormal(outColor, vec3(0.0, 0.0, 0.0), 0.5);
     gl_FragColor = vec4(outColor, color.a);
   } else {
@@ -52,10 +52,16 @@ void main() {
   }
 }`;
 
-export class FogOfWarFilter extends PIXI.Filter {
-  constructor(mask: PIXI.Texture) {
-    super(undefined, FRAG_PROGRAM, {
-      maskSampler: mask,
+export class FogOfWarFilter extends Filter {
+  constructor(mask: Texture) {
+    super({
+      glProgram: new GlProgram({
+        fragment,
+        vertex: defaultFilterVert,
+      }),
+      resources: {
+        maskSampler: mask,
+      },
     });
   }
 }

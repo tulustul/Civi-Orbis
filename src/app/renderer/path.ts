@@ -1,18 +1,23 @@
-import * as PIXI from "pixi.js";
-
 import { getTileCenter } from "./utils";
 import { MapUi } from "../ui/map-ui";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
 import { Tile } from "../api/tile.interface";
+import {
+  CanvasTextMetrics,
+  Container,
+  Graphics,
+  Text,
+  TextStyle,
+} from "pixi.js";
 
 export class PathRenderer {
-  pathGraphics = new PIXI.Graphics();
+  pathGraphics = new Graphics();
 
-  labels: PIXI.Text[] = [];
+  labels: Text[] = [];
 
   constructor(
-    private container: PIXI.Container,
+    private container: Container,
     private game: GameApi,
     private camera: Camera,
     private mapUi: MapUi,
@@ -44,7 +49,7 @@ export class PathRenderer {
 
     g.visible = true;
 
-    g.lineStyle(0.1, 0xff0000);
+    g.setStrokeStyle({ width: 0.1, color: 0xff0000 });
     g.moveTo(...getTileCenter(unit.tile));
     for (const turn of path) {
       for (const tile of turn) {
@@ -55,18 +60,18 @@ export class PathRenderer {
     for (let turn = 0; turn < path.length; turn++) {
       if (path[turn][0]) {
         const scale = this.camera.transform.scale;
-        const label = new PIXI.Text(turn.toString(), {
+        const style = new TextStyle({
           align: "center",
           fill: "white",
-          dropShadow: true,
-          dropShadowBlur: 5,
-          dropShadowDistance: 0,
+          dropShadow: { blur: 5 },
           fontSize: scale * 0.7,
-        } as PIXI.TextStyle);
+        });
+        const label = new Text({ text: turn.toString(), style });
+
         label.scale.set(1 / scale, 1 / scale);
         this.container.addChild(label);
         this.labels.push(label);
-        const metrics = PIXI.TextMetrics.measureText(
+        const metrics = CanvasTextMetrics.measureText(
           turn.toString(),
           label.style,
         );

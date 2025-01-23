@@ -13,10 +13,11 @@ import { NextTurnService } from "../next-turn.service";
 import { GameApi } from "src/app/api";
 
 @Component({
-  selector: "app-next-turn-button",
-  templateUrl: "./next-turn-button.component.html",
-  styleUrls: ["./next-turn-button.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-next-turn-button",
+    templateUrl: "./next-turn-button.component.html",
+    styleUrls: ["./next-turn-button.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class NextTurnButtonComponent implements OnInit, OnDestroy {
   ngUnsubscribe = new Subject<void>();

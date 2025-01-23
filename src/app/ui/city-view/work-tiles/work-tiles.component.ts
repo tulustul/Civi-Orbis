@@ -17,10 +17,11 @@ import { CityDetails } from "src/app/api/city-details";
 import { Tile } from "src/app/api/tile.interface";
 
 @Component({
-  selector: "app-work-tiles",
-  templateUrl: "./work-tiles.component.html",
-  styleUrls: ["./work-tiles.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-work-tiles",
+    templateUrl: "./work-tiles.component.html",
+    styleUrls: ["./work-tiles.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class WorkTilesComponent implements OnInit, OnDestroy {
   @Input() city: CityDetails;

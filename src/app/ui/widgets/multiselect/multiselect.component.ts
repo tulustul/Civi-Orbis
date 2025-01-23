@@ -3,9 +3,10 @@ import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { Option } from "../option.interface";
 
 @Component({
-  selector: "app-multiselect",
-  templateUrl: "./multiselect.component.html",
-  styleUrls: ["./multiselect.component.scss"],
+    selector: "app-multiselect",
+    templateUrl: "./multiselect.component.html",
+    styleUrls: ["./multiselect.component.scss"],
+    standalone: false
 })
 export class MultiselectComponent {
   @Input() options: Option[];

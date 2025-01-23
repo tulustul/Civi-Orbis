@@ -3,9 +3,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { listSaveGames, deleteSaveGame, exportSave } from "../../../api/saving";
 
 @Component({
-  selector: "app-saves-list",
-  templateUrl: "./saves-list.component.html",
-  styleUrls: ["./saves-list.component.scss"],
+    selector: "app-saves-list",
+    templateUrl: "./saves-list.component.html",
+    styleUrls: ["./saves-list.component.scss"],
+    standalone: false
 })
 export class SavesListComponent implements OnInit {
   @Input() selectedSave: string;

@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js";
+import { Geometry, Shader, ShaderFromResources } from "pixi.js";
 
 import { SeaLevel } from "src/app/shared";
 import { GameState } from "src/app/api/state";
@@ -6,10 +6,11 @@ import { TileContainer } from "./tile-container";
 import { HEX_GEOMETRY } from "./utils";
 import { Tile } from "../api/tile.interface";
 import { programs as areaPrograms } from "./shaders/area-shaders";
+import { Mesh, Texture } from "pixi.js";
 
 export interface AreaPrograms {
-  background: PIXI.Program;
-  border: PIXI.Program;
+  background: ShaderFromResources;
+  border: ShaderFromResources;
 }
 
 export interface AreaOptions {
@@ -50,9 +51,9 @@ const RIGHT_SIDE_TRIANGLES: number[][] = [
   [0.5, 0.5, 0, 0.25, 0.25, 0.125],
 ];
 
-const borderGeometries = new Map<string, PIXI.Geometry>();
+const borderGeometries = new Map<string, Geometry>();
 
-function makeBorderGeometry(borders: string): PIXI.Geometry {
+function makeBorderGeometry(borders: string): Geometry {
   const vertices: number[] = [];
   const uvs: number[] = [];
 
@@ -80,9 +81,12 @@ function makeBorderGeometry(borders: string): PIXI.Geometry {
       }
     }
   }
-  return new PIXI.Geometry()
-    .addAttribute("aVertexPosition", vertices, 2)
-    .addAttribute("aUvs", uvs, 1);
+  return new Geometry({
+    attributes: {
+      aVertexPosition: { buffer: vertices, format: "float32" },
+      aUvs: { buffer: uvs, format: "float32" },
+    },
+  });
 }
 
 export class Area {
@@ -92,7 +96,10 @@ export class Area {
 
   drawer: AreaDrawer;
 
-  constructor(state: GameState, private options: AreaOptions) {
+  constructor(
+    state: GameState,
+    private options: AreaOptions,
+  ) {
     this.drawer = new AreaDrawer(this, state, options);
   }
 
@@ -180,13 +187,13 @@ export class Area {
 }
 
 class AreaDrawer {
-  borderShader: PIXI.MeshMaterial;
+  borderShader: Shader;
 
-  backgroundShader: PIXI.MeshMaterial;
+  backgroundShader: Shader;
 
-  bordersMap = new Map<Tile, PIXI.Mesh>();
+  bordersMap = new Map<Tile, Mesh>();
 
-  backgroundMap = new Map<Tile, PIXI.Mesh>();
+  backgroundMap = new Map<Tile, Mesh>();
 
   vec4Color: number[];
 
@@ -206,11 +213,9 @@ class AreaDrawer {
       1,
     ];
 
-    const emptyTexture = new PIXI.Texture(new PIXI.BaseTexture());
-
-    this.borderShader = new PIXI.MeshMaterial(emptyTexture, {
-      program: programs.border,
-      uniforms: {
+    this.borderShader = Shader.from({
+      ...programs.border,
+      resources: {
         color: this.vec4Color,
         borderSize: this.options.borderSize,
         borderShadow: this.options.borderShadow,
@@ -218,9 +223,9 @@ class AreaDrawer {
       },
     });
 
-    this.backgroundShader = new PIXI.MeshMaterial(emptyTexture, {
-      program: programs.background,
-      uniforms: {
+    this.backgroundShader = Shader.from({
+      ...programs.background,
+      resources: {
         color: this.vec4Color,
         opacity: this.options.backgroundOpacity,
       },
@@ -242,7 +247,10 @@ class AreaDrawer {
       return;
     }
 
-    const mesh = new PIXI.Mesh(HEX_GEOMETRY, this.backgroundShader);
+    const mesh = new Mesh({
+      geometry: HEX_GEOMETRY,
+      shader: this.backgroundShader,
+    });
     mesh.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     mesh.position.y = tile.y * 0.75;
 
@@ -279,7 +287,7 @@ class AreaDrawer {
       borderGeometries.set(borders, geometry);
     }
 
-    const mesh = new PIXI.Mesh(geometry, this.borderShader);
+    const mesh = new Mesh(geometry, this.borderShader);
 
     mesh.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     mesh.position.y = tile.y * 0.75;

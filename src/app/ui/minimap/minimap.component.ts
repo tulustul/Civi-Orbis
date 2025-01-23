@@ -14,9 +14,10 @@ import { Camera } from "src/app/renderer/camera";
 import { GameApi } from "src/app/api";
 
 @Component({
-  selector: "app-minimap",
-  templateUrl: "./minimap.component.html",
-  styleUrls: ["./minimap.component.scss"],
+    selector: "app-minimap",
+    templateUrl: "./minimap.component.html",
+    styleUrls: ["./minimap.component.scss"],
+    standalone: false
 })
 export class MinimapComponent implements AfterViewInit, OnDestroy {
   app: PIXIE.Application | null = null;

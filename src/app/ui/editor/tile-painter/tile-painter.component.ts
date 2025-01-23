@@ -39,9 +39,10 @@ interface PaintData {
 }
 
 @Component({
-  selector: "app-tile-painter",
-  templateUrl: "./tile-painter.component.html",
-  styleUrls: ["./tile-painter.component.scss"],
+    selector: "app-tile-painter",
+    templateUrl: "./tile-painter.component.html",
+    styleUrls: ["./tile-painter.component.scss"],
+    standalone: false
 })
 export class TilePainterComponent implements OnInit {
   SIZE_OPTIONS: Option[] = [

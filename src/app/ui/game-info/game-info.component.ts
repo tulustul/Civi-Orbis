@@ -4,9 +4,10 @@ import { UIState } from "../ui-state";
 import { GameApi } from "src/app/api";
 
 @Component({
-  selector: "app-game-info",
-  templateUrl: "./game-info.component.html",
-  styleUrls: ["./game-info.component.scss"],
+    selector: "app-game-info",
+    templateUrl: "./game-info.component.html",
+    styleUrls: ["./game-info.component.scss"],
+    standalone: false
 })
 export class GameInfoComponent implements OnInit {
   debugModalVisible = false;

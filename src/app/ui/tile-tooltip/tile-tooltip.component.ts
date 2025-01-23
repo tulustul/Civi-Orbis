@@ -5,9 +5,10 @@ import { TileDetails } from "src/app/api/tile-details";
 import { MapUi } from "../map-ui";
 
 @Component({
-  selector: "app-tile-tooltip",
-  templateUrl: "./tile-tooltip.component.html",
-  styleUrls: ["./tile-tooltip.component.scss"],
+    selector: "app-tile-tooltip",
+    templateUrl: "./tile-tooltip.component.html",
+    styleUrls: ["./tile-tooltip.component.scss"],
+    standalone: false
 })
 export class TileTooltipComponent implements OnInit {
   tileDetailsVisible$ = this.mapUi.hoveredTile$.pipe(debounceTime(1200));

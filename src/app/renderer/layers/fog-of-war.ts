@@ -1,5 +1,3 @@
-import * as PIXI from "pixi.js";
-
 import { Tile } from "../../api/tile.interface";
 import { GameApi } from "src/app/api";
 import { takeUntil } from "rxjs/operators";
@@ -8,6 +6,7 @@ import { Camera } from "../camera";
 import { drawTileSprite } from "../utils";
 import { GameRenderer } from "../renderer";
 import { GameState } from "src/app/api/state";
+import { Container, Sprite } from "pixi.js";
 
 export class FogOfWarDrawer {
   // TODO do we need this wrapper?
@@ -15,12 +14,12 @@ export class FogOfWarDrawer {
 
   tilesContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  private renderedTiles = new Map<Tile, PIXI.Sprite>();
+  private renderedTiles = new Map<Tile, Sprite>();
 
   private texture = this.renderer.textures["hexMask.png"];
 
   constructor(
-    private container: PIXI.Container,
+    private container: Container,
     private game: GameApi,
     private renderer: GameRenderer,
     private camera: Camera,

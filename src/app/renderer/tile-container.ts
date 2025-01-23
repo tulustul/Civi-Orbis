@@ -1,11 +1,10 @@
-import * as PIXI from "pixi.js";
-
 import { BoundingBox } from "./camera";
 import { TilesMap } from "../api/map";
 import { Tile } from "../api/tile.interface";
+import { Container } from "pixi.js";
 
-export class TileWrapperContainer extends PIXI.Container {
-  tilesMap = new Map<Tile, PIXI.DisplayObject[]>();
+export class TileWrapperContainer extends Container {
+  tilesMap = new Map<Tile, Container[]>();
 
   bindToMap(map: TilesMap) {
     for (let x = 0; x < map.width; x++) {
@@ -16,25 +15,25 @@ export class TileWrapperContainer extends PIXI.Container {
   }
 }
 
-export class TileContainer extends PIXI.DisplayObject {
+export class TileContainer extends Container {
   parent: TileWrapperContainer;
 
   private map: TilesMap;
 
-  private grid: PIXI.DisplayObject[][][] = [];
-  childrenMap = new Map<PIXI.DisplayObject, Tile>();
+  private grid: Container[][][] = [];
+  childrenMap = new Map<Container, Tile>();
 
   // TODO can it be rewritten with tile ids? Map<number, ...>
-  private tilesMap = new Map<Tile, PIXI.DisplayObject[]>();
+  private tilesMap = new Map<Tile, Container[]>();
 
   // needed only for interactivity
-  children: PIXI.DisplayObject[] = [];
+  children: Container[] = [];
 
   constructor(private bBox: BoundingBox) {
     super();
   }
 
-  addChild<T extends PIXI.DisplayObject>(child: T, tile: Tile): void {
+  addChild<T extends Container>(child: T, tile: Tile): void {
     if (child.parent) {
       child.parent.removeChild(child);
     }
@@ -56,7 +55,7 @@ export class TileContainer extends PIXI.DisplayObject {
     child.emit("added", this);
   }
 
-  removeChild(child: PIXI.DisplayObject) {
+  removeChild(child: Container) {
     if (this.childrenMap.has(child)) {
       // remove from childrenMap
       const tile = this.childrenMap.get(child)!;
@@ -91,7 +90,7 @@ export class TileContainer extends PIXI.DisplayObject {
     }
   }
 
-  moveChild(child: PIXI.DisplayObject, tile: Tile) {
+  moveChild(child: Container, tile: Tile) {
     this.removeChild(child);
     this.addChild(child, tile);
   }
@@ -133,7 +132,7 @@ export class TileContainer extends PIXI.DisplayObject {
     }
   }
 
-  render(renderer: PIXI.Renderer) {
+  render(renderer: Renderer) {
     if (!this.visible || this.worldAlpha <= 0 || !this.renderable) {
       return;
     }

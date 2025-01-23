@@ -9,9 +9,10 @@ import { MapUi } from "../../map-ui";
 import { City } from "src/app/api/city";
 
 @Component({
-  selector: "app-city-editor",
-  templateUrl: "./city-editor.component.html",
-  styleUrls: ["./city-editor.component.scss"],
+    selector: "app-city-editor",
+    templateUrl: "./city-editor.component.html",
+    styleUrls: ["./city-editor.component.scss"],
+    standalone: false
 })
 export class CityEditorComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;

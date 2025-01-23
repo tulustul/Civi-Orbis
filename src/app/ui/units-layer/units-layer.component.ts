@@ -19,10 +19,11 @@ import { TILE_SIZE } from "src/app/renderer/constants";
 import { UnitsLayerService } from "./units-layer.service";
 
 @Component({
-  selector: "app-units-layer",
-  templateUrl: "./units-layer.component.html",
-  styleUrls: ["./units-layer.component.scss"],
-  providers: [UnitsLayerService],
+    selector: "app-units-layer",
+    templateUrl: "./units-layer.component.html",
+    styleUrls: ["./units-layer.component.scss"],
+    providers: [UnitsLayerService],
+    standalone: false
 })
 export class UnitsLayerComponent implements OnInit, AfterViewInit {
   ngUnsubscribe = new Subject<void>();

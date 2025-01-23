@@ -4,9 +4,10 @@ import { UIState } from "../ui-state";
 import { MapUi } from "../map-ui";
 
 @Component({
-  selector: "app-editor",
-  templateUrl: "./editor.component.html",
-  styleUrls: ["./editor.component.scss"],
+    selector: "app-editor",
+    templateUrl: "./editor.component.html",
+    styleUrls: ["./editor.component.scss"],
+    standalone: false
 })
 export class EditorComponent implements OnInit, OnDestroy {
   constructor(private uiState: UIState, private mapUi: MapUi) {}

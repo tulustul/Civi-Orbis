@@ -12,9 +12,10 @@ import { MapUi } from "../../map-ui";
 import { GameApi } from "src/app/api";
 
 @Component({
-  selector: "app-units-stack",
-  templateUrl: "./units-stack.component.html",
-  styleUrls: ["./units-stack.component.scss"],
+    selector: "app-units-stack",
+    templateUrl: "./units-stack.component.html",
+    styleUrls: ["./units-stack.component.scss"],
+    standalone: false
 })
 export class UnitsStackComponent implements OnInit {
   @Input() tile: Tile;

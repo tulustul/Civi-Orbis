@@ -24,10 +24,11 @@ import { UiView } from "../ui-view";
 import { UIState } from "../ui-state";
 
 @Component({
-  selector: "app-city-view",
-  templateUrl: "./city-view.component.html",
-  styleUrls: ["./city-view.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-city-view",
+    templateUrl: "./city-view.component.html",
+    styleUrls: ["./city-view.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CityViewComponent implements OnInit, OnDestroy, UiView {
   @ViewChild("workTiles") workTilesComponent: WorkTilesComponent;

@@ -5,9 +5,10 @@ import { saveGameData } from "src/app/api/saving";
 import { GameApi } from "src/app/api";
 
 @Component({
-  selector: "app-save-view",
-  templateUrl: "./save-view.component.html",
-  styleUrls: ["./save-view.component.scss"],
+    selector: "app-save-view",
+    templateUrl: "./save-view.component.html",
+    styleUrls: ["./save-view.component.scss"],
+    standalone: false
 })
 export class SaveViewComponent {
   @Output() return = new EventEmitter<void>();

@@ -16,10 +16,11 @@ import { MapUi } from "../map-ui";
 import { UnitsLayerService } from "../units-layer/units-layer.service";
 
 @Component({
-  selector: "app-unit",
-  templateUrl: "./unit.component.html",
-  styleUrls: ["./unit.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-unit",
+    templateUrl: "./unit.component.html",
+    styleUrls: ["./unit.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   @Input() unit: Unit;

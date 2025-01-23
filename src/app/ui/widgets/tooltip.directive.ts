@@ -16,7 +16,8 @@ import { ComponentPortal } from "@angular/cdk/portal";
 import { TooltipComponent } from "./tooltip/tooltip.component";
 
 @Directive({
-  selector: "[appTooltip]",
+    selector: "[appTooltip]",
+    standalone: false
 })
 export class TooltipDirective implements OnDestroy {
   overlayRef: OverlayRef | null = null;

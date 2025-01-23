@@ -5,9 +5,10 @@ import { UIState } from "../../ui-state";
 import { GameApi } from "src/app/api";
 
 @Component({
-  selector: "app-main-menu-view",
-  templateUrl: "./main-menu-view.component.html",
-  styleUrls: ["./main-menu-view.component.scss"],
+    selector: "app-main-menu-view",
+    templateUrl: "./main-menu-view.component.html",
+    styleUrls: ["./main-menu-view.component.scss"],
+    standalone: false
 })
 export class MainMenuViewComponent {
   @Output() change = new EventEmitter<MenuView>();

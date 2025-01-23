@@ -14,10 +14,11 @@ import {
 import { UnitDetails } from "src/app/api/unit-details";
 
 @Component({
-  selector: "app-unit-action-requirements",
-  templateUrl: "./unit-action-requirements.component.html",
-  styleUrls: ["./unit-action-requirements.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-unit-action-requirements",
+    templateUrl: "./unit-action-requirements.component.html",
+    styleUrls: ["./unit-action-requirements.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class UnitActionRequirementsComponent implements OnInit {
   @Input() unit: UnitDetails;

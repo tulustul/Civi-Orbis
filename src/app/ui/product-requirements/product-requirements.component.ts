@@ -14,10 +14,11 @@ import { getBuildingById } from "src/app/core/data-manager";
 import { CityDetails } from "src/app/api/city-details";
 
 @Component({
-  selector: "app-product-requirements",
-  templateUrl: "./product-requirements.component.html",
-  styleUrls: ["./product-requirements.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-product-requirements",
+    templateUrl: "./product-requirements.component.html",
+    styleUrls: ["./product-requirements.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ProductRequirementsComponent implements OnInit, AfterViewInit {
   @Input() product: ProductDefinition;

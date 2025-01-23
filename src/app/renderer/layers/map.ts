@@ -1,5 +1,3 @@
-import * as PIXI from "pixi.js";
-
 import { takeUntil } from "rxjs/operators";
 
 import { TileWrapperContainer, TileContainer } from "../tile-container";
@@ -15,6 +13,7 @@ import { GameState } from "../../api/state";
 import { TrackedPlayer } from "../../api/tracked-player";
 import { PoliticsDrawer } from "../politics";
 import { Tile } from "../../api/tile.interface";
+import { Container } from "pixi.js";
 
 export class MapDrawer {
   wrapperContainer = new TileWrapperContainer();
@@ -23,9 +22,9 @@ export class MapDrawer {
 
   areasContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  overlaysContainer = new PIXI.Container();
+  overlaysContainer = new Container();
 
-  tileContainers = new Map<Tile, PIXI.Container>();
+  tileContainers = new Map<Tile, Container>();
 
   terrainDrawer: TerrainDrawer;
 
@@ -40,7 +39,7 @@ export class MapDrawer {
   politicsDrawer: PoliticsDrawer;
 
   constructor(
-    private container: PIXI.Container,
+    private container: Container,
     private game: GameApi,
     private renderer: GameRenderer,
     private camera: Camera,
@@ -143,7 +142,7 @@ export class MapDrawer {
     for (let x = 0; x < gameState.map.width; x++) {
       for (let y = 0; y < gameState.map.height; y++) {
         const tile = gameState.map.tiles[x][y];
-        const container = new PIXI.Container();
+        const container = new Container();
         this.tileContainers.set(tile, container);
         this.tilesContainer.addChild(container, tile);
         this.drawTile(tile, container);
@@ -167,7 +166,7 @@ export class MapDrawer {
     }
   }
 
-  private drawTile(tile: Tile, container: PIXI.Container) {
+  private drawTile(tile: Tile, container: Container) {
     this.terrainDrawer.drawTile(tile, container);
     this.riverDrawer.drawTile(tile, container);
     this.yieldsDrawer.drawTile(tile, container);

@@ -10,10 +10,11 @@ import { Unit } from "src/app/api/unit";
 import { CombatSimulation } from "src/app/core/combat";
 
 @Component({
-  selector: "app-combat-info",
-  templateUrl: "./combat-info.component.html",
-  styleUrls: ["./combat-info.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-combat-info",
+    templateUrl: "./combat-info.component.html",
+    styleUrls: ["./combat-info.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CombatInfoComponent implements OnInit {
   @Input() attacker: UnitDetails;

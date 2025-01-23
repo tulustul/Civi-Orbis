@@ -1,22 +1,21 @@
-import * as PIXI from "pixi.js";
-
 import { TileDirection } from "src/app/shared";
 import { Tile } from "src/app/api/tile.interface";
+import { Container, Graphics } from "pixi.js";
 
 export class RiverDrawer {
-  public drawTile(tile: Tile, container: PIXI.Container) {
+  public drawTile(tile: Tile, container: Container) {
     if (!tile.riverParts.length) {
       return;
     }
 
     // TODO avoid rendering the same river twice.
 
-    const g = new PIXI.Graphics();
+    const g = new Graphics();
     g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     g.position.y = tile.y * 0.75;
     container.addChild(g);
 
-    g.lineStyle(0.15, 0x4169e1);
+    g.setStrokeStyle({ width: 0.15, color: 0x4169e1 });
 
     for (const river of tile.riverParts) {
       if (river === TileDirection.NW) {

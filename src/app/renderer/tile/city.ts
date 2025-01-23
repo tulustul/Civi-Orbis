@@ -1,18 +1,17 @@
-import * as PIXI from "pixi.js";
-
 import { getTileVariants, pickRandom, drawTileSprite } from "../utils";
 import { GameRenderer } from "../renderer";
 import { City } from "src/app/api/city";
+import { Container, Sprite } from "pixi.js";
 
 const SMALL_CITY_TEXTURES = getTileVariants("villageSmall", 4);
 const BIG_CITY_TEXTURES = getTileVariants("village", 4);
 
 export class CityDrawer {
-  citiesGraphics = new Map<City, PIXI.Sprite>();
+  citiesGraphics = new Map<City, Sprite>();
 
   constructor(private renderer: GameRenderer) {}
 
-  draw(city: City, container: PIXI.Container) {
+  draw(city: City, container: Container) {
     const variants = city.size >= 10 ? BIG_CITY_TEXTURES : SMALL_CITY_TEXTURES;
     const textureName = pickRandom(variants);
     const g = drawTileSprite(city.tile, this.textures[textureName]);
@@ -27,7 +26,7 @@ export class CityDrawer {
     g.destroy();
   }
 
-  update(city: City, container: PIXI.Container) {
+  update(city: City, container: Container) {
     this.destroy(city);
     this.draw(city, container);
   }

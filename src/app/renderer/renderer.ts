@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js";
+import { Loader, Container, Application } from "pixi.js";
 
 import { Injectable } from "@angular/core";
 
@@ -18,7 +18,7 @@ import { TileContainer, TileWrapperContainer } from "./tile-container";
 
 @Injectable()
 export class GameRenderer {
-  app: PIXI.Application;
+  app: Application;
 
   canvas: HTMLCanvasElement;
 
@@ -34,13 +34,13 @@ export class GameRenderer {
 
   fogOfWarLayer: Layer;
 
-  overlaysContainer = new PIXI.Container();
+  overlaysContainer = new Container();
 
-  loader = new PIXI.Loader();
+  loader = new Loader();
 
   atlas = this.loader.add("assets/atlas.json").load(() => this.onLoad());
 
-  textures: PIXI.ITextureDictionary;
+  textures: ITextureDictionary;
 
   _loading$ = new BehaviorSubject<boolean>(true);
   loading$ = this._loading$.asObservable();
@@ -59,10 +59,11 @@ export class GameRenderer {
     this.game.stop$.subscribe(() => this.clear());
   }
 
-  setCanvas(canvas: HTMLCanvasElement) {
+  async setCanvas(canvas: HTMLCanvasElement) {
     const [width, height] = [window.innerWidth, window.innerHeight];
 
-    this.app = new PIXI.Application({ view: canvas, width, height });
+    this.app = new Application();
+    await this.app.init({ view: canvas, width, height });
 
     this.canvas = canvas;
 
@@ -153,15 +154,30 @@ export class GameRenderer {
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
 
       // this.mapDrawer.unitsDrawer.container.setTransform(x, y, t.scale, t.scale);
-      this.overlaysContainer.setTransform(x, y, t.scale, t.scale);
-      this.mapLayer.stage.setTransform(x, y, t.scale, t.scale);
-      this.fogOfWarLayer.stage.setTransform(x, y, t.scale, t.scale);
+      this.overlaysContainer.updateTransform({
+        x,
+        y,
+        scaleX: t.scale,
+        scaleY: t.scale,
+      });
+      this.mapLayer.stage.updateTransform({
+        x,
+        y,
+        scaleX: t.scale,
+        scaleY: t.scale,
+      });
+      this.fogOfWarLayer.stage.updateTransform({
+        x,
+        y,
+        scaleX: t.scale,
+        scaleY: t.scale,
+      });
     });
   }
 
   onLoad() {
     const atlas = this.atlas.resources["assets/atlas.json"];
-    atlas.spritesheet!.baseTexture.mipmap = PIXI.MIPMAP_MODES.POW2;
+    atlas.spritesheet!.baseTexture.mipmap = MIPMAP_MODES.POW2;
     this.textures = atlas.textures!;
     if (this.canvas) {
       this.onReady();

@@ -4,9 +4,10 @@ import { MenuView } from "./menu-view";
 import { UIState } from "../ui-state";
 
 @Component({
-  selector: "app-game-menu",
-  templateUrl: "./game-menu.component.html",
-  styleUrls: ["./game-menu.component.scss"],
+    selector: "app-game-menu",
+    templateUrl: "./game-menu.component.html",
+    styleUrls: ["./game-menu.component.scss"],
+    standalone: false
 })
 export class GameMenuComponent implements OnInit {
   view: MenuView = "main-menu-view";

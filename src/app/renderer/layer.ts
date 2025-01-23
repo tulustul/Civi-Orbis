@@ -1,14 +1,14 @@
-import * as PIXI from "pixi.js";
+import { Application, Container, RenderTexture, Sprite } from "pixi.js";
 
 export class Layer {
-  texture: PIXI.RenderTexture;
+  texture: RenderTexture;
 
-  sprite = new PIXI.Sprite();
+  sprite = new Sprite();
 
-  stage = new PIXI.Container();
+  stage = new Container();
 
-  constructor(private app: PIXI.Application) {
-    this.texture = PIXI.RenderTexture.create({
+  constructor(private app: Application) {
+    this.texture = RenderTexture.create({
       width: app.renderer.width,
       height: app.renderer.height,
     });
@@ -22,7 +22,7 @@ export class Layer {
   }
 
   resize(width: number, height: number) {
-    const newTexture = PIXI.RenderTexture.create({ width, height });
+    const newTexture = RenderTexture.create({ width, height });
 
     this.sprite.texture = newTexture;
     this.sprite.width = width;

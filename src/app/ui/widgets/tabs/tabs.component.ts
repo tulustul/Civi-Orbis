@@ -8,9 +8,10 @@ import {
 import { TabComponent } from "./tab/tab.component";
 
 @Component({
-  selector: "app-tabs",
-  templateUrl: "./tabs.component.html",
-  styleUrls: ["./tabs.component.scss"],
+    selector: "app-tabs",
+    templateUrl: "./tabs.component.html",
+    styleUrls: ["./tabs.component.scss"],
+    standalone: false
 })
 export class TabsComponent implements AfterContentInit {
   @ContentChildren(TabComponent) tabs: QueryList<TabComponent>;

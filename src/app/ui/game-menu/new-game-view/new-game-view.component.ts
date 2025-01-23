@@ -6,9 +6,10 @@ import { Camera } from "src/app/renderer/camera";
 import { UIState } from "../../ui-state";
 
 @Component({
-  selector: "app-new-game-view",
-  templateUrl: "./new-game-view.component.html",
-  styleUrls: ["./new-game-view.component.scss"],
+    selector: "app-new-game-view",
+    templateUrl: "./new-game-view.component.html",
+    styleUrls: ["./new-game-view.component.scss"],
+    standalone: false
 })
 export class NewGameViewComponent implements OnInit {
   @Output() return = new EventEmitter<void>();

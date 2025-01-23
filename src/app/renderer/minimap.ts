@@ -1,4 +1,10 @@
-import * as PIXI from "pixi.js";
+import {
+  Graphics,
+  Container,
+  Sprite,
+  Application,
+  RenderTexture,
+} from "pixi.js";
 
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -33,19 +39,19 @@ export class MinimapRenderer {
   height = 0;
   scale = 1;
 
-  public container = new PIXI.Container();
+  public container = new Container();
 
-  private mapScene = new PIXI.Container();
+  private mapScene = new Container();
 
-  private cameraGraphics = new PIXI.Graphics();
+  private cameraGraphics = new Graphics();
 
-  private mapSprite = new PIXI.Sprite();
+  private mapSprite = new Sprite();
 
-  private mapTexture: PIXI.RenderTexture;
+  private mapTexture: RenderTexture;
 
-  private tilesMap = new Map<Tile, PIXI.DisplayObject[]>();
+  private tilesMap = new Map<Tile, DisplayObject[]>();
 
-  private app: PIXI.Application;
+  private app: Application;
 
   private destroyed$ = new Subject<void>();
 
@@ -103,14 +109,14 @@ export class MinimapRenderer {
     this.height *= 0.75;
   }
 
-  create(app: PIXI.Application) {
+  create(app: Application) {
     if (!this.game.state) {
       return;
     }
 
     this.app = app;
 
-    this.mapTexture = PIXI.RenderTexture.create({
+    this.mapTexture = RenderTexture.create({
       width: this.width,
       height: this.height,
     });
@@ -170,8 +176,8 @@ export class MinimapRenderer {
 
     this.cameraGraphics.clear();
 
-    this.cameraGraphics.lineStyle(1, 0xffffff);
-    this.cameraGraphics.drawRect(
+    this.cameraGraphics.setStrokeStyle({ width: 1, color: 0xffffff });
+    this.cameraGraphics.rect(
       xStart,
       yStart,
       width * this.scale,
@@ -211,7 +217,7 @@ export class MinimapRenderer {
       color = CLIMATE_COLORS[tile.climate];
     }
 
-    const g = new PIXI.Graphics();
+    const g = new Graphics();
     g.beginFill(color);
     drawHex(g);
     g.endFill();
@@ -231,7 +237,7 @@ export class MinimapRenderer {
     }
   }
 
-  private renderRivers(tile: Tile, graphics: PIXI.Graphics) {
+  private renderRivers(tile: Tile, graphics: Graphics) {
     if (!tile.riverParts.length) {
       return;
     }

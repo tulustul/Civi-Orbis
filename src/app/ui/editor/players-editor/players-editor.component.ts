@@ -9,10 +9,11 @@ import { GameApi } from "src/app/api";
 import { Player } from "src/app/api/player";
 
 @Component({
-  selector: "app-players-editor",
-  templateUrl: "./players-editor.component.html",
-  styleUrls: ["./players-editor.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-players-editor",
+    templateUrl: "./players-editor.component.html",
+    styleUrls: ["./players-editor.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class PlayersEditorComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private game: GameApi) {}

@@ -18,10 +18,11 @@ import { CityInfoComponent } from "./city-info/city-info.component";
 import { getTileCoords } from "src/app/renderer/utils";
 
 @Component({
-  selector: "app-cities-layer",
-  templateUrl: "./cities-layer.component.html",
-  styleUrls: ["./cities-layer.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-cities-layer",
+    templateUrl: "./cities-layer.component.html",
+    styleUrls: ["./cities-layer.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CitiesLayerComponent implements OnInit, AfterViewInit {
   ngUnsubscribe = new Subject<void>();

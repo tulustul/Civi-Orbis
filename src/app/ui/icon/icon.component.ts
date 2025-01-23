@@ -10,10 +10,11 @@ import {
 import * as atlasIcons from "../../../assets/atlas-icons.json";
 
 @Component({
-  selector: "app-icon",
-  templateUrl: "./icon.component.html",
-  styleUrls: ["./icon.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-icon",
+    templateUrl: "./icon.component.html",
+    styleUrls: ["./icon.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class IconComponent implements OnChanges {
   @HostBinding("class.tint")

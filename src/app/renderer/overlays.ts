@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js";
+import { Graphics } from "pixi.js";
 
 import { drawClosedHex, getTileCoords, drawHex } from "./utils";
 import { MapUi } from "../ui/map-ui";
@@ -8,20 +8,21 @@ import { Camera } from "./camera";
 import { GameState } from "../api/state";
 import { GameApi } from "../api";
 import { takeUntil } from "rxjs/operators";
+import { Container } from "pixi.js";
 
 export class OverlaysRenderer {
   wrapperContainer = new TileWrapperContainer();
 
   tilesContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  hoveredTileGraphics = new PIXI.Graphics();
+  hoveredTileGraphics = new Graphics();
 
-  selectedTileGraphics = new PIXI.Graphics();
+  selectedTileGraphics = new Graphics();
 
-  highlightedTilesGraphics = new PIXI.Graphics();
+  highlightedTilesGraphics = new Graphics();
 
   constructor(
-    private container: PIXI.Container,
+    private container: Container,
     private game: GameApi,
     private camera: Camera,
     mapUi: MapUi,
@@ -60,7 +61,7 @@ export class OverlaysRenderer {
     this.tilesContainer.bindToMap(state.map);
   }
 
-  private displayAtTile(obj: PIXI.DisplayObject, tile: Tile | null) {
+  private displayAtTile(obj: Container, tile: Tile | null) {
     if (tile) {
       const [x, y] = getTileCoords(tile);
       obj.position.x = x;
@@ -72,17 +73,23 @@ export class OverlaysRenderer {
   }
 
   buildHoveredTileGraphics() {
-    this.hoveredTileGraphics.lineStyle(0.02, 0xffffff, 0.5);
-    this.hoveredTileGraphics.beginFill(0xffffff, 0.1);
+    this.hoveredTileGraphics.setStrokeStyle({
+      width: 0.02,
+      color: 0xffffff,
+      alpha: 0.5,
+    });
     drawClosedHex(this.hoveredTileGraphics);
-    this.hoveredTileGraphics.endFill();
+    this.hoveredTileGraphics.fill({ color: 0xffffff22, alpha: 0.1 });
   }
 
   buildSelectedTileGraphics() {
-    this.selectedTileGraphics.lineStyle(0.05, 0xff0000, 0.5);
-    this.selectedTileGraphics.beginFill(0xffffff, 0.1);
+    this.selectedTileGraphics.setStrokeStyle({
+      width: 0.05,
+      color: 0xff0000,
+      alpha: 0.5,
+    });
     drawClosedHex(this.selectedTileGraphics);
-    this.selectedTileGraphics.endFill();
+    this.selectedTileGraphics.fill({ color: 0xffffff, alpha: 0.1 });
   }
 
   buildHighlightedTiles(tiles: Set<Tile>) {
@@ -96,9 +103,8 @@ export class OverlaysRenderer {
     for (const tile of tiles) {
       const [x, y] = getTileCoords(tile);
 
-      g.beginFill(0xffffff, 0.3);
       drawHex(g, x, y);
-      g.endFill();
+      g.fill({ color: 0xffffff, alpha: 0.3 });
     }
 
     this.container.addChild(g);

@@ -10,9 +10,10 @@ import { Controls } from "../controls";
 import { GameRenderer } from "../renderer/renderer";
 
 @Component({
-  selector: "app-game-canvas",
-  templateUrl: "./game-canvas.component.html",
-  styleUrls: ["./game-canvas.component.scss"],
+    selector: "app-game-canvas",
+    templateUrl: "./game-canvas.component.html",
+    styleUrls: ["./game-canvas.component.scss"],
+    standalone: false
 })
 export class GameCanvasComponent implements AfterViewInit {
   @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;

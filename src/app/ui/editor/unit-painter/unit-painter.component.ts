@@ -12,9 +12,10 @@ import { makeCommand } from "src/app/api/internal/commander";
 import { UNITS_DEFINITIONS } from "src/app/data/products/units";
 
 @Component({
-  selector: "app-unit-painter",
-  templateUrl: "./unit-painter.component.html",
-  styleUrls: ["./unit-painter.component.scss"],
+    selector: "app-unit-painter",
+    templateUrl: "./unit-painter.component.html",
+    styleUrls: ["./unit-painter.component.scss"],
+    standalone: false
 })
 export class UnitPainterComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;

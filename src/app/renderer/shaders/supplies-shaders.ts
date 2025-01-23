@@ -1,6 +1,6 @@
-import * as PIXI from "pixi.js";
+import { Shader, ShaderFromResources } from "pixi.js";
 
-const VS_BORDER_PROGRAM = `
+const VERTEX_BORDER = `
 precision mediump float;
 
 attribute vec2 aVertexPosition;
@@ -16,7 +16,7 @@ void main() {
   gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
 }`;
 
-const FRAG_BORDER_PROGRAM = `
+const FRAGMENT_BORDER = `
 precision mediump float;
 
 varying float vUvs;
@@ -38,7 +38,7 @@ void main() {
   gl_FragColor = vec4(c.r * a, c.g * a, c.b * a, a);
 }`;
 
-const VS_BACKGROUND_PROGRAM = `
+const VERTEX_BACKGROUND = `
 precision mediump float;
 
 attribute vec2 aVertexPosition;
@@ -50,7 +50,7 @@ void main() {
   gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
 }`;
 
-const FRAG_BACKGROUND_PROGRAM = `
+const FRAGMENT_BACKGROUND = `
 precision mediump float;
 
 uniform vec4 color;
@@ -61,10 +61,11 @@ void main() {
   gl_FragColor = vec4(color.r * opacity, color.g * opacity, color.b * opacity, opacity);
 }`;
 
-const border = PIXI.Program.from(VS_BORDER_PROGRAM, FRAG_BORDER_PROGRAM);
-const background = PIXI.Program.from(
-  VS_BACKGROUND_PROGRAM,
-  FRAG_BACKGROUND_PROGRAM,
-);
+const border: ShaderFromResources = {
+  gl: { vertex: VERTEX_BORDER, fragment: FRAGMENT_BORDER },
+};
+const background: ShaderFromResources = {
+  gl: { vertex: VERTEX_BACKGROUND, fragment: FRAGMENT_BACKGROUND },
+};
 
 export const programs = { border, background };

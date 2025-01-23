@@ -1,7 +1,8 @@
 import { Directive, HostListener, ElementRef } from "@angular/core";
 
 @Directive({
-  selector: "button",
+    selector: "button",
+    standalone: false
 })
 export class ButtonDirective {
   constructor(private elementRef: ElementRef<HTMLButtonElement>) {}

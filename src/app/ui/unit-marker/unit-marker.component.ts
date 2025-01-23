@@ -17,10 +17,11 @@ import { UnitDetails } from "src/app/api/unit-details";
 import { TILE_SIZE } from "src/app/renderer/constants";
 
 @Component({
-  selector: "app-unit-marker",
-  templateUrl: "./unit-marker.component.html",
-  styleUrls: ["./unit-marker.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-unit-marker",
+    templateUrl: "./unit-marker.component.html",
+    styleUrls: ["./unit-marker.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class UnitMarkerComponent implements OnInit, OnDestroy {
   @Input() unit: UnitDetails;

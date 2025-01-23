@@ -1,4 +1,3 @@
-import * as PIXI from "pixi.js";
 import {
   getTileVariants,
   drawTileSprite,
@@ -10,6 +9,7 @@ import { TileImprovement } from "src/app/core/tile-improvements";
 import { SeaLevel, Climate, LandForm } from "src/app/shared";
 import { GameApi } from "src/app/api";
 import { Tile } from "src/app/api/tile.interface";
+import { Container, Sprite } from "pixi.js";
 
 const SEA_TEXTURES: Record<SeaLevel, string[]> = {
   [SeaLevel.deep]: getTileVariants("hexOcean", 4),
@@ -74,9 +74,12 @@ const MINE_TEXTURES = getTileVariants("mines", 5);
 const SAWMILL_TEXTURES = getTileVariants("forester_hut", 4);
 
 export class TerrainDrawer {
-  constructor(private renderer: GameRenderer, game: GameApi) {}
+  constructor(
+    private renderer: GameRenderer,
+    game: GameApi,
+  ) {}
 
-  public drawTile(tile: Tile, container: PIXI.Container) {
+  public drawTile(tile: Tile, container: Container) {
     let variants: string[];
 
     if (tile.wetlands) {
@@ -111,8 +114,8 @@ export class TerrainDrawer {
     this.drawResource(tile, container);
   }
 
-  private drawImprovement(tile: Tile, container: PIXI.Container) {
-    let sprite: PIXI.Sprite | null = null;
+  private drawImprovement(tile: Tile, container: Container) {
+    let sprite: Sprite | null = null;
     if (tile.improvement === TileImprovement.farm) {
       const textureName = pickRandom(FARM_TEXTURES);
       sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
@@ -130,7 +133,7 @@ export class TerrainDrawer {
     return sprite;
   }
 
-  private drawResource(tile: Tile, container: PIXI.Container) {
+  private drawResource(tile: Tile, container: Container) {
     if (!tile.resource) {
       return;
     }
@@ -141,7 +144,7 @@ export class TerrainDrawer {
     container.addChild(sprite);
   }
 
-  private drawRoads(tile: Tile, container: PIXI.Container) {
+  private drawRoads(tile: Tile, container: Container) {
     if (tile.road === null) {
       return null;
     }

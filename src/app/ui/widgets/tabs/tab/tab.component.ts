@@ -10,9 +10,10 @@ import { BehaviorSubject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 
 @Component({
-  selector: "app-tab",
-  templateUrl: "./tab.component.html",
-  styleUrls: ["./tab.component.scss"],
+    selector: "app-tab",
+    templateUrl: "./tab.component.html",
+    styleUrls: ["./tab.component.scss"],
+    standalone: false
 })
 export class TabComponent implements OnDestroy {
   @Input() tabTitle: string;

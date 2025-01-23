@@ -16,10 +16,11 @@ import { MapUi } from "../map-ui";
 import { UnitComponent } from "../unit/unit.component";
 
 @Component({
-  selector: "app-tile-units",
-  templateUrl: "./tile-units.component.html",
-  styleUrls: ["./tile-units.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-tile-units",
+    templateUrl: "./tile-units.component.html",
+    styleUrls: ["./tile-units.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TileUnitsComponent implements OnInit, OnDestroy {
   @Input() tile: Tile;

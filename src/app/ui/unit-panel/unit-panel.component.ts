@@ -21,10 +21,11 @@ import { CombatSimulation } from "src/app/core/combat";
 import { UnitComponent } from "../unit/unit.component";
 
 @Component({
-  selector: "app-unit-panel",
-  templateUrl: "./unit-panel.component.html",
-  styleUrls: ["./unit-panel.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-unit-panel",
+    templateUrl: "./unit-panel.component.html",
+    styleUrls: ["./unit-panel.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class UnitPanelComponent implements OnInit, OnDestroy {
   @ViewChild("unitComponent") unitComponent: UnitComponent | undefined;

@@ -1,5 +1,3 @@
-import * as PIXI from "pixi.js";
-
 import { Unit } from "src/app/api/unit";
 import { GameRenderer } from "../renderer";
 import { Tile } from "src/app/api/tile.interface";
@@ -10,6 +8,7 @@ import { Camera } from "../camera";
 import { GameState } from "src/app/api/state";
 import { takeUntil } from "rxjs/operators";
 import { merge } from "rxjs";
+import { Container, Graphics, Sprite } from "pixi.js";
 
 export class UnitsDrawer {
   tilesMap = new Map<Unit, Tile>();
@@ -18,9 +17,9 @@ export class UnitsDrawer {
 
   tileContainer = new TileContainer(this.camera.tileBoundingBox);
 
-  unitContainerMap = new Map<Unit, PIXI.Container>();
+  unitContainerMap = new Map<Unit, Container>();
 
-  healthBarsMap = new Map<Unit, PIXI.Container>();
+  healthBarsMap = new Map<Unit, Container>();
 
   constructor(
     private game: GameApi,
@@ -65,16 +64,16 @@ export class UnitsDrawer {
     const unitTextureName = `${unit.definition.id}.png`;
     const unitTexture = this.textures[unitTextureName];
 
-    const unitContainer = new PIXI.Container();
+    const unitContainer = new Container();
     this.tileContainer.addChild(unitContainer, unit.tile);
 
-    const backgroundSprite = new PIXI.Sprite(backgroundTexture);
+    const backgroundSprite = new Sprite(backgroundTexture);
     backgroundSprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
 
     unitContainer.addChild(backgroundSprite);
     backgroundSprite.tint = unit.player.color;
 
-    const unitSprite = new PIXI.Sprite(unitTexture);
+    const unitSprite = new Sprite(unitTexture);
     unitSprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
     unitSprite.position.x = backgroundSprite.width / 2 - unitSprite.width / 2;
     unitSprite.position.y = backgroundSprite.height / 2 - unitSprite.height / 2;
@@ -138,7 +137,7 @@ export class UnitsDrawer {
         continue;
       }
 
-      const sprite = unitContainer.children[0] as PIXI.Sprite;
+      const sprite = unitContainer.children[0] as Sprite;
       unitContainer.position.x =
         tile.x + (tile.y % 2 ? 0.5 : 0) + 0.5 - sprite.width / 2 + x;
       unitContainer.position.y = tile.y * 0.75 + 0.5 - sprite.height / 2;
@@ -173,7 +172,7 @@ export class UnitsDrawer {
       return;
     }
 
-    const healthBarContainer = new PIXI.Container();
+    const healthBarContainer = new Container();
     this.healthBarsMap.set(unit, healthBarContainer);
     unitContainer.addChild(healthBarContainer);
 
@@ -187,18 +186,16 @@ export class UnitsDrawer {
       color = 0xffb42c;
     }
 
-    let g = new PIXI.Graphics();
+    let g = new Graphics();
     g.position.y = -0.03;
-    g.beginFill(color);
-    g.drawRect(0, 0, barWidth, 0.03);
-    g.endFill();
+    g.rect(0, 0, barWidth, 0.03);
+    g.fill({ color });
     healthBarContainer.addChild(g);
 
-    g = new PIXI.Graphics();
+    g = new Graphics();
     g.position.y = -0.03;
-    g.beginFill(0x000000);
-    g.drawRect(barWidth, 0, maxBarWidth - barWidth, 0.03);
-    g.endFill();
+    g.rect(barWidth, 0, maxBarWidth - barWidth, 0.03);
+    g.fill({ color: 0x000000 });
     healthBarContainer.addChild(g);
   }
 

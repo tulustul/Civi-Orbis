@@ -33,9 +33,10 @@ import { ResourceDefinition } from "src/app/core/data.interface";
 import { getResourceDefinitionById } from "src/app/core/data-manager";
 
 @Component({
-  selector: "app-tile-editor",
-  templateUrl: "./tile-editor.component.html",
-  styleUrls: ["./tile-editor.component.scss"],
+    selector: "app-tile-editor",
+    templateUrl: "./tile-editor.component.html",
+    styleUrls: ["./tile-editor.component.scss"],
+    standalone: false
 })
 export class TileEditorComponent implements OnInit {
   @Input() isVisible$: Observable<boolean>;

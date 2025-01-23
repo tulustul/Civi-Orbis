@@ -17,10 +17,11 @@ import { GameApi } from "src/app/api";
 import { City } from "src/app/api/city";
 
 @Component({
-  selector: "app-city-info",
-  templateUrl: "./city-info.component.html",
-  styleUrls: ["./city-info.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-city-info",
+    templateUrl: "./city-info.component.html",
+    styleUrls: ["./city-info.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CityInfoComponent implements OnInit, OnDestroy {
   private _city: City;
