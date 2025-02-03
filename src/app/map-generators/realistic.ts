@@ -1,5 +1,3 @@
-import * as SimplexNoise from "simplex-noise";
-
 import { MapGenerator } from "./map-generator.interface";
 import { TilesMapCore } from "../core/tiles-map";
 import {
@@ -21,6 +19,7 @@ import { getTileInDirection } from "../shared/hex-math";
 import { RESOURCES_DEFINITIONS } from "../data/resources";
 import { ResourceCore } from "../core/resources";
 import { randomNormal } from "../core/random";
+import SimplexNoise from "simplex-noise";
 
 interface TileMetadata {
   height: number;
@@ -29,19 +28,19 @@ interface TileMetadata {
 }
 
 export class RealisticMapGenerator implements MapGenerator {
-  private map: TilesMapCore;
+  private map!: TilesMapCore;
 
-  private width: number;
+  private width!: number;
 
-  private height: number;
+  private height!: number;
 
   private seed: string | undefined;
 
-  private uniformity: number;
+  private uniformity!: number;
 
-  private seaLevel: number;
+  private seaLevel!: number;
 
-  private resources: number;
+  private resources!: number;
 
   private startingLocations: TileCore[] = [];
 
@@ -434,7 +433,10 @@ export class RealisticMapGenerator implements MapGenerator {
 class ComplexNoise {
   private noises: SimplexNoise[];
 
-  constructor(private scales: number[][], seed: string | undefined) {
+  constructor(
+    private scales: number[][],
+    seed: string | undefined,
+  ) {
     this.noises = scales.map(() => new SimplexNoise(seed));
   }
 

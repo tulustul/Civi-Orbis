@@ -4,8 +4,8 @@ import { Yields, EMPTY_YIELDS } from "./yields";
 import { TileCore } from "./tile";
 
 export class ResourceCore {
-  yields: Yields;
-  bonuses: Bonuses;
+  yields!: Yields;
+  bonuses!: Bonuses;
 
   constructor(
     public definition: ResourceDefinition,

@@ -6,20 +6,22 @@ precision mediump float;
 attribute vec2 aVertexPosition;
 attribute float aUvs;
 
-uniform mat3 translationMatrix;
-uniform mat3 projectionMatrix;
+uniform mat3 uProjectionMatrix;
+uniform mat3 uWorldTransformMatrix;
+uniform mat3 uTransformMatrix;
 
-varying float vUvs;
+out float vUvs;
 
 void main() {
   vUvs = aUvs;
-  gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+  mat3 mvp = uProjectionMatrix * uWorldTransformMatrix * uTransformMatrix;
+  gl_Position = vec4((mvp * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
 }`;
 
 const FRAGMENT_BORDER = `
 precision mediump float;
 
-varying float vUvs;
+in float vUvs;
 
 uniform vec4 color;
 uniform float borderSize;
@@ -35,6 +37,7 @@ void main() {
     a = (vUvs - (1.0 - borderShadow)) * borderShadowStrength;
   }
 
+  // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
   gl_FragColor = vec4(c.r * a, c.g * a, c.b * a, a);
 }`;
 
@@ -43,11 +46,13 @@ precision mediump float;
 
 attribute vec2 aVertexPosition;
 
-uniform mat3 translationMatrix;
-uniform mat3 projectionMatrix;
+uniform mat3 uProjectionMatrix;
+uniform mat3 uWorldTransformMatrix;
+uniform mat3 uTransformMatrix;
 
 void main() {
-  gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+  mat3 mvp = uProjectionMatrix * uWorldTransformMatrix * uTransformMatrix;
+  gl_Position = vec4((mvp * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
 }`;
 
 const FRAGMENT_BACKGROUND = `

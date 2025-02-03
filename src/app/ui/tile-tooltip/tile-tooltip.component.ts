@@ -5,23 +5,24 @@ import { TileDetails } from "src/app/api/tile-details";
 import { MapUi } from "../map-ui";
 
 @Component({
-    selector: "app-tile-tooltip",
-    templateUrl: "./tile-tooltip.component.html",
-    styleUrls: ["./tile-tooltip.component.scss"],
-    standalone: false
+  selector: "app-tile-tooltip",
+  templateUrl: "./tile-tooltip.component.html",
+  styleUrls: ["./tile-tooltip.component.scss"],
+  standalone: false,
 })
 export class TileTooltipComponent implements OnInit {
-  tileDetailsVisible$ = this.mapUi.hoveredTile$.pipe(debounceTime(1200));
-
   tileDetails: TileDetails | null = null;
 
   x = 0;
   y = 0;
 
-  constructor(private game: GameApi, private mapUi: MapUi) {}
+  constructor(
+    private game: GameApi,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
-    this.tileDetailsVisible$.subscribe(async (tile) => {
+    this.mapUi.hoveredTile$.pipe(debounceTime(1200)).subscribe(async (tile) => {
       if (!tile) {
         return;
       }

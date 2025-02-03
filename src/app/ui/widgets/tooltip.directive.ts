@@ -16,13 +16,13 @@ import { ComponentPortal } from "@angular/cdk/portal";
 import { TooltipComponent } from "./tooltip/tooltip.component";
 
 @Directive({
-    selector: "[appTooltip]",
-    standalone: false
+  selector: "[appTooltip]",
+  standalone: false,
 })
 export class TooltipDirective implements OnDestroy {
   overlayRef: OverlayRef | null = null;
 
-  @Input("appTooltip") templateRef: TemplateRef<any>;
+  @Input("appTooltip") templateRef!: TemplateRef<any>;
 
   @Input("tooltipContext") context: any;
 

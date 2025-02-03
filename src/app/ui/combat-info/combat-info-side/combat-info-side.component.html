@@ -1,16 +1,16 @@
-<h3>{{ label }}</h3>
-<div>{{ unitName }}</div>
+<h3>{{ label() }}</h3>
+<div>{{ unitName() }}</div>
 <div class="field">
-  Approx. dmg.: <b>{{ simulationSide.damage }}</b>
+  Approx. dmg.: <b>{{ simulationSide().damage }}</b>
 </div>
 <div class="field">
-  Strength: <b>{{ simulationSide.strength.toFixed(1) }}</b>
+  Strength: <b>{{ simulationSide().strength.toFixed(1) }}</b>
 </div>
 
 <div class="modifiers">
   <div
     class="modifier"
-    *ngFor="let modifier of simulationSide.modifiers"
+    *ngFor="let modifier of simulationSide().modifiers"
     [class.positive]="modifier.value > 0"
   >
     {{ modifier.value > 0 ? "+" : "" }}{{ (modifier.value * 100).toFixed() }}%

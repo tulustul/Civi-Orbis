@@ -1,30 +1,30 @@
 import {
-  Component,
-  OnInit,
   ChangeDetectionStrategy,
-  OnDestroy,
   ChangeDetectorRef,
-  Input,
+  Component,
   HostBinding,
+  OnDestroy,
+  OnInit,
+  input,
 } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Camera } from "src/app/renderer/camera";
 import { UnitDetails } from "src/app/api/unit-details";
+import { Camera } from "src/app/renderer/camera";
 import { TILE_SIZE } from "src/app/renderer/constants";
 
 @Component({
-    selector: "app-unit-marker",
-    templateUrl: "./unit-marker.component.html",
-    styleUrls: ["./unit-marker.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-unit-marker",
+  templateUrl: "./unit-marker.component.html",
+  styleUrls: ["./unit-marker.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class UnitMarkerComponent implements OnInit, OnDestroy {
-  @Input() unit: UnitDetails;
+  unit = input.required<UnitDetails>();
 
   ngUnsubscribe = new Subject<void>();
 
@@ -50,7 +50,8 @@ export class UnitMarkerComponent implements OnInit, OnDestroy {
     if (!this.unit) {
       return "";
     }
-    const [x, y] = [this.unit.tile.x, this.unit.tile.y];
+    const unit = this.unit();
+    const [x, y] = [unit.tile.x, unit.tile.y];
     const [screenX, screenY] = this.camera.gameToScreen(x, y);
     const scale = this.camera.transform.scale / TILE_SIZE;
     return this.domSanitizer.bypassSecurityTrustStyle(
@@ -60,6 +61,6 @@ export class UnitMarkerComponent implements OnInit, OnDestroy {
 
   @HostBinding("class.have-moves")
   get haveMoves() {
-    return this.unit.actionPointsLeft > 0;
+    return this.unit().actionPointsLeft > 0;
   }
 }

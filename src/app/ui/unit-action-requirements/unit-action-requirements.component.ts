@@ -1,46 +1,46 @@
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
+  OnInit,
+  input,
 } from "@angular/core";
 
+import { UnitDetails } from "src/app/api/unit-details";
 import {
   UnitAction,
-  getPublicWorksRequired,
   getPublicWorksPerTurn,
+  getPublicWorksRequired,
 } from "src/app/core/unit-actions";
-import { UnitDetails } from "src/app/api/unit-details";
 
 @Component({
-    selector: "app-unit-action-requirements",
-    templateUrl: "./unit-action-requirements.component.html",
-    styleUrls: ["./unit-action-requirements.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-unit-action-requirements",
+  templateUrl: "./unit-action-requirements.component.html",
+  styleUrls: ["./unit-action-requirements.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class UnitActionRequirementsComponent implements OnInit {
-  @Input() unit: UnitDetails;
+  unit = input.required<UnitDetails>();
 
-  @Input() action: UnitAction;
+  action = input.required<UnitAction>();
 
   failedRequirements: string[] = [];
 
   constructor(private cdr: ChangeDetectorRef) {}
 
   async ngOnInit() {
-    this.failedRequirements = await this.unit.getFailedActionRequirements(
-      this.action,
+    this.failedRequirements = await this.unit().getFailedActionRequirements(
+      this.action(),
     );
     this.cdr.markForCheck();
   }
 
   get publicWorksRequired() {
-    return getPublicWorksRequired(this.action);
+    return getPublicWorksRequired(this.action());
   }
 
   get publicWorksPerTurn() {
-    return getPublicWorksPerTurn(this.action);
+    return getPublicWorksPerTurn(this.action());
   }
 }

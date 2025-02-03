@@ -1,6 +1,6 @@
 <app-unit
   class="for-tile-units allow-interaction"
-  *ngFor="let unit of tile.units"
+  *ngFor="let unit of tile().units"
   [class.is-selected]="unit.id === selectedUnit?.id"
   [unit]="unit"
 ></app-unit>

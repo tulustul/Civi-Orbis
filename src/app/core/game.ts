@@ -9,14 +9,14 @@ import { collector } from "./collector";
 export class Game {
   debug = new Debug();
 
-  map: TilesMapCore;
+  map!: TilesMapCore;
 
   players: PlayerCore[] = [];
   playersMap = new Map<number, PlayerCore>();
 
   activePlayerIndex = -1;
 
-  trackedPlayer: PlayerCore;
+  trackedPlayer!: PlayerCore;
 
   humanPlayer: PlayerCore | null = null;
 

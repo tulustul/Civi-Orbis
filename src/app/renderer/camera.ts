@@ -25,21 +25,21 @@ export interface BoundingBox {
 @Injectable()
 export class Camera {
   MAX_ZOOM = TILE_SIZE; // tile graphics width in pixels
-  MIN_ZOOM = 7;
+  MIN_ZOOM = 2;
 
   transform = { x: 0, y: 0, scale: 130 };
   private _transform$ = new BehaviorSubject<Transform>(this.transform);
   transform$ = this._transform$.asObservable();
   private transformChanged = false;
 
-  private scalePivotX: number;
-  private scalePivotY: number;
+  private scalePivotX!: number;
+  private scalePivotY!: number;
 
   private scaleAnimation: Animation | null = null;
   private moveXAnimation: Animation | null = null;
   private moveYAnimation: Animation | null = null;
 
-  private renderer: GameRenderer;
+  private renderer!: GameRenderer;
 
   public tileBoundingBox: BoundingBox = {
     xStart: 0,
@@ -198,17 +198,6 @@ export class Camera {
     }
 
     this.updateBoundingBox();
-
-    this.updateProjectionMatrix();
-  }
-
-  updateProjectionMatrix() {
-    const m = this.renderer.app.renderer.projection.projectionMatrix;
-
-    m.tx = this.transform.x;
-    m.ty = this.transform.y;
-    m.d = this.transform.scale;
-    m.a = this.transform.scale;
   }
 
   updateBoundingBox() {

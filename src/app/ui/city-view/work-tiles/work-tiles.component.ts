@@ -1,32 +1,32 @@
 import {
-  Component,
-  OnInit,
-  Input,
-  OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  input,
 } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 
-import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
-import { MapUi } from "../../map-ui";
-import { Camera } from "src/app/renderer/camera";
 import { CityDetails } from "src/app/api/city-details";
 import { Tile } from "src/app/api/tile.interface";
+import { Camera } from "src/app/renderer/camera";
+import { MapUi } from "../../map-ui";
 
 @Component({
-    selector: "app-work-tiles",
-    templateUrl: "./work-tiles.component.html",
-    styleUrls: ["./work-tiles.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-work-tiles",
+  templateUrl: "./work-tiles.component.html",
+  styleUrls: ["./work-tiles.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class WorkTilesComponent implements OnInit, OnDestroy {
-  @Input() city: CityDetails;
+  city = input.required<CityDetails>();
 
-  @Input() workedTiles: Set<Tile>;
+  workedTiles = input.required<Set<Tile>>();
 
   private ngUnsubscribe = new Subject<void>();
 
@@ -53,10 +53,10 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
   }
 
   async toggle(tile: Tile) {
-    if (this.workedTiles.has(tile)) {
-      await this.city.unworkTile(tile);
+    if (this.workedTiles().has(tile)) {
+      await this.city().unworkTile(tile);
     } else {
-      await this.city.workTile(tile);
+      await this.city().workTile(tile);
     }
 
     if (!this.ngUnsubscribe.isStopped) {
@@ -66,8 +66,10 @@ export class WorkTilesComponent implements OnInit, OnDestroy {
   }
 
   updateWorkedTilesArea() {
-    this.mapUi.cityWorkedTilesArea.setTiles(Array.from(this.city.workedTiles));
-    this.mapUi.cityNotWorkedTilesArea.setTiles(this.city.getNotWorkedTiles());
+    this.mapUi.cityWorkedTilesArea.setTiles(
+      Array.from(this.city().workedTiles),
+    );
+    this.mapUi.cityNotWorkedTilesArea.setTiles(this.city().getNotWorkedTiles());
   }
 
   getTransform(tile: Tile) {

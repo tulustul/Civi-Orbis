@@ -18,18 +18,18 @@ import { CityInfoComponent } from "./city-info/city-info.component";
 import { getTileCoords } from "src/app/renderer/utils";
 
 @Component({
-    selector: "app-cities-layer",
-    templateUrl: "./cities-layer.component.html",
-    styleUrls: ["./cities-layer.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-cities-layer",
+  templateUrl: "./cities-layer.component.html",
+  styleUrls: ["./cities-layer.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class CitiesLayerComponent implements OnInit, AfterViewInit {
   ngUnsubscribe = new Subject<void>();
 
-  @ViewChildren(CityInfoComponent) citiesComponents: CityInfoComponent[];
+  @ViewChildren(CityInfoComponent) citiesComponents!: CityInfoComponent[];
 
-  cities: City[];
+  cities: City[] = [];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -83,7 +83,7 @@ export class CitiesLayerComponent implements OnInit, AfterViewInit {
     }
 
     for (const cityComponent of this.citiesComponents) {
-      const tile = cityComponent.city.tile;
+      const tile = cityComponent.city().tile;
       const cityEl = cityComponent.elementRef.nativeElement;
       if (
         tile.x >= box.xStart &&
@@ -98,7 +98,7 @@ export class CitiesLayerComponent implements OnInit, AfterViewInit {
       }
 
       const cityScale = Math.pow(scale / 70, 0.4);
-      let [x, y] = getTileCoords(cityComponent.city.tile);
+      let [x, y] = getTileCoords(cityComponent.city().tile);
       [x, y] = this.camera.canvasToScreen(x + 0.5, y + 0.8);
       cityEl.style.transform = `translate(${x}px, ${y}px) scale(${cityScale})`;
     }

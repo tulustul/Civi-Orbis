@@ -1,30 +1,30 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, input } from "@angular/core";
 
-import {
-  CLIMATE_OPTIONS,
-  FOREST_OPTIONS,
-  LAND_FORM_OPTIONS,
-  SEA_LEVEL_OPTIONS,
-  WETLANDS_OPTIONS,
-  IMPROVEMENT_OPTIONS,
-} from "../constants";
-import { Option } from "../../widgets/option.interface";
 import { Observable } from "rxjs";
-import { takeUntil, filter } from "rxjs/operators";
+import { filter, takeUntil } from "rxjs/operators";
+import { GameApi } from "src/app/api";
+import { Tile } from "src/app/api/tile.interface";
 import { Controls } from "src/app/controls";
-import { MapUi } from "../../map-ui";
 import { TileImprovement } from "src/app/core/tile-improvements";
 import {
   Climate,
   LandForm,
   SeaLevel,
-  isForestable,
   areWetlandsPossible,
+  isForestable,
   isImprovementPossible,
 } from "src/app/shared";
-import { GameApi } from "src/app/api";
 import { getTilesInRange } from "src/app/shared/hex-math";
-import { Tile } from "src/app/api/tile.interface";
+import { MapUi } from "../../map-ui";
+import { Option } from "../../widgets/option.interface";
+import {
+  CLIMATE_OPTIONS,
+  FOREST_OPTIONS,
+  IMPROVEMENT_OPTIONS,
+  LAND_FORM_OPTIONS,
+  SEA_LEVEL_OPTIONS,
+  WETLANDS_OPTIONS,
+} from "../constants";
 
 const IGNORE_OPTION: Option = { label: "ignore", value: undefined };
 
@@ -39,10 +39,10 @@ interface PaintData {
 }
 
 @Component({
-    selector: "app-tile-painter",
-    templateUrl: "./tile-painter.component.html",
-    styleUrls: ["./tile-painter.component.scss"],
-    standalone: false
+  selector: "app-tile-painter",
+  templateUrl: "./tile-painter.component.html",
+  styleUrls: ["./tile-painter.component.scss"],
+  standalone: false,
 })
 export class TilePainterComponent implements OnInit {
   SIZE_OPTIONS: Option[] = [
@@ -72,7 +72,7 @@ export class TilePainterComponent implements OnInit {
     improvement: undefined,
   };
 
-  @Input() isVisible$: Observable<boolean>;
+  isVisible$ = input.required<Observable<boolean>>();
 
   paintData = { ...this.DEFAULT_PAINT_DATA };
 
@@ -83,8 +83,8 @@ export class TilePainterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const shown = this.isVisible$.pipe(filter((v) => v));
-    const hidden = this.isVisible$.pipe(filter((v) => !v));
+    const shown = this.isVisible$().pipe(filter((v) => v));
+    const hidden = this.isVisible$().pipe(filter((v) => !v));
 
     shown.subscribe(() => {
       this.controls.mouseButton$.pipe(takeUntil(hidden)).subscribe((button) => {

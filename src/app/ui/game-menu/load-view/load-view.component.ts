@@ -13,15 +13,15 @@ import { GameApi } from "src/app/api";
 import { Camera } from "src/app/renderer/camera";
 
 @Component({
-    selector: "app-load-view",
-    templateUrl: "./load-view.component.html",
-    styleUrls: ["./load-view.component.scss"],
-    standalone: false
+  selector: "app-load-view",
+  templateUrl: "./load-view.component.html",
+  styleUrls: ["./load-view.component.scss"],
+  standalone: false,
 })
 export class LoadViewComponent implements OnInit {
   @Output() return = new EventEmitter<void>();
 
-  @ViewChild(SavesListComponent) savesListComponent: SavesListComponent;
+  @ViewChild(SavesListComponent) savesListComponent!: SavesListComponent;
 
   saveName = "";
 
@@ -42,7 +42,7 @@ export class LoadViewComponent implements OnInit {
 
     const data = loadGameData(this.saveName);
     if (!data) {
-      return null;
+      return;
     }
 
     this.waiting = true;

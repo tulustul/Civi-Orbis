@@ -3,6 +3,7 @@ import {
   OnInit,
   Input,
   ChangeDetectionStrategy,
+  input,
 } from "@angular/core";
 
 import { UnitDetails } from "src/app/api/unit-details";
@@ -10,18 +11,16 @@ import { Unit } from "src/app/api/unit";
 import { CombatSimulation } from "src/app/core/combat";
 
 @Component({
-    selector: "app-combat-info",
-    templateUrl: "./combat-info.component.html",
-    styleUrls: ["./combat-info.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-combat-info",
+  templateUrl: "./combat-info.component.html",
+  styleUrls: ["./combat-info.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class CombatInfoComponent implements OnInit {
-  @Input() attacker: UnitDetails;
-
-  @Input() defender: Unit;
-
-  @Input() simulation: CombatSimulation;
+  attacker = input.required<UnitDetails>();
+  defender = input.required<Unit>();
+  simulation = input.required<CombatSimulation>();
 
   constructor() {}
 
@@ -29,7 +28,7 @@ export class CombatInfoComponent implements OnInit {
 
   get ratio() {
     return (
-      this.simulation.attacker.strength / this.simulation.defender.strength
+      this.simulation().attacker.strength / this.simulation().defender.strength
     );
   }
 

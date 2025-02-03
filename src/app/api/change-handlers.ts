@@ -77,7 +77,7 @@ function onAreaDestroyed(state: GameState, turn: number) {
   state["_turn$"].next(turn);
 }
 
-function onAreaTilesAdded(state: GameState, data) {
+function onAreaTilesAdded(state: GameState, data: any) {
   const area = state.areasMap.get(data.id);
   if (!area) {
     return;
@@ -86,7 +86,7 @@ function onAreaTilesAdded(state: GameState, data) {
   area.addTiles(state.map.getTilesFromIds(data.tiles));
 }
 
-function onAreaTilesRemoved(state: GameState, data) {
+function onAreaTilesRemoved(state: GameState, data: any) {
   const area = state.areasMap.get(data.id);
   if (!area) {
     return;

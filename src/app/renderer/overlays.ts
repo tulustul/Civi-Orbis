@@ -13,7 +13,7 @@ import { Container } from "pixi.js";
 export class OverlaysRenderer {
   wrapperContainer = new TileWrapperContainer();
 
-  tilesContainer = new TileContainer(this.camera.tileBoundingBox);
+  tilesContainer!: TileContainer;
 
   hoveredTileGraphics = new Graphics();
 
@@ -22,11 +22,13 @@ export class OverlaysRenderer {
   highlightedTilesGraphics = new Graphics();
 
   constructor(
-    private container: Container,
+    public container: Container,
     private game: GameApi,
     private camera: Camera,
     mapUi: MapUi,
   ) {
+    this.tilesContainer = new TileContainer(this.camera.tileBoundingBox);
+
     this.game.init$.subscribe((state) => {
       this.build(state);
 
@@ -79,7 +81,7 @@ export class OverlaysRenderer {
       alpha: 0.5,
     });
     drawClosedHex(this.hoveredTileGraphics);
-    this.hoveredTileGraphics.fill({ color: 0xffffff22, alpha: 0.1 });
+    this.hoveredTileGraphics.fill({ color: 0xffffff, alpha: 0.1 });
   }
 
   buildSelectedTileGraphics() {

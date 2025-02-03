@@ -10,15 +10,18 @@ import { Controls } from "../controls";
 import { GameRenderer } from "../renderer/renderer";
 
 @Component({
-    selector: "app-game-canvas",
-    templateUrl: "./game-canvas.component.html",
-    styleUrls: ["./game-canvas.component.scss"],
-    standalone: false
+  selector: "app-game-canvas",
+  templateUrl: "./game-canvas.component.html",
+  styleUrls: ["./game-canvas.component.scss"],
+  standalone: false,
 })
 export class GameCanvasComponent implements AfterViewInit {
-  @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild("canvas") canvas!: ElementRef<HTMLCanvasElement>;
 
-  constructor(public controls: Controls, private renderer: GameRenderer) {}
+  constructor(
+    public controls: Controls,
+    private renderer: GameRenderer,
+  ) {}
 
   ngAfterViewInit() {
     this.renderer.setCanvas(this.canvas.nativeElement);

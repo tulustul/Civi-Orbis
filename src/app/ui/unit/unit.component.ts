@@ -1,14 +1,14 @@
 import {
-  Component,
-  OnInit,
-  Input,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
   HostListener,
   OnChanges,
-  ElementRef,
-  ChangeDetectorRef,
-  Optional,
   OnDestroy,
+  OnInit,
+  Optional,
+  input,
 } from "@angular/core";
 
 import { Unit } from "src/app/api/unit";
@@ -16,17 +16,16 @@ import { MapUi } from "../map-ui";
 import { UnitsLayerService } from "../units-layer/units-layer.service";
 
 @Component({
-    selector: "app-unit",
-    templateUrl: "./unit.component.html",
-    styleUrls: ["./unit.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-unit",
+  templateUrl: "./unit.component.html",
+  styleUrls: ["./unit.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class UnitComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() unit: Unit;
+  unit = input.required<Unit>();
 
-  @Input()
-  showMovesIndicator = true;
+  showMovesIndicator = input(true);
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -36,6 +35,7 @@ export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   ) {}
 
   ngOnInit() {
+    console.log("UnitComponent ngOnInit", this.unit());
     if (this.unitsLayerService) {
       this.unitsLayerService.addUnitComponent(this);
     }
@@ -48,12 +48,13 @@ export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges() {
+    console.log("UnitComponent ngOnInit", this.unit());
     this.updateClasses();
   }
 
   @HostListener("click")
   onClick() {
-    this.mapUi.selectUnit(this.unit);
+    this.mapUi.selectUnit(this.unit());
   }
 
   @HostListener("contextmenu", ["$event"])
@@ -75,21 +76,21 @@ export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get tint() {
-    return this.unit.player.cssColor;
+    return this.unit().player.cssColor;
   }
 
   get unitBackground() {
-    const strength = this.unit.definition.strength;
+    const strength = this.unit().definition.strength;
     const backgroundType = strength > 0 ? "military" : "civilian";
     return `unitBackground-${backgroundType}`;
   }
 
   get movesStatus() {
-    if (this.unit.actionPointsLeft === this.unit.definition.actionPoints) {
+    if (this.unit().actionPointsLeft === this.unit().definition.actionPoints) {
       return "all";
     }
 
-    if (this.unit.actionPointsLeft === 0) {
+    if (this.unit().actionPointsLeft === 0) {
       return "none";
     }
 
@@ -97,11 +98,11 @@ export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get healthStatus() {
-    if (this.unit.health >= 70) {
+    if (this.unit().health >= 70) {
       return "healthy";
     }
 
-    if (this.unit.health >= 35) {
+    if (this.unit().health >= 35) {
       return "injured";
     }
 
@@ -109,10 +110,10 @@ export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get isDamaged() {
-    return this.unit.health < 100;
+    return this.unit().health < 100;
   }
 
   get suppliesDiminishing() {
-    return this.unit.supplies < 100;
+    return this.unit().supplies < 100;
   }
 }

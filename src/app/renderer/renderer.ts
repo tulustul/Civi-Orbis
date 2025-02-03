@@ -1,4 +1,18 @@
-import { Loader, Container, Application } from "pixi.js";
+import {
+  Assets,
+  Container,
+  Application,
+  Spritesheet,
+  Texture,
+  Graphics,
+  Sprite,
+  UpdateTransformOptions,
+  Mesh,
+  Shader,
+  NoiseFilter,
+  DisplacementFilter,
+  MaskFilter,
+} from "pixi.js";
 
 import { Injectable } from "@angular/core";
 
@@ -15,32 +29,35 @@ import { GameApi } from "../api";
 import { Layer } from "./layer";
 import { FogOfWarFilter } from "./filters/fog-of-war-filter";
 import { TileContainer, TileWrapperContainer } from "./tile-container";
+import atlasData from "../../assets/atlas.json";
+import { drawHex, HEX_GEOMETRY } from "./utils";
+import { programs } from "./shaders/area-shaders";
+import { VisibleTilesDrawer } from "./layers/visible-tiles-drawer";
 
 @Injectable()
 export class GameRenderer {
-  app: Application;
+  app!: Application;
 
-  canvas: HTMLCanvasElement;
+  canvas!: HTMLCanvasElement;
 
-  mapDrawer: MapDrawer;
+  mapDrawer!: MapDrawer;
 
-  fogOfWarDrawer: FogOfWarDrawer;
+  fogOfWarDrawer!: FogOfWarDrawer;
+  visibleTilesDrawer!: VisibleTilesDrawer;
 
-  overlays: OverlaysRenderer;
+  overlays!: OverlaysRenderer;
 
-  path: PathRenderer;
+  path!: PathRenderer;
 
-  mapLayer: Layer;
+  mapLayer!: Layer;
 
-  fogOfWarLayer: Layer;
+  fogOfWarLayer!: Layer;
+
+  visibleTilesLayer!: Layer;
 
   overlaysContainer = new Container();
 
-  loader = new Loader();
-
-  atlas = this.loader.add("assets/atlas.json").load(() => this.onLoad());
-
-  textures: ITextureDictionary;
+  spritesheet!: Spritesheet;
 
   _loading$ = new BehaviorSubject<boolean>(true);
   loading$ = this._loading$.asObservable();
@@ -57,18 +74,38 @@ export class GameRenderer {
     this.camera.setRenderer(this);
 
     this.game.stop$.subscribe(() => this.clear());
+
+    this.loadAssets();
+  }
+
+  async loadAssets() {
+    await Assets.load("assets/hex.png");
+    const atlas = await Assets.load("assets/atlas.png");
+    this.spritesheet = new Spritesheet(atlas, atlasData);
+    this.spritesheet.textureSource.autoGenerateMipmaps = true;
+
+    await this.spritesheet.parse();
+
+    if (this.canvas) {
+      this.onReady();
+    }
+
+    this._loading$.next(false);
   }
 
   async setCanvas(canvas: HTMLCanvasElement) {
     const [width, height] = [window.innerWidth, window.innerHeight];
 
     this.app = new Application();
-    await this.app.init({ view: canvas, width, height });
+    (globalThis as any).__PIXI_APP__ = this.app;
+
+    await this.app.init({ view: canvas, width, height, preference: "webgl" });
 
     this.canvas = canvas;
 
     this.mapLayer = new Layer(this.app);
     this.fogOfWarLayer = new Layer(this.app);
+    this.visibleTilesLayer = new Layer(this.app);
 
     this.mapDrawer = new MapDrawer(
       this.mapLayer.stage,
@@ -79,6 +116,13 @@ export class GameRenderer {
 
     this.fogOfWarDrawer = new FogOfWarDrawer(
       this.fogOfWarLayer.stage,
+      this.game,
+      this,
+      this.camera,
+    );
+
+    this.visibleTilesDrawer = new VisibleTilesDrawer(
+      this.visibleTilesLayer.stage,
       this.game,
       this,
       this.camera,
@@ -101,12 +145,17 @@ export class GameRenderer {
     this.overlaysContainer.interactiveChildren = false;
 
     this.app.stage.addChild(this.mapLayer.sprite);
-    // this.app.stage.addChild(this.mapDrawer.unitsDrawer.container);
+    // this.app.stage.addChild(this.visibleTilesLayer.sprite);
     this.app.stage.addChild(this.overlaysContainer);
 
     this.mapLayer.sprite.filters = [
-      new FogOfWarFilter(this.fogOfWarLayer.texture),
+      new MaskFilter({
+        sprite: this.visibleTilesLayer.sprite,
+      }),
+      new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
     ];
+
+    console.log(this.mapLayer.texture, this.fogOfWarLayer.texture);
 
     if (this.isLoaded) {
       this.onReady();
@@ -127,13 +176,14 @@ export class GameRenderer {
         const borderShadow = Math.max(0.4, Math.min(0.7, (150 - scale) / 100));
 
         for (const area of this.mapDrawer.politicsDrawer.areas) {
-          area.drawer.backgroundShader.uniforms.opacity = backgroundOpacity;
-          area.drawer.borderShader.uniforms.borderShadow = borderShadow;
+          area.drawer.backgroundShader.resources["opacity"] = backgroundOpacity;
+          area.drawer.borderShader.resources["borderShadow"] = borderShadow;
         }
       }
 
       this.mapLayer.renderToTarget();
       this.fogOfWarLayer.renderToTarget();
+      this.visibleTilesLayer.renderToTarget();
     });
   }
 
@@ -141,10 +191,11 @@ export class GameRenderer {
     this.app.renderer.resize(width, height);
     this.mapLayer.resize(width, height);
     this.fogOfWarLayer.resize(width, height);
+    this.visibleTilesLayer.resize(width, height);
 
     // A new texture is created when resizing, need to update the filter. Could just update uniforms but whatever.
     this.mapLayer.sprite.filters = [
-      new FogOfWarFilter(this.fogOfWarLayer.texture),
+      new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
     ];
   }
 
@@ -153,37 +204,19 @@ export class GameRenderer {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
 
+      const transform: Partial<UpdateTransformOptions> = {
+        x,
+        y,
+        scaleX: t.scale,
+        scaleY: t.scale,
+      };
+
       // this.mapDrawer.unitsDrawer.container.setTransform(x, y, t.scale, t.scale);
-      this.overlaysContainer.updateTransform({
-        x,
-        y,
-        scaleX: t.scale,
-        scaleY: t.scale,
-      });
-      this.mapLayer.stage.updateTransform({
-        x,
-        y,
-        scaleX: t.scale,
-        scaleY: t.scale,
-      });
-      this.fogOfWarLayer.stage.updateTransform({
-        x,
-        y,
-        scaleX: t.scale,
-        scaleY: t.scale,
-      });
+      this.mapLayer.stage.updateTransform(transform);
+      this.overlaysContainer.updateTransform(transform);
+      this.fogOfWarLayer.stage.updateTransform(transform);
+      this.visibleTilesLayer.stage.updateTransform(transform);
     });
-  }
-
-  onLoad() {
-    const atlas = this.atlas.resources["assets/atlas.json"];
-    atlas.spritesheet!.baseTexture.mipmap = MIPMAP_MODES.POW2;
-    this.textures = atlas.textures!;
-    if (this.canvas) {
-      this.onReady();
-    }
-
-    this._loading$.next(false);
   }
 
   clear() {
@@ -191,9 +224,10 @@ export class GameRenderer {
     this.path.clear();
     this.overlays.clear();
     this.fogOfWarDrawer.clear();
+    this.visibleTilesDrawer.clear();
   }
 
   get isLoaded() {
-    return !!this.textures;
+    return !!this.spritesheet.textures;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, input } from "@angular/core";
 
 import { Observable } from "rxjs";
 import { filter, takeUntil } from "rxjs/operators";
@@ -9,21 +9,24 @@ import { MapUi } from "../../map-ui";
 import { City } from "src/app/api/city";
 
 @Component({
-    selector: "app-city-editor",
-    templateUrl: "./city-editor.component.html",
-    styleUrls: ["./city-editor.component.scss"],
-    standalone: false
+  selector: "app-city-editor",
+  templateUrl: "./city-editor.component.html",
+  styleUrls: ["./city-editor.component.scss"],
+  standalone: false,
 })
 export class CityEditorComponent implements OnInit {
-  @Input() isVisible$: Observable<boolean>;
+  isVisible$ = input.required<Observable<boolean>>();
 
   city: City | null = null;
 
-  constructor(private game: Game, private mapUi: MapUi) {}
+  constructor(
+    private game: Game,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
-    const shown = this.isVisible$.pipe(filter((v) => v));
-    const hidden = this.isVisible$.pipe(filter((v) => !v));
+    const shown = this.isVisible$().pipe(filter((v) => v));
+    const hidden = this.isVisible$().pipe(filter((v) => !v));
 
     shown.subscribe(() => {
       this.mapUi.enableSelectingTile(true);

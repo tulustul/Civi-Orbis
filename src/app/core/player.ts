@@ -13,29 +13,16 @@ import {
 import { collector } from "./collector";
 import { PlayerYields } from "../shared";
 import { InternalPolitics } from "./internal-politics";
+import { AreaCore } from "./area";
 
 export const PLAYER_COLORS: number[] = [
-  0xff0000,
-  0x00ff00,
-  0x0000ff,
-  0xffff00,
-  0x00ffff,
-  0xff00ff,
-  0x999999,
-  0xdddddd,
-  0xfbacac,
-  0xe6b873,
-  0x39862b,
-  0x2e716e,
-  0x7457bb,
-  0xab57bb,
-  0x79583c,
-  0xb6bbe6,
-  0xb6bce6,
+  0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0x00ffff, 0xff00ff, 0x999999,
+  0xdddddd, 0xfbacac, 0xe6b873, 0x39862b, 0x2e716e, 0x7457bb, 0xab57bb,
+  0x79583c, 0xb6bbe6, 0xb6bce6,
 ];
 
 export class PlayerCore {
-  id: number;
+  id!: number;
 
   exploredTiles = new Set<TileCore>();
 
@@ -56,7 +43,7 @@ export class PlayerCore {
     perTurn: { ...EMPTY_YIELDS },
   };
 
-  area = this.game.areasManager.make();
+  area: AreaCore;
 
   ai: AIPlayer | null = null;
 
@@ -65,7 +52,12 @@ export class PlayerCore {
   suppliedTiles = new Set<TileCore>();
   potentialSuppliedTiles = new Set<TileCore>();
 
-  constructor(public game: Game, public color: number) {}
+  constructor(
+    public game: Game,
+    public color: number,
+  ) {
+    this.area = this.game.areasManager.make();
+  }
 
   exploreTiles(tiles: Iterable<TileCore>) {
     for (const tile of tiles) {

@@ -160,6 +160,6 @@ export class TerrainDrawer {
   }
 
   protected get textures() {
-    return this.renderer.textures;
+    return this.renderer.spritesheet.textures;
   }
 }

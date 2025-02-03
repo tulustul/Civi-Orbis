@@ -5,7 +5,7 @@ import { AIPlayer } from "./ai-player";
 import { AISystem } from "./ai-system";
 
 export class FoundCityOperation extends AiOperation {
-  target: TileCore;
+  target: TileCore | null = null;
   settler: UnitCore | null = null;
 
   perform() {}

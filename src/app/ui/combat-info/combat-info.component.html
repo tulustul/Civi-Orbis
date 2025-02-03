@@ -5,14 +5,14 @@
 <div class="sides">
   <app-combat-info-side
     label="Attacker"
-    [unitName]="attacker.definition.name"
-    [simulationSide]="simulation.attacker"
+    [unitName]="attacker().definition.name"
+    [simulationSide]="simulation().attacker"
   ></app-combat-info-side>
 
   <app-combat-info-side
     label="Defender"
     class="inverted-colors"
-    [unitName]="defender.definition.name"
-    [simulationSide]="simulation.defender"
+    [unitName]="defender().definition.name"
+    [simulationSide]="simulation().defender"
   ></app-combat-info-side>
 </div>

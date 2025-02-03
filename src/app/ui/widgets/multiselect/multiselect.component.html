@@ -1,7 +1,7 @@
 <div
   class="option"
-  *ngFor="let option of options"
-  [class.selected]="value.includes(option.value)"
+  *ngFor="let option of options()"
+  [class.selected]="value().includes(option.value)"
   (click)="toggleOption(option)"
 >
   {{ option.label }}

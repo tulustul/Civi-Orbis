@@ -1,61 +1,61 @@
-<div class="growth-color" *ngIf="bonuses?.yieldValue?.food as food">
+<div class="growth-color" *ngIf="bonuses().yieldValue?.food as food">
   + {{ food }} food
 </div>
 
 <div
   class="production-color"
-  *ngIf="bonuses?.yieldValue?.production as production"
+  *ngIf="bonuses().yieldValue?.production as production"
 >
   + {{ production }} production
 </div>
 
-<div class="culture-color" *ngIf="bonuses?.yieldValue?.culture as culture">
+<div class="culture-color" *ngIf="bonuses().yieldValue?.culture as culture">
   + {{ culture }} culture
 </div>
 
 <div
   class="public-works-color"
-  *ngIf="bonuses?.yieldValue?.publicWorks as publicWorks"
+  *ngIf="bonuses().yieldValue?.publicWorks as publicWorks"
 >
   + {{ publicWorks }} public works
 </div>
 
-<div class="growth-color" *ngIf="bonuses?.yieldFactor?.food as food">
+<div class="growth-color" *ngIf="bonuses().yieldFactor?.food as food">
   + {{ food | percentBonus }} food
 </div>
 
 <div
   class="production-color"
-  *ngIf="bonuses?.yieldFactor?.production as production"
+  *ngIf="bonuses().yieldFactor?.production as production"
 >
   + {{ production | percentBonus }} production
 </div>
 
-<div class="culture-color" *ngIf="bonuses?.yieldFactor?.culture as culture">
+<div class="culture-color" *ngIf="bonuses().yieldFactor?.culture as culture">
   + {{ culture | percentBonus }} culture
 </div>
 
 <div
   class="public-works-color"
-  *ngIf="bonuses?.yieldFactor?.publicWorks as publicWorks"
+  *ngIf="bonuses().yieldFactor?.publicWorks as publicWorks"
 >
   + {{ publicWorks | percentBonus }} public works
 </div>
 
-<div class="growth-color" *ngIf="bonuses?.transferProductionToFood as transfer">
+<div class="growth-color" *ngIf="bonuses().transferProductionToFood as transfer">
   {{ transfer | percentBonus }} production transfered into food
 </div>
 
 <div
   class="culture-color"
-  *ngIf="bonuses?.transferProductionToCulture as transfer"
+  *ngIf="bonuses().transferProductionToCulture as transfer"
 >
   {{ transfer | percentBonus }} production transfered into culture
 </div>
 
 <div
   class="public-works-color"
-  *ngIf="bonuses?.transferProductionToPublicWorks as transfer"
+  *ngIf="bonuses().transferProductionToPublicWorks as transfer"
 >
   {{ transfer | percentBonus }} production transfered into public works
 </div>

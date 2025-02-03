@@ -8,15 +8,15 @@ import {
 import { TabComponent } from "./tab/tab.component";
 
 @Component({
-    selector: "app-tabs",
-    templateUrl: "./tabs.component.html",
-    styleUrls: ["./tabs.component.scss"],
-    standalone: false
+  selector: "app-tabs",
+  templateUrl: "./tabs.component.html",
+  styleUrls: ["./tabs.component.scss"],
+  standalone: false,
 })
 export class TabsComponent implements AfterContentInit {
-  @ContentChildren(TabComponent) tabs: QueryList<TabComponent>;
+  @ContentChildren(TabComponent) tabs!: QueryList<TabComponent>;
 
-  activeTab: TabComponent;
+  activeTab: TabComponent | undefined;
 
   ngAfterContentInit() {
     this.activateTab(this.tabs.first);

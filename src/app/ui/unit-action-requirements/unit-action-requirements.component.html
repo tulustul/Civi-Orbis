@@ -34,6 +34,6 @@
   Costs per turn: {{ publicWorksPerTurn }} public works points.
 </div>
 
-<div *ngIf="action === 'foundCity'">
+<div *ngIf="action() === 'foundCity'">
   Will consume the unit
 </div>

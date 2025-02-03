@@ -8,12 +8,7 @@ import { GameRenderer } from "../renderer";
 import { GameState } from "src/app/api/state";
 import { Container, Sprite } from "pixi.js";
 
-export class FogOfWarDrawer {
-  // TODO do we need this wrapper?
-  wrapperContainer = new TileWrapperContainer();
-
-  tilesContainer: TileContainer;
-
+export class VisibleTilesDrawer {
   private renderedTiles = new Map<Tile, Sprite>();
 
   public texture;
@@ -24,7 +19,6 @@ export class FogOfWarDrawer {
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
-    this.tilesContainer = new TileContainer(this.camera.tileBoundingBox);
     this.texture = this.renderer.spritesheet.textures["hexMask.png"];
     // this.container.addChild(this.wrapperContainer);
     // this.wrapperContainer.addChild(this.tilesContainer);
@@ -32,11 +26,7 @@ export class FogOfWarDrawer {
     this.game.init$.subscribe((state) => {
       this.build(state);
 
-      state.tilesShowed$
-        .pipe(takeUntil(this.game.stop$))
-        .subscribe(() => this.bindToTrackedPlayer());
-
-      state.tilesShowedAdded$
+      state.tilesExplored$
         .pipe(takeUntil(this.game.stop$))
         .subscribe((tiles) => this.addTiles(tiles));
 
@@ -47,13 +37,12 @@ export class FogOfWarDrawer {
   }
 
   clear() {
-    this.tilesContainer.destroyAllChildren();
     this.renderedTiles.clear();
   }
 
   private build(state: GameState) {
-    this.wrapperContainer.bindToMap(state.map);
-    this.tilesContainer.bindToMap(state.map);
+    // this.wrapperContainer.bindToMap(state.map);
+    // this.tilesContainer.bindToMap(state.map);
   }
 
   private bindToTrackedPlayer() {

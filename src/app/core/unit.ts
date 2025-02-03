@@ -10,11 +10,11 @@ import { SuppliesBlocker, SuppliesProducer } from "./supplies";
 export type UnitOrder = "go" | "skip" | "sleep" | null;
 
 export class UnitCore {
-  id: number;
+  id!: number;
   actionPointsLeft: number;
   health = 100;
   supplies = 100;
-  path: TileCore[][] | null;
+  path: TileCore[][] | null = null;
   parent: UnitCore | null = null;
   children: UnitCore[] = [];
 

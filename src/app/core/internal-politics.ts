@@ -10,7 +10,7 @@ export class InternalPolitics {
 
   stateReligion: any | null; // TODO
 
-  taxing: number; // [0-1]
+  taxing!: number; // [0-1]
 
-  scienceSpending: number; // [0-1]
+  scienceSpending!: number; // [0-1]
 }

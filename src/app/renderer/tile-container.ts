@@ -1,7 +1,7 @@
 import { BoundingBox } from "./camera";
 import { TilesMap } from "../api/map";
 import { Tile } from "../api/tile.interface";
-import { Container } from "pixi.js";
+import { Container, Renderer, UpdateTransformOptions } from "pixi.js";
 
 export class TileWrapperContainer extends Container {
   tilesMap = new Map<Tile, Container[]>();
@@ -16,9 +16,7 @@ export class TileWrapperContainer extends Container {
 }
 
 export class TileContainer extends Container {
-  parent: TileWrapperContainer;
-
-  private map: TilesMap;
+  private map!: TilesMap;
 
   private grid: Container[][][] = [];
   childrenMap = new Map<Container, Tile>();
@@ -27,19 +25,19 @@ export class TileContainer extends Container {
   private tilesMap = new Map<Tile, Container[]>();
 
   // needed only for interactivity
-  children: Container[] = [];
+  override children: Container[] = [];
 
   constructor(private bBox: BoundingBox) {
     super();
   }
 
-  addChild<T extends Container>(child: T, tile: Tile): void {
+  addChildToTile<T extends Container>(child: T, tile: Tile): void {
     if (child.parent) {
       child.parent.removeChild(child);
     }
 
-    (child as any).parent = this;
-    (child as any).transform._parentID = -1;
+    child.parent = this;
+    // child.worldTransform._parentID = -1;
 
     this.grid[tile.x][tile.y].push(child);
 
@@ -50,12 +48,12 @@ export class TileContainer extends Container {
 
     (this as any)._boundsID++;
 
-    this.parent.tilesMap.get(tile)!.push(child);
+    (this.parent as TileWrapperContainer).tilesMap.get(tile)!.push(child);
 
     child.emit("added", this);
   }
 
-  removeChild(child: Container) {
+  removeChildFromTile(child: Container) {
     if (this.childrenMap.has(child)) {
       // remove from childrenMap
       const tile = this.childrenMap.get(child)!;
@@ -76,7 +74,7 @@ export class TileContainer extends Container {
       }
 
       // remove from parent
-      children = this.parent.tilesMap.get(tile)!;
+      children = (this.parent as TileWrapperContainer).tilesMap.get(tile)!;
       index = children.indexOf(child);
       if (index !== -1) {
         children.splice(index, 1);
@@ -91,8 +89,8 @@ export class TileContainer extends Container {
   }
 
   moveChild(child: Container, tile: Tile) {
-    this.removeChild(child);
-    this.addChild(child, tile);
+    this.removeChildFromTile(child);
+    this.addChildToTile(child, tile);
   }
 
   getChildsFor(tile: Tile) {
@@ -133,7 +131,7 @@ export class TileContainer extends Container {
   }
 
   render(renderer: Renderer) {
-    if (!this.visible || this.worldAlpha <= 0 || !this.renderable) {
+    if (!this.visible || this.alpha <= 0 || !this.renderable) {
       return;
     }
 
@@ -144,29 +142,31 @@ export class TileContainer extends Container {
         }
       }
     }
-    renderer.batch.flush();
+    // renderer.batch.flush();
   }
 
-  updateTransform() {
+  override updateTransform(opts: Partial<UpdateTransformOptions>): this {
     if (!this.grid.length) {
-      return;
+      return this;
     }
 
     (this as any)._boundsID++;
 
-    this.transform.updateTransform(this.parent.transform);
+    this.worldTransform.copyFrom(this.parent.worldTransform);
 
     // TODO: check render flags, how to process stuff here
-    (this as any).worldAlpha = this.alpha * this.parent.worldAlpha;
+    (this as any).worldAlpha = this.alpha * this.parent.alpha;
 
     for (let x = this.bBox.xStart; x < this.bBox.xEnd; x++) {
       for (let y = this.bBox.yStart; y < this.bBox.yEnd; y++) {
         for (const child of this.grid[x][y]) {
           if (child.visible) {
-            child.updateTransform();
+            child.updateTransform(opts);
           }
         }
       }
     }
+
+    return this;
   }
 }

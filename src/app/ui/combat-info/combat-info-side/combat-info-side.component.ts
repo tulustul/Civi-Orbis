@@ -1,12 +1,12 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, input } from "@angular/core";
 
-import { CombatSimulationSide, CombatModifierType } from "src/app/core/combat";
+import { CombatModifierType, CombatSimulationSide } from "src/app/core/combat";
 
 @Component({
-    selector: "app-combat-info-side",
-    templateUrl: "./combat-info-side.component.html",
-    styleUrls: ["./combat-info-side.component.scss"],
-    standalone: false
+  selector: "app-combat-info-side",
+  templateUrl: "./combat-info-side.component.html",
+  styleUrls: ["./combat-info-side.component.scss"],
+  standalone: false,
 })
 export class CombatInfoSideComponent implements OnInit {
   MODIFIER_LABELS: Record<CombatModifierType, string> = {
@@ -17,11 +17,9 @@ export class CombatInfoSideComponent implements OnInit {
     [CombatModifierType.flanks]: "from flanks",
   };
 
-  @Input() label: string;
-
-  @Input() unitName: string;
-
-  @Input() simulationSide: CombatSimulationSide;
+  label = input.required<string>();
+  unitName = input.required<string>();
+  simulationSide = input.required<CombatSimulationSide>();
 
   constructor() {}
 

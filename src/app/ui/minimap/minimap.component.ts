@@ -1,5 +1,3 @@
-import * as PIXIE from "pixi.js";
-
 import {
   Component,
   ViewChild,
@@ -12,19 +10,20 @@ import { MinimapRenderer } from "src/app/renderer/minimap";
 import { GameRenderer } from "src/app/renderer/renderer";
 import { Camera } from "src/app/renderer/camera";
 import { GameApi } from "src/app/api";
+import { Application } from "pixi.js";
 
 @Component({
-    selector: "app-minimap",
-    templateUrl: "./minimap.component.html",
-    styleUrls: ["./minimap.component.scss"],
-    standalone: false
+  selector: "app-minimap",
+  templateUrl: "./minimap.component.html",
+  styleUrls: ["./minimap.component.scss"],
+  standalone: false,
 })
 export class MinimapComponent implements AfterViewInit, OnDestroy {
-  app: PIXIE.Application | null = null;
+  app: Application | null = null;
 
   minimapRenderer: MinimapRenderer | null = null;
 
-  @ViewChild("canvas") canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild("canvas") canvas!: ElementRef<HTMLCanvasElement>;
 
   constructor(
     private game: GameApi,
@@ -41,7 +40,7 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
     this.app?.destroy();
   }
 
-  create() {
+  async create() {
     if (this.minimapRenderer) {
       this.minimapRenderer.destroy();
     }
@@ -53,7 +52,8 @@ export class MinimapComponent implements AfterViewInit, OnDestroy {
     );
     this.minimapRenderer.calculateSize();
 
-    this.app = new PIXIE.Application({
+    this.app = new Application();
+    await this.app.init({
       view: this.canvas.nativeElement,
       width: this.minimapRenderer.width,
       height: this.minimapRenderer.height,

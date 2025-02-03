@@ -12,12 +12,11 @@ export class Layer {
       width: app.renderer.width,
       height: app.renderer.height,
     });
-
     this.sprite.texture = this.texture;
   }
 
   renderToTarget() {
-    this.app.renderer.render(this.stage, this.texture);
+    this.app.renderer.render({ container: this.stage, target: this.texture });
     this.app.render();
   }
 

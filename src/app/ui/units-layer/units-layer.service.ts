@@ -28,10 +28,10 @@ export class UnitsLayerService implements OnDestroy {
   }
 
   addUnitComponent(unitComponent: UnitComponent) {
-    this.unitComponents.set(unitComponent.unit, unitComponent);
+    this.unitComponents.set(unitComponent.unit(), unitComponent);
   }
 
   removeUnitComponent(unitComponent: UnitComponent) {
-    this.unitComponents.delete(unitComponent.unit);
+    this.unitComponents.delete(unitComponent.unit());
   }
 }

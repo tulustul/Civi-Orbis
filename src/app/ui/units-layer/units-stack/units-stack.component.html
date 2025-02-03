@@ -1,4 +1,4 @@
-<ng-container *ngFor="let unit of tile.units">
+<ng-container *ngFor="let unit of tile().units">
   <app-unit
     *ngIf="!unit.parent"
     [class.is-selected]="unit.id === selectedUnit?.id"

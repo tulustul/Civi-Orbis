@@ -5,16 +5,16 @@ import { filter } from "rxjs/operators";
 import { GameApi } from "src/app/api";
 
 @Component({
-    selector: "app-turn-counter",
-    templateUrl: "./turn-counter.component.html",
-    styleUrls: ["./turn-counter.component.scss"],
-    standalone: false
+  selector: "app-turn-counter",
+  templateUrl: "./turn-counter.component.html",
+  styleUrls: ["./turn-counter.component.scss"],
+  standalone: false,
 })
 export class TurnCounterComponent implements OnInit {
   @HostBinding("class.is-visible")
   isVisible = false;
 
-  timeout: number;
+  timeout: number | null = null;
 
   constructor(public game: GameApi) {}
 

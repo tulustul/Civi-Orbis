@@ -1,21 +1,21 @@
 <div class="panel panel-bottom-right-corner left">
   <div class="size-and-growth margin">
-    <span class="size">{{ city.size }}</span>
+    <span class="size">{{ city().size }}</span>
 
     <app-progress-bar
       class="growth-bar"
       [appTooltip]="growthTooltipTmpl"
-      [progress]="city.totalFood"
-      [nextProgress]="city.totalFood + city.perTurn.food"
-      [total]="city.foodToGrow"
+      [progress]="city().totalFood"
+      [nextProgress]="city().totalFood + city().perTurn.food"
+      [total]="city().foodToGrow"
     >
-      <span class="turns" *ngIf="city.perTurn.food > 0"
-        >will grow in {{ city.turnsToGrow | turns }} turns</span
+      <span class="turns" *ngIf="city().perTurn.food > 0"
+        >will grow in {{ city().turnsToGrow | turns }} turns</span
       >
-      <span class="turns" *ngIf="city.perTurn.food < 0"
-        >will shrink in {{ -city.turnsToGrow | turns }} turns</span
+      <span class="turns" *ngIf="city().perTurn.food < 0"
+        >will shrink in {{ -city().turnsToGrow | turns }} turns</span
       >
-      <span class="turns" *ngIf="city.perTurn.food === 0">growth stalled</span>
+      <span class="turns" *ngIf="city().perTurn.food === 0">growth stalled</span>
     </app-progress-bar>
   </div>
 
@@ -25,21 +25,21 @@
     <div class="yield growth-color">
       <div class="label">Food</div>
       <div class="value">
-        {{ city.yields.food }} - {{ city.foodConsumed }} =
-        {{ city.perTurn.food }}
+        {{ city().yields.food }} - {{ city().foodConsumed }} =
+        {{ city().perTurn.food }}
       </div>
     </div>
     <div class="yield production-color">
       <div class="label">Production</div>
-      <div class="value">{{ city.perTurn.production }}</div>
+      <div class="value">{{ city().perTurn.production }}</div>
     </div>
     <div class="yield culture-color">
       <div class="label">Culture</div>
-      <div class="value">{{ city.perTurn.culture }}</div>
+      <div class="value">{{ city().perTurn.culture }}</div>
     </div>
     <div class="yield public-works-color">
       <div class="label">Public works</div>
-      <div class="value">{{ city.perTurn.publicWorks }}</div>
+      <div class="value">{{ city().perTurn.publicWorks }}</div>
     </div>
   </div>
 
@@ -54,12 +54,12 @@
   <app-progress-bar
     class="culture-bar margin"
     [appTooltip]="expansionTooltipTmpl"
-    [progress]="city.totalCulture"
-    [nextProgress]="city.totalCulture + city.perTurn.culture"
-    [total]="city.cultureToExpand"
+    [progress]="city().totalCulture"
+    [nextProgress]="city().totalCulture + city().perTurn.culture"
+    [total]="city().cultureToExpand"
   >
     <span class="turns">
-      borders will expand in {{ city.turnsToExpand | turns }} turns
+      borders will expand in {{ city().turnsToExpand | turns }} turns
     </span>
   </app-progress-bar>
 
@@ -69,25 +69,25 @@
 
   <app-progress-bar
     class="production-bar margin"
-    *ngIf="city.product"
+    *ngIf="city().product"
     [appTooltip]="buildingTooltipTmpl"
-    [tooltipContext]="{ building: city.product.productDefinition }"
-    [progress]="city.totalProduction"
-    [nextProgress]="city.totalProduction + city.perTurn.production"
-    [total]="city.product?.productDefinition.productionCost"
+    [tooltipContext]="{ building: city().product?.productDefinition }"
+    [progress]="city().totalProduction"
+    [nextProgress]="city().totalProduction + city().perTurn.production"
+    [total]="city().product!.productDefinition.productionCost"
   >
     <div class="progress-bar-content">
       <span class="product-name-and-icon">
         <app-icon
-          [name]="city.product?.productDefinition.id"
+          [name]="city().product!.productDefinition!.id"
           [scale]="0.3"
         ></app-icon>
         <span class="name">
-          {{ city.product?.productDefinition.name || "-" }}
+          {{ city().product?.productDefinition?.name || "-" }}
         </span>
       </span>
-      <span class="turns" *ngIf="city.product">
-        {{ city.turnsToProductionEnd | turns }} turns
+      <span class="turns" *ngIf="city().product">
+        {{ city().turnsToProductionEnd | turns }} turns
       </span>
     </div>
   </app-progress-bar>
@@ -96,8 +96,8 @@
     <app-tab class="no-padding" tabTitle="recruit">
       <div
         class="product"
-        *ngFor="let unit of city.availableUnits"
-        [class.disabled]="city.disabledUnits.has(unit)"
+        *ngFor="let unit of city().availableUnits"
+        [class.disabled]="city().disabledUnits.has(unit)"
         [appTooltip]="unitTooltipTmpl"
         [tooltipContext]="{ unit: unit }"
         (click)="produceUnit(unit)"
@@ -109,7 +109,7 @@
           </span>
         </span>
         <span class="turns small">
-          {{ city.getTurnsToProduce(unit) }} turns
+          {{ city().getTurnsToProduce(unit) }} turns
         </span>
       </div>
     </app-tab>
@@ -117,8 +117,8 @@
     <app-tab class="no-padding" tabTitle="construct">
       <div
         class="product"
-        *ngFor="let building of city.availableBuildings"
-        [class.disabled]="city.disabledBuildings.has(building)"
+        *ngFor="let building of city().availableBuildings"
+        [class.disabled]="city().disabledBuildings.has(building)"
         [appTooltip]="buildingTooltipTmpl"
         [tooltipContext]="{ building: building }"
         (click)="produceBuilding(building)"
@@ -130,7 +130,7 @@
           </span></span
         >
         <span class="turns small">
-          {{ city.getTurnsToProduce(building) }} turns
+          {{ city().getTurnsToProduce(building) }} turns
         </span>
       </div>
     </app-tab>
@@ -138,7 +138,7 @@
     <app-tab class="no-padding" tabTitle="work on">
       <div
         class="product"
-        *ngFor="let idleProduct of city.availableIdleProducts"
+        *ngFor="let idleProduct of city().availableIdleProducts"
         [appTooltip]="idleProductTooltipTmpl"
         [tooltipContext]="{ idleProduct: idleProduct }"
         (click)="workOnIdleProduct(idleProduct)"
@@ -152,8 +152,8 @@
   </app-tabs>
 </div>
 
-<div class="city-name">
-  <h2 class="panel">{{ city.name }}</h2>
+<div class="city()-name">
+  <h2 class="panel">{{ city().name }}</h2>
   <button class="btn-primary" (click)="quit()">Return</button>
 </div>
 
@@ -162,7 +162,7 @@
 
   <div
     class="building"
-    *ngFor="let building of city.buildings"
+    *ngFor="let building of city().buildings"
     [appTooltip]="buildingTooltipTmpl"
     [tooltipContext]="{ building: building }"
   >
@@ -172,15 +172,15 @@
 
 <app-work-tiles
   #workTiles
-  [city]="city"
-  [workedTiles]="city.workedTiles"
+  [city]="city()"
+  [workedTiles]="city().workedTiles"
 ></app-work-tiles>
 
 <ng-template #buildingTooltipTmpl let-building="building">
   <b>{{ building.name }}</b>
   <app-product-requirements
     [product]="building"
-    [city]="city"
+    [city]="city()"
   ></app-product-requirements>
   <app-bonuses [bonuses]="building.bonuses"></app-bonuses>
   <div>Cost: {{ building.productionCost }}</div>
@@ -190,7 +190,7 @@
   <b>{{ unit.name }}</b>
   <app-product-requirements
     [product]="unit"
-    [city]="city"
+    [city]="city()"
   ></app-product-requirements>
   <div>Cost: {{ unit.productionCost }}</div>
 </ng-template>
@@ -202,14 +202,14 @@
 
 <ng-template #growthTooltipTmpl>
   <div class="growth-color">
-    {{ city.totalFood.toFixed(1) }} (+{{ city.yields.food }}) /
-    {{ city.foodToGrow }}
+    {{ city().totalFood.toFixed(1) }} (+{{ city().yields.food }}) /
+    {{ city().foodToGrow }}
   </div>
 </ng-template>
 
 <ng-template #expansionTooltipTmpl>
   <div class="culture-color">
-    {{ city.totalCulture.toFixed(1) }} (+{{ city.yields.culture }}) /
-    {{ city.cultureToExpand }}
+    {{ city().totalCulture.toFixed(1) }} (+{{ city().yields.culture }}) /
+    {{ city().cultureToExpand }}
   </div>
 </ng-template>

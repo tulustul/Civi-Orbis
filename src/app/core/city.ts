@@ -32,9 +32,9 @@ export interface Product {
 }
 
 export class CityCore {
-  id: number;
-  name: string;
-  size: number;
+  id!: number;
+  name!: string;
+  size!: number;
 
   totalFood = 0;
   foodConsumed = 1;
@@ -76,15 +76,20 @@ export class CityCore {
 
   resources: ResourceDefinition[] = [];
 
-  suppliesProducers = new SuppliesProducer(this.tile, this.player, 5);
+  suppliesProducers: SuppliesProducer;
 
-  constructor(public tile: TileCore, public player: PlayerCore) {
+  constructor(
+    public tile: TileCore,
+    public player: PlayerCore,
+  ) {
     this.addTile(tile);
 
     this.passableAreas.add(tile.passableArea);
     for (const neighbour of tile.neighbours) {
       this.passableAreas.add(neighbour.passableArea);
     }
+
+    this.suppliesProducers = new SuppliesProducer(this.tile, this.player, 5);
   }
 
   nextTurn() {
@@ -457,9 +462,8 @@ export class CityCore {
   }
 
   updateProductsList() {
-    this.availableUnits = this.getAvailableProducts<UnitDefinition>(
-      UNITS_DEFINITIONS,
-    );
+    this.availableUnits =
+      this.getAvailableProducts<UnitDefinition>(UNITS_DEFINITIONS);
     this.disabledUnits = this.getDisabledProducts<UnitDefinition>(
       this.availableUnits,
     );
@@ -469,9 +473,8 @@ export class CityCore {
         this.product?.productDefinition !== b && !this.buildings.includes(b),
     );
 
-    this.availableBuildings = this.getAvailableProducts<Building>(
-      notBuildBuildings,
-    );
+    this.availableBuildings =
+      this.getAvailableProducts<Building>(notBuildBuildings);
     this.disabledBuildings = this.getDisabledProducts<Building>(
       this.availableBuildings,
     );

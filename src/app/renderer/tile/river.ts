@@ -48,5 +48,6 @@ export class RiverDrawer {
         g.lineTo(0, 0.25);
       }
     }
+    g.stroke();
   }
 }

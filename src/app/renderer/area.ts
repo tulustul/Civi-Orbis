@@ -1,12 +1,21 @@
-import { Geometry, Shader, ShaderFromResources } from "pixi.js";
+import {
+  Container,
+  Geometry,
+  Shader,
+  ShaderFromResources,
+  Sprite,
+  Mesh,
+  MeshSimple,
+  Texture,
+  Graphics,
+} from "pixi.js";
 
 import { SeaLevel } from "src/app/shared";
 import { GameState } from "src/app/api/state";
 import { TileContainer } from "./tile-container";
-import { HEX_GEOMETRY } from "./utils";
+import { drawHex, HEX_GEOMETRY } from "./utils";
 import { Tile } from "../api/tile.interface";
 import { programs as areaPrograms } from "./shaders/area-shaders";
-import { Mesh, Texture } from "pixi.js";
 
 export interface AreaPrograms {
   background: ShaderFromResources;
@@ -20,7 +29,7 @@ export interface AreaOptions {
   borderShadowStrength: number;
   backgroundOpacity: number;
   visibleOnWater: boolean;
-  container: TileContainer;
+  container: Container;
   programs?: AreaPrograms;
 }
 
@@ -83,7 +92,7 @@ function makeBorderGeometry(borders: string): Geometry {
   }
   return new Geometry({
     attributes: {
-      aVertexPosition: { buffer: vertices, format: "float32" },
+      aVertexPosition: { buffer: vertices, format: "float32x2" },
       aUvs: { buffer: uvs, format: "float32" },
     },
   });
@@ -191,11 +200,11 @@ class AreaDrawer {
 
   backgroundShader: Shader;
 
-  bordersMap = new Map<Tile, Mesh>();
+  bordersMap = new Map<Tile, Mesh<Geometry, Shader>>();
 
-  backgroundMap = new Map<Tile, Mesh>();
+  backgroundMap = new Map<Tile, Mesh<Geometry, Shader>>();
 
-  vec4Color: number[];
+  vec4Color: Float32Array;
 
   constructor(
     private area: Area,
@@ -206,28 +215,35 @@ class AreaDrawer {
 
     const programs = options.programs ?? areaPrograms;
 
-    this.vec4Color = [
+    this.vec4Color = new Float32Array([
       parseInt(cssColor[1] + cssColor[2], 16) / 255,
       parseInt(cssColor[3] + cssColor[4], 16) / 255,
       parseInt(cssColor[5] + cssColor[6], 16) / 255,
       1,
-    ];
+    ]);
 
     this.borderShader = Shader.from({
       ...programs.border,
       resources: {
-        color: this.vec4Color,
-        borderSize: this.options.borderSize,
-        borderShadow: this.options.borderShadow,
-        borderShadowStrength: this.options.borderShadowStrength,
+        uniforms: {
+          color: { value: this.vec4Color, type: "vec4<f32>" },
+          borderSize: { value: this.options.borderSize, type: "f32" },
+          borderShadow: { value: this.options.borderShadow, type: "f32" },
+          borderShadowStrength: {
+            value: this.options.borderShadowStrength,
+            type: "f32",
+          },
+        },
       },
     });
 
     this.backgroundShader = Shader.from({
       ...programs.background,
       resources: {
-        color: this.vec4Color,
-        opacity: this.options.backgroundOpacity,
+        uniforms: {
+          color: { value: this.vec4Color, type: "vec4<f32>" },
+          opacity: { value: this.options.backgroundOpacity, type: "f32" },
+        },
       },
     });
   }
@@ -254,7 +270,7 @@ class AreaDrawer {
     mesh.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     mesh.position.y = tile.y * 0.75;
 
-    this.options.container.addChild(mesh, tile);
+    this.options.container.addChild(mesh);
     this.backgroundMap.set(tile, mesh);
 
     if (!this.state.trackedPlayer.exploredTiles.has(tile)) {
@@ -287,12 +303,12 @@ class AreaDrawer {
       borderGeometries.set(borders, geometry);
     }
 
-    const mesh = new Mesh(geometry, this.borderShader);
+    const mesh = new Mesh({ geometry, shader: this.borderShader });
 
     mesh.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     mesh.position.y = tile.y * 0.75;
 
-    this.options.container.addChild(mesh, tile);
+    this.options.container.addChild(mesh);
     this.bordersMap.set(tile, mesh);
 
     if (!this.state.trackedPlayer.exploredTiles.has(tile)) {

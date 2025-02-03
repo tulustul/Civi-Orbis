@@ -12,19 +12,22 @@ import { getUnitById } from "../core/data-manager";
 
 export class UnitDetails {
   id: number;
-  tile: Tile;
+  tile!: Tile;
   definition: UnitDefinition;
-  player: Player;
-  parent: Unit | null;
+  player!: Player;
+  parent!: Unit | null;
   children: Unit[] = [];
-  actionPointsLeft: number;
-  health: number;
-  supplies: number;
+  actionPointsLeft!: number;
+  health!: number;
+  supplies!: number;
   path: Tile[][] | null = null;
-  order: UnitOrder;
-  isSupplied: boolean;
+  order!: UnitOrder;
+  isSupplied!: boolean;
 
-  constructor(private game: GameState, unit: UnitDetailsChanneled) {
+  constructor(
+    private game: GameState,
+    unit: UnitDetailsChanneled,
+  ) {
     this.id = unit.id;
     this.definition = getUnitById(unit.definitionId)!;
     this.update(unit);

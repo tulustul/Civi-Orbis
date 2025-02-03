@@ -15,7 +15,7 @@ export class UnitsDrawer {
 
   container = new TileWrapperContainer();
 
-  tileContainer = new TileContainer(this.camera.tileBoundingBox);
+  tileContainer: TileContainer;
 
   unitContainerMap = new Map<Unit, Container>();
 
@@ -26,6 +26,8 @@ export class UnitsDrawer {
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
+    this.tileContainer = new TileContainer(this.camera.tileBoundingBox);
+
     game.init$.subscribe((state) => {
       state.unitSpawned$
         .pipe(takeUntil(game.stop$))
@@ -65,7 +67,7 @@ export class UnitsDrawer {
     const unitTexture = this.textures[unitTextureName];
 
     const unitContainer = new Container();
-    this.tileContainer.addChild(unitContainer, unit.tile);
+    this.tileContainer.addChildToTile(unitContainer, unit.tile);
 
     const backgroundSprite = new Sprite(backgroundTexture);
     backgroundSprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
@@ -213,6 +215,6 @@ export class UnitsDrawer {
   }
 
   protected get textures() {
-    return this.renderer.textures;
+    return this.renderer.spritesheet.textures;
   }
 }

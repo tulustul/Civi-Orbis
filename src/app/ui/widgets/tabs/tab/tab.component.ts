@@ -1,24 +1,18 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnDestroy,
-} from "@angular/core";
+import { Component, OnDestroy, input, output } from "@angular/core";
 
 import { BehaviorSubject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 
 @Component({
-    selector: "app-tab",
-    templateUrl: "./tab.component.html",
-    styleUrls: ["./tab.component.scss"],
-    standalone: false
+  selector: "app-tab",
+  templateUrl: "./tab.component.html",
+  styleUrls: ["./tab.component.scss"],
+  standalone: false,
 })
 export class TabComponent implements OnDestroy {
-  @Input() tabTitle: string;
+  tabTitle = input.required<string>();
 
-  @Output() select = new EventEmitter<void>();
+  select = output<void>();
 
   private _isVisible$ = new BehaviorSubject<boolean>(false);
   isVisible$ = this._isVisible$.asObservable().pipe(distinctUntilChanged());
@@ -33,7 +27,7 @@ export class TabComponent implements OnDestroy {
 
   show() {
     this._isVisible$.next(true);
-    this.select.next();
+    this.select.emit();
   }
 
   get isVisible() {

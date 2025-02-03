@@ -10,13 +10,16 @@ export class Unit {
   definition: UnitDefinition;
   player: Player;
   tile: Tile;
-  parent: Unit | null;
+  parent!: Unit | null;
   children: Unit[] = [];
   health: number;
   supplies: number;
   actionPointsLeft: number;
 
-  constructor(private game: GameState, unit: UnitChanneled) {
+  constructor(
+    private game: GameState,
+    unit: UnitChanneled,
+  ) {
     this.id = unit.id;
     this.tile = game.map.tilesMap.get(unit.tileId)!;
     this.player = game.playersMap.get(unit.playerId)!;

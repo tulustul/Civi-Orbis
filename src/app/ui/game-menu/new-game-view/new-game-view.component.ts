@@ -4,12 +4,13 @@ import { GameApi } from "src/app/api/game";
 import { MapGeneratorOptions } from "src/app/api/game.interface";
 import { Camera } from "src/app/renderer/camera";
 import { UIState } from "../../ui-state";
+import { measureTime, measureTimeAsync } from "src/app/utils";
 
 @Component({
-    selector: "app-new-game-view",
-    templateUrl: "./new-game-view.component.html",
-    styleUrls: ["./new-game-view.component.scss"],
-    standalone: false
+  selector: "app-new-game-view",
+  templateUrl: "./new-game-view.component.html",
+  styleUrls: ["./new-game-view.component.scss"],
+  standalone: false,
 })
 export class NewGameViewComponent implements OnInit {
   @Output() return = new EventEmitter<void>();
@@ -53,7 +54,7 @@ export class NewGameViewComponent implements OnInit {
     };
 
     this.waiting = true;
-    await this.game.newGame(mapOptions);
+    await measureTimeAsync("new game", () => this.game.newGame(mapOptions));
     this.waiting = false;
 
     const unit = this.game.state?.trackedPlayer.units[0];

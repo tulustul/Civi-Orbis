@@ -1,33 +1,33 @@
 import {
-  Component,
-  Input,
-  ViewChild,
-  TemplateRef,
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
   OnInit,
+  TemplateRef,
+  ViewChild,
+  input,
 } from "@angular/core";
 
-import { ProductDefinition } from "src/app/core/data.interface";
-import { getBuildingById } from "src/app/core/data-manager";
 import { CityDetails } from "src/app/api/city-details";
+import { getBuildingById } from "src/app/core/data-manager";
+import { ProductDefinition } from "src/app/core/data.interface";
 
 @Component({
-    selector: "app-product-requirements",
-    templateUrl: "./product-requirements.component.html",
-    styleUrls: ["./product-requirements.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-product-requirements",
+  templateUrl: "./product-requirements.component.html",
+  styleUrls: ["./product-requirements.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ProductRequirementsComponent implements OnInit, AfterViewInit {
-  @Input() product: ProductDefinition;
+  product = input.required<ProductDefinition>();
 
-  @Input() city: CityDetails;
+  city = input.required<CityDetails>();
 
-  @ViewChild("buildingTmpl") buildingRef: TemplateRef<any>;
+  @ViewChild("buildingTmpl") buildingRef!: TemplateRef<any>;
 
-  @ViewChild("sizeTmpl") sizeRef: TemplateRef<any>;
+  @ViewChild("sizeTmpl") sizeRef!: TemplateRef<any>;
 
   templates = new Map<string, TemplateRef<any>>();
 
@@ -36,8 +36,8 @@ export class ProductRequirementsComponent implements OnInit, AfterViewInit {
   constructor(private cdr: ChangeDetectorRef) {}
 
   async ngOnInit() {
-    this.failedRequirements = await this.city.getFailedActionRequirements(
-      this.product,
+    this.failedRequirements = await this.city().getFailedActionRequirements(
+      this.product(),
     );
     this.cdr.markForCheck();
   }

@@ -56,6 +56,7 @@ export class PathRenderer {
         g.lineTo(...getTileCenter(tile));
       }
     }
+    g.stroke();
 
     for (let turn = 0; turn < path.length; turn++) {
       if (path[turn][0]) {

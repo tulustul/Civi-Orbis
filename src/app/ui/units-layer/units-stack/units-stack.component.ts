@@ -1,24 +1,24 @@
 import {
   Component,
-  OnInit,
   ElementRef,
-  Input,
   HostListener,
+  OnInit,
+  input,
 } from "@angular/core";
 
+import { GameApi } from "src/app/api";
 import { Tile } from "src/app/api/tile.interface";
 import { Controls } from "src/app/controls";
 import { MapUi } from "../../map-ui";
-import { GameApi } from "src/app/api";
 
 @Component({
-    selector: "app-units-stack",
-    templateUrl: "./units-stack.component.html",
-    styleUrls: ["./units-stack.component.scss"],
-    standalone: false
+  selector: "app-units-stack",
+  templateUrl: "./units-stack.component.html",
+  styleUrls: ["./units-stack.component.scss"],
+  standalone: false,
 })
 export class UnitsStackComponent implements OnInit {
-  @Input() tile: Tile;
+  tile = input.required<Tile>();
 
   constructor(
     public elementRef: ElementRef<HTMLElement>,

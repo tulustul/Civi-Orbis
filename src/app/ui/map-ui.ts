@@ -48,17 +48,17 @@ export class MapUi {
 
   allowMapPanning = true;
 
-  hoveredCity: City | null;
+  hoveredCity!: City | null;
 
-  unitRangeArea: Area;
+  unitRangeArea!: Area;
 
-  cityRangeArea: Area;
-  cityBordersOnlyArea: Area;
-  cityWorkedTilesArea: Area;
-  cityNotWorkedTilesArea: Area;
-  suppliesRangeArea: Area;
+  cityRangeArea!: Area;
+  cityBordersOnlyArea!: Area;
+  cityWorkedTilesArea!: Area;
+  cityNotWorkedTilesArea!: Area;
+  suppliesRangeArea!: Area;
 
-  editorArea: Area;
+  editorArea!: Area;
 
   constructor(
     private game: GameApi,
@@ -115,10 +115,10 @@ export class MapUi {
 
       this.game.state!.turn$.subscribe(() => this.setPath(null));
 
-      const areasContainer = this.camera["renderer"].overlays.tilesContainer;
+      const areasContainer = this.camera["renderer"].overlays.container;
 
       this.unitRangeArea = new Area(this.game.state!, {
-        color: 0xffffff,
+        color: 0xddffdd,
         container: areasContainer,
         backgroundOpacity: 0.15,
         borderShadow: 0.4,

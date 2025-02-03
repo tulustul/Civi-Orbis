@@ -19,19 +19,19 @@ import { TILE_SIZE } from "src/app/renderer/constants";
 import { UnitsLayerService } from "./units-layer.service";
 
 @Component({
-    selector: "app-units-layer",
-    templateUrl: "./units-layer.component.html",
-    styleUrls: ["./units-layer.component.scss"],
-    providers: [UnitsLayerService],
-    standalone: false
+  selector: "app-units-layer",
+  templateUrl: "./units-layer.component.html",
+  styleUrls: ["./units-layer.component.scss"],
+  providers: [UnitsLayerService],
+  standalone: false,
 })
 export class UnitsLayerComponent implements OnInit, AfterViewInit {
   ngUnsubscribe = new Subject<void>();
 
   @ViewChildren(UnitsStackComponent)
-  unitStacksComponents: UnitsStackComponent[];
+  unitStacksComponents!: UnitsStackComponent[];
 
-  tiles: Set<Tile>;
+  tiles!: Set<Tile>;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -87,7 +87,7 @@ export class UnitsLayerComponent implements OnInit, AfterViewInit {
     }
 
     for (const unitStackComponent of this.unitStacksComponents) {
-      const tile = unitStackComponent.tile;
+      const tile = unitStackComponent.tile();
       const cityEl = unitStackComponent.elementRef.nativeElement;
       if (
         tile.x >= box.xStart &&
@@ -102,7 +102,7 @@ export class UnitsLayerComponent implements OnInit, AfterViewInit {
       }
 
       const tileScale = scale / TILE_SIZE;
-      let [x, y] = getTileCoords(unitStackComponent.tile);
+      let [x, y] = getTileCoords(tile);
       [x, y] = this.camera.canvasToScreen(x, y);
       cityEl.style.transform = `translate(${x}px, ${y}px) scale(${tileScale})`;
     }

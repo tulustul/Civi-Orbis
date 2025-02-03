@@ -1,24 +1,28 @@
-import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, input } from "@angular/core";
 
 @Component({
-    selector: "app-progress-bar",
-    templateUrl: "./progress-bar.component.html",
-    styleUrls: ["./progress-bar.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-progress-bar",
+  templateUrl: "./progress-bar.component.html",
+  styleUrls: ["./progress-bar.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ProgressBarComponent {
-  @Input() progress: number;
+  progress = input.required<number>();
 
-  @Input() nextProgress: number;
+  nextProgress = input<number>();
 
-  @Input() total: number;
+  total = input.required<number>();
 
   get progressPercent() {
-    return (this.progress / this.total) * 100;
+    return (this.progress() / this.total()) * 100;
   }
 
   get nextProgressPercent() {
-    return (this.nextProgress / this.total) * 100;
+    const nextProgress = this.nextProgress();
+    if (!nextProgress) {
+      return 0;
+    }
+    return (nextProgress / this.total()) * 100;
   }
 }

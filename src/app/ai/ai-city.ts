@@ -5,7 +5,7 @@ import { Product, CityCore } from "../core/city";
 import { AISystem } from "./ai-system";
 
 export class ProduceOperation extends AiOperation {
-  product: Product;
+  // product: Product;
 
   city: CityCore | null = null;
 

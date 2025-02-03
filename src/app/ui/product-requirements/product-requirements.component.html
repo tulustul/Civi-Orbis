@@ -1,6 +1,6 @@
 <ng-container *ngFor="let r of failedRequirements">
   <ng-container
-    *ngTemplateOutlet="templates.get(r[0]); context: r[1]"
+    *ngTemplateOutlet="templates.get(r[0])!; context: r[1]"
   ></ng-container>
 </ng-container>
 

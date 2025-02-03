@@ -1,4 +1,4 @@
-import { Shader, ShaderFromResources } from "pixi.js";
+import { ShaderFromResources } from "pixi.js";
 
 const VERTEX_BORDER = `
 precision mediump float;
@@ -9,7 +9,7 @@ attribute float aUvs;
 uniform mat3 translationMatrix;
 uniform mat3 projectionMatrix;
 
-varying float vUvs;
+in float vUvs;
 
 void main() {
   vUvs = aUvs;
@@ -19,7 +19,7 @@ void main() {
 const FRAGMENT_BORDER = `
 precision mediump float;
 
-varying float vUvs;
+in float vUvs;
 
 uniform vec4 color;
 uniform float borderSize;

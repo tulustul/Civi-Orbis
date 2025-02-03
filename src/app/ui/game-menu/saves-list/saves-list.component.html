@@ -1,7 +1,7 @@
 <div
   class="save"
   *ngFor="let save of saves"
-  [class.selected]="save === selectedSave"
+  [class.selected]="save === selectedSave()"
   (click)="change.next(save)"
 >
   <span>{{ save }}</span>

@@ -36,6 +36,6 @@ export class CityDrawer {
   }
 
   private get textures() {
-    return this.renderer.textures;
+    return this.renderer.spritesheet.textures;
   }
 }

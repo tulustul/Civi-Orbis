@@ -33,11 +33,10 @@ export class YiedsDrawer {
     quantity: number,
     color: number,
   ) {
-    g.beginFill(color);
     for (let i = 0; i < quantity; i++) {
       const x = 0.5 - (quantity / 2) * 0.1 + 0.1 * i;
-      g.drawRect(x, y, 0.05, 0.05);
+      g.rect(x, y, 0.05, 0.05);
     }
-    g.endFill();
+    g.fill({ color });
   }
 }

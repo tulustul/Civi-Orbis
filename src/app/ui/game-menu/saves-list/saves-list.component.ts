@@ -1,19 +1,19 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, EventEmitter, OnInit, Output, input } from "@angular/core";
 
-import { listSaveGames, deleteSaveGame, exportSave } from "../../../api/saving";
+import { deleteSaveGame, exportSave, listSaveGames } from "../../../api/saving";
 
 @Component({
-    selector: "app-saves-list",
-    templateUrl: "./saves-list.component.html",
-    styleUrls: ["./saves-list.component.scss"],
-    standalone: false
+  selector: "app-saves-list",
+  templateUrl: "./saves-list.component.html",
+  styleUrls: ["./saves-list.component.scss"],
+  standalone: false,
 })
 export class SavesListComponent implements OnInit {
-  @Input() selectedSave: string;
+  selectedSave = input.required<string>();
 
   @Output() change = new EventEmitter<string>();
 
-  saves: string[];
+  saves: string[] = [];
 
   ngOnInit(): void {
     this.refresh();
@@ -22,7 +22,7 @@ export class SavesListComponent implements OnInit {
   delete(save: string) {
     deleteSaveGame(save);
     this.refresh();
-    if (this.selectedSave === save) {
+    if (this.selectedSave() === save) {
       this.change.next("");
     }
   }

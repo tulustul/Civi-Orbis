@@ -1,45 +1,45 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, input } from "@angular/core";
 
 import { Observable } from "rxjs";
-import { takeUntil, filter } from "rxjs/operators";
+import { filter, takeUntil } from "rxjs/operators";
 
+import { GameApi } from "src/app/api";
+import { Tile } from "src/app/api/tile.interface";
+import { getResourceDefinitionById } from "src/app/core/data-manager";
+import { ResourceDefinition } from "src/app/core/data.interface";
+import { TileImprovement, TileRoad } from "src/app/core/tile-improvements";
+import { RESOURCES_DEFINITIONS } from "src/app/data/resources";
+import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
+import {
+  TileDirection,
+  areWetlandsPossible,
+  isForestable,
+  isImprovementPossible,
+  isResourcePossible,
+  isRoadPossible,
+} from "src/app/shared";
+import { getDirectionTo } from "src/app/shared/hex-math";
+import { MapUi } from "../../map-ui";
+import { Option } from "../../widgets/option.interface";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,
+  IMPROVEMENT_OPTIONS,
   LAND_FORM_OPTIONS,
   RIVER_OPTIONS,
+  ROAD_OPTIONS,
   SEA_LEVEL_OPTIONS,
   WETLANDS_OPTIONS,
-  IMPROVEMENT_OPTIONS,
-  ROAD_OPTIONS,
 } from "../constants";
-import { OPPOSITE_DIRECTIONS } from "src/app/map-generators/utils";
-import { MapUi } from "../../map-ui";
-import { TileImprovement, TileRoad } from "src/app/core/tile-improvements";
-import {
-  TileDirection,
-  isForestable,
-  areWetlandsPossible,
-  isImprovementPossible,
-  isRoadPossible,
-  isResourcePossible,
-} from "src/app/shared";
-import { GameApi } from "src/app/api";
-import { getDirectionTo } from "src/app/shared/hex-math";
-import { Tile, Resource } from "src/app/api/tile.interface";
-import { RESOURCES_DEFINITIONS } from "src/app/data/resources";
-import { Option } from "../../widgets/option.interface";
-import { ResourceDefinition } from "src/app/core/data.interface";
-import { getResourceDefinitionById } from "src/app/core/data-manager";
 
 @Component({
-    selector: "app-tile-editor",
-    templateUrl: "./tile-editor.component.html",
-    styleUrls: ["./tile-editor.component.scss"],
-    standalone: false
+  selector: "app-tile-editor",
+  templateUrl: "./tile-editor.component.html",
+  styleUrls: ["./tile-editor.component.scss"],
+  standalone: false,
 })
 export class TileEditorComponent implements OnInit {
-  @Input() isVisible$: Observable<boolean>;
+  isVisible$ = input.required<Observable<boolean>>();
 
   tile: Tile | null = null;
 
@@ -58,11 +58,14 @@ export class TileEditorComponent implements OnInit {
     }),
   );
 
-  constructor(private game: GameApi, private mapUi: MapUi) {}
+  constructor(
+    private game: GameApi,
+    private mapUi: MapUi,
+  ) {}
 
   ngOnInit(): void {
-    const shown = this.isVisible$.pipe(filter((v) => v));
-    const hidden = this.isVisible$.pipe(filter((v) => !v));
+    const shown = this.isVisible$().pipe(filter((v) => v));
+    const hidden = this.isVisible$().pipe(filter((v) => !v));
 
     shown.subscribe(() => {
       this.mapUi.enableSelectingTile(true);

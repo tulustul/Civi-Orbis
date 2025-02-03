@@ -24,7 +24,7 @@ export class TradeManager {
 }
 
 export class TradeGraph {
-  nodes: TradeNode[];
+  nodes!: TradeNode[];
   nodesMap = new Map<CityCore, TradeNode>();
 
   findRoute(from: CityCore, to: CityCore): TradeRoute | null {
@@ -39,12 +39,12 @@ export class TradeGraph {
 }
 
 export class TradeRoute {
-  edges: TradeEdge[];
+  edges!: TradeEdge[];
 }
 
 export class TradeNode {
-  city: CityCore;
-  edges: TradeEdge;
+  city!: CityCore;
+  edges!: TradeEdge;
 }
 
 export class TradeEdge {
@@ -55,7 +55,10 @@ export class TradeEdge {
   toAGoods: TradeGoods[] = [];
   toBGoods: TradeGoods[] = [];
 
-  constructor(public nodeA: CityCore, public nodeB: CityCore) {
+  constructor(
+    public nodeA: CityCore,
+    public nodeB: CityCore,
+  ) {
     this.path = this.buildPath();
   }
 
@@ -71,7 +74,7 @@ export class TradeEdge {
 }
 
 export class TradeGoods {
-  from: CityCore;
+  from!: CityCore;
 
   yields: Yields = { ...EMPTY_YIELDS };
 

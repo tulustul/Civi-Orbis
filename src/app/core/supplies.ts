@@ -41,7 +41,10 @@ export class SuppliesProducer {
 }
 
 export class SuppliesBlocker {
-  constructor(public tile: TileCore, public player: PlayerCore) {
+  constructor(
+    public tile: TileCore,
+    public player: PlayerCore,
+  ) {
     this.update(tile);
   }
 
@@ -86,7 +89,7 @@ function _getRange(
   result.add(tile);
 
   if (actionPointsLeft <= 0) {
-    return result;
+    return;
   }
 
   for (const neighbour of tile.neighbours) {

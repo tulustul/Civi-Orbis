@@ -20,49 +20,52 @@ import {
 
 export class CityDetails {
   id: number;
-  name: string;
-  size: number;
-  tile: Tile;
-  player: Player;
+  name!: string;
+  size!: number;
+  tile!: Tile;
+  player!: Player;
 
-  totalFood: number;
-  foodToGrow: number;
-  turnsToGrow: number;
+  totalFood!: number;
+  foodToGrow!: number;
+  turnsToGrow!: number;
 
-  totalProduction: number;
-  turnsToProductionEnd: number | null;
+  totalProduction!: number;
+  turnsToProductionEnd!: number | null;
 
-  product: Product | null;
+  product!: Product | null;
 
-  foodConsumed: number;
+  foodConsumed!: number;
 
-  totalCulture: number;
-  cultureToExpand: number;
+  totalCulture!: number;
+  cultureToExpand!: number;
 
-  tileYields: Yields;
-  yields: Yields;
-  perTurn: Yields;
+  tileYields!: Yields;
+  yields!: Yields;
+  perTurn!: Yields;
 
-  buildings: Building[];
-  buildingsIds: Set<string>;
+  buildings!: Building[];
+  buildingsIds!: Set<string>;
 
-  tiles: Set<Tile>;
+  tiles!: Set<Tile>;
 
-  workedTiles: Set<Tile>;
+  workedTiles!: Set<Tile>;
 
-  availableBuildings: Building[];
+  availableBuildings!: Building[];
 
-  disabledBuildings: Set<Building>;
+  disabledBuildings!: Set<Building>;
 
-  availableUnits: UnitDefinition[];
-  disabledUnits: Set<UnitDefinition>;
+  availableUnits!: UnitDefinition[];
+  disabledUnits!: Set<UnitDefinition>;
 
-  availableIdleProducts: IdleProduct[];
-  disabledIdleProducts: Set<IdleProduct>;
+  availableIdleProducts!: IdleProduct[];
+  disabledIdleProducts!: Set<IdleProduct>;
 
   citySimple: City;
 
-  constructor(private game: GameState, city: CityDetailsChanneled) {
+  constructor(
+    private game: GameState,
+    city: CityDetailsChanneled,
+  ) {
     this.id = city.id;
     this.update(city);
     this.citySimple = game.citiesMap.get(city.id)!;

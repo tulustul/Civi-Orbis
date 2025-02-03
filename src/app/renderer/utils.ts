@@ -14,6 +14,7 @@ const HEX_VERTICES = [
 export const HEX_GEOMETRY = new Geometry({
   attributes: {
     aVertexPosition: { buffer: HEX_VERTICES, format: "float32x2" },
+    // aUvs: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   },
 });
 
@@ -26,6 +27,8 @@ export function getTileCoords(tile: Tile): [number, number] {
 }
 
 export function drawHex(graphics: Graphics, x = 0, y = 0) {
+  x += y % 2 ? 0.5 : 0;
+  y *= 0.75;
   graphics.moveTo(x + 0, y + 0.25);
   graphics.lineTo(x + 0.5, y + 0);
   graphics.lineTo(x + 1, y + 0.25);

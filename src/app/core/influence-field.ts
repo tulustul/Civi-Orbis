@@ -9,11 +9,11 @@ import { Entity } from "./data.interface";
  */
 
 export class InfluenceFieldEmitter<T extends Entity> {
-  tile: TileCore;
-  entity: T;
-  pressure: number;
-  pressureSpreadModifier: number;
-  minInfluenceToSpread: number;
+  tile!: TileCore;
+  entity!: T;
+  pressure!: number;
+  pressureSpreadModifier!: number;
+  minInfluenceToSpread!: number;
 
   constructor(options: InfluenceFieldEmitterOptions<T>) {
     Object.assign(this, options);

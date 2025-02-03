@@ -6,24 +6,27 @@ import { Tile } from "./tile.interface";
 
 export class City {
   id: number;
-  player: Player;
+  player!: Player;
   tile: Tile;
 
-  name: string;
-  size: number;
+  name!: string;
+  size!: number;
 
-  totalFood: number;
-  foodToGrow: number;
-  foodPerTurn: number;
-  turnsToGrow: number;
+  totalFood!: number;
+  foodToGrow!: number;
+  foodPerTurn!: number;
+  turnsToGrow!: number;
 
-  totalProduction: number;
-  productionRequired: number | null;
-  productionPerTurn: number;
-  turnsToProductionEnd: number | null;
-  productName: string | null;
+  totalProduction!: number;
+  productionRequired!: number | null;
+  productionPerTurn!: number;
+  turnsToProductionEnd!: number | null;
+  productName!: string | null;
 
-  constructor(private game: GameState, city: CityChanneled) {
+  constructor(
+    private game: GameState,
+    city: CityChanneled,
+  ) {
     this.id = city.id;
     this.tile = game.map.tilesMap.get(city.tileId)!;
 

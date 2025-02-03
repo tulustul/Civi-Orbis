@@ -21,18 +21,18 @@ import { CombatSimulation } from "src/app/core/combat";
 import { UnitComponent } from "../unit/unit.component";
 
 @Component({
-    selector: "app-unit-panel",
-    templateUrl: "./unit-panel.component.html",
-    styleUrls: ["./unit-panel.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: "app-unit-panel",
+  templateUrl: "./unit-panel.component.html",
+  styleUrls: ["./unit-panel.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class UnitPanelComponent implements OnInit, OnDestroy {
   @ViewChild("unitComponent") unitComponent: UnitComponent | undefined;
 
   unit: UnitDetails | null = null;
-  enemy: Unit | null;
-  combatSimulation: CombatSimulation | null;
+  enemy: Unit | null = null;
+  combatSimulation: CombatSimulation | null = null;
 
   requirementsTemplates = new Map<UnitAction, TemplateRef<any>>();
 
@@ -117,5 +117,12 @@ export class UnitPanelComponent implements OnInit, OnDestroy {
       this.unit.player.id !== unit.player.id &&
       unit.definition.strength
     );
+  }
+
+  get unitSimple() {
+    if (!this.unit) {
+      return null;
+    }
+    return this.game.state?.unitsMap.get(this.unit.id) ?? null;
   }
 }

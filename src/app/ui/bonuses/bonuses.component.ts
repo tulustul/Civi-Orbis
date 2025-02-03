@@ -1,15 +1,15 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, input } from "@angular/core";
 
 import { Bonuses } from "src/app/core/bonus";
 
 @Component({
-    selector: "app-bonuses",
-    templateUrl: "./bonuses.component.html",
-    styleUrls: ["./bonuses.component.scss"],
-    standalone: false
+  selector: "app-bonuses",
+  templateUrl: "./bonuses.component.html",
+  styleUrls: ["./bonuses.component.scss"],
+  standalone: false,
 })
 export class BonusesComponent implements OnInit {
-  @Input() bonuses: Bonuses;
+  bonuses = input.required<Bonuses>();
 
   constructor() {}
 

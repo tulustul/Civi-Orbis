@@ -46,19 +46,15 @@ export function getPublicWorksPerTurn(action: UnitAction) {
 }
 
 export abstract class ActionRequirement {
-  static id: string;
+  id = "";
 
-  id: string;
-
-  constructor() {
-    this.id = this.constructor["id"];
-  }
+  constructor() {}
 
   abstract check(unit: UnitCore, action: UnitAction): boolean;
 }
 
 export class OwnTileRequirement extends ActionRequirement {
-  id = "ownTile";
+  override id = "ownTile";
 
   check(unit: UnitCore) {
     return unit.tile.areaOf?.player === unit.player;
@@ -66,7 +62,7 @@ export class OwnTileRequirement extends ActionRequirement {
 }
 
 export class NotForeignTileRequirement extends ActionRequirement {
-  id = "notForeignTile";
+  override id = "notForeignTile";
 
   check(unit: UnitCore) {
     return !unit.tile.areaOf || unit.tile.areaOf?.player === unit.player;
@@ -74,7 +70,7 @@ export class NotForeignTileRequirement extends ActionRequirement {
 }
 
 export class ImprovementNotYetBuiltRequirement extends ActionRequirement {
-  id = "sameImprovement";
+  override id = "sameImprovement";
 
   constructor(public improvement: TileImprovement) {
     super();
@@ -85,7 +81,7 @@ export class ImprovementNotYetBuiltRequirement extends ActionRequirement {
   }
 }
 export class IsImprovementPossibleRequirement extends ActionRequirement {
-  id = "improvementPossible";
+  override id = "improvementPossible";
 
   constructor(public improvement: TileImprovement) {
     super();
@@ -97,7 +93,7 @@ export class IsImprovementPossibleRequirement extends ActionRequirement {
 }
 
 export class NoRoadRequirement extends ActionRequirement {
-  id = "noRoad";
+  override id = "noRoad";
 
   check(unit: UnitCore) {
     return unit.tile.road === null;
@@ -105,7 +101,7 @@ export class NoRoadRequirement extends ActionRequirement {
 }
 
 export class isRoadPossibleRequirement extends ActionRequirement {
-  id = "roadPossible";
+  override id = "roadPossible";
 
   check(unit: UnitCore) {
     return isRoadPossible(unit.tile);
@@ -113,7 +109,7 @@ export class isRoadPossibleRequirement extends ActionRequirement {
 }
 
 export class PublicWorksPointsRequirement extends ActionRequirement {
-  id = "publicWorks";
+  override id = "publicWorks";
 
   check(unit: UnitCore, action: UnitAction) {
     return (

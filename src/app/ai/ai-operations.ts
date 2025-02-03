@@ -7,7 +7,7 @@ export abstract class AiOperation {
 
   blockedBy: AiOperation[] = [];
 
-  abstract perform();
+  abstract perform(): void;
 
   cancel() {
     for (const op of this.children) {

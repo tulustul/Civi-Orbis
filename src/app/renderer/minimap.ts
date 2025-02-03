@@ -4,6 +4,7 @@ import {
   Sprite,
   Application,
   RenderTexture,
+  Texture,
 } from "pixi.js";
 
 import { Subject } from "rxjs";
@@ -47,11 +48,11 @@ export class MinimapRenderer {
 
   private mapSprite = new Sprite();
 
-  private mapTexture: RenderTexture;
+  private mapTexture!: RenderTexture;
 
-  private tilesMap = new Map<Tile, DisplayObject[]>();
+  private tilesMap = new Map<Tile, Container[]>();
 
-  private app: Application;
+  private app!: Application;
 
   private destroyed$ = new Subject<void>();
 
@@ -177,12 +178,9 @@ export class MinimapRenderer {
     this.cameraGraphics.clear();
 
     this.cameraGraphics.setStrokeStyle({ width: 1, color: 0xffffff });
-    this.cameraGraphics.rect(
-      xStart,
-      yStart,
-      width * this.scale,
-      height * this.scale,
-    );
+    this.cameraGraphics
+      .rect(xStart, yStart, width * this.scale, height * this.scale)
+      .stroke();
 
     if (this.app) {
       this.app.render();
@@ -190,7 +188,10 @@ export class MinimapRenderer {
   }
 
   private updateMap() {
-    this.app.renderer.render(this.mapScene, this.mapTexture);
+    this.app.renderer.render({
+      container: this.mapScene,
+      target: this.mapTexture,
+    });
     this.app.render();
   }
 
@@ -218,12 +219,9 @@ export class MinimapRenderer {
     }
 
     const g = new Graphics();
-    g.beginFill(color);
-    drawHex(g);
-    g.endFill();
+    drawHex(g, tile.x, tile.y);
+    g.fill({ color });
 
-    g.position.x = (tile.x + (tile.y % 2 ? 0.5 : 0)) * this.scale;
-    g.position.y = tile.y * 0.75 * this.scale;
     g.scale.x = this.scale;
     g.scale.y = this.scale;
 
@@ -242,7 +240,7 @@ export class MinimapRenderer {
       return;
     }
 
-    graphics.lineStyle(0.3, SEA_COLORS[SeaLevel.deep]);
+    graphics.setStrokeStyle({ width: 0.3, color: SEA_COLORS[SeaLevel.deep] });
 
     for (const river of tile.riverParts) {
       if (river === TileDirection.NW) {
@@ -275,5 +273,7 @@ export class MinimapRenderer {
         graphics.lineTo(0, 0.25);
       }
     }
+
+    graphics.stroke();
   }
 }

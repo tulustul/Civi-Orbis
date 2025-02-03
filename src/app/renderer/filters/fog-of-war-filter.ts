@@ -1,18 +1,61 @@
-import { Filter, GlProgram, Texture, defaultFilterVert } from "pixi.js";
+import {
+  Filter,
+  FilterSystem,
+  GlProgram,
+  Matrix,
+  Sprite,
+  Texture,
+  TextureMatrix,
+  UniformGroup,
+} from "pixi.js";
+
+const vertex = `
+in vec2 aPosition;
+
+out vec2 vTextureCoord;
+out vec2 vMaskCoord;
+
+
+uniform vec4 uInputSize;
+uniform vec4 uOutputFrame;
+uniform vec4 uOutputTexture;
+uniform mat3 uFilterMatrix;
+
+vec4 filterVertexPosition(  vec2 aPosition )
+{
+    vec2 position = aPosition * uOutputFrame.zw + uOutputFrame.xy;
+
+    position.x = position.x * (2.0 / uOutputTexture.x) - 1.0;
+    position.y = position.y * (2.0*uOutputTexture.z / uOutputTexture.y) - uOutputTexture.z;
+
+    return vec4(position, 0.0, 1.0);
+}
+
+vec2 filterTextureCoord(  vec2 aPosition )
+{
+    return aPosition * (uOutputFrame.zw * uInputSize.zw);
+}
+
+vec2 getFilterCoord( vec2 aPosition )
+{
+    return  ( uFilterMatrix * vec3( filterTextureCoord(aPosition), 1.0)  ).xy;
+}
+
+void main(void)
+{
+    gl_Position = filterVertexPosition(aPosition);
+    vTextureCoord = filterTextureCoord(aPosition);
+    vMaskCoord = getFilterCoord(aPosition);
+}`;
 
 const fragment = `
 precision mediump float;
 
-#define FILTER_SIZE 2
-#define COLOR_LEVELS 30.0
-#define EDGE_FILTER_SIZE 3
-#define EDGE_THRESHOLD 0.5
+in vec2 vTextureCoord;
+in vec2 vMaskCoord;
 
-varying vec2 vTextureCoord;
-varying vec4 vColor;
-
-uniform sampler2D uSampler;
-uniform sampler2D maskSampler;
+uniform sampler2D uTexture;
+uniform sampler2D uMaskTexture;
 
 vec3 blendNormal(vec3 base, vec3 blend) {
 	return blend;
@@ -22,11 +65,11 @@ vec3 blendNormal(vec3 base, vec3 blend, float opacity) {
 	return (blendNormal(base, blend) * opacity + base * (1.0 - opacity));
 }
 
-vec3 setContrast(in vec3 color, in float contrast) {
+vec3 setContrast(vec3 color, float contrast) {
   return ((color - 0.5) * contrast) + 0.5;
 }
 
-vec3 makeSepia(in vec3 color, in float strength) {
+vec3 makeSepia(vec3 color, float strength) {
   vec3 sepia;
 
   sepia.r = dot(color, vec3(0.393, 0.769, 0.189));
@@ -38,11 +81,17 @@ vec3 makeSepia(in vec3 color, in float strength) {
   return color - diff;
 }
 
+vec3 desaturate(vec3 color, float strength) {
+  float gray = dot(color, vec3(0.299, 0.587, 0.114));
+  return mix(color, vec3(gray), strength);
+}
+
 void main() {
-  vec4 color = texture2D(uSampler, vTextureCoord);
-  vec4 mask = texture2D(maskSampler, vTextureCoord);
+  vec4 color = texture2D(uTexture, vTextureCoord);
+  vec4 mask = texture2D(uMaskTexture, vMaskCoord);
 
   if (mask.r < 0.5) {
+    // vec3 outColor = desaturate(color.rgb, 0.6);
     vec3 outColor = makeSepia(color.rgb, 0.6);
     // outColor = setContrast(outColor, 0.4);
     outColor = blendNormal(outColor, vec3(0.0, 0.0, 0.0), 0.5);
@@ -53,15 +102,48 @@ void main() {
 }`;
 
 export class FogOfWarFilter extends Filter {
-  constructor(mask: Texture) {
+  private readonly _textureMatrix: TextureMatrix;
+  sprite: Sprite;
+
+  constructor({ sprite }: { sprite: Sprite }) {
+    const textureMatrix = new TextureMatrix(sprite.texture);
+    const filterUniforms = new UniformGroup({
+      uFilterMatrix: { value: new Matrix(), type: "mat3x3<f32>" },
+    });
+
     super({
-      glProgram: new GlProgram({
+      glProgram: GlProgram.from({
         fragment,
-        vertex: defaultFilterVert,
+        vertex,
       }),
       resources: {
-        maskSampler: mask,
+        filterUniforms,
+        uMaskTexture: sprite.texture.source,
       },
     });
+
+    this._textureMatrix = textureMatrix;
+    this.sprite = sprite;
+  }
+
+  public override apply(
+    filterManager: FilterSystem,
+    input: Texture,
+    output: Texture,
+    clearMode: boolean,
+  ): void {
+    // will trigger an update if the texture changed..
+    // this._textureMatrix.texture = this.sprite.texture;
+
+    filterManager
+      .calculateSpriteMatrix(
+        (this.resources as any).filterUniforms.uniforms.uFilterMatrix as Matrix,
+        this.sprite,
+      )
+      .prepend(this._textureMatrix.mapCoord);
+
+    // (this.resources as any).uMaskTexture = this.sprite.texture.source;
+
+    filterManager.applyFilter(this, input, output, clearMode);
   }
 }

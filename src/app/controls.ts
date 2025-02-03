@@ -91,7 +91,7 @@ export class Controls {
     }
 
     if (this.mapUi.allowMapPanning && this.isMousePressed) {
-      if (this.mouseButton === 1) {
+      if (this.mouseButton === 0) {
         this.camera.moveBy(event.movementX, event.movementY);
       }
     }

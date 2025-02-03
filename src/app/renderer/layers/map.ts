@@ -13,14 +13,17 @@ import { GameState } from "../../api/state";
 import { TrackedPlayer } from "../../api/tracked-player";
 import { PoliticsDrawer } from "../politics";
 import { Tile } from "../../api/tile.interface";
-import { Container } from "pixi.js";
+import { Container, Graphics, Sprite, Texture } from "pixi.js";
+import { drawHex, drawTileSpriteCentered } from "../utils";
+import { measureTime } from "src/app/utils";
 
 export class MapDrawer {
   wrapperContainer = new TileWrapperContainer();
 
-  tilesContainer = new TileContainer(this.camera.tileBoundingBox);
+  tilesContainer: TileContainer;
+  tilesContainer2 = new Container();
 
-  areasContainer = new TileContainer(this.camera.tileBoundingBox);
+  areasContainer: TileContainer;
 
   overlaysContainer = new Container();
 
@@ -36,7 +39,7 @@ export class MapDrawer {
 
   cityDrawer: CityDrawer;
 
-  politicsDrawer: PoliticsDrawer;
+  politicsDrawer!: PoliticsDrawer;
 
   constructor(
     private container: Container,
@@ -44,7 +47,10 @@ export class MapDrawer {
     private renderer: GameRenderer,
     private camera: Camera,
   ) {
+    this.tilesContainer = new TileContainer(this.camera.tileBoundingBox);
+    this.areasContainer = new TileContainer(this.camera.tileBoundingBox);
     this.container.addChild(this.wrapperContainer);
+    this.container.addChild(this.tilesContainer2);
 
     this.tilesContainer["interactiveChildren"] = false;
     this.areasContainer["interactiveChildren"] = false;
@@ -54,7 +60,7 @@ export class MapDrawer {
     this.wrapperContainer.addChild(this.overlaysContainer);
 
     this.game.init$.subscribe((state) => {
-      this.build(state);
+      measureTime("build map", () => this.build(state));
 
       state.trackedPlayer$
         .pipe(takeUntil(this.game.stop$))
@@ -144,7 +150,8 @@ export class MapDrawer {
         const tile = gameState.map.tiles[x][y];
         const container = new Container();
         this.tileContainers.set(tile, container);
-        this.tilesContainer.addChild(container, tile);
+        this.container.addChild(container);
+        // this.tilesContainer.addChildToTile(container, tile);
         this.drawTile(tile, container);
       }
     }

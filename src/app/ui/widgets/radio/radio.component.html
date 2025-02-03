@@ -1,8 +1,8 @@
 <div
   class="option"
-  *ngFor="let option of options"
+  *ngFor="let option of options()"
   [class.selected]="option.value === value"
-  (click)="changed.next(option.value)"
+  (click)="changed.emit(option.value)"
 >
   {{ option.label }}
 </div>
