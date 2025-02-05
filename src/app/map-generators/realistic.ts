@@ -181,13 +181,13 @@ export class RealisticMapGenerator implements MapGenerator {
       let height = 0;
 
       // Adjust horizontal map edges to be more likely sea.
-      const distanceToEdge = Math.min(tile.x, this.width - tile.x);
-      const edgeThrehold = this.width * 0.1;
-      if (distanceToEdge < edgeThrehold) {
-        value -=
-          (maxValue / 2) *
-          Math.cos((Math.PI / 2 / edgeThrehold) * distanceToEdge);
-      }
+      // const distanceToEdge = Math.min(tile.x, this.width - tile.x);
+      // const edgeThrehold = this.width * 0.1;
+      // if (distanceToEdge < edgeThrehold) {
+      //   value -=
+      //     (maxValue / 2) *
+      //     Math.cos((Math.PI / 2 / edgeThrehold) * distanceToEdge);
+      // }
 
       if (value > seaLevel) {
         height = value;

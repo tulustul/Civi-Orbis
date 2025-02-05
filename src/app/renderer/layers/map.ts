@@ -149,6 +149,7 @@ export class MapDrawer {
       for (let y = 0; y < gameState.map.height; y++) {
         const tile = gameState.map.tiles[x][y];
         const container = new Container();
+        container.zIndex = y;
         this.tileContainers.set(tile, container);
         this.container.addChild(container);
         // this.tilesContainer.addChildToTile(container, tile);

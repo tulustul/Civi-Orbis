@@ -35,7 +35,6 @@ export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   ) {}
 
   ngOnInit() {
-    console.log("UnitComponent ngOnInit", this.unit());
     if (this.unitsLayerService) {
       this.unitsLayerService.addUnitComponent(this);
     }
@@ -48,7 +47,6 @@ export class UnitComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges() {
-    console.log("UnitComponent ngOnInit", this.unit());
     this.updateClasses();
   }
 

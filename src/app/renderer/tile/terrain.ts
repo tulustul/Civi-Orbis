@@ -11,67 +11,59 @@ import { GameApi } from "src/app/api";
 import { Tile } from "src/app/api/tile.interface";
 import { Container, Sprite } from "pixi.js";
 
-const SEA_TEXTURES: Record<SeaLevel, string[]> = {
-  [SeaLevel.deep]: getTileVariants("hexOcean", 4),
-  [SeaLevel.shallow]: getTileVariants("hexShallowWater", 4),
-  [SeaLevel.none]: [],
+const SEA_TEXTURES: Record<SeaLevel, string> = {
+  [SeaLevel.deep]: "hexOcean00.png",
+  [SeaLevel.shallow]: "hexShallowWater00.png",
+  [SeaLevel.none]: "",
 };
 
-const CLIMATE_TEXTURES: Record<Climate, Record<LandForm, string[]>> = {
+const CLIMATE_TEXTURES: Record<Climate, Record<LandForm, string>> = {
   [Climate.continental]: {
-    [LandForm.plains]: getTileVariants("hexPlainsCold", 4),
-    [LandForm.hills]: getTileVariants("hexHillsCold", 4),
-    [LandForm.mountains]: getTileVariants("hexMountain", 4),
+    [LandForm.plains]: "hexPlainsCold00.png",
+    [LandForm.hills]: "hexHillsCold00.png",
+    [LandForm.mountains]: "hexMountain00.png",
   },
   [Climate.desert]: {
-    [LandForm.plains]: getTileVariants("hexSand", 4),
-    [LandForm.hills]: getTileVariants("hexHillsDesert", 4),
-    [LandForm.mountains]: getTileVariants("hexMountainDesert", 4),
+    [LandForm.plains]: "hexSand00.png",
+    [LandForm.hills]: "hexHillsDesert00.png",
+    [LandForm.mountains]: "hexMountainDesert00.png",
   },
   [Climate.oceanic]: {
-    [LandForm.plains]: getTileVariants("hexPlains", 4),
-    [LandForm.hills]: getTileVariants("hexHighlands", 4),
-    [LandForm.mountains]: getTileVariants("hexMountain", 4),
+    [LandForm.plains]: "hexPlains00.png",
+    [LandForm.hills]: "hexHighlands00.png",
+    [LandForm.mountains]: "hexMountain00.png",
   },
   [Climate.savanna]: {
-    [LandForm.plains]: getTileVariants("hexScrublands", 4),
-    [LandForm.hills]: getTileVariants("hexHillsSavanna", 4),
-    [LandForm.mountains]: getTileVariants("hexMountainDesert", 4),
+    [LandForm.plains]: "hexScrublands00.png",
+    [LandForm.hills]: "hexHillsSavanna00.png",
+    [LandForm.mountains]: "hexMountainDesert00.png",
   },
   [Climate.tropical]: {
-    [LandForm.plains]: getTileVariants("hexTropicalPlains", 4),
-    [LandForm.hills]: getTileVariants("hexHills", 4),
-    [LandForm.mountains]: getTileVariants("hexMountain", 4),
+    [LandForm.plains]: "hexTropicalPlains00.png",
+    [LandForm.hills]: "hexHills00.png",
+    [LandForm.mountains]: "hexMountain00.png",
   },
   [Climate.tundra]: {
-    [LandForm.plains]: getTileVariants("hexPlainsColdSnowTransition", 4),
-    [LandForm.hills]: getTileVariants("hexHillsColdSnowTransition", 4),
-    [LandForm.mountains]: getTileVariants("hexMountainSnow", 4),
+    [LandForm.plains]: "hexPlainsColdSnowTransition00.png",
+    [LandForm.hills]: "hexHillsColdSnowTransition00.png",
+    [LandForm.mountains]: "hexMountainSnow00.png",
   },
   [Climate.arctic]: {
-    [LandForm.plains]: getTileVariants("hexPlainsColdSnowCovered", 4),
-    [LandForm.hills]: getTileVariants("hexHillsColdSnowCovered", 4),
-    [LandForm.mountains]: getTileVariants("hexMountainSnow", 4),
+    [LandForm.plains]: "hexPlainsColdSnowCovered00.png",
+    [LandForm.hills]: "hexHillsColdSnowCovered00.png",
+    [LandForm.mountains]: "hexMountainSnow00.png",
   },
 };
 
-const FOREST_TEXTURES: Record<Climate, string[]> = {
-  [Climate.continental]: getTileVariants("hexForestPine", 4),
-  [Climate.oceanic]: getTileVariants("hexForestBroadleaf", 4),
-  [Climate.tropical]: getTileVariants("hexJungle", 4),
-  [Climate.tundra]: getTileVariants("hexForestPineSnowTransition", 4),
-  [Climate.savanna]: [],
-  [Climate.desert]: [],
-  [Climate.arctic]: [],
+const FOREST_TEXTURES: Record<Climate, string> = {
+  [Climate.continental]: "hexForestPine00.png",
+  [Climate.oceanic]: "hexForestBroadleaf00.png",
+  [Climate.tropical]: "hexJungle00.png",
+  [Climate.tundra]: "hexForestPineSnowTransition00.png",
+  [Climate.savanna]: "",
+  [Climate.desert]: "",
+  [Climate.arctic]: "",
 };
-
-const WETLANDS_TEXTURES = getTileVariants("hexMarsh", 4);
-const WETLANDS_FOREST_TEXTURES = getTileVariants("hexSwamp", 4);
-const DESERT_FLOOD_PLAINS_TEXTURES = getTileVariants("hexGrassySand", 4);
-
-const FARM_TEXTURES = getTileVariants("field", 15);
-const MINE_TEXTURES = getTileVariants("mines", 5);
-const SAWMILL_TEXTURES = getTileVariants("forester_hut", 4);
 
 export class TerrainDrawer {
   constructor(
@@ -80,31 +72,30 @@ export class TerrainDrawer {
   ) {}
 
   public drawTile(tile: Tile, container: Container) {
-    let variants: string[];
+    let textureName: string;
 
     if (tile.wetlands) {
       if (tile.forest) {
-        variants = WETLANDS_FOREST_TEXTURES;
+        textureName = "hexSwamp00.png";
       } else {
-        variants = WETLANDS_TEXTURES;
+        textureName = "hexMarsh00.png";
       }
     } else if (tile.forest) {
-      variants = FOREST_TEXTURES[tile.climate];
+      textureName = FOREST_TEXTURES[tile.climate];
     } else if (tile.seaLevel === SeaLevel.none) {
       if (
         tile.climate === Climate.desert &&
         tile.landForm === LandForm.plains &&
         tile.riverParts.length
       ) {
-        variants = DESERT_FLOOD_PLAINS_TEXTURES;
+        textureName = "hexGrassySand00.png";
       } else {
-        variants = CLIMATE_TEXTURES[tile.climate][tile.landForm];
+        textureName = CLIMATE_TEXTURES[tile.climate][tile.landForm];
       }
     } else {
-      variants = SEA_TEXTURES[tile.seaLevel];
+      textureName = SEA_TEXTURES[tile.seaLevel];
     }
 
-    const textureName = pickRandom(variants);
     const sprite = drawTileSprite(tile, this.textures[textureName]);
 
     container.addChild(sprite);
@@ -117,16 +108,13 @@ export class TerrainDrawer {
   private drawImprovement(tile: Tile, container: Container) {
     let sprite: Sprite | null = null;
     if (tile.improvement === TileImprovement.farm) {
-      const textureName = pickRandom(FARM_TEXTURES);
-      sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
+      sprite = drawTileSpriteCentered(tile, this.textures["field.png"]);
       container.addChild(sprite);
     } else if (tile.improvement === TileImprovement.mine) {
-      const textureName = pickRandom(MINE_TEXTURES);
-      sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
+      sprite = drawTileSpriteCentered(tile, this.textures["mines.png"]);
       container.addChild(sprite);
     } else if (tile.improvement === TileImprovement.sawmill) {
-      const textureName = pickRandom(SAWMILL_TEXTURES);
-      sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
+      sprite = drawTileSpriteCentered(tile, this.textures["forester_hut.png"]);
       container.addChild(sprite);
     }
 
@@ -139,7 +127,11 @@ export class TerrainDrawer {
     }
 
     const textureName = `${tile.resource.id}.png`;
-    const sprite = drawTileSpriteCentered(tile, this.textures[textureName]);
+    const sprite = drawTileSpriteCentered(
+      tile,
+      this.textures[textureName],
+      0.4,
+    );
     sprite.y += 0.3;
     container.addChild(sprite);
   }

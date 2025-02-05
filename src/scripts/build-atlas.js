@@ -15,6 +15,7 @@ spritesheet(
     trim: true,
     powerOfTwo: true,
     square: false,
+    padding:2
   },
   function (err) {
     if (err) throw err;

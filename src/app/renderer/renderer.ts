@@ -33,6 +33,7 @@ import atlasData from "../../assets/atlas.json";
 import { drawHex, HEX_GEOMETRY } from "./utils";
 import { programs } from "./shaders/area-shaders";
 import { VisibleTilesDrawer } from "./layers/visible-tiles-drawer";
+import { Grid } from "./grid";
 
 @Injectable()
 export class GameRenderer {
@@ -55,9 +56,14 @@ export class GameRenderer {
 
   visibleTilesLayer!: Layer;
 
-  overlaysContainer = new Container();
+  overlaysContainer = new Container({ label: "overlays" });
+  mapContainer = new Container({ label: "map" });
 
   spritesheet!: Spritesheet;
+
+  grid!: Grid;
+
+  gridTexture!: Texture;
 
   _loading$ = new BehaviorSubject<boolean>(true);
   loading$ = this._loading$.asObservable();
@@ -67,9 +73,9 @@ export class GameRenderer {
   tick$ = this._tick$.asObservable();
 
   constructor(
-    private game: GameApi,
+    public game: GameApi,
     public mapUi: MapUi,
-    private camera: Camera,
+    public camera: Camera,
   ) {
     this.camera.setRenderer(this);
 
@@ -79,10 +85,11 @@ export class GameRenderer {
   }
 
   async loadAssets() {
-    await Assets.load("assets/hex.png");
+    this.gridTexture = await Assets.load("assets/grid.png");
     const atlas = await Assets.load("assets/atlas.png");
     this.spritesheet = new Spritesheet(atlas, atlasData);
     this.spritesheet.textureSource.autoGenerateMipmaps = true;
+    this.spritesheet.textureSource.scaleMode = "nearest";
 
     await this.spritesheet.parse();
 
@@ -108,6 +115,7 @@ export class GameRenderer {
     this.visibleTilesLayer = new Layer(this.app);
 
     this.mapDrawer = new MapDrawer(
+      // this.mapContainer,
       this.mapLayer.stage,
       this.game,
       this,
@@ -146,16 +154,15 @@ export class GameRenderer {
 
     this.app.stage.addChild(this.mapLayer.sprite);
     // this.app.stage.addChild(this.visibleTilesLayer.sprite);
+    this.app.stage.addChild(this.mapContainer);
     this.app.stage.addChild(this.overlaysContainer);
 
-    this.mapLayer.sprite.filters = [
-      new MaskFilter({
-        sprite: this.visibleTilesLayer.sprite,
-      }),
-      new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
+    this.mapContainer.filters = [
+      // new MaskFilter({
+      //   sprite: this.visibleTilesLayer.sprite,
+      // }),
+      // new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
     ];
-
-    console.log(this.mapLayer.texture, this.fogOfWarLayer.texture);
 
     if (this.isLoaded) {
       this.onReady();
@@ -176,8 +183,10 @@ export class GameRenderer {
         const borderShadow = Math.max(0.4, Math.min(0.7, (150 - scale) / 100));
 
         for (const area of this.mapDrawer.politicsDrawer.areas) {
-          area.drawer.backgroundShader.resources["opacity"] = backgroundOpacity;
-          area.drawer.borderShader.resources["borderShadow"] = borderShadow;
+          area.drawer.backgroundShader.resources["uniforms"].uniforms.opacity =
+            backgroundOpacity;
+          area.drawer.borderShader.resources["uniforms"].uniforms.borderShadow =
+            borderShadow;
         }
       }
 
@@ -194,12 +203,14 @@ export class GameRenderer {
     this.visibleTilesLayer.resize(width, height);
 
     // A new texture is created when resizing, need to update the filter. Could just update uniforms but whatever.
-    this.mapLayer.sprite.filters = [
-      new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
-    ];
+    // this.mapContainer.filters = [
+    //   new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
+    // ];
   }
 
   onReady() {
+    this.grid = new Grid(this);
+
     this.camera.transform$.subscribe((t) => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;
       const y = (-t.y + this.canvas.height / 2 / t.scale) * t.scale;
@@ -213,6 +224,7 @@ export class GameRenderer {
 
       // this.mapDrawer.unitsDrawer.container.setTransform(x, y, t.scale, t.scale);
       this.mapLayer.stage.updateTransform(transform);
+      this.mapContainer.updateTransform(transform);
       this.overlaysContainer.updateTransform(transform);
       this.fogOfWarLayer.stage.updateTransform(transform);
       this.visibleTilesLayer.stage.updateTransform(transform);

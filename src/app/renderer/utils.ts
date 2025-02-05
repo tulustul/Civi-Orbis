@@ -59,21 +59,27 @@ export function getTileVariants(tileName: string, variants: number): string[] {
 
 export function drawTileSprite(tile: Tile, texture: Texture) {
   const sprite = new Sprite(texture);
-  sprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
+  sprite.scale.set(1 / texture.width, 1 / texture.width);
+  sprite.anchor.set(0, 1);
+  sprite.zIndex = -tile.y;
   putContainerAtTile(tile, sprite);
   return sprite;
 }
 
-export function drawTileSpriteCentered(tile: Tile, texture: Texture) {
+export function drawTileSpriteCentered(
+  tile: Tile,
+  texture: Texture,
+  scale = 1,
+) {
   const sprite = new Sprite(texture);
-  sprite.scale.set(1 / TILE_SIZE, 1 / TILE_SIZE);
+  sprite.scale.set(scale / texture.width, scale / texture.width);
   putSpriteAtTileCentered(tile, sprite);
   return sprite;
 }
 
 export function putContainerAtTile(tile: Tile, container: Container) {
   container.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
-  container.position.y = tile.y * 0.75 - 0.5;
+  container.position.y = tile.y * 0.75 + 1;
 }
 
 export function putSpriteAtTileCentered(tile: Tile, sprite: Sprite) {
