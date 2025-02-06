@@ -5,7 +5,10 @@ import { Area } from "./area";
 export class PoliticsDrawer {
   areas: Area[] = [];
 
-  constructor(private state: GameState, private renderer: GameRenderer) {
+  constructor(
+    private state: GameState,
+    private renderer: GameRenderer,
+  ) {
     this.makeAreas();
   }
 
@@ -14,7 +17,7 @@ export class PoliticsDrawer {
       const tiles = await this.state.getAreaTiles(player.areaId);
       const area = new Area(this.state, {
         color: player.color,
-        container: this.renderer.overlays.tilesContainer,
+        container: this.renderer.overlays.container,
         backgroundOpacity: 0.5,
         borderShadow: 0.7,
         borderSize: 0.08,

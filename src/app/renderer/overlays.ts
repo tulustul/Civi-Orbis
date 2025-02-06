@@ -3,18 +3,9 @@ import { Graphics } from "pixi.js";
 import { drawClosedHex, getTileCoords, drawHex } from "./utils";
 import { MapUi } from "../ui/map-ui";
 import { Tile } from "../api/tile.interface";
-import { TileWrapperContainer, TileContainer } from "./tile-container";
-import { Camera } from "./camera";
-import { GameState } from "../api/state";
-import { GameApi } from "../api";
-import { takeUntil } from "rxjs/operators";
 import { Container } from "pixi.js";
 
 export class OverlaysRenderer {
-  wrapperContainer = new TileWrapperContainer();
-
-  tilesContainer!: TileContainer;
-
   hoveredTileGraphics = new Graphics();
 
   selectedTileGraphics = new Graphics();
@@ -23,24 +14,10 @@ export class OverlaysRenderer {
 
   constructor(
     public container: Container,
-    private game: GameApi,
-    private camera: Camera,
     mapUi: MapUi,
   ) {
-    this.tilesContainer = new TileContainer(this.camera.tileBoundingBox);
-
-    this.game.init$.subscribe((state) => {
-      this.build(state);
-
-      state.tilesExplored$
-        .pipe(takeUntil(this.game.stop$))
-        .subscribe((tiles) => this.reveal(tiles));
-    });
-
     this.container.addChild(this.hoveredTileGraphics);
     this.container.addChild(this.selectedTileGraphics);
-    this.container.addChild(this.wrapperContainer);
-    this.wrapperContainer.addChild(this.tilesContainer);
 
     this.buildHoveredTileGraphics();
     this.buildSelectedTileGraphics();
@@ -56,11 +33,6 @@ export class OverlaysRenderer {
     mapUi.highlightedTiles$.subscribe((tiles) => {
       this.buildHighlightedTiles(tiles);
     });
-  }
-
-  build(state: GameState) {
-    this.wrapperContainer.bindToMap(state.map);
-    this.tilesContainer.bindToMap(state.map);
   }
 
   private displayAtTile(obj: Container, tile: Tile | null) {
@@ -110,17 +82,6 @@ export class OverlaysRenderer {
     }
 
     this.container.addChild(g);
-  }
-
-  reveal(tiles: Iterable<Tile>) {
-    for (const tile of tiles) {
-      const displayObjects = this.wrapperContainer.tilesMap.get(tile);
-      if (displayObjects) {
-        for (const obj of displayObjects) {
-          obj.visible = true;
-        }
-      }
-    }
   }
 
   clear() {

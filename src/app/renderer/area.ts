@@ -3,17 +3,12 @@ import {
   Geometry,
   Shader,
   ShaderFromResources,
-  Sprite,
   Mesh,
-  MeshSimple,
-  Texture,
-  Graphics,
 } from "pixi.js";
 
 import { SeaLevel } from "src/app/shared";
 import { GameState } from "src/app/api/state";
-import { TileContainer } from "./tile-container";
-import { drawHex, HEX_GEOMETRY } from "./utils";
+import { HEX_GEOMETRY } from "./utils";
 import { Tile } from "../api/tile.interface";
 import { programs as areaPrograms } from "./shaders/area-shaders";
 

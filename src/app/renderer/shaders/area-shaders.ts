@@ -1,4 +1,4 @@
-import { Shader, ShaderFromResources } from "pixi.js";
+import { ShaderFromResources } from "pixi.js";
 
 const VERTEX_BORDER = `
 precision mediump float;

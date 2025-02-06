@@ -1,19 +1,11 @@
-import { Tile } from "../../api/tile.interface";
+import { Tile } from "../api/tile.interface";
 import { GameApi } from "src/app/api";
 import { takeUntil } from "rxjs/operators";
-import { TileWrapperContainer, TileContainer } from "../tile-container";
-import { Camera } from "../camera";
-import { drawTileSprite } from "../utils";
-import { GameRenderer } from "../renderer";
-import { GameState } from "src/app/api/state";
+import { drawTileSprite } from "./utils";
+import { GameRenderer } from "./renderer";
 import { Container, Sprite } from "pixi.js";
 
-export class FogOfWarDrawer {
-  // TODO do we need this wrapper?
-  wrapperContainer = new TileWrapperContainer();
-
-  tilesContainer: TileContainer;
-
+export class VisibleTilesDrawer {
   private renderedTiles = new Map<Tile, Sprite>();
 
   public texture;
@@ -22,21 +14,11 @@ export class FogOfWarDrawer {
     private container: Container,
     private game: GameApi,
     private renderer: GameRenderer,
-    private camera: Camera,
   ) {
-    this.tilesContainer = new TileContainer(this.camera.tileBoundingBox);
     this.texture = this.renderer.spritesheet.textures["hexMask.png"];
-    // this.container.addChild(this.wrapperContainer);
-    // this.wrapperContainer.addChild(this.tilesContainer);
 
     this.game.init$.subscribe((state) => {
-      this.build(state);
-
-      state.tilesShowed$
-        .pipe(takeUntil(this.game.stop$))
-        .subscribe(() => this.bindToTrackedPlayer());
-
-      state.tilesShowedAdded$
+      state.tilesExplored$
         .pipe(takeUntil(this.game.stop$))
         .subscribe((tiles) => this.addTiles(tiles));
 
@@ -47,13 +29,7 @@ export class FogOfWarDrawer {
   }
 
   clear() {
-    this.tilesContainer.destroyAllChildren();
     this.renderedTiles.clear();
-  }
-
-  private build(state: GameState) {
-    this.wrapperContainer.bindToMap(state.map);
-    this.tilesContainer.bindToMap(state.map);
   }
 
   private bindToTrackedPlayer() {
@@ -81,7 +57,6 @@ export class FogOfWarDrawer {
 
   private renderTile(tile: Tile) {
     const sprite = drawTileSprite(tile, this.texture);
-    // this.tilesContainer.addChildToTile(sprite, tile);
     this.container.addChild(sprite);
     this.renderedTiles.set(tile, sprite);
   }

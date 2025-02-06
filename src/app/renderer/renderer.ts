@@ -4,14 +4,7 @@ import {
   Application,
   Spritesheet,
   Texture,
-  Graphics,
-  Sprite,
   UpdateTransformOptions,
-  Mesh,
-  Shader,
-  NoiseFilter,
-  DisplacementFilter,
-  MaskFilter,
 } from "pixi.js";
 
 import { Injectable } from "@angular/core";
@@ -21,18 +14,14 @@ import { filter } from "rxjs/operators";
 
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
-import { MapDrawer } from "./layers/map";
-import { FogOfWarDrawer } from "./layers/fog-of-war";
+import { MapDrawer } from "./map";
+import { FogOfWarDrawer } from "./fog-of-war";
 import { MapUi } from "../ui/map-ui";
 import { Camera } from "./camera";
 import { GameApi } from "../api";
 import { Layer } from "./layer";
-import { FogOfWarFilter } from "./filters/fog-of-war-filter";
-import { TileContainer, TileWrapperContainer } from "./tile-container";
 import atlasData from "../../assets/atlas.json";
-import { drawHex, HEX_GEOMETRY } from "./utils";
-import { programs } from "./shaders/area-shaders";
-import { VisibleTilesDrawer } from "./layers/visible-tiles-drawer";
+import { VisibleTilesDrawer } from "./visible-tiles-drawer";
 import { Grid } from "./grid";
 
 @Injectable()
@@ -119,7 +108,7 @@ export class GameRenderer {
       this.mapLayer.stage,
       this.game,
       this,
-      this.camera,
+      this.mapUi,
     );
 
     this.fogOfWarDrawer = new FogOfWarDrawer(
@@ -133,15 +122,9 @@ export class GameRenderer {
       this.visibleTilesLayer.stage,
       this.game,
       this,
-      this.camera,
     );
 
-    this.overlays = new OverlaysRenderer(
-      this.overlaysContainer,
-      this.game,
-      this.camera,
-      this.mapUi,
-    );
+    this.overlays = new OverlaysRenderer(this.overlaysContainer, this.mapUi);
 
     this.path = new PathRenderer(
       this.overlaysContainer,
@@ -157,7 +140,7 @@ export class GameRenderer {
     this.app.stage.addChild(this.mapContainer);
     this.app.stage.addChild(this.overlaysContainer);
 
-    this.mapContainer.filters = [
+    this.mapLayer.sprite.filters = [
       // new MaskFilter({
       //   sprite: this.visibleTilesLayer.sprite,
       // }),
