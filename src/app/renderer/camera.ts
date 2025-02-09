@@ -103,7 +103,7 @@ export class Camera {
     duration = 600,
   ) {
     const t = this.transform;
-    const currentScale = this.scaleAnimation?.end || t.scale;
+    const currentScale = this.scaleAnimation?.to || t.scale;
     const newScale = currentScale * scaleFactor;
     this.scaleToWithEasing(newScale, screenPivotX, screenPivotY, duration);
   }

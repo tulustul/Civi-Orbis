@@ -119,6 +119,7 @@ export interface TrackedPlayerChanneled {
 export interface UnitChanneled {
   id: number;
   tileId: number;
+  lastTileIds: number[];
   definitionId: string;
   playerId: number;
   parentId: number | null;
@@ -128,7 +129,8 @@ export interface UnitChanneled {
   supplies: number;
 }
 
-export interface UnitDetailsChanneled extends UnitChanneled {
+export interface UnitDetailsChanneled
+  extends Omit<UnitChanneled, "lastTileIds"> {
   order: UnitOrder;
   path: number[][] | null;
   isSupplied: boolean;
@@ -286,6 +288,7 @@ export function unitToChannel(unit: UnitCore): UnitChanneled {
   return {
     id: unit.id,
     tileId: unit.tile.id,
+    lastTileIds: unit.lastTiles.map((t) => t.id),
     definitionId: unit.definition.id,
     playerId: unit.player.id,
     parentId: unit.parent?.id || null,

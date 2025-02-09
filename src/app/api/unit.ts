@@ -10,6 +10,7 @@ export class Unit {
   definition: UnitDefinition;
   player: Player;
   tile: Tile;
+  lastTiles: Tile[];
   parent!: Unit | null;
   children: Unit[] = [];
   health: number;
@@ -22,6 +23,7 @@ export class Unit {
   ) {
     this.id = unit.id;
     this.tile = game.map.tilesMap.get(unit.tileId)!;
+    this.lastTiles = unit.lastTileIds.map((id) => game.map.tilesMap.get(id)!);
     this.player = game.playersMap.get(unit.playerId)!;
     this.definition = getUnitById(unit.definitionId)!;
     this.health = unit.health;
@@ -44,6 +46,7 @@ export class Unit {
       }
 
       this.tile = game.map.tilesMap.get(unit.tileId)!;
+      this.lastTiles = unit.lastTileIds.map((id) => game.map.tilesMap.get(id)!);
       this.tile.units.push(this);
     }
 

@@ -1,4 +1,4 @@
-import { Unit } from "./unit";
+import { Unit, UnitMove } from "./unit";
 import { City } from "./city";
 import { TrackedPlayer } from "./tracked-player";
 import { setChangesHandlers } from "./internal/changes";
@@ -11,12 +11,14 @@ import {
 } from "../core/serialization/channel";
 import { Tile } from "./tile.interface";
 import { PlayerYields } from "../shared";
+import { UnitMoveChanneled } from "react/cives-orbis/src/core/serialization/channel";
 
 const HANDLERS = {
   "tiles.updated": onTilesUpdate,
 
   "unit.updated": onUnitUpdate,
   "unit.destroyed": onUnitDestroyed,
+  "unit.moved": onUnitMoved,
 
   "city.updated": onCityUpdate,
 
@@ -55,6 +57,14 @@ function onUnitDestroyed(state: GameState, id: number) {
     unit.destroy(state);
     state["_unitDestroyed$"].next(unit);
   }
+}
+
+function onUnitMoved(state: GameState, unitMoveChanneled: UnitMoveChanneled) {
+  const unitMove: UnitMove = {
+    unit: state.unitsMap.get(unitMoveChanneled.unitId)!,
+    tiles: unitMoveChanneled.tileIds.map((id) => state.map.tilesMap.get(id)!),
+  };
+  state["_unitMove$"].next(unitMove);
 }
 
 function onCityUpdate(state: GameState, cityChanneled: CityChanneled) {

@@ -1,5 +1,5 @@
 import { TilesMap } from "./map";
-import { Unit } from "./unit";
+import { Unit, UnitMove } from "./unit";
 import { City } from "./city";
 import { TrackedPlayer } from "./tracked-player";
 import { makeCommand } from "./internal/commander";

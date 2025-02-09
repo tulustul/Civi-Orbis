@@ -1,0 +1,4 @@
+.minimap {
+  display: flex;
+  flex-direction: column;
+}
