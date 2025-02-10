@@ -1,7 +1,10 @@
 import { controls, renderer } from "@/renderer";
 import { memo } from "react";
+import { useEventListener } from "usehooks-ts";
 
 function _GameCanvas() {
+  useEventListener("keydown", (event) => controls.onKeyDown(event));
+
   return (
     <canvas
       ref={(canvas) => {

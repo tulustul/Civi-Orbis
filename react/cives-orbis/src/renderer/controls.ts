@@ -3,6 +3,9 @@ import { BehaviorSubject } from "rxjs";
 import { mapUi } from "@/ui/mapUi";
 import { camera } from "./camera";
 import { game } from "@/api";
+import { useUiState } from "@/ui/uiState";
+import { nextTurnService } from "@/ui/nextTurn";
+import { useMenu } from "@/ui";
 
 export class Controls {
   isMousePressed = false;
@@ -102,35 +105,38 @@ export class Controls {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    // if (this.uiState.activeView) {
+    const uiState = useUiState.getState();
+    const menu = useMenu.getState();
+    // if (uiState.activeView) {
     //   if (event.key === "Escape") {
-    //     this.uiState.activeView.quit();
+    //     uiState.activeView.quit();
     //   }
-    // } else if (this.uiState.menuVisible$.value) {
-    //   if (event.key === "Escape" && game.state) {
-    //     this.uiState.menuVisible$.next(false);
-    //   }
-    // } else {
-    //   if (event.key === "Enter") {
-    //     this.nextTurnService.next();
-    //   } else if (event.key === "Escape") {
-    //     this.uiState.menuVisible$.next(true);
-    //   } else if (mapUi.selectedUnit) {
-    //     if (event.key === "s" || event.key === "f") {
-    //       mapUi.selectedUnit
-    //         .setOrder("sleep")
-    //         .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
-    //     } else if (event.key === " ") {
-    //       mapUi.selectedUnit
-    //         .setOrder("skip")
-    //         .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
-    //     } else if (event.key === "b") {
-    //       mapUi.selectedUnit
-    //         .doAction("foundCity")
-    //         .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
-    //     }
-    //   }
-    // }
+    // } else
+    if (menu.enabled) {
+      if (event.key === "Escape" && game.state) {
+        menu.hide();
+      }
+    } else {
+      if (event.key === "Enter") {
+        nextTurnService.next();
+      } else if (event.key === "Escape") {
+        menu.show();
+      } else if (mapUi.selectedUnit) {
+        if (event.key === "s" || event.key === "f") {
+          mapUi.selectedUnit
+            .setOrder("sleep")
+            .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
+        } else if (event.key === " ") {
+          mapUi.selectedUnit
+            .setOrder("skip")
+            .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
+        } else if (event.key === "b") {
+          mapUi.selectedUnit
+            .doAction("foundCity")
+            .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
+        }
+      }
+    }
   }
 
   onKeyUp(event: KeyboardEvent) {}

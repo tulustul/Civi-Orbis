@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { GameCanvas } from "./ui/GameCanvas";
-import { MainMenu } from "./ui/mainMenu/MainMenu";
-import { useUiState } from "./ui/uiState";
 import { loadAssets } from "./renderer/assets";
-import { Minimap } from "./ui/Minimap";
-import { NextTurnButton } from "./ui/NextTurnButton";
+import { GameMenu, useMenu } from "./ui";
+import { GameCanvas } from "./ui/GameCanvas";
 import { MapMode } from "./ui/MapMode";
+import { useUiState } from "./ui/uiState";
 
 function App() {
   const [loading, setLoading] = useState(true);
 
   const uiState = useUiState();
+  const menu = useMenu();
 
   useEffect(() => {
     loadAssets().then(() => {
@@ -47,7 +46,7 @@ function App() {
 
   return (
     <>
-      {uiState.menuEnabled && <MainMenu />}
+      {menu.enabled && <GameMenu />}
       <GameCanvas />
       {getContent()}
     </>

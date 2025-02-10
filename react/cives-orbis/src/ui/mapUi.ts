@@ -32,6 +32,7 @@ export class MapUi {
   private _yieldsVisible$ = new BehaviorSubject<boolean>(true);
   yieldsVisible$ = this._yieldsVisible$.pipe(distinctUntilChanged());
 
+  private selectedUnitSimple: Unit | null = null;
   private _selectedUnit$ = new BehaviorSubject<UnitDetails | null>(null);
   selectedUnit$ = this._selectedUnit$.asObservable();
 
@@ -58,12 +59,14 @@ export class MapUi {
   editorArea!: Area;
 
   constructor() {
-    console.log("mapUi");
     this.clickedTile$.subscribe((tile) => {
       if (this.selectingTileEnabled) {
         this._selectedTile$.next(tile);
       } else if (tile.units.length) {
-        if (this.selectedUnit?.tile !== tile) {
+        if (
+          this.selectedUnit?.tile !== tile &&
+          this.selectedUnitSimple?.tile !== tile
+        ) {
           this.selectFirstUnitFromTile(tile);
         }
       } else if (tile?.city) {
@@ -276,6 +279,7 @@ export class MapUi {
     }
 
     if (unit.player.id === game.state?.trackedPlayer.id) {
+      this.selectedUnitSimple = unit;
       const data = await game.state.getUnitDetails(unit.id);
       if (data) {
         const unitDetails = new UnitDetails(game.state!, data);
@@ -284,6 +288,8 @@ export class MapUi {
         unitDetails
           .getRange()
           .then((tiles) => this.unitRangeArea.setTiles(tiles));
+      } else {
+        this.selectedUnitSimple = null;
       }
       this.setPath(this._selectedUnit$.value?.path || null);
     }
@@ -291,6 +297,7 @@ export class MapUi {
 
   private clearSelectedUnit(clearRange = true) {
     const previousUnit = this.selectedUnit;
+    this.selectedUnitSimple = null;
     this._selectedUnit$.next(null);
     if (clearRange) {
       this.unitRangeArea.clear();

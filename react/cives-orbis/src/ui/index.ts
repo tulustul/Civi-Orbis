@@ -1,2 +1,2 @@
 export * from "./mapUi";
-export * from "./mainMenu";
+export * from "./gameMenu";

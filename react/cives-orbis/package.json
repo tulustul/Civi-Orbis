@@ -12,10 +12,12 @@
   "dependencies": {
     "@pixi/react": "^8.0.0-beta.23",
     "clsx": "^2.1.1",
+    "pixi-filters": "^6.1.0",
     "pixi.js": "^8.7.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rxjs": "^7.8.1",
+    "usehooks-ts": "^3.1.1",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

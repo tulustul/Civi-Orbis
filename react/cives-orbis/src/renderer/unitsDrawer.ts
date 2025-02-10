@@ -1,13 +1,17 @@
 import { game, Tile, Unit } from "@/api";
 import { Container, Graphics, Sprite } from "pixi.js";
+import { OutlineFilter } from "pixi-filters";
 import { merge, takeUntil } from "rxjs";
 import { Animations } from "./animation";
 import { getAssets } from "./assets";
 import { TILE_SIZE } from "./constants";
+import { mapUi } from "@/ui";
 
 export class UnitsDrawer {
   units = new Map<number, UnitDrawer>();
   tilesByUnit = new Map<number, Tile>();
+
+  private selectedDrawer: UnitDrawer | null = null;
 
   constructor(private container: Container) {
     game.init$.subscribe(() => {
@@ -42,6 +46,22 @@ export class UnitsDrawer {
         drawer.animatePosition(move.tiles);
         this.updateNeighbours(drawer);
         this.tilesByUnit.set(drawer.unit.id, drawer.unit.tile);
+      }
+    });
+
+    mapUi.selectedUnit$.pipe(takeUntil(game.stop$)).subscribe((unit) => {
+      if (this.selectedDrawer) {
+        this.selectedDrawer.deselect();
+      }
+
+      if (!unit) {
+        return;
+      }
+
+      const drawer = this.units.get(unit.id);
+      if (drawer) {
+        this.selectedDrawer = drawer;
+        drawer.select();
       }
     });
 
@@ -145,6 +165,8 @@ export class UnitDrawer {
         },
       });
     });
+
+    this.container.on("click", () => mapUi.selectUnit(this.unit));
   }
 
   destroy() {
@@ -210,6 +232,22 @@ export class UnitDrawer {
     }
 
     return 0xffff00;
+  }
+
+  select() {
+    this.container.zIndex = 1;
+    this.container.filters = [
+      new OutlineFilter({
+        color: 0xffffff,
+        thickness: 4,
+        quality: 1,
+      }),
+    ];
+  }
+
+  deselect() {
+    this.container.filters = [];
+    this.container.zIndex = 0;
   }
 }
 

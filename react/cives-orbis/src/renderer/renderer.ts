@@ -68,7 +68,13 @@ export class GameRenderer {
     this.app = new Application();
     (globalThis as any).__PIXI_APP__ = this.app;
 
-    await this.app.init({ canvas, width, height, preference: "webgl" });
+    await this.app.init({
+      canvas,
+      width,
+      height,
+      preference: "webgl",
+      antialias: true,
+    });
 
     camera.setApp(this.app);
     this.canvas = canvas;
@@ -98,7 +104,7 @@ export class GameRenderer {
     this.app.stage.addChild(this.mapContainer);
     this.app.stage.addChild(this.overlaysContainer);
     this.mapContainer.addChild(this.unitsContainer);
-    this.unitsContainer.zIndex = 100;
+    this.unitsContainer.zIndex = 1000;
 
     this.unitsContainer.filters = [
       new MaskFilter({
