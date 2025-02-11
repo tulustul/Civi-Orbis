@@ -39,6 +39,9 @@ export class MapUi {
   private _hoveredUnit$ = new BehaviorSubject<Unit | null>(null);
   hoveredUnit$ = this._hoveredUnit$.pipe(distinctUntilChanged());
 
+  private _selectedCity$ = new BehaviorSubject<CityDetails | null>(null);
+  selectedCity$ = this._selectedCity$.pipe(distinctUntilChanged());
+
   private selectingTileEnabled = false;
 
   private _cityLabelsVisible$ = new BehaviorSubject<boolean>(true);
@@ -218,7 +221,7 @@ export class MapUi {
 
   selectCity(city: City | null) {
     if (!city) {
-      // this.uiState.selectedCity$.next(null);
+      this._selectedCity$.next(null);
       this.allowMapPanning = true;
       return;
     }
@@ -226,7 +229,7 @@ export class MapUi {
     if (city.player.id === game.state?.trackedPlayer.id) {
       game.state.getCityDetails(city.id).then((data) => {
         const cityDetails = new CityDetails(game.state!, data);
-        // this.uiState.selectedCity$.next(cityDetails);
+        this._selectedCity$.next(cityDetails);
         this.cityRangeArea.setTiles(Array.from(cityDetails.tiles));
         this.allowMapPanning = false;
       });

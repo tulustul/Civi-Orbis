@@ -20,6 +20,7 @@ import { mapUi } from "@/ui";
 import { FogOfWarFilter } from "./filters/fog-of-war-filter";
 import { UnitsDrawer } from "./unitsDrawer";
 import { animationsManager } from "./animation";
+import { CitiesDrawer } from "./citiesDrawer";
 
 export class GameRenderer {
   app!: Application;
@@ -43,8 +44,9 @@ export class GameRenderer {
 
   overlaysContainer = new Container({ label: "overlays" });
   mapContainer = new Container({ label: "map" });
-  unitsContainer = new Container({ label: "units" });
-  unitsDrawer = new UnitsDrawer(this.unitsContainer);
+  unitsAndCitiesContainer = new Container({ label: "unitsAndCities" });
+  unitsDrawer = new UnitsDrawer(this.unitsAndCitiesContainer);
+  citiesDrawer = new CitiesDrawer(this.unitsAndCitiesContainer);
 
   grid!: Grid;
 
@@ -103,19 +105,19 @@ export class GameRenderer {
     this.app.stage.addChild(this.mapLayer.sprite);
     this.app.stage.addChild(this.mapContainer);
     this.app.stage.addChild(this.overlaysContainer);
-    this.mapContainer.addChild(this.unitsContainer);
-    this.unitsContainer.zIndex = 1000;
+    this.mapContainer.addChild(this.unitsAndCitiesContainer);
+    this.unitsAndCitiesContainer.zIndex = 1000;
 
-    this.unitsContainer.filters = [
-      new MaskFilter({
-        sprite: this.fogOfWarLayer.sprite,
-      }),
+    this.unitsAndCitiesContainer.filters = [
+      // new MaskFilter({
+      //   sprite: this.fogOfWarLayer.sprite,
+      // }),
     ];
     this.mapLayer.sprite.filters = [
-      new MaskFilter({
-        sprite: this.visibleTilesLayer.sprite,
-      }),
-      new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
+      // new MaskFilter({
+      //   sprite: this.visibleTilesLayer.sprite,
+      // }),
+      // new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
     ];
 
     this.grid = new Grid();
@@ -151,6 +153,7 @@ export class GameRenderer {
       if (scale != this.lastScale) {
         this.lastScale = scale;
         this.unitsDrawer.setScale(scale);
+        this.citiesDrawer.setScale(scale);
       }
 
       if (this.mapDrawer.politicsDrawer) {
@@ -193,6 +196,8 @@ export class GameRenderer {
     this.overlays.clear();
     this.fogOfWarDrawer.clear();
     this.visibleTilesDrawer.clear();
+    this.unitsDrawer.clear();
+    this.citiesDrawer.clear();
   }
 }
 

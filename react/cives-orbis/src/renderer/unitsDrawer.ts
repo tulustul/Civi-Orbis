@@ -20,7 +20,7 @@ export class UnitsDrawer {
   }
 
   private init() {
-    this.units.clear();
+    this.clear();
 
     if (!game.state) {
       return;
@@ -119,12 +119,34 @@ export class UnitsDrawer {
       drawer.container.scale.set(unitScale);
     }
   }
+
+  clear() {
+    for (const drawer of this.units.values()) {
+      drawer.destroy();
+    }
+    this.units.clear();
+    this.tilesByUnit.clear();
+  }
 }
 
 export class UnitDrawer {
   public container = new Container();
   private g = new Graphics();
-  private scale = 1;
+  private isSelected = false;
+
+  static selectionFilter = new OutlineFilter({
+    color: 0xffffff,
+    alpha: 1,
+    thickness: 4,
+    quality: 1,
+  });
+
+  static highlightFilter = new OutlineFilter({
+    color: 0xffffff,
+    alpha: 0.5,
+    thickness: 4,
+    quality: 1,
+  });
 
   constructor(public unit: Unit) {
     const textures = getAssets().iconsSpritesheet.textures;
@@ -141,31 +163,8 @@ export class UnitDrawer {
     this.container.addChild(banner, icon, this.g);
 
     this.container.interactive = true;
-
-    this.container.on("pointerover", () => {
-      Animations.run({
-        from: this.container.scale.x,
-        to: this.container.scale.x * 1.1,
-        duration: 100,
-        fn: (scale) => {
-          this.container.scale.x = scale;
-          this.container.scale.y = scale;
-        },
-      });
-    });
-
-    this.container.on("pointerout", () => {
-      Animations.run({
-        from: this.container.scale.x,
-        to: this.container.scale.x * 0.9,
-        duration: 100,
-        fn: (scale) => {
-          this.container.scale.x = scale;
-          this.container.scale.y = scale;
-        },
-      });
-    });
-
+    this.container.on("pointerover", () => this.highlight());
+    this.container.on("pointerout", () => this.dehighlight());
     this.container.on("click", () => mapUi.selectUnit(this.unit));
   }
 
@@ -234,18 +233,28 @@ export class UnitDrawer {
     return 0xffff00;
   }
 
+  highlight() {
+    if (this.isSelected) {
+      return;
+    }
+    this.container.filters = [UnitDrawer.highlightFilter];
+  }
+
+  dehighlight() {
+    if (this.isSelected) {
+      return;
+    }
+    this.container.filters = [];
+  }
+
   select() {
+    this.isSelected = true;
     this.container.zIndex = 1;
-    this.container.filters = [
-      new OutlineFilter({
-        color: 0xffffff,
-        thickness: 4,
-        quality: 1,
-      }),
-    ];
+    this.container.filters = [UnitDrawer.selectionFilter];
   }
 
   deselect() {
+    this.isSelected = false;
     this.container.filters = [];
     this.container.zIndex = 0;
   }

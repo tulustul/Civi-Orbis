@@ -113,7 +113,13 @@ export class MapDrawer {
     game.stop$.subscribe(() => this.clear());
   }
 
-  clear() {}
+  clear() {
+    this.politicsDrawer.clear();
+    this.terrainContainer.removeChildren();
+    this.yieldsContainer.removeChildren();
+    this.tileContainers.clear();
+    this.tileYields.clear();
+  }
 
   private build(gameState: GameState) {
     this.politicsDrawer = new PoliticsDrawer(gameState, this.container);
