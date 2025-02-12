@@ -4,12 +4,7 @@ import { CityDetails } from "@/api/city-details";
 import { Tile } from "@/api/tile.interface";
 import { Unit } from "@/api/unit";
 import { UnitDetails } from "@/api/unit-details";
-import { UnitTrait } from "@/core/data.interface";
-import { renderer } from "@/renderer";
-import { Area } from "@/renderer/area";
 import { camera } from "@/renderer/camera";
-import { programs as suppliesPrograms } from "@/renderer/shaders/supplies-shaders";
-import { Container } from "pixi.js";
 import { BehaviorSubject, Subject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 
@@ -39,6 +34,9 @@ export class MapUi {
   private _hoveredUnit$ = new BehaviorSubject<Unit | null>(null);
   hoveredUnit$ = this._hoveredUnit$.pipe(distinctUntilChanged());
 
+  private _hoveredCity$ = new BehaviorSubject<City | null>(null);
+  hoveredCity$ = this._hoveredCity$.pipe(distinctUntilChanged());
+
   private _selectedCity$ = new BehaviorSubject<CityDetails | null>(null);
   selectedCity$ = this._selectedCity$.pipe(distinctUntilChanged());
 
@@ -48,18 +46,6 @@ export class MapUi {
   cityLabelsVisible$ = this._cityLabelsVisible$.pipe(distinctUntilChanged());
 
   allowMapPanning = true;
-
-  hoveredCity!: City | null;
-
-  unitRangeArea!: Area;
-
-  cityRangeArea!: Area;
-  cityBordersOnlyArea!: Area;
-  cityWorkedTilesArea!: Area;
-  cityNotWorkedTilesArea!: Area;
-  suppliesRangeArea!: Area;
-
-  editorArea!: Area;
 
   constructor() {
     this.clickedTile$.subscribe((tile) => {
@@ -80,21 +66,17 @@ export class MapUi {
       }
     });
 
-    // this.hoveredTile$.subscribe((tile) => {
-    //   if (!this.uiState.selectedCity$.value) {
-    //     if (tile?.city) {
-    //       this.hoverCity(tile.city);
-    //     } else if (this.hoveredCity) {
-    //       this.unhoverCity();
-    //     }
+    this.hoveredTile$.subscribe((tile) => {
+      if (!this._selectedCity$.value) {
+        this.hoverCity(tile?.city ? tile.city : null);
 
-    //     if (tile?.units.length) {
-    //       this._hoveredUnit$.next(tile.units[0]);
-    //     } else {
-    //       this._hoveredUnit$.next(null);
-    //     }
-    //   }
-    // });
+        if (tile?.units.length) {
+          this._hoveredUnit$.next(tile.units[0]);
+        } else {
+          this._hoveredUnit$.next(null);
+        }
+      }
+    });
 
     game.state?.trackedPlayer$.subscribe((player) => {
       this._selectedUnit$.next(null);
@@ -114,87 +96,14 @@ export class MapUi {
       });
 
       game.state!.turn$.subscribe(() => this.setPath(null));
-
-      const areasContainer = renderer.overlaysContainer;
-
-      this.unitRangeArea = new Area(game.state!, {
-        color: 0xddffdd,
-        container: areasContainer,
-        backgroundOpacity: 0.15,
-        borderShadow: 0.4,
-        borderSize: 0.0,
-        borderShadowStrength: 2,
-        visibleOnWater: true,
-      });
-
-      this.cityRangeArea = new Area(game.state!, {
-        color: 0xffffff,
-        container: areasContainer,
-        backgroundOpacity: 0.2,
-        borderShadow: 0.3,
-        borderSize: 0.1,
-        borderShadowStrength: 1.2,
-        visibleOnWater: false,
-      });
-
-      this.cityBordersOnlyArea = new Area(game.state!, {
-        color: 0xffffff,
-        container: areasContainer,
-        backgroundOpacity: 0,
-        borderShadow: 0.3,
-        borderSize: 0.1,
-        borderShadowStrength: 1.2,
-        visibleOnWater: false,
-      });
-
-      this.cityWorkedTilesArea = new Area(game.state!, {
-        color: 0xffa001,
-        container: areasContainer,
-        backgroundOpacity: 0.2,
-        borderShadow: 0.8,
-        borderSize: 0,
-        borderShadowStrength: 1,
-        visibleOnWater: true,
-      });
-
-      this.cityNotWorkedTilesArea = new Area(game.state!, {
-        color: 0xffffff,
-        container: areasContainer,
-        backgroundOpacity: 0.2,
-        borderShadow: 0.3,
-        borderSize: 0,
-        borderShadowStrength: 1.5,
-        visibleOnWater: false,
-      });
-
-      this.editorArea = new Area(game.state!, {
-        color: 0xffffff,
-        container: areasContainer,
-        backgroundOpacity: 0.25,
-        borderShadow: 0.5,
-        borderSize: 0.05,
-        borderShadowStrength: 1,
-        visibleOnWater: true,
-      });
-
-      this.suppliesRangeArea = new Area(game.state!, {
-        color: 0xffffff,
-        container: areasContainer,
-        backgroundOpacity: 0.25,
-        borderShadow: 0.5,
-        borderSize: 0.05,
-        borderShadowStrength: 1,
-        visibleOnWater: true,
-        programs: suppliesPrograms,
-      });
     });
 
     game.stop$.subscribe(() => this.clear());
   }
 
-  update() {
-    this._yieldsVisible$.next(camera.transform.scale > 40);
-  }
+  // update() {
+  // this._yieldsVisible$.next(camera.transform.scale > 40);
+  // }
 
   get hoveredTile() {
     return this._hoveredTile$.value;
@@ -230,36 +139,14 @@ export class MapUi {
       game.state.getCityDetails(city.id).then((data) => {
         const cityDetails = new CityDetails(game.state!, data);
         this._selectedCity$.next(cityDetails);
-        this.cityRangeArea.setTiles(Array.from(cityDetails.tiles));
+
         this.allowMapPanning = false;
       });
     }
   }
 
-  hoverCity(city: City) {
-    this.hoveredCity = city;
-
-    if (city.player.id === game.state?.trackedPlayer.id) {
-      city.getWorkTiles().then((data) => {
-        this.cityWorkedTilesArea.setTiles(data.workedTiles);
-        this.cityNotWorkedTilesArea.setTiles(data.notWorkedTiles);
-        this.cityBordersOnlyArea.setTiles(
-          data.notWorkedTiles.concat(data.workedTiles),
-        );
-      });
-    } else {
-      city.getRange().then((tiles) => {
-        this.cityRangeArea.setTiles(tiles);
-      });
-    }
-  }
-
-  unhoverCity() {
-    this.cityWorkedTilesArea.clear();
-    this.cityNotWorkedTilesArea.clear();
-    this.cityBordersOnlyArea.clear();
-    this.cityRangeArea.clear();
-    this.hoveredCity = null;
+  hoverCity(city: City | null) {
+    this._hoveredCity$.next(city);
   }
 
   async selectUnit(unit: Unit | null) {
@@ -268,17 +155,8 @@ export class MapUi {
     }
 
     if (!unit) {
-      this.clearSelectedUnit(!unit);
+      this.clearSelectedUnit();
       return;
-    }
-
-    if (
-      unit.definition.trait === UnitTrait.military ||
-      unit.definition.trait === UnitTrait.supply
-    ) {
-      unit.player.getSuppliedTiles().then((tiles) => {
-        this.suppliesRangeArea.setTiles(tiles);
-      });
     }
 
     if (unit.player.id === game.state?.trackedPlayer.id) {
@@ -288,9 +166,6 @@ export class MapUi {
         const unitDetails = new UnitDetails(game.state!, data);
         this._selectedUnit$.next(unitDetails);
         game.state!.updateUnit(unitDetails.id);
-        unitDetails
-          .getRange()
-          .then((tiles) => this.unitRangeArea.setTiles(tiles));
       } else {
         this.selectedUnitSimple = null;
       }
@@ -298,13 +173,10 @@ export class MapUi {
     }
   }
 
-  private clearSelectedUnit(clearRange = true) {
+  private clearSelectedUnit() {
     const previousUnit = this.selectedUnit;
     this.selectedUnitSimple = null;
     this._selectedUnit$.next(null);
-    if (clearRange) {
-      this.unitRangeArea.clear();
-    }
     if (previousUnit) {
       game.state!.updateUnit(previousUnit.id);
     }
@@ -329,13 +201,6 @@ export class MapUi {
     this._hoveredTile$.next(null);
     this._selectedTile$.next(null);
     this._highlightedTiles$.next(new Set());
-
-    this.editorArea.clear();
-    this.cityRangeArea.clear();
-    this.unitRangeArea.clear();
-    this.cityBordersOnlyArea.clear();
-    this.cityWorkedTilesArea.clear();
-    this.cityNotWorkedTilesArea.clear();
   }
 }
 

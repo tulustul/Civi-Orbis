@@ -1,16 +1,15 @@
 import {
   Container,
   Geometry,
+  Mesh,
   Shader,
   ShaderFromResources,
-  Mesh,
 } from "pixi.js";
 
-import { SeaLevel } from "@/shared";
-import { GameState } from "@/api/state";
-import { HEX_GEOMETRY } from "./utils";
 import { Tile } from "@/api/tile.interface";
+import { SeaLevel } from "@/shared";
 import { programs as areaPrograms } from "./shaders/area-shaders";
+import { HEX_GEOMETRY } from "./utils";
 
 export interface AreaPrograms {
   background: ShaderFromResources;
@@ -100,11 +99,8 @@ export class Area {
 
   drawer: AreaDrawer;
 
-  constructor(
-    state: GameState,
-    private options: AreaOptions,
-  ) {
-    this.drawer = new AreaDrawer(this, state, options);
+  constructor(private options: AreaOptions) {
+    this.drawer = new AreaDrawer(this, options);
   }
 
   destroy() {
@@ -203,7 +199,6 @@ class AreaDrawer {
 
   constructor(
     private area: Area,
-    private state: GameState,
     private options: AreaOptions,
   ) {
     const cssColor = "#" + options.color.toString(16).padStart(6, "0");
@@ -267,10 +262,6 @@ class AreaDrawer {
 
     this.options.container.addChild(mesh);
     this.backgroundMap.set(tile, mesh);
-
-    if (!this.state.trackedPlayer.exploredTiles.has(tile)) {
-      mesh.visible = false;
-    }
   }
 
   updateTileBorders(tile: Tile) {
@@ -305,10 +296,6 @@ class AreaDrawer {
 
     this.options.container.addChild(mesh);
     this.bordersMap.set(tile, mesh);
-
-    if (!this.state.trackedPlayer.exploredTiles.has(tile)) {
-      mesh.visible = false;
-    }
   }
 
   clear() {

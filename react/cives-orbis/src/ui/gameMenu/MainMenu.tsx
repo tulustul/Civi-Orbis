@@ -1,8 +1,8 @@
 import { game } from "@/api";
-import { camera } from "@/renderer";
 import { useUiState } from "@/ui/uiState";
 import styles from "./GameMenu.module.css";
 import { useMenu } from "./gameMenuStore";
+import { camera } from "@/renderer/camera";
 
 export function MainMenu() {
   const uiState = useUiState();

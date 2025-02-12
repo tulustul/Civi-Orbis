@@ -1,9 +1,10 @@
 import { game } from "@/api";
 import { City } from "@/api/city";
-import { mapUi } from "@/ui";
+import { mapUi } from "@/ui/mapUi";
 import { OutlineFilter } from "pixi-filters";
 import { Container, Graphics, Text } from "pixi.js";
 import { merge, takeUntil } from "rxjs";
+import { camera } from "./camera";
 import { TILE_SIZE } from "./constants";
 
 export class CitiesDrawer {
@@ -61,6 +62,7 @@ export class CitiesDrawer {
     for (const city of game.state!.cities) {
       this.makeCityDrawer(city);
     }
+    this.setScale(camera.transform.scale);
   }
 
   private updateCity(city: City) {
@@ -83,10 +85,11 @@ export class CitiesDrawer {
     if (scale < 20) {
       alpha = Math.max(0, 1 - (20 - scale) / 8);
     }
-    const unitScale = Math.pow(0.5 / TILE_SIZE / scale, 0.5);
+    const citiesScale = 1 / TILE_SIZE / Math.pow(scale / TILE_SIZE, 0.5);
+    // const citiesScale = (0.3 / TILE_SIZE) * Math.pow(scale, 0.45);
     for (const drawer of this.cities.values()) {
       drawer.container.alpha = alpha;
-      drawer.container.scale.set(unitScale);
+      drawer.container.scale.set(citiesScale);
     }
   }
 
@@ -99,6 +102,9 @@ class CityDrawer {
   private nameText = new Text({ style: { fill: 0xffffff, fontSize: 40 } });
   private productionText = new Text({
     style: { fill: 0xffffff, fontSize: 40 },
+  });
+  private sizeText = new Text({
+    style: { fill: 0xffffff, fontSize: 100 },
   });
   private isSelected = false;
 
@@ -119,7 +125,12 @@ class CityDrawer {
   constructor(private city: City) {
     this.container.x = city.tile.x + (city.tile.y % 2 ? 1 : 0.5);
     this.container.y = city.tile.y * 0.75 + 0.5;
-    this.container.addChild(this.g, this.nameText, this.productionText);
+    this.container.addChild(
+      this.g,
+      this.nameText,
+      this.productionText,
+      this.sizeText,
+    );
 
     this.productionText.y = 50;
 
@@ -134,17 +145,29 @@ class CityDrawer {
   updateUi() {
     this.g.clear();
 
+    console.log(this.city.turnsToGrow);
     this.nameText.text = `${this.city.name} (${this.city.turnsToGrow})`;
-    this.productionText.text = `${this.city.productName} (${this.city.turnsToProductionEnd})`;
+    if (this.city.productName) {
+      this.productionText.text = `${this.city.productName} (${this.city.turnsToProductionEnd})`;
+    } else {
+      this.productionText.text = "";
+    }
+    this.sizeText.text = this.city.size.toString();
 
     const width =
       Math.max(this.nameText.width, this.productionText.width) + 150;
-    this.nameText.x = -width / 2 + 50;
-    this.productionText.x = -width / 2 + 50;
+    this.nameText.x = -width / 2 + 120;
+    this.productionText.x = -width / 2 + 120;
+
+    this.sizeText.x = -this.sizeText.width / 2 + 50 - width / 2;
 
     this.g
       .roundRect(-width / 2, 0, width, 100, 50)
-      .fill({ color: 0x000000, alpha: 0.5 });
+      .fill({ color: 0x000000, alpha: 0.8 });
+
+    this.g
+      .circle(-width / 2 + 53, 50, 44)
+      .fill({ color: this.city.player.color });
   }
 
   destroy() {
@@ -177,3 +200,21 @@ class CityDrawer {
     this.container.zIndex = 0;
   }
 }
+
+// if (import.meta.hot) {
+//   console.log("citiesDrawer.ts is hot");
+// }
+
+type ProgressBarOptions = {
+  g: Graphics;
+  progress: number;
+  nextProgress: number;
+  total: number;
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+  color: number;
+  nextColor: number;
+};
+function progressBar(options: ProgressBarOptions) {}

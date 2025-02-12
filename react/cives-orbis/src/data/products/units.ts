@@ -42,7 +42,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     name: "Scout",
     type: UnitType.land,
     trait: UnitTrait.explorer,
-    actionPoints: 3,
+    actionPoints: 8,
     strength: 2,
     actions: [],
     productionCost: 10,

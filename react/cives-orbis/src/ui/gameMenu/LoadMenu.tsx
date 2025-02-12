@@ -1,11 +1,12 @@
 import { game } from "@/api";
 import { importSave, loadGameData } from "@/api/saving";
-import { camera } from "@/renderer";
+import { camera } from "@/renderer/camera";
 import { useRef, useState } from "react";
 import { useMenu } from "./gameMenuStore";
 import { SavesList } from "./SavesList";
 import { Modal, Spinner } from "@/ui/components";
 import styles from "./GameMenu.module.css";
+import { useUiState } from "../uiState";
 
 export function LoadMenu() {
   const [saveName, setSaveName] = useState("");
@@ -13,6 +14,7 @@ export function LoadMenu() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const menu = useMenu();
+  const uiState = useUiState();
 
   async function load() {
     if (!saveName) {
@@ -39,6 +41,7 @@ export function LoadMenu() {
     }
 
     menu.hide();
+    uiState.setMode("map");
     setWaiting(false);
   }
 

@@ -15,7 +15,7 @@ export class PoliticsDrawer {
   async makeAreas() {
     for (const player of this.state.players) {
       const tiles = await this.state.getAreaTiles(player.areaId);
-      const area = new Area(this.state, {
+      const area = new Area({
         color: player.color,
         container: this.container,
         backgroundOpacity: 0.5,

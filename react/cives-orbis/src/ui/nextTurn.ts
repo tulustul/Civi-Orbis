@@ -2,7 +2,7 @@ import { BehaviorSubject } from "rxjs";
 
 import { game } from "@/api";
 import { mapUi } from "./mapUi";
-import { camera } from "@/renderer";
+import { camera } from "@/renderer/camera";
 
 export class NextTurnService {
   private _waiting$ = new BehaviorSubject<boolean>(false);

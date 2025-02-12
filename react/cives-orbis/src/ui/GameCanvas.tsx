@@ -1,4 +1,5 @@
-import { controls, renderer } from "@/renderer";
+import { controls } from "@/renderer/controls";
+import { renderer } from "@/renderer/renderer";
 import { memo } from "react";
 import { useEventListener } from "usehooks-ts";
 

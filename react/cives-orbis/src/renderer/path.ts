@@ -1,4 +1,3 @@
-import { mapUi } from "@/ui";
 import {
   CanvasTextMetrics,
   Container,
@@ -9,6 +8,7 @@ import {
 import { Tile } from "../api/tile.interface";
 import { getTileCenter } from "./utils";
 import { camera } from "./camera";
+import { mapUi } from "@/ui/mapUi";
 
 export class PathRenderer {
   pathGraphics = new Graphics();

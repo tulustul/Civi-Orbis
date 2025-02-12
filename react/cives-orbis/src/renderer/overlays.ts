@@ -1,9 +1,9 @@
 import { Graphics } from "pixi.js";
 
 import { Tile } from "@/api";
-import { mapUi } from "@/ui";
 import { Container } from "pixi.js";
 import { drawClosedHex, drawHex, getTileCoords } from "./utils";
+import { mapUi } from "@/ui/mapUi";
 
 export class OverlaysRenderer {
   hoveredTileGraphics = new Graphics();

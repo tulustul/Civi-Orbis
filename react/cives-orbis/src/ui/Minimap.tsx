@@ -1,4 +1,4 @@
-import { camera } from "@/renderer";
+import { camera } from "@/renderer/camera";
 import { MinimapRenderer } from "@/renderer/minimap";
 import { Application } from "pixi.js";
 import { MouseEvent, useEffect, useRef } from "react";

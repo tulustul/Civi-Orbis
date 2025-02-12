@@ -16,11 +16,11 @@ import { PathRenderer } from "./path";
 import { MapDrawer } from "./terrain";
 import { VisibleTilesDrawer } from "./visible-tiles-drawer";
 import { camera } from "./camera";
-import { mapUi } from "@/ui";
 import { FogOfWarFilter } from "./filters/fog-of-war-filter";
 import { UnitsDrawer } from "./unitsDrawer";
 import { animationsManager } from "./animation";
-import { CitiesDrawer } from "./citiesDrawer";
+// import { CitiesDrawer } from "./citiesDrawer";
+import { AreasDrawer } from "./areasDrawer";
 
 export class GameRenderer {
   app!: Application;
@@ -46,7 +46,8 @@ export class GameRenderer {
   mapContainer = new Container({ label: "map" });
   unitsAndCitiesContainer = new Container({ label: "unitsAndCities" });
   unitsDrawer = new UnitsDrawer(this.unitsAndCitiesContainer);
-  citiesDrawer = new CitiesDrawer(this.unitsAndCitiesContainer);
+  // citiesDrawer = new CitiesDrawer(this.unitsAndCitiesContainer);
+  areaDrawer = new AreasDrawer(this.overlaysContainer);
 
   grid!: Grid;
 
@@ -103,21 +104,21 @@ export class GameRenderer {
     this.overlaysContainer.interactiveChildren = false;
 
     this.app.stage.addChild(this.mapLayer.sprite);
-    this.app.stage.addChild(this.mapContainer);
     this.app.stage.addChild(this.overlaysContainer);
+    this.app.stage.addChild(this.mapContainer);
     this.mapContainer.addChild(this.unitsAndCitiesContainer);
     this.unitsAndCitiesContainer.zIndex = 1000;
 
     this.unitsAndCitiesContainer.filters = [
-      // new MaskFilter({
-      //   sprite: this.fogOfWarLayer.sprite,
-      // }),
+      new MaskFilter({
+        sprite: this.fogOfWarLayer.sprite,
+      }),
     ];
     this.mapLayer.sprite.filters = [
-      // new MaskFilter({
-      //   sprite: this.visibleTilesLayer.sprite,
-      // }),
-      // new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
+      new MaskFilter({
+        sprite: this.visibleTilesLayer.sprite,
+      }),
+      new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
     ];
 
     this.grid = new Grid();
@@ -145,7 +146,6 @@ export class GameRenderer {
     this.app.ticker.add(() => {
       animationsManager.update(this.app.ticker.deltaMS);
       // camera.update();
-      mapUi.update();
       this._tick$.next();
 
       const scale = camera.transform.scale;
@@ -153,7 +153,7 @@ export class GameRenderer {
       if (scale != this.lastScale) {
         this.lastScale = scale;
         this.unitsDrawer.setScale(scale);
-        this.citiesDrawer.setScale(scale);
+        // this.citiesDrawer.setScale(scale);
       }
 
       if (this.mapDrawer.politicsDrawer) {
@@ -197,8 +197,21 @@ export class GameRenderer {
     this.fogOfWarDrawer.clear();
     this.visibleTilesDrawer.clear();
     this.unitsDrawer.clear();
-    this.citiesDrawer.clear();
+    // this.citiesDrawer.clear();
   }
 }
 
-export const renderer = new GameRenderer();
+export let renderer = new GameRenderer();
+
+if (import.meta.hot) {
+  console.log("renderer.ts is hot");
+
+  const hotData = import.meta.hot.data as { renderer?: GameRenderer };
+  if (hotData.renderer) {
+    renderer = hotData.renderer;
+  }
+  import.meta.hot.accept(() => {
+    console.log("accept renderer");
+    import.meta.hot!.data.renderer = renderer;
+  });
+}

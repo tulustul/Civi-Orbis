@@ -23,6 +23,7 @@ import { Layer } from "./layer";
 import atlasData from "../../assets/atlas.json";
 import { VisibleTilesDrawer } from "./visible-tiles-drawer";
 import { Grid } from "./grid";
+import { AreasDrawer } from "react/cives-orbis/src/renderer/areasDrawer";
 
 @Injectable()
 export class GameRenderer {
@@ -57,6 +58,8 @@ export class GameRenderer {
   _loading$ = new BehaviorSubject<boolean>(true);
   loading$ = this._loading$.asObservable();
   ready$ = this._loading$.pipe(filter((loading) => !loading));
+
+  areaDrawer = new AreasDrawer(this.overlaysContainer);
 
   private _tick$ = new Subject<void>();
   tick$ = this._tick$.asObservable();

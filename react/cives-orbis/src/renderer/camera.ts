@@ -5,6 +5,7 @@ import { Application } from "pixi.js";
 import { Animation, Animations } from "./animation";
 import { TILE_SIZE } from "./constants";
 import { getTileCoords } from "./utils";
+import { game } from "@/api";
 
 export interface Transform {
   x: number;
@@ -32,6 +33,13 @@ export class Camera {
 
   private scaleAnimation: Animation<number> | null = null;
 
+  public tileBoundingBox: BoundingBox = {
+    xStart: 0,
+    yStart: 0,
+    xEnd: 0,
+    yEnd: 0,
+  };
+
   setApp(app: Application) {
     this.app = app;
     app.ticker.add(() => {
@@ -46,12 +54,14 @@ export class Camera {
     this.transform.x -= x / this.transform.scale;
     this.transform.y -= y / this.transform.scale;
     this.transformChanged = true;
+    this.updateBoundingBox();
   }
 
   moveTo(x: number, y: number) {
     this.transform.x = x;
     this.transform.y = y;
     this.transformChanged = true;
+    this.updateBoundingBox();
   }
 
   moveToTileWithEasing(tile: Tile) {
@@ -113,6 +123,8 @@ export class Camera {
     t.y += y1 - y2;
 
     this.transformChanged = true;
+
+    this.updateBoundingBox();
   }
 
   moveToTile(tile: Tile) {
@@ -148,6 +160,29 @@ export class Camera {
       gameX += 0.5;
     }
     return this.canvasToScreen(gameX, gameY * 0.75);
+  }
+
+  updateBoundingBox() {
+    if (!game.state) {
+      return;
+    }
+
+    const t = this.transform;
+    const width = Math.floor(this.app.canvas.width / t.scale);
+    const height = Math.floor(this.app.canvas.height / t.scale);
+
+    const map = game.state.map;
+
+    const xStart = Math.floor(t.x - width / 2 - 1);
+    const yStart = Math.floor(t.y - height / 2);
+
+    this.tileBoundingBox.xStart = Math.max(0, Math.min(map.width, xStart));
+    this.tileBoundingBox.yStart = Math.max(0, Math.min(map.height, yStart));
+    this.tileBoundingBox.xEnd = Math.min(map.width, xStart + width + 3);
+    this.tileBoundingBox.yEnd = Math.min(
+      map.height,
+      (yStart + height + 2) / 0.75,
+    );
   }
 }
 

@@ -1,11 +1,11 @@
 import { game } from "@/api";
-import { useBind } from "@/utils";
+import { useObservable } from "@/utils";
 import { nextTurnService } from "./nextTurn";
 import { Spinner } from "./components";
 
 export function NextTurnButton() {
-  const nextTask = useBind(game.nextTask$);
-  const waiting = useBind(nextTurnService.waiting$);
+  const nextTask = useObservable(game.nextTask$);
+  const waiting = useObservable(nextTurnService.waiting$);
 
   function getCssClass() {
     if (!nextTask) {

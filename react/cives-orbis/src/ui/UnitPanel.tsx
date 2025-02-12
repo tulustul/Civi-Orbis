@@ -1,4 +1,4 @@
-import { useBind, useforceRender } from "@/utils";
+import { useObservable, useforceRender } from "@/utils";
 import { Panel } from "./components";
 import { mapUi } from "./mapUi";
 import clsx from "clsx";
@@ -7,7 +7,7 @@ import { ACTIONS, UnitAction } from "@/core/unit-actions";
 import styles from "./UnitPanel.module.css";
 
 export function UnitPanel() {
-  const unit = useBind(mapUi.selectedUnit$);
+  const unit = useObservable(mapUi.selectedUnit$);
   const forceRender = useforceRender();
 
   function destroy() {}

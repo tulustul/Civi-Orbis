@@ -5,7 +5,7 @@ import { camera } from "./camera";
 import { game } from "@/api";
 import { useUiState } from "@/ui/uiState";
 import { nextTurnService } from "@/ui/nextTurn";
-import { useMenu } from "@/ui";
+import { useMenu } from "@/ui/gameMenu";
 
 export class Controls {
   isMousePressed = false;
@@ -63,7 +63,7 @@ export class Controls {
           mapUi.setPath(selectedUnit.path);
           // to refresh the ui
           mapUi["_selectedUnit$"].next(selectedUnit);
-          mapUi.unitRangeArea.setTiles(await selectedUnit.getRange());
+          // mapUi.unitRangeArea.setTiles(await selectedUnit.getRange());
         });
       }
     }

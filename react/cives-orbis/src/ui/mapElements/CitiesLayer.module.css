@@ -1,0 +1,59 @@
+.citiesLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  will-change: opacity;
+}
+.citiesLayer.hidden {
+  display: none;
+}
+
+.city {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 300px;
+  margin-left: -150px;
+  transform-origin: top;
+  will-change: transform;
+}
+.info {
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0 0 4px 0 black;
+  display: flex;
+  pointer-events: all;
+  overflow: hidden;
+  cursor: pointer;
+  text-shadow: 0px 0px 5px black;
+}
+.size {
+  font-size: 26px;
+  padding: 0 5px;
+  min-width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--player-color);
+}
+.progressBar {
+  height: 20px;
+}
+.turns {
+  margin-left: 15px;
+}
+.growth {
+  --progress-bar-color: var(--growth-color);
+}
+.production {
+  --progress-bar-color: var(--production-color);
+}
+.simpleView {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+}

@@ -5,7 +5,8 @@ import { merge, takeUntil } from "rxjs";
 import { Animations } from "./animation";
 import { getAssets } from "./assets";
 import { TILE_SIZE } from "./constants";
-import { mapUi } from "@/ui";
+import { camera } from "./camera";
+import { mapUi } from "@/ui/mapUi";
 
 export class UnitsDrawer {
   units = new Map<number, UnitDrawer>();
@@ -72,6 +73,7 @@ export class UnitsDrawer {
     for (const unit of game.state!.units) {
       this.makeUnitDrawer(unit);
     }
+    this.setScale(camera.transform.scale);
   }
 
   private updateUnit(unit: Unit) {
@@ -156,8 +158,6 @@ export class UnitDrawer {
     banner.tint = unit.player.cssColor;
     banner.anchor.set(0.5, 0.5);
     icon.anchor.set(0.5, 0.5);
-    this.container.scale.x = 1 / TILE_SIZE;
-    this.container.scale.y = 1 / TILE_SIZE;
     this.updateUi();
     this.updatePosition();
     this.container.addChild(banner, icon, this.g);
