@@ -8,6 +8,7 @@ import {
   cityToChannel,
   trackedPlayerToChannel,
   unitMoveToChannel,
+  tileToTileCoords,
 } from "./serialization/channel";
 import { PlayerYields } from "../shared";
 
@@ -25,6 +26,7 @@ class Collector {
   moves: UnitMoveCore[] = [];
 
   cities = new Set<CityCore>();
+  citiesRevealed = new Set<CityCore>();
   citiesDestroyed = new Set<number>();
 
   areaTilesAdded = new Map<number, TileCore[]>();
@@ -32,9 +34,9 @@ class Collector {
 
   trackedPlayer: PlayerCore | undefined;
   trackedPlayerYields: PlayerYields | undefined;
-  tilesExplored = new Set<number>();
-  tilesShowed = new Set<number>();
-  tilesShowedAdded = new Set<number>();
+  tilesExplored = new Set<TileCore>();
+  tilesShowed = new Set<TileCore>();
+  tilesShowedAdded = new Set<TileCore>();
 
   turn: number | undefined;
 
@@ -50,6 +52,9 @@ class Collector {
 
     for (const city of this.cities) {
       changes.push({ type: "city.updated", data: cityToChannel(city) });
+    }
+    for (const city of this.citiesRevealed) {
+      changes.push({ type: "city.revealed", data: cityToChannel(city) });
     }
     for (const id of this.citiesDestroyed) {
       changes.push({ type: "city.destroyed", data: id });
@@ -94,19 +99,19 @@ class Collector {
     if (this.tilesExplored.size) {
       changes.push({
         type: "trackedPlayer.tilesExplored",
-        data: Array.from(this.tilesExplored),
+        data: Array.from(this.tilesExplored).map(tileToTileCoords),
       });
     }
     if (this.tilesShowed.size) {
       changes.push({
         type: "trackedPlayer.tilesShowed",
-        data: Array.from(this.tilesShowed),
+        data: Array.from(this.tilesShowed).map(tileToTileCoords),
       });
     }
     if (this.tilesShowedAdded.size) {
       changes.push({
         type: "trackedPlayer.tilesShowedAdded",
-        data: Array.from(this.tilesShowedAdded),
+        data: Array.from(this.tilesShowedAdded).map(tileToTileCoords),
       });
     }
 
@@ -121,6 +126,7 @@ class Collector {
     this.moves = [];
 
     this.cities.clear();
+    this.citiesRevealed.clear();
     this.citiesDestroyed.clear();
 
     this.areaTilesAdded.clear();
@@ -155,13 +161,13 @@ class Collector {
 
   setVisibleTiles(tiles: Set<TileCore>) {
     for (const tile of tiles) {
-      this.tilesShowed.add(tile.id);
+      this.tilesShowed.add(tile);
     }
   }
 
   addVisibleTiles(tiles: Set<TileCore>) {
     for (const tile of tiles) {
-      this.tilesShowedAdded.add(tile.id);
+      this.tilesShowedAdded.add(tile);
     }
   }
 }

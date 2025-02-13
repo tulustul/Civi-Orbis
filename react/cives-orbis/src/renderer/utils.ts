@@ -2,6 +2,7 @@ import { Container, Geometry, Graphics, Sprite, Texture } from "pixi.js";
 
 import { TILE_SIZE } from "./constants";
 import { Tile } from "../api/tile.interface";
+import { TileChanneled, TileCoords } from "@/core/serialization/channel";
 
 // prettier-ignore
 const HEX_VERTICES = [
@@ -22,7 +23,7 @@ export function getTileCenter(tile: Tile): [number, number] {
   return [0.5 + tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75 + 0.5];
 }
 
-export function getTileCoords(tile: Tile): [number, number] {
+export function getTileCoords(tile: TileCoords): [number, number] {
   return [tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75];
 }
 
@@ -57,7 +58,7 @@ export function getTileVariants(tileName: string, variants: number): string[] {
   return result;
 }
 
-export function drawTileSprite(tile: Tile, texture: Texture) {
+export function drawTileSprite(tile: TileCoords, texture: Texture) {
   const sprite = new Sprite(texture);
   sprite.scale.set(1 / texture.width, 1 / texture.width);
   sprite.anchor.set(0, 1);
@@ -67,7 +68,7 @@ export function drawTileSprite(tile: Tile, texture: Texture) {
 }
 
 export function drawTileSpriteCentered(
-  tile: Tile,
+  tile: TileCoords,
   texture: Texture,
   scale = 1,
 ) {
@@ -77,12 +78,12 @@ export function drawTileSpriteCentered(
   return sprite;
 }
 
-export function putContainerAtTile(tile: Tile, container: Container) {
+export function putContainerAtTile(tile: TileCoords, container: Container) {
   container.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
   container.position.y = tile.y * 0.75 + 1;
 }
 
-export function putSpriteAtTileCentered(tile: Tile, sprite: Sprite) {
+export function putSpriteAtTileCentered(tile: TileCoords, sprite: Sprite) {
   sprite.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.5 - sprite.width / 2;
   sprite.position.y = tile.y * 0.75 + 0.5 - sprite.height / 2;
 }

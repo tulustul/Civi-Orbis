@@ -19,6 +19,11 @@ import {
   GameChanneled,
   tileDetailsToChannel,
   TileDetailsChanneled,
+  UnitChanneled,
+  unitToChannel,
+  tileToChannel,
+  cityToChannel,
+  tileToTileCoords,
 } from "./core/serialization/channel";
 import { dumpGame, loadGame } from "./core/serialization/dump";
 import {
@@ -57,12 +62,16 @@ const HANDLERS = {
   "unit.getRange": unitGetRange,
   "unit.getFailedActionRequirements": unitGetFailedActionRequirements,
   "unit.simulateCombat": unitSimulateCombat,
+  "unit.getAll": unitGetAll,
 
+  "tile.getAll": tileGetAll,
+  "tile.getAllVisible": tileGetAllVisible,
   "tile.getDetails": tileGetDetails,
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
   "tile.setResource": tileSetResource,
 
+  "city.getAllRevealed": getAllRevealed,
   "city.getDetails": getCityDetails,
   "city.produce": cityProduce,
   "city.getRange": cityGetRange,
@@ -300,6 +309,18 @@ function unitSimulateCombat(data: any): CombatSimulation | null {
   return simulateCombat(attacker, defender);
 }
 
+function unitGetAll(): UnitChanneled[] {
+  return game.unitsManager.units.map((unit) => unitToChannel(unit));
+}
+
+export function tileGetAll() {
+  return Array.from(game.map.tilesMap.values()).map(tileToChannel);
+}
+
+export function tileGetAllVisible() {
+  return Array.from(game.trackedPlayer.visibleTiles).map(tileToTileCoords);
+}
+
 export function tileGetDetails(data: {
   tileId: number;
   playerId: number;
@@ -350,6 +371,12 @@ export function tileSetResource(data: any) {
     tile.resource = null;
   }
   tile.update();
+}
+
+export function getAllRevealed() {
+  return game.citiesManager.cities
+    .filter((city) => game.trackedPlayer.exploredTiles.has(city.tile))
+    .map(cityToChannel);
 }
 
 export function getCityDetails(cityId: number) {

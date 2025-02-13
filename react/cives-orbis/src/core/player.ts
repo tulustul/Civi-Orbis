@@ -52,11 +52,14 @@ export class PlayerCore {
   suppliedTiles = new Set<TileCore>();
   potentialSuppliedTiles = new Set<TileCore>();
 
+  cssColor: string;
+
   constructor(
     public game: Game,
     public color: number,
   ) {
     this.area = this.game.areasManager.make();
+    this.cssColor = "#" + color.toString(16).padStart(6, "0");
   }
 
   exploreTiles(tiles: Iterable<TileCore>) {
@@ -64,7 +67,10 @@ export class PlayerCore {
       if (!this.exploredTiles.has(tile)) {
         this.exploredTiles.add(tile);
         if (this.id === this.game.trackedPlayer.id) {
-          collector.tilesExplored.add(tile.id);
+          collector.tilesExplored.add(tile);
+          if (tile.city) {
+            collector.citiesRevealed.add(tile.city);
+          }
         }
       }
     }
@@ -75,7 +81,7 @@ export class PlayerCore {
       if (!this.visibleTiles.has(tile)) {
         this.visibleTiles.add(tile);
         if (this.id === this.game.trackedPlayer.id) {
-          collector.tilesShowedAdded.add(tile.id);
+          collector.tilesShowedAdded.add(tile);
         }
       }
     }

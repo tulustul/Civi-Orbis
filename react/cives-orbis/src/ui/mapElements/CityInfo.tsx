@@ -1,13 +1,13 @@
-import { City } from "@/api/city";
+import { game } from "@/api";
+import { CityChanneled } from "@/core/serialization/channel";
 import { camera, Transform } from "@/renderer/camera";
-import { getTileCoords } from "@/renderer/utils";
+import { ProgressBar } from "@/ui/components";
 import { useEffect, useRef } from "react";
 import styles from "./CitiesLayer.module.css";
-import { ProgressBar } from "../components";
-import { game } from "@/api";
+import { getTileCoords } from "@/renderer/utils";
 
 type Props = {
-  city: City;
+  city: CityChanneled;
 };
 
 export function CityInfo({ city }: Props) {
@@ -22,10 +22,10 @@ export function CityInfo({ city }: Props) {
     if (!elRef.current) {
       return;
     }
-    elRef.current.style.setProperty("--player-color", city.player.cssColor);
+    elRef.current.style.setProperty("--player-color", city.cssColor);
   }, []);
 
-  const areDetailsVisible = city.player.id === game.state!.trackedPlayer.id;
+  const areDetailsVisible = city.playerId === game.state!.trackedPlayer.id;
 
   function transform(t: Transform) {
     if (!elRef.current) {
@@ -47,7 +47,7 @@ export function CityInfo({ city }: Props) {
     }
 
     const cityScale = Math.pow(t.scale / 70, 0.4);
-    let [x, y] = getTileCoords(city.tile);
+    let [x, y] = getTileCoords(tile);
     [x, y] = camera.canvasToScreen(x + 0.5, y + 0.8);
     elRef.current.style.transform = `translate(${x}px, ${y}px) scale(${cityScale})`;
   }

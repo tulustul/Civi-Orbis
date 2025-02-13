@@ -26,7 +26,7 @@ export class Game {
 
   unitsManager = new UnitsManager();
 
-  citiesManager = new CitiesManager();
+  citiesManager = new CitiesManager(this);
 
   start() {
     this.preprocessEntities();

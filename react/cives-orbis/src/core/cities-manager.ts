@@ -4,6 +4,7 @@ import { TileRoad } from "./tile-improvements";
 import { TileCore } from "./tile";
 import { LandForm, SeaLevel } from "../shared";
 import { collector } from "./collector";
+import { Game } from "./game";
 
 export class CitiesManager {
   cities: CityCore[] = [];
@@ -11,6 +12,8 @@ export class CitiesManager {
   citiesMap = new Map<number, CityCore>();
 
   lastId = 0;
+
+  constructor(private game: Game) {}
 
   spawn(tile: TileCore, player: PlayerCore, isNew = true) {
     if (tile.city) {
@@ -60,6 +63,9 @@ export class CitiesManager {
     city.suppliesProducers.add();
 
     collector.cities.add(city);
+    if (this.game.trackedPlayer.exploredTiles.has(city.tile)) {
+      collector.citiesRevealed.add(city);
+    }
 
     return city;
   }

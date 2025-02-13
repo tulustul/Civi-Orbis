@@ -26,7 +26,7 @@ export class Unit {
     unit: UnitChanneled,
   ) {
     this.id = unit.id;
-    this.tile = game.map.tilesMap.get(unit.tileId)!;
+    this.tile = game.map.tilesMap.get(unit.tile.id)!;
     this.player = game.playersMap.get(unit.playerId)!;
     this.definition = getUnitById(unit.definitionId)!;
     this.health = unit.health;
@@ -42,13 +42,13 @@ export class Unit {
     this.supplies = unit.supplies;
     this.actionPointsLeft = unit.actionPointsLeft;
 
-    if (this.tile.id !== unit.tileId) {
+    if (this.tile.id !== unit.tile.id) {
       const index = this.tile.units.indexOf(this);
       if (index !== -1) {
         this.tile.units.splice(index, 1);
       }
 
-      this.tile = game.map.tilesMap.get(unit.tileId)!;
+      this.tile = game.map.tilesMap.get(unit.tile.id)!;
       this.tile.units.push(this);
     }
 

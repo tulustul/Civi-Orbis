@@ -28,7 +28,7 @@ export class City {
     city: CityChanneled,
   ) {
     this.id = city.id;
-    this.tile = game.map.tilesMap.get(city.tileId)!;
+    this.tile = game.map.tilesMap.get(city.tile.id)!;
 
     this.tile.city = this;
 

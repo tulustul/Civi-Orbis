@@ -1,5 +1,5 @@
 import { worker, awaitingExecutors } from "./worker";
-import { changeHandlers } from "./changes";
+import { bridgeHandlers, changeHandlers } from "./changes";
 import { game } from "@/api";
 
 export function initWorkerListeners() {
@@ -20,12 +20,19 @@ function onMessage(event: MessageEvent) {
     for (const change of event.data.changes) {
       console.debug(`change received: ${change.type}`);
       const handler = changeHandlers.get(change.type);
-      if (!handler) {
+      const bridgeHandler = bridgeHandlers.get(change.type);
+      if (!handler && !bridgeHandler) {
         console.error(`No handler for change with type "${change.type}"`);
         continue;
       }
 
-      handler(game.state!, change.data);
+      if (handler) {
+        handler(game.state!, change.data);
+      }
+
+      if (bridgeHandler) {
+        bridgeHandler(change.data);
+      }
     }
   }
 

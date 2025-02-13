@@ -4,6 +4,7 @@ import { CityDetails } from "@/api/city-details";
 import { Tile } from "@/api/tile.interface";
 import { Unit } from "@/api/unit";
 import { UnitDetails } from "@/api/unit-details";
+import { UnitChanneled } from "@/core/serialization/channel";
 import { camera } from "@/renderer/camera";
 import { BehaviorSubject, Subject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
@@ -27,7 +28,7 @@ export class MapUi {
   private _yieldsVisible$ = new BehaviorSubject<boolean>(true);
   yieldsVisible$ = this._yieldsVisible$.pipe(distinctUntilChanged());
 
-  private selectedUnitSimple: Unit | null = null;
+  private selectedUnitSimple: UnitChanneled | null = null;
   private _selectedUnit$ = new BehaviorSubject<UnitDetails | null>(null);
   selectedUnit$ = this._selectedUnit$.asObservable();
 
@@ -54,7 +55,7 @@ export class MapUi {
       } else if (tile.units.length) {
         if (
           this.selectedUnit?.tile !== tile &&
-          this.selectedUnitSimple?.tile !== tile
+          this.selectedUnitSimple?.tile.id !== tile.id
         ) {
           this.selectFirstUnitFromTile(tile);
         }
@@ -149,7 +150,7 @@ export class MapUi {
     this._hoveredCity$.next(city);
   }
 
-  async selectUnit(unit: Unit | null) {
+  async selectUnit(unit: UnitChanneled | null) {
     if (unit?.id === this.selectedUnit?.id) {
       return;
     }
@@ -159,7 +160,7 @@ export class MapUi {
       return;
     }
 
-    if (unit.player.id === game.state?.trackedPlayer.id) {
+    if (unit.playerId === game.state?.trackedPlayer.id) {
       this.selectedUnitSimple = unit;
       const data = await game.state.getUnitDetails(unit.id);
       if (data) {
@@ -186,7 +187,7 @@ export class MapUi {
     const trackedPlayerId = game.state!.trackedPlayer.id;
     for (const unit of tile.units) {
       if (!unit.parent && unit.player.id === trackedPlayerId) {
-        this.selectUnit(unit);
+        // this.selectUnit(unit); // TODO
         return;
       }
     }

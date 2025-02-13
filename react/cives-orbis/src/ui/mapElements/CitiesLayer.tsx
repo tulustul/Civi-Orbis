@@ -1,24 +1,22 @@
-import { game } from "@/api";
-import { City } from "@/api/city";
+import { bridge } from "@/bridge";
+import { CityChanneled } from "@/core/serialization/channel";
 import { camera } from "@/renderer/camera";
 import { useEffect, useRef, useState } from "react";
-import { merge } from "rxjs";
 import styles from "./CitiesLayer.module.css";
 import { CityInfo } from "./CityInfo";
 
 export function CitiesLayer() {
   const elRef = useRef<HTMLDivElement>(null);
 
-  const [cities, setCities] = useState<City[]>([]);
+  const [cities, setCities] = useState<CityChanneled[]>([]);
 
   useEffect(() => {
-    const subscription = merge(
-      game.state!.citySpawned$,
-      game.state!.cityDestroyed$,
-      game.state!.tilesExplored$,
-    ).subscribe(updateCities);
+    const subscription = bridge.cities.revealed$.subscribe((city) => {
+      setCities((c) => [...c, city]);
+      setTimeout(transform);
+    });
 
-    updateCities();
+    build();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -28,12 +26,9 @@ export function CitiesLayer() {
     return () => subscription.unsubscribe();
   }, [camera]);
 
-  function updateCities() {
-    const player = game.state!.trackedPlayer;
-    setCities(
-      game.state!.cities.filter((city) => player.exploredTiles.has(city.tile)),
-    );
-
+  async function build() {
+    const cities = await bridge.cities.getAllRevealed();
+    setCities(cities);
     setTimeout(transform);
   }
 

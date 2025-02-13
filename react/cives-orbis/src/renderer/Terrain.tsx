@@ -1,19 +1,16 @@
 import { useExtend } from "@pixi/react";
 import { useEffect, useRef } from "react";
 
-import { takeUntil } from "rxjs/operators";
-
-// import { GameRenderer } from "./renderer";
-import { game, GameApi } from "@/api";
-import { GameState } from "@/api/state";
-import { PoliticsDrawer } from "./politics";
-import { Tile } from "@/api/tile.interface";
-import { Container, Graphics, Sprite } from "pixi.js";
-import { drawTileSprite, drawTileSpriteCentered } from "./utils";
-import { measureTime } from "@/utils";
-import { Climate, LandForm, SeaLevel, TileDirection } from "@/shared";
+import { game } from "@/api";
+import { bridge } from "@/bridge";
+import { TileChanneled } from "@/core/serialization/channel";
 import { TileImprovement } from "@/core/tile-improvements";
+import { Climate, LandForm, SeaLevel, TileDirection } from "@/shared";
+import { measureTime } from "@/utils";
+import { Container, Graphics, Sprite } from "pixi.js";
 import { getAssets } from "./assets";
+import { PoliticsDrawer } from "./politics";
+import { drawTileSprite, drawTileSpriteCentered } from "./utils";
 
 const SEA_TEXTURES: Record<SeaLevel, string> = {
   [SeaLevel.deep]: "hexOcean00.png",
@@ -72,9 +69,9 @@ const FOREST_TEXTURES: Record<Climate, string> = {
 export class TerrainDrawer {
   yieldsContainer = new Container({ label: "yields", isRenderGroup: true });
 
-  tileContainers = new Map<Tile, Container>();
+  tileContainers = new Map<TileChanneled, Container>();
   // Yields are not using per tile container but use a separate container for easy toggling.
-  tileYields = new Map<Tile, Graphics>();
+  tileYields = new Map<TileChanneled, Graphics>();
 
   politicsDrawer!: PoliticsDrawer;
 
@@ -82,31 +79,14 @@ export class TerrainDrawer {
     container.addChild(this.yieldsContainer);
     this.yieldsContainer.zIndex = 1000;
 
-    game.init$.subscribe((state) => {
-      measureTime("build map", () => this.build(state));
+    game.init$.subscribe(() => {
+      measureTime("build map", async () => await this.build());
+    });
 
-      state.tilesUpdated$.pipe(takeUntil(game.stop$)).subscribe((tiles) => {
-        for (const tile of tiles) {
-          this.updateTile(tile);
-        }
-      });
-
-      // cities
-      state.citySpawned$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((city) => this.updateTile(city.tile));
-
-      // state.cityUpdated$
-      //   .pipe(takeUntil(game.stop$))
-      //   .subscribe((city) => this.updateTile(city.tile));
-
-      state.cityDestroyed$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((city) => this.updateTile(city.tile));
-
-      // mapUi.yieldsVisible$
-      //   .pipe(takeUntil(game.stop$))
-      //   .subscribe((visible) => (this.yieldsContainer.visible = visible));
+    bridge.tiles.updated$.subscribe((tiles) => {
+      for (const tile of tiles) {
+        this.updateTile(tile);
+      }
     });
 
     game.stop$.subscribe(() => this.clear());
@@ -118,29 +98,27 @@ export class TerrainDrawer {
 
   clear() {}
 
-  private build(gameState: GameState) {
+  private async build() {
     // this.politicsDrawer = new PoliticsDrawer(gameState, this.renderer);
+    const tiles = await bridge.tiles.getAll();
 
-    for (let x = 0; x < gameState.map.width; x++) {
-      for (let y = 0; y < gameState.map.height; y++) {
-        const tile = gameState.map.tiles[x][y];
-        const container = new Container();
-        container.zIndex = y;
-        this.tileContainers.set(tile, container);
-        this.container.addChild(container);
-        this.drawTile(tile, container);
-      }
+    for (const tile of tiles) {
+      const container = new Container();
+      container.zIndex = tile.y;
+      this.tileContainers.set(tile, container);
+      this.container.addChild(container);
+      this.drawTile(tile, container);
     }
   }
 
-  private updateTile(tile: Tile) {
+  private updateTile(tile: TileChanneled) {
     const container = this.clearTile(tile);
     if (container) {
       this.drawTile(tile, container);
     }
   }
 
-  private clearTile(tile: Tile) {
+  private clearTile(tile: TileChanneled) {
     const container = this.tileContainers.get(tile);
     if (container) {
       for (const child of container.children) {
@@ -156,7 +134,7 @@ export class TerrainDrawer {
     return container;
   }
 
-  private drawTile(tile: Tile, container: Container) {
+  private drawTile(tile: TileChanneled, container: Container) {
     this.drawTerrain(tile, container);
     this.drawImprovement(tile, container);
     this.drawResource(tile, container);
@@ -166,7 +144,7 @@ export class TerrainDrawer {
     this.drawYields(tile);
   }
 
-  private drawTerrain(tile: Tile, container: Container) {
+  private drawTerrain(tile: TileChanneled, container: Container) {
     let textureName: string;
 
     if (tile.wetlands) {
@@ -196,7 +174,7 @@ export class TerrainDrawer {
     container.addChild(sprite);
   }
 
-  private drawImprovement(tile: Tile, container: Container) {
+  private drawImprovement(tile: TileChanneled, container: Container) {
     let sprite: Sprite | null = null;
     if (tile.improvement === TileImprovement.farm) {
       sprite = drawTileSpriteCentered(tile, this.textures["field.png"]);
@@ -211,7 +189,7 @@ export class TerrainDrawer {
     }
   }
 
-  private drawResource(tile: Tile, container: Container) {
+  private drawResource(tile: TileChanneled, container: Container) {
     if (!tile.resource) {
       return;
     }
@@ -226,30 +204,26 @@ export class TerrainDrawer {
     container.addChild(sprite);
   }
 
-  private drawRoads(tile: Tile, container: Container) {
+  private drawRoads(tile: TileChanneled, container: Container) {
     if (tile.road === null) {
       return;
     }
 
-    const roadId = tile.fullNeighbours
-      .map((n) => (!n || n.road === null ? "0" : "1"))
-      .join("");
-
-    const textureName = `hexRoad-${roadId}-00.png`;
+    const textureName = `hexRoad-${tile.roads}-00.png`;
     const sprite = drawTileSprite(tile, this.textures[textureName]);
     container.addChild(sprite);
   }
 
-  private drawCity(tile: Tile, container: Container) {
-    if (!tile.city) {
+  private drawCity(tile: TileChanneled, container: Container) {
+    if (!tile.cityId) {
       return;
     }
 
-    const g = drawTileSprite(tile.city.tile, this.textures["village.png"]);
+    const g = drawTileSprite(tile, this.textures["village.png"]);
     container.addChild(g);
   }
 
-  private drawRiver(tile: Tile, container: Container) {
+  private drawRiver(tile: TileChanneled, container: Container) {
     if (!tile.riverParts.length) {
       return;
     }
@@ -297,7 +271,7 @@ export class TerrainDrawer {
     g.stroke();
   }
 
-  private drawYields(tile: Tile) {
+  private drawYields(tile: TileChanneled) {
     const g = new Graphics();
 
     g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;

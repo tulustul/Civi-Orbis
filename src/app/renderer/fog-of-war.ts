@@ -6,6 +6,7 @@ import { drawTileSprite } from "./utils";
 import { GameRenderer } from "./renderer";
 import { GameState } from "src/app/api/state";
 import { Container, Sprite } from "pixi.js";
+import { bridge } from "react/cives-orbis/src/bridge";
 
 export class FogOfWarDrawer {
   private renderedTiles = new Map<Tile, Sprite>();
@@ -20,17 +21,13 @@ export class FogOfWarDrawer {
   ) {
     this.texture = this.renderer.spritesheet.textures["hexMask.png"];
 
+    bridge.tiles.showed$.subscribe(() => this.bindToTrackedPlayer());
+
+    bridge.tiles.showedAdded$.subscribe((tiles) => this.addTiles(tiles));
+
+    bridge.player.tracked$.subscribe(() => this.bindToTrackedPlayer());
+
     this.game.init$.subscribe((state) => {
-      state.tilesShowed$
-        .pipe(takeUntil(this.game.stop$))
-        .subscribe(() => this.bindToTrackedPlayer());
-
-      state.tilesShowedAdded$
-        .pipe(takeUntil(this.game.stop$))
-        .subscribe((tiles) => this.addTiles(tiles));
-
-      state.trackedPlayer$.subscribe(() => this.bindToTrackedPlayer());
-
       this.bindToTrackedPlayer();
     });
   }

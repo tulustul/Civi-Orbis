@@ -1,24 +1,23 @@
-import { Unit, UnitMove } from "./unit";
+import {
+  CityChanneled,
+  TileChanneled,
+  TrackedPlayerChanneled,
+  UnitChanneled,
+} from "@/core/serialization/channel";
+import { PlayerYields } from "@/shared";
 import { City } from "./city";
-import { TrackedPlayer } from "./tracked-player";
 import { setChangesHandlers } from "./internal/changes";
 import { GameState } from "./state";
-import {
-  UnitChanneled,
-  CityChanneled,
-  TrackedPlayerChanneled,
-  TileChanneled,
-  UnitMoveChanneled,
-} from "@/core/serialization/channel";
 import { Tile } from "./tile.interface";
-import { PlayerYields } from "@/shared";
+import { TrackedPlayer } from "./tracked-player";
+import { Unit } from "./unit";
 
 const HANDLERS = {
   "tiles.updated": onTilesUpdate,
 
   "unit.updated": onUnitUpdate,
   "unit.destroyed": onUnitDestroyed,
-  "unit.moved": onUnitMoved,
+  // "unit.moved": onUnitMoved,
 
   "city.updated": onCityUpdate,
 
@@ -59,13 +58,13 @@ function onUnitDestroyed(state: GameState, id: number) {
   }
 }
 
-function onUnitMoved(state: GameState, unitMoveChanneled: UnitMoveChanneled) {
-  const unitMove: UnitMove = {
-    unit: state.unitsMap.get(unitMoveChanneled.unitId)!,
-    tiles: unitMoveChanneled.tileIds.map((id) => state.map.tilesMap.get(id)!),
-  };
-  state["_unitMove$"].next(unitMove);
-}
+// function onUnitMoved(state: GameState, unitMoveChanneled: UnitMoveChanneled) {
+//   const unitMove: UnitMove = {
+//     unit: state.unitsMap.get(unitMoveChanneled.unitId)!,
+//     tiles: unitMoveChanneled.tileIds.map((id) => state.map.tilesMap.get(id)!),
+//   };
+//   state["_unitMove$"].next(unitMove);
+// }
 
 function onCityUpdate(state: GameState, cityChanneled: CityChanneled) {
   const city = state.citiesMap.get(cityChanneled.id);

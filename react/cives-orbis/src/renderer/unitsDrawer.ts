@@ -1,56 +1,45 @@
-import { game, Tile, Unit } from "@/api";
-import { Container, Graphics, Sprite } from "pixi.js";
+import { game } from "@/api";
+import { bridge } from "@/bridge";
+import {
+  TileCoordsWithUnits,
+  UnitChanneled,
+} from "@/core/serialization/channel";
+import { mapUi } from "@/ui/mapUi";
 import { OutlineFilter } from "pixi-filters";
-import { merge, takeUntil } from "rxjs";
+import { Container, Graphics, Sprite } from "pixi.js";
 import { Animations } from "./animation";
 import { getAssets } from "./assets";
-import { TILE_SIZE } from "./constants";
 import { camera } from "./camera";
-import { mapUi } from "@/ui/mapUi";
+import { TILE_SIZE } from "./constants";
 
 export class UnitsDrawer {
   units = new Map<number, UnitDrawer>();
-  tilesByUnit = new Map<number, Tile>();
 
   private selectedDrawer: UnitDrawer | null = null;
 
   constructor(private container: Container) {
-    game.init$.subscribe(() => {
-      this.init();
-    });
-  }
+    game.init$.subscribe(() => this.build());
 
-  private init() {
-    this.clear();
+    bridge.units.updated$.subscribe((unit) => this.updateUnit(unit));
 
-    if (!game.state) {
-      return;
-    }
-
-    merge(game.state.unitSpawned$, game.state.unitUpdated$)
-      .pipe(takeUntil(game.stop$))
-      .subscribe((unit) => {
-        this.updateUnit(unit);
-      });
-
-    game.state.unitDestroyed$.pipe(takeUntil(game.stop$)).subscribe((unit) => {
-      const drawer = this.units.get(unit.id);
+    bridge.units.destroyed$.subscribe((unitId) => {
+      const drawer = this.units.get(unitId);
       if (drawer) {
         drawer.destroy();
-        this.units.delete(unit.id);
+        this.units.delete(unitId);
       }
     });
 
-    game.state.unitMove$.pipe(takeUntil(game.stop$)).subscribe((move) => {
-      const drawer = this.units.get(move.unit.id);
+    bridge.units.moved$.subscribe((move) => {
+      const drawer = this.units.get(move.unitId);
       if (drawer) {
         drawer.animatePosition(move.tiles);
-        this.updateNeighbours(drawer);
-        this.tilesByUnit.set(drawer.unit.id, drawer.unit.tile);
+        this.updateNeighbours(drawer, move.tiles[0]);
+        this.updateNeighbours(drawer, move.tiles[move.tiles.length - 1]);
       }
     });
 
-    mapUi.selectedUnit$.pipe(takeUntil(game.stop$)).subscribe((unit) => {
+    mapUi.selectedUnit$.subscribe((unit) => {
       if (this.selectedDrawer) {
         this.selectedDrawer.deselect();
       }
@@ -65,20 +54,21 @@ export class UnitsDrawer {
         drawer.select();
       }
     });
-
-    this.build();
   }
 
-  private build() {
-    for (const unit of game.state!.units) {
+  private async build() {
+    const units = await bridge.units.getAll();
+    for (const unit of units) {
       this.makeUnitDrawer(unit);
     }
     this.setScale(camera.transform.scale);
   }
 
-  private updateUnit(unit: Unit) {
+  private updateUnit(unit: UnitChanneled) {
     let drawer = this.units.get(unit.id);
-    if (!drawer) {
+    if (drawer) {
+      drawer.unit = unit;
+    } else {
       drawer = this.makeUnitDrawer(unit);
     }
     this.updateDrawer(drawer);
@@ -86,27 +76,23 @@ export class UnitsDrawer {
 
   private updateDrawer(drawer: UnitDrawer) {
     drawer.updateUi();
-    this.updateNeighbours(drawer);
-    this.tilesByUnit.set(drawer.unit.id, drawer.unit.tile);
+    this.updateNeighbours(drawer, drawer.unit.tile);
   }
 
-  private updateNeighbours(drawer: UnitDrawer) {
-    const lastTile = this.tilesByUnit.get(drawer.unit.id);
-    if (lastTile) {
-      for (const unit of lastTile.units) {
-        const otherDrawer = this.units.get(unit.id);
-        if (otherDrawer && otherDrawer !== drawer) {
-          otherDrawer.correctPosition();
-        }
+  private updateNeighbours(drawer: UnitDrawer, tile: TileCoordsWithUnits) {
+    for (const unitId of tile.units) {
+      const otherDrawer = this.units.get(unitId);
+      if (otherDrawer && otherDrawer !== drawer) {
+        otherDrawer.unit.tile = tile;
+        otherDrawer.correctPosition();
       }
     }
   }
 
-  private makeUnitDrawer(unit: Unit) {
+  private makeUnitDrawer(unit: UnitChanneled) {
     const drawer = new UnitDrawer(unit);
     this.container.addChild(drawer.container);
     this.units.set(unit.id, drawer);
-    this.tilesByUnit.set(unit.id, unit.tile);
     return drawer;
   }
 
@@ -127,7 +113,6 @@ export class UnitsDrawer {
       drawer.destroy();
     }
     this.units.clear();
-    this.tilesByUnit.clear();
   }
 }
 
@@ -150,12 +135,11 @@ export class UnitDrawer {
     quality: 1,
   });
 
-  constructor(public unit: Unit) {
+  constructor(public unit: UnitChanneled) {
     const textures = getAssets().iconsSpritesheet.textures;
-    const type = unit.definition.strength > 0 ? "military" : "civilian";
-    const banner = new Sprite(textures[`unitBackground-${type}.png`]);
-    const icon = new Sprite(textures[`${unit.definition.id}.png`]);
-    banner.tint = unit.player.cssColor;
+    const banner = new Sprite(textures[`unitBackground-${unit.type}.png`]);
+    const icon = new Sprite(textures[`${unit.definitionId}.png`]);
+    banner.tint = unit.cssColor;
     banner.anchor.set(0.5, 0.5);
     icon.anchor.set(0.5, 0.5);
     this.updateUi();
@@ -181,7 +165,7 @@ export class UnitDrawer {
   }
 
   private updatePosition() {
-    const [x, y] = tileToUnitPosition(this.unit, this.unit.tile);
+    const [x, y] = this.tileToUnitPosition(this.unit.tile);
     this.container.x = x;
     this.container.y = y;
   }
@@ -189,7 +173,7 @@ export class UnitDrawer {
   correctPosition() {
     Animations.run({
       from: [this.container.x, this.container.y],
-      to: tileToUnitPosition(this.unit, this.unit.tile),
+      to: this.tileToUnitPosition(this.unit.tile),
       duration: 100,
       fn: (pos) => {
         this.container.x = pos[0];
@@ -198,10 +182,10 @@ export class UnitDrawer {
     });
   }
 
-  animatePosition(tiles: Tile[]) {
+  animatePosition(tiles: TileCoordsWithUnits[]) {
     const positions = tiles
       .slice(1)
-      .map((tile) => tileToUnitPosition(this.unit, tile));
+      .map((tile) => this.tileToUnitPosition(tile));
 
     Animations.sequence({
       animations: positions.map((pos, i) => {
@@ -222,11 +206,11 @@ export class UnitDrawer {
   }
 
   private getStatusColor() {
-    if (this.unit.actionPointsLeft === this.unit.definition.actionPoints) {
+    if (this.unit.actions === "all") {
       return 0x00ff00;
     }
 
-    if (this.unit.actionPointsLeft === 0) {
+    if (this.unit.actions === "none") {
       return 0xff0000;
     }
 
@@ -258,20 +242,18 @@ export class UnitDrawer {
     this.container.filters = [];
     this.container.zIndex = 0;
   }
-}
 
-function tileToUnitPosition(
-  unit: Unit,
-  tile: Tile,
-  ignoreOthers = false,
-): [number, number] {
-  let x = tile.x + (tile.y % 2 ? 1 : 0.5);
+  tileToUnitPosition(
+    tile: TileCoordsWithUnits,
+    ignoreOthers = false,
+  ): [number, number] {
+    let x = tile.x + (tile.y % 2 ? 1 : 0.5);
 
-  const tileUnits = tile.units;
-  if (!ignoreOthers && tileUnits.length > 1) {
-    const index = tileUnits.indexOf(unit);
-    x += (index - (tileUnits.length - 1) / 2) * 0.3;
+    if (!ignoreOthers && tile.units.length > 1) {
+      const index = tile.units.indexOf(this.unit.id);
+      x += (index - (tile.units.length - 1) / 2) * 0.3;
+    }
+
+    return [x, (tile.y + 0.75) * 0.75];
   }
-
-  return [x, (tile.y + 0.75) * 0.75];
 }

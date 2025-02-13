@@ -1,27 +1,23 @@
-import { Container, Sprite } from "pixi.js";
-import { takeUntil } from "rxjs/operators";
-import { Tile } from "../api/tile.interface";
-import { drawTileSprite } from "./utils";
-import { getAssets } from "./assets";
 import { game } from "@/api";
+import { bridge } from "@/bridge";
+import { TileCoords } from "@/core/serialization/channel";
+import { Container, Sprite } from "pixi.js";
+import { getAssets } from "./assets";
+import { drawTileSprite } from "./utils";
 
 export class FogOfWarDrawer {
-  private renderedTiles = new Map<Tile, Sprite>();
+  private renderedTiles = new Map<TileCoords, Sprite>();
 
   private texture = getAssets().tilesSpritesheet.textures["hexMask.png"];
 
   constructor(private container: Container) {
-    game.init$.subscribe((state) => {
-      state.tilesShowed$
-        .pipe(takeUntil(game.stop$))
-        .subscribe(() => this.bindToTrackedPlayer());
+    bridge.tiles.showed$.subscribe(() => this.bindToTrackedPlayer());
 
-      state.tilesShowedAdded$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((tiles) => this.addTiles(tiles));
+    bridge.tiles.showedAdded$.subscribe((tiles) => this.addTiles(tiles));
 
-      state.trackedPlayer$.subscribe(() => this.bindToTrackedPlayer());
+    bridge.player.tracked$.subscribe(() => this.bindToTrackedPlayer());
 
+    game.init$.subscribe(() => {
       this.bindToTrackedPlayer();
     });
   }
@@ -30,11 +26,12 @@ export class FogOfWarDrawer {
     this.renderedTiles.clear();
   }
 
-  private bindToTrackedPlayer() {
-    const visibleTiles = game.state!.trackedPlayer.visibleTiles;
+  private async bindToTrackedPlayer() {
+    const visibleTiles = await bridge.tiles.getAllVisible();
+    const visibleTilesSet = new Set(visibleTiles.map((t) => t.id));
 
     for (const tile of this.renderedTiles.keys()) {
-      if (!visibleTiles.has(tile)) {
+      if (!visibleTilesSet.has(tile.id)) {
         this.destroyTile(tile);
       }
     }
@@ -45,7 +42,7 @@ export class FogOfWarDrawer {
     }
   }
 
-  private addTiles(tiles: Tile[]) {
+  private addTiles(tiles: TileCoords[]) {
     for (const tile of tiles) {
       if (!this.renderedTiles.has(tile)) {
         this.renderTile(tile);
@@ -53,14 +50,13 @@ export class FogOfWarDrawer {
     }
   }
 
-  private renderTile(tile: Tile) {
+  private renderTile(tile: TileCoords) {
     const sprite = drawTileSprite(tile, this.texture);
-    // this.tilesContainer.addChildToTile(sprite, tile);
     this.container.addChild(sprite);
     this.renderedTiles.set(tile, sprite);
   }
 
-  private destroyTile(tile: Tile) {
+  private destroyTile(tile: TileCoords) {
     const sprite = this.renderedTiles.get(tile);
     this.renderedTiles.delete(tile);
     if (sprite) {
