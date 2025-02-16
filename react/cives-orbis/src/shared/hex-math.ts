@@ -115,7 +115,7 @@ export function getDirectionTo(
 export function getTilesInRange(tile: BaseTile, range: number): Set<BaseTile> {
   const result = new Set<BaseTile>([tile]);
   for (let i = 0; i < range; i++) {
-    let neighbours = new Set<BaseTile>();
+    const neighbours = new Set<BaseTile>();
     for (const tile of result) {
       for (const neighbour of (tile as any).neighbours) {
         // TODO fix typing

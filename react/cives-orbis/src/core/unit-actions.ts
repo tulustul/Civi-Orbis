@@ -132,11 +132,7 @@ function foundCity(game: Game, unit: UnitCore) {
   }
 }
 
-function buildImprovement(
-  game: Game,
-  unit: UnitCore,
-  improvement: TileImprovement,
-) {
+function buildImprovement(unit: UnitCore, improvement: TileImprovement) {
   unit.actionPointsLeft = 0;
   unit.tile.improvement = improvement;
   unit.tile.update();
@@ -152,7 +148,7 @@ function buildImprovement(
     IMPROVEMENT_PUBLIC_WORKS_COSTS_PER_TURN[improvement];
 }
 
-function buildRoad(game: Game, unit: UnitCore) {
+function buildRoad(unit: UnitCore) {
   unit.actionPointsLeft = 0;
   unit.tile.road = TileRoad.road;
   unit.tile.update();
@@ -181,7 +177,7 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
   buildFarm: {
     action: "buildFarm",
     name: "Build a farm",
-    fn: (game, unit) => buildImprovement(game, unit, TileImprovement.farm),
+    fn: (_, unit) => buildImprovement(unit, TileImprovement.farm),
     requirements: [
       new OwnTileRequirement(),
       new ImprovementNotYetBuiltRequirement(TileImprovement.farm),
@@ -192,7 +188,7 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
   buildMine: {
     action: "buildMine",
     name: "Build a mine",
-    fn: (game, unit) => buildImprovement(game, unit, TileImprovement.mine),
+    fn: (_, unit) => buildImprovement(unit, TileImprovement.mine),
     requirements: [
       new OwnTileRequirement(),
       new ImprovementNotYetBuiltRequirement(TileImprovement.mine),
@@ -203,7 +199,7 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
   buildSawmill: {
     action: "buildSawmill",
     name: "Build a sawmill",
-    fn: (game, unit) => buildImprovement(game, unit, TileImprovement.sawmill),
+    fn: (_, unit) => buildImprovement(unit, TileImprovement.sawmill),
     requirements: [
       new OwnTileRequirement(),
       new ImprovementNotYetBuiltRequirement(TileImprovement.sawmill),
@@ -214,7 +210,7 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
   buildRoad: {
     action: "buildRoad",
     name: "Build a road",
-    fn: (game, unit) => buildRoad(game, unit),
+    fn: (_, unit) => buildRoad(unit),
     requirements: [
       new NoRoadRequirement(),
       new isRoadPossibleRequirement(),

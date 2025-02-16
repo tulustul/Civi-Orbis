@@ -1,7 +1,6 @@
-import { AiOperation } from "./ai-operations";
+import { CityCore } from "../core/city";
 import { TileCore } from "../core/tile";
-import { AIPlayer } from "./ai-player";
-import { Product, CityCore } from "../core/city";
+import { AiOperation } from "./ai-operations";
 import { AISystem } from "./ai-system";
 
 export class ProduceOperation extends AiOperation {

@@ -4,21 +4,19 @@ import { moveAlongPath } from "./movement";
 import { PlayerCore } from "./player";
 import {} from "./supplies";
 import {
+  GameFactoryOptions,
   makeGame,
   SymbolCallbacks,
-  GameFactoryOptions,
-  alterGame,
 } from "./tests/game-factory";
-import { dumpMap, putRiver } from "./tests/map-utils";
-import { zocAddUnit, zocForgetUnit } from "./zoc";
+import { dumpMap } from "./tests/map-utils";
 
 const symbolCallbacks: SymbolCallbacks = {
   "0": (game, tile) =>
     game.unitsManager.spawn("unit_warrior", tile, game.players[0]),
   "1": (game, tile) =>
     game.unitsManager.spawn("unit_warrior", tile, game.players[1]),
-  M: (game, tile) => (tile.landForm = LandForm.mountains),
-  "~": (game, tile) => (tile.seaLevel = SeaLevel.shallow),
+  M: (_, tile) => (tile.landForm = LandForm.mountains),
+  "~": (_, tile) => (tile.seaLevel = SeaLevel.shallow),
   C: (game, tile) => game.citiesManager.spawn(tile, game.players[0], true),
   s: (game, tile) =>
     game.unitsManager.spawn("unit_supply_wagon", tile, game.players[0]),

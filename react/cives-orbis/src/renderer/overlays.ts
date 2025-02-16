@@ -1,9 +1,9 @@
 import { Graphics } from "pixi.js";
 
-import { Tile } from "@/api";
 import { Container } from "pixi.js";
 import { drawClosedHex, drawHex, getTileCoords } from "./utils";
 import { mapUi } from "@/ui/mapUi";
+import { TileCoords } from "@/core/serialization/channel";
 
 export class OverlaysRenderer {
   hoveredTileGraphics = new Graphics();
@@ -32,7 +32,7 @@ export class OverlaysRenderer {
     });
   }
 
-  private displayAtTile(obj: Container, tile: Tile | null) {
+  private displayAtTile(obj: Container, tile: TileCoords | null) {
     if (tile) {
       const [x, y] = getTileCoords(tile);
       obj.position.x = x;
@@ -63,7 +63,7 @@ export class OverlaysRenderer {
     this.selectedTileGraphics.fill({ color: 0xffffff, alpha: 0.1 });
   }
 
-  buildHighlightedTiles(tiles: Set<Tile>) {
+  buildHighlightedTiles(tiles: Set<TileCoords>) {
     this.highlightedTilesGraphics.clear();
     if (!tiles.size) {
       this.container.removeChild(this.highlightedTilesGraphics);

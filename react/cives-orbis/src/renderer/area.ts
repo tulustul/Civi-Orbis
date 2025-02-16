@@ -6,8 +6,7 @@ import {
   ShaderFromResources,
 } from "pixi.js";
 
-import { Tile } from "@/api/tile.interface";
-import { SeaLevel } from "@/shared";
+import { TilesCoordsWithNeighbours } from "@/core/serialization/channel";
 import { programs as areaPrograms } from "./shaders/area-shaders";
 import { HEX_GEOMETRY } from "./utils";
 
@@ -93,9 +92,10 @@ function makeBorderGeometry(borders: string): Geometry {
 }
 
 export class Area {
-  tiles = new Set<Tile>();
+  tiles = new Set<TilesCoordsWithNeighbours>();
+  tilesById = new Map<number, TilesCoordsWithNeighbours>();
 
-  borders = new Map<Tile, string>();
+  bordersByTile = new Map<number, string>();
 
   drawer: AreaDrawer;
 
@@ -107,13 +107,19 @@ export class Area {
     this.drawer.clear();
   }
 
-  setTiles(tiles: Tile[]) {
+  setTiles(tiles: TilesCoordsWithNeighbours[]) {
     this.clear();
     this.tiles = new Set(tiles);
+    for (const tile of this.tiles) {
+      this.tilesById.set(tile.id, tile);
+    }
     this.computeAllBorders();
 
-    for (const [tile, borders] of this.borders) {
-      this.drawer.drawTileBorders(tile, borders);
+    for (const tile of this.tiles) {
+      const borders = this.bordersByTile.get(tile.id);
+      if (borders) {
+        this.drawer.drawTileBorders(tile, borders);
+      }
     }
 
     if (this.options.backgroundOpacity > 0) {
@@ -123,37 +129,45 @@ export class Area {
     }
   }
 
-  addTiles(tiles: Tile[]) {
+  addTiles(tiles: TilesCoordsWithNeighbours[]) {
     for (const tile of tiles) {
       this.tiles.add(tile);
+      this.tilesById.set(tile.id, tile);
       this.drawer.drawTileBackground(tile);
     }
 
     this.computeBordersForTiles(tiles);
   }
 
-  removeTiles(tiles: Tile[]) {
+  removeTiles(tiles: TilesCoordsWithNeighbours[]) {
     this.drawer.removeTiles(tiles);
     for (const tile of tiles) {
-      this.tiles.delete(tile);
+      this.tiles.delete(this.tilesById.get(tile.id)!);
+      this.tilesById.delete(tile.id);
     }
     this.computeBordersForTiles(tiles);
   }
 
-  private computeBordersForTiles(tiles: Tile[]) {
-    const visited = new Set<Tile>();
+  private computeBordersForTiles(tiles: TilesCoordsWithNeighbours[]) {
+    const visited = new Set<number>();
     for (const tile of tiles) {
-      if (visited.has(tile)) {
+      if (visited.has(tile.id)) {
         continue;
       }
-      visited.add(tile);
+      visited.add(tile.id);
       this.computeTileBorders(tile);
       this.drawer.updateTileBorders(tile);
 
-      for (const neighbour of tile.neighbours) {
-        if (!this.tiles.has(neighbour) || visited.has(neighbour)) {
+      for (const neighbourId of tile.fullNeighbours) {
+        if (
+          neighbourId == null ||
+          !this.tilesById.has(neighbourId) ||
+          visited.has(neighbourId)
+        ) {
           continue;
         }
+
+        const neighbour = this.tilesById.get(neighbourId)!;
         this.computeTileBorders(neighbour);
         this.drawer.updateTileBorders(neighbour);
       }
@@ -161,27 +175,28 @@ export class Area {
   }
 
   private computeAllBorders() {
-    this.borders.clear();
+    this.bordersByTile.clear();
     for (const tile of this.tiles) {
       this.computeTileBorders(tile);
     }
   }
 
-  private computeTileBorders(tile: Tile) {
+  private computeTileBorders(tile: TilesCoordsWithNeighbours) {
     const borders = tile.fullNeighbours
-      .map((n) => (n && this.tiles.has(n) ? "0" : "1"))
+      .map((n) => (n && this.tilesById.has(n) ? "0" : "1"))
       .join("");
 
     if (borders === "000000") {
-      this.borders.delete(tile);
+      this.bordersByTile.delete(tile.id);
     } else {
-      this.borders.set(tile, borders);
+      this.bordersByTile.set(tile.id, borders);
     }
   }
 
   clear() {
-    this.borders.clear();
-    this.tiles = new Set();
+    this.bordersByTile.clear();
+    this.tiles.clear();
+    this.tilesById.clear();
     this.drawer.clear();
   }
 }
@@ -191,9 +206,9 @@ class AreaDrawer {
 
   backgroundShader: Shader;
 
-  bordersMap = new Map<Tile, Mesh<Geometry, Shader>>();
+  bordersMap = new Map<number, Mesh<Geometry, Shader>>();
 
-  backgroundMap = new Map<Tile, Mesh<Geometry, Shader>>();
+  backgroundMap = new Map<number, Mesh<Geometry, Shader>>();
 
   vec4Color: Float32Array;
 
@@ -201,15 +216,13 @@ class AreaDrawer {
     private area: Area,
     private options: AreaOptions,
   ) {
-    const cssColor = "#" + options.color.toString(16).padStart(6, "0");
-
     const programs = options.programs ?? areaPrograms;
 
     this.vec4Color = new Float32Array([
-      parseInt(cssColor[1] + cssColor[2], 16) / 255,
-      parseInt(cssColor[3] + cssColor[4], 16) / 255,
-      parseInt(cssColor[5] + cssColor[6], 16) / 255,
-      1,
+      ((options.color >> 16) & 0xff) / 255, // red
+      ((options.color >> 8) & 0xff) / 255, // green
+      (options.color & 0xff) / 255, // blue
+      1, // alpha
     ]);
 
     this.borderShader = Shader.from({
@@ -238,20 +251,21 @@ class AreaDrawer {
     });
   }
 
-  removeTiles(tiles: Tile[]) {
+  removeTiles(tiles: TilesCoordsWithNeighbours[]) {
     for (const tile of tiles) {
-      const mesh = this.backgroundMap.get(tile);
+      const mesh = this.backgroundMap.get(tile.id);
       if (mesh) {
         mesh.destroy();
-        this.backgroundMap.delete(tile);
+        this.backgroundMap.delete(tile.id);
       }
     }
   }
 
-  drawTileBackground(tile: Tile) {
-    if (tile.seaLevel !== SeaLevel.none && !this.options.visibleOnWater) {
-      return;
-    }
+  drawTileBackground(tile: TilesCoordsWithNeighbours) {
+    // TODO fix
+    // if (tile.seaLevel !== SeaLevel.none && !this.options.visibleOnWater) {
+    //   return;
+    // }
 
     const mesh = new Mesh({
       geometry: HEX_GEOMETRY,
@@ -261,28 +275,28 @@ class AreaDrawer {
     mesh.position.y = tile.y * 0.75;
 
     this.options.container.addChild(mesh);
-    this.backgroundMap.set(tile, mesh);
+    this.backgroundMap.set(tile.id, mesh);
   }
 
-  updateTileBorders(tile: Tile) {
-    const mesh = this.bordersMap.get(tile);
+  updateTileBorders(tile: TilesCoordsWithNeighbours) {
+    const mesh = this.bordersMap.get(tile.id);
     if (mesh) {
       mesh.destroy();
     }
 
-    if (!this.area.tiles.has(tile)) {
+    if (!this.area.tilesById.has(tile.id)) {
       return;
     }
 
-    const borders = this.area.borders.get(tile);
+    const borders = this.area.bordersByTile.get(tile.id);
     if (borders) {
       this.drawTileBorders(tile, borders);
     } else {
-      this.bordersMap.delete(tile);
+      this.bordersMap.delete(tile.id);
     }
   }
 
-  drawTileBorders(tile: Tile, borders: string) {
+  drawTileBorders(tile: TilesCoordsWithNeighbours, borders: string) {
     let geometry = borderGeometries.get(borders);
     if (!geometry) {
       geometry = makeBorderGeometry(borders);
@@ -295,7 +309,7 @@ class AreaDrawer {
     mesh.position.y = tile.y * 0.75;
 
     this.options.container.addChild(mesh);
-    this.bordersMap.set(tile, mesh);
+    this.bordersMap.set(tile.id, mesh);
   }
 
   clear() {

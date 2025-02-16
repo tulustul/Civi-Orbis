@@ -1,10 +1,11 @@
-import { game } from "@/api";
 import { CityChanneled } from "@/core/serialization/channel";
 import { camera, Transform } from "@/renderer/camera";
 import { ProgressBar } from "@/ui/components";
 import { useEffect, useRef } from "react";
 import styles from "./CitiesLayer.module.css";
 import { getTileCoords } from "@/renderer/utils";
+import { controls } from "@/renderer/controls";
+import { mapUi } from "../mapUi";
 
 type Props = {
   city: CityChanneled;
@@ -24,8 +25,6 @@ export function CityInfo({ city }: Props) {
     }
     elRef.current.style.setProperty("--player-color", city.cssColor);
   }, []);
-
-  const areDetailsVisible = city.playerId === game.state!.trackedPlayer.id;
 
   function transform(t: Transform) {
     if (!elRef.current) {
@@ -53,7 +52,7 @@ export function CityInfo({ city }: Props) {
   }
 
   function getBody() {
-    if (!areDetailsVisible) {
+    if (city.visibilityLevel === "basic") {
       return <div className={styles.simpleView}>{city.name}</div>;
     }
 
@@ -83,7 +82,16 @@ export function CityInfo({ city }: Props) {
   }
 
   return (
-    <div className={styles.city} ref={elRef}>
+    <div
+      className={styles.city}
+      ref={elRef}
+      onClick={() => mapUi.selectCity(city.id)}
+      onMouseDown={(e) => controls.onMouseDown(e.nativeEvent)}
+      onMouseUp={() => controls.onMouseUp()}
+      onMouseMove={(e) => controls.onMouseMove(e.nativeEvent)}
+      onWheel={(e) => controls.onWheel(e.nativeEvent)}
+      onContextMenu={(e) => e.preventDefault()}
+    >
       <div className={styles.info}>
         <div className={styles.size}>{city.size}</div>
         {getBody()}

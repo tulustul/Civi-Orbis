@@ -7,19 +7,17 @@ import {
 
 import { Subject } from "rxjs";
 
-import { game } from "@/api";
 import { FogOfWarDrawer } from "./fog-of-war";
 import { Grid } from "./grid";
 import { Layer } from "./layer";
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
 import { MapDrawer } from "./terrain";
-import { VisibleTilesDrawer } from "./visible-tiles-drawer";
+import { ExploredTilesDrawer } from "./exploredTilesDrawer";
 import { camera } from "./camera";
 import { FogOfWarFilter } from "./filters/fog-of-war-filter";
 import { UnitsDrawer } from "./unitsDrawer";
 import { animationsManager } from "./animation";
-// import { CitiesDrawer } from "./citiesDrawer";
 import { AreasDrawer } from "./areasDrawer";
 
 export class GameRenderer {
@@ -30,7 +28,7 @@ export class GameRenderer {
   mapDrawer!: MapDrawer;
 
   fogOfWarDrawer!: FogOfWarDrawer;
-  visibleTilesDrawer!: VisibleTilesDrawer;
+  visibleTilesDrawer!: ExploredTilesDrawer;
 
   overlays!: OverlaysRenderer;
 
@@ -40,7 +38,7 @@ export class GameRenderer {
 
   fogOfWarLayer!: Layer;
 
-  visibleTilesLayer!: Layer;
+  exploredTilesLayer!: Layer;
 
   overlaysContainer = new Container({ label: "overlays" });
   mapContainer = new Container({ label: "map" });
@@ -55,10 +53,6 @@ export class GameRenderer {
 
   private _tick$ = new Subject<void>();
   tick$ = this._tick$.asObservable();
-
-  constructor() {
-    game.stop$.subscribe(() => this.clear());
-  }
 
   async setCanvas(canvas: HTMLCanvasElement) {
     if (this.app) {
@@ -84,17 +78,13 @@ export class GameRenderer {
 
     this.mapLayer = new Layer(this.app, "mapLayer");
     this.fogOfWarLayer = new Layer(this.app, "fogOfWarLayer");
-    this.visibleTilesLayer = new Layer(this.app, "visibleTilesLayer");
+    this.exploredTilesLayer = new Layer(this.app, "visibleTilesLayer");
 
-    this.mapDrawer = new MapDrawer(
-      // this.mapContainer,
-      this.mapLayer.stage,
-    );
+    this.mapDrawer = new MapDrawer(this.mapLayer.stage);
 
     this.fogOfWarDrawer = new FogOfWarDrawer(this.fogOfWarLayer.stage);
-
-    this.visibleTilesDrawer = new VisibleTilesDrawer(
-      this.visibleTilesLayer.stage,
+    this.visibleTilesDrawer = new ExploredTilesDrawer(
+      this.exploredTilesLayer.stage,
     );
 
     this.overlays = new OverlaysRenderer(this.overlaysContainer);
@@ -116,7 +106,7 @@ export class GameRenderer {
     ];
     this.mapLayer.sprite.filters = [
       new MaskFilter({
-        sprite: this.visibleTilesLayer.sprite,
+        sprite: this.exploredTilesLayer.sprite,
       }),
       new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
     ];
@@ -140,7 +130,7 @@ export class GameRenderer {
       this.mapContainer.updateTransform(transform);
       this.overlaysContainer.updateTransform(transform);
       this.fogOfWarLayer.stage.updateTransform(transform);
-      this.visibleTilesLayer.stage.updateTransform(transform);
+      this.exploredTilesLayer.stage.updateTransform(transform);
     });
 
     this.app.ticker.add(() => {
@@ -164,7 +154,7 @@ export class GameRenderer {
 
         const borderShadow = Math.max(0.4, Math.min(0.7, (150 - scale) / 100));
 
-        for (const area of this.mapDrawer.politicsDrawer.areas) {
+        for (const area of this.mapDrawer.politicsDrawer.areas.values()) {
           area.drawer.backgroundShader.resources["uniforms"].uniforms.opacity =
             backgroundOpacity;
           area.drawer.borderShader.resources["uniforms"].uniforms.borderShadow =
@@ -174,7 +164,7 @@ export class GameRenderer {
 
       this.mapLayer.renderToTarget();
       this.fogOfWarLayer.renderToTarget();
-      this.visibleTilesLayer.renderToTarget();
+      this.exploredTilesLayer.renderToTarget();
     });
   }
 
@@ -182,7 +172,7 @@ export class GameRenderer {
     this.app.renderer.resize(width, height);
     this.mapLayer.resize(width, height);
     this.fogOfWarLayer.resize(width, height);
-    this.visibleTilesLayer.resize(width, height);
+    this.exploredTilesLayer.resize(width, height);
 
     // A new texture is created when resizing, need to update the filter. Could just update uniforms but whatever.
     // this.mapContainer.filters = [

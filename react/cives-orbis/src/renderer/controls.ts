@@ -1,11 +1,11 @@
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, take } from "rxjs";
 
 import { mapUi } from "@/ui/mapUi";
 import { camera } from "./camera";
-import { game } from "@/api";
-import { useUiState } from "@/ui/uiState";
 import { nextTurnService } from "@/ui/nextTurn";
 import { useMenu } from "@/ui/gameMenu";
+import { bridge } from "@/bridge";
+import { GameInfo, TileCoords } from "@/core/serialization/channel";
 
 export class Controls {
   isMousePressed = false;
@@ -14,6 +14,20 @@ export class Controls {
   mouseButton$ = this._mouseButton$.asObservable();
 
   private hasMouseMoved = false;
+
+  gameInfo: GameInfo | null = null;
+
+  constructor() {
+    bridge.game.start$.subscribe((gameStartInfo) => {
+      this.gameInfo = gameStartInfo.gameInfo;
+      if (gameStartInfo.tileToGo) {
+        camera.moveToTile(gameStartInfo.tileToGo);
+      }
+      if (gameStartInfo.unitIdToSelect) {
+        mapUi.selectUnit(gameStartInfo.unitIdToSelect);
+      }
+    });
+  }
 
   onMouseDown(event: MouseEvent) {
     this.hasMouseMoved = false;
@@ -24,12 +38,14 @@ export class Controls {
 
     if (mapUi.selectedUnit && this.mouseButton === 2) {
       const tile = this.getTileFromMouseEvent(event);
-      if (tile) {
-        mapUi.selectedUnit.findPath(tile).then(() => {
-          if (mapUi.selectedUnit) {
-            mapUi.setPath(mapUi.selectedUnit.path);
-          }
-        });
+      if (tile !== null) {
+        bridge.units
+          .findPath({ destinationId: tile.id, unitId: mapUi.selectedUnit.id })
+          .then((unit) => {
+            if (unit && mapUi.selectedUnit) {
+              mapUi.setPath(unit.path);
+            }
+          });
       }
     }
 
@@ -52,20 +68,20 @@ export class Controls {
     return false;
   }
 
-  onMouseUp(event: MouseEvent) {
-    const [x, y] = camera.screenToGame(event.clientX, event.clientY);
+  onMouseUp() {
+    // const [x, y] = camera.screenToGame(event.clientX, event.clientY);
 
     const selectedUnit = mapUi.selectedUnit;
     if (selectedUnit && this.mouseButton === 2) {
-      const tile = game.state!.map.get(x, y);
-      if (tile) {
-        selectedUnit.moveAlongPath().then(async () => {
-          mapUi.setPath(selectedUnit.path);
-          // to refresh the ui
-          mapUi["_selectedUnit$"].next(selectedUnit);
-          // mapUi.unitRangeArea.setTiles(await selectedUnit.getRange());
-        });
-      }
+      // const tile = game.state!.map.get(x, y);
+      // if (tile) {
+      bridge.units.moveAlongPath(selectedUnit.id).then(async () => {
+        mapUi.setPath(selectedUnit.path);
+        // to refresh the ui
+        mapUi["_selectedUnit$"].next(selectedUnit);
+        // mapUi.unitRangeArea.setTiles(await selectedUnit.getRange());
+      });
+      // }
     }
 
     this.isMousePressed = false;
@@ -76,15 +92,17 @@ export class Controls {
     this.hasMouseMoved = true;
     const tile = this.getTileFromMouseEvent(event);
 
-    if (tile !== mapUi.hoveredTile) {
+    if (tile?.id !== mapUi.hoveredTile?.id) {
       mapUi.hoverTile(tile);
 
       if (tile && mapUi.selectedUnit && this.mouseButton === 2) {
-        mapUi.selectedUnit.findPath(tile).then(() => {
-          if (mapUi.selectedUnit) {
-            mapUi.setPath(mapUi.selectedUnit.path);
-          }
-        });
+        bridge.units
+          .findPath({ destinationId: tile.id, unitId: mapUi.selectedUnit.id })
+          .then((unit) => {
+            if (unit && mapUi.selectedUnit) {
+              mapUi.setPath(unit.path);
+            }
+          });
       }
     }
 
@@ -105,15 +123,13 @@ export class Controls {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    const uiState = useUiState.getState();
     const menu = useMenu.getState();
-    // if (uiState.activeView) {
-    //   if (event.key === "Escape") {
-    //     uiState.activeView.quit();
-    //   }
-    // } else
-    if (menu.enabled) {
-      if (event.key === "Escape" && game.state) {
+    if (mapUi.selectedCity) {
+      if (event.key === "Escape") {
+        mapUi.selectCity(null);
+      }
+    } else if (menu.enabled) {
+      if (event.key === "Escape" && this.gameInfo) {
         menu.hide();
       }
     } else {
@@ -123,27 +139,37 @@ export class Controls {
         menu.show();
       } else if (mapUi.selectedUnit) {
         if (event.key === "s" || event.key === "f") {
-          mapUi.selectedUnit
-            .setOrder("sleep")
+          bridge.units
+            .setOrder({ unitId: mapUi.selectedUnit.id, order: "sleep" })
             .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
         } else if (event.key === " ") {
-          mapUi.selectedUnit
-            .setOrder("skip")
+          bridge.units
+            .setOrder({ unitId: mapUi.selectedUnit.id, order: "skip" })
             .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
         } else if (event.key === "b") {
-          mapUi.selectedUnit
-            .doAction("foundCity")
+          bridge.units
+            .doAction({ unitId: mapUi.selectedUnit.id, action: "foundCity" })
             .then(() => mapUi["_selectedUnit$"].next(mapUi.selectedUnit));
         }
       }
     }
   }
 
-  onKeyUp(event: KeyboardEvent) {}
-
-  getTileFromMouseEvent(event: MouseEvent) {
+  getTileFromMouseEvent(event: MouseEvent): TileCoords | null {
+    if (this.gameInfo === null) {
+      return null;
+    }
     const [x, y] = camera.screenToGame(event.clientX, event.clientY);
-    return game.state!.map.get(x, y);
+    if (
+      x < 0 ||
+      y < 0 ||
+      x >= this.gameInfo.mapWidth ||
+      y >= this.gameInfo.mapHeight
+    ) {
+      return null;
+    }
+    const id = x * this.gameInfo.mapWidth + y;
+    return { id, x, y };
   }
 
   nextTurn() {

@@ -7,7 +7,10 @@ import { UnitTrait, UnitType } from "../core/data.interface";
 import { getMoveResult, MoveResult } from "../core/movement";
 
 export class ExploreOperation extends AiOperation {
-  constructor(public unit: UnitCore, public target: TileCore) {
+  constructor(
+    public unit: UnitCore,
+    public target: TileCore,
+  ) {
     super();
   }
 
@@ -46,7 +49,7 @@ export class ExploringAI extends AISystem {
 
     for (const area of passableAreas) {
       if (!areaExplorers.has(area)) {
-        const type = areasType.get(area)!;
+        // const type = areasType.get(area)!;
         // TODO make explorer
       }
     }

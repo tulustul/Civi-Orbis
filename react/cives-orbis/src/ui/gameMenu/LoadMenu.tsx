@@ -1,12 +1,11 @@
-import { game } from "@/api";
-import { importSave, loadGameData } from "@/api/saving";
-import { camera } from "@/renderer/camera";
+import { bridge } from "@/bridge";
+import { importSave, loadGameData } from "@/saving";
+import { Modal, Spinner } from "@/ui/components";
 import { useRef, useState } from "react";
+import { useUiState } from "../uiState";
+import styles from "./GameMenu.module.css";
 import { useMenu } from "./gameMenuStore";
 import { SavesList } from "./SavesList";
-import { Modal, Spinner } from "@/ui/components";
-import styles from "./GameMenu.module.css";
-import { useUiState } from "../uiState";
 
 export function LoadMenu() {
   const [saveName, setSaveName] = useState("");
@@ -28,17 +27,7 @@ export function LoadMenu() {
 
     setWaiting(true);
 
-    await game.loadGame(data);
-
-    const city = game.state?.trackedPlayer.cities[0];
-    if (city) {
-      camera.moveToTile(city.tile);
-    } else {
-      const unit = game.state?.trackedPlayer.units[0];
-      if (unit) {
-        camera.moveToTile(unit.tile);
-      }
-    }
+    await bridge.game.load(data);
 
     menu.hide();
     uiState.setMode("map");

@@ -1,12 +1,13 @@
-import { Container } from "pixi.js";
-import { Area } from "./area";
+import { bridge } from "@/bridge";
+import { UnitTrait } from "@/core/data.interface";
+import {
+  CityDetailsChanneled,
+  UnitDetailsChanneled,
+} from "@/core/serialization/channel";
 import { programs as suppliesPrograms } from "@/renderer/shaders/supplies-shaders";
 import { mapUi } from "@/ui/mapUi";
-import { game } from "@/api";
-import { City } from "@/api/city";
-import { CityDetails } from "@/api/city-details";
-import { UnitDetails } from "@/api/unit-details";
-import { UnitTrait } from "@/core/data.interface";
+import { Container } from "pixi.js";
+import { Area } from "./area";
 
 export class AreasDrawer {
   unitRangeArea: Area;
@@ -108,8 +109,8 @@ export class AreasDrawer {
     this.cityNotWorkedTilesArea.clear();
   }
 
-  private async onHoveredCity(city: City | null) {
-    if (!city) {
+  private async onHoveredCity(cityId: number | null) {
+    if (cityId === null) {
       this.cityWorkedTilesArea.clear();
       this.cityNotWorkedTilesArea.clear();
       this.cityBordersOnlyArea.clear();
@@ -117,42 +118,49 @@ export class AreasDrawer {
       return;
     }
 
-    if (city.player.id === game.state?.trackedPlayer.id) {
-      const data = await city.getWorkTiles();
-      this.cityWorkedTilesArea.setTiles(data.workedTiles);
-      this.cityNotWorkedTilesArea.setTiles(data.notWorkedTiles);
-      this.cityBordersOnlyArea.setTiles(
-        data.notWorkedTiles.concat(data.workedTiles),
-      );
-    } else {
-      const tiles = await city.getRange();
+    // if (city.playerId === game.state?.trackedPlayer.id) {
+    //   const data = await bridge.cities.getWorkTiles(city.id);
+    //   if (!data) {
+    //     return;
+    //   }
+    //   this.cityWorkedTilesArea.setTiles(data.workedTiles);
+    //   this.cityNotWorkedTilesArea.setTiles(data.notWorkedTiles);
+    //   this.cityBordersOnlyArea.setTiles(
+    //     data.notWorkedTiles.concat(data.workedTiles),
+    //   );
+    // } else {
+    const tiles = await bridge.cities.getRange(cityId);
+    if (tiles) {
       this.cityRangeArea.setTiles(tiles);
     }
+    // }
   }
 
-  private async onSelectedCity(city: CityDetails | null) {
+  private async onSelectedCity(city: CityDetailsChanneled | null) {
     if (city) {
-      this.cityRangeArea.setTiles(Array.from(city.tiles));
+      const tiles = await bridge.cities.getRange(city.id);
+      if (tiles) {
+        this.cityRangeArea.setTiles(tiles);
+      }
     } else {
       this.cityRangeArea.clear();
     }
   }
 
-  private async onSelectedUnit(unit: UnitDetails | null) {
+  private async onSelectedUnit(unit: UnitDetailsChanneled | null) {
     if (!unit) {
       this.unitRangeArea.clear();
       return;
     }
 
-    if (
-      unit.definition.trait === UnitTrait.military ||
-      unit.definition.trait === UnitTrait.supply
-    ) {
-      unit.player.getSuppliedTiles().then((tiles) => {
+    if (unit.trait === UnitTrait.military || unit.trait === UnitTrait.supply) {
+      bridge.player.getSuppliedTiles(unit.playerId).then((tiles) => {
         this.suppliesRangeArea.setTiles(tiles);
       });
     }
 
-    unit.getRange().then((tiles) => this.unitRangeArea.setTiles(tiles));
+    bridge.units
+      .getRange(unit.id)
+      .then((tiles) => this.unitRangeArea.setTiles(tiles));
   }
 }

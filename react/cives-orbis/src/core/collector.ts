@@ -9,6 +9,8 @@ import {
   trackedPlayerToChannel,
   unitMoveToChannel,
   tileToTileCoords,
+  tilesToTileCoordsWithNeighbours,
+  CityChanneled,
 } from "./serialization/channel";
 import { PlayerYields } from "../shared";
 
@@ -17,7 +19,14 @@ export type UnitMoveCore = {
   tiles: TileCore[];
 };
 
+export type CityRevealedResult = {
+  city: CityChanneled;
+  action: "center" | "none";
+};
+
 class Collector {
+  changes: any[] = [];
+
   tiles = new Set<TileCore>();
 
   units = new Set<UnitCore>();
@@ -41,7 +50,7 @@ class Collector {
   turn: number | undefined;
 
   flush() {
-    const changes: any[] = [];
+    const changes = this.changes;
 
     for (const unit of this.units) {
       changes.push({ type: "unit.updated", data: unitToChannel(unit) });
@@ -54,7 +63,12 @@ class Collector {
       changes.push({ type: "city.updated", data: cityToChannel(city) });
     }
     for (const city of this.citiesRevealed) {
-      changes.push({ type: "city.revealed", data: cityToChannel(city) });
+      const isTracked = city.player === city.player.game.trackedPlayer;
+      const data: CityRevealedResult = {
+        city: cityToChannel(city),
+        action: isTracked && !city.player.ai ? "center" : "none",
+      };
+      changes.push({ type: "city.revealed", data });
     }
     for (const id of this.citiesDestroyed) {
       changes.push({ type: "city.destroyed", data: id });
@@ -70,13 +84,13 @@ class Collector {
     for (const [id, tiles] of this.areaTilesAdded.entries()) {
       changes.push({
         type: "area.tilesAdded",
-        data: { id, tiles: tiles.map((t) => t.id) },
+        data: { id, tiles: tiles.map(tilesToTileCoordsWithNeighbours) },
       });
     }
     for (const [id, tiles] of this.areaTilesRemoved.entries()) {
       changes.push({
         type: "area.tilesRemoved",
-        data: { id, tiles: tiles.map((t) => t.id) },
+        data: { id, tiles: tiles.map(tilesToTileCoordsWithNeighbours) },
       });
     }
 
@@ -137,6 +151,8 @@ class Collector {
     this.tilesExplored.clear();
     this.tilesShowed.clear();
     this.tilesShowedAdded.clear();
+
+    this.changes = [];
 
     this.turn = undefined;
 

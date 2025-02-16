@@ -1,6 +1,6 @@
+import { bridge } from "@/bridge";
 import { TilingSprite } from "pixi.js";
 import { getAssets } from "./assets";
-import { game } from "@/api";
 
 export class Grid {
   public sprite: TilingSprite;
@@ -15,9 +15,9 @@ export class Grid {
     // this.sprite.visible = false;
     // renderer.overlaysContainer.addChild(this.sprite);
 
-    game.init$.subscribe(() => {
-      this.sprite.width = game.state!.map.width;
-      this.sprite.height = game.state!.map.height * 0.75;
+    bridge.game.start$.subscribe((startInfo) => {
+      this.sprite.width = startInfo.gameInfo.mapWidth;
+      this.sprite.height = startInfo.gameInfo.mapHeight * 0.75;
     });
   }
 

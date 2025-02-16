@@ -1,11 +1,11 @@
 import { BehaviorSubject } from "rxjs";
 
-import { Tile } from "@/api/tile.interface";
 import { Application } from "pixi.js";
 import { Animation, Animations } from "./animation";
 import { TILE_SIZE } from "./constants";
 import { getTileCoords } from "./utils";
-import { game } from "@/api";
+import { GameInfo, TileCoords } from "@/core/serialization/channel";
+import { bridge } from "@/bridge";
 
 export interface Transform {
   x: number;
@@ -40,6 +40,14 @@ export class Camera {
     yEnd: 0,
   };
 
+  gameInfo: GameInfo | null = null;
+
+  constructor() {
+    bridge.game.start$.subscribe((gameStartInfo) => {
+      this.gameInfo = gameStartInfo.gameInfo;
+    });
+  }
+
   setApp(app: Application) {
     this.app = app;
     app.ticker.add(() => {
@@ -64,7 +72,7 @@ export class Camera {
     this.updateBoundingBox();
   }
 
-  moveToTileWithEasing(tile: Tile) {
+  moveToTileWithEasing(tile: TileCoords) {
     const t = this.transform;
     const [x, y] = getTileCoords(tile);
 
@@ -127,7 +135,7 @@ export class Camera {
     this.updateBoundingBox();
   }
 
-  moveToTile(tile: Tile) {
+  moveToTile(tile: TileCoords) {
     const [x, y] = getTileCoords(tile);
     this.moveTo(x, y);
   }
@@ -163,7 +171,7 @@ export class Camera {
   }
 
   updateBoundingBox() {
-    if (!game.state) {
+    if (!this.gameInfo) {
       return;
     }
 
@@ -171,18 +179,16 @@ export class Camera {
     const width = Math.floor(this.app.canvas.width / t.scale);
     const height = Math.floor(this.app.canvas.height / t.scale);
 
-    const map = game.state.map;
+    const w = this.gameInfo.mapWidth;
+    const h = this.gameInfo.mapHeight;
 
     const xStart = Math.floor(t.x - width / 2 - 1);
     const yStart = Math.floor(t.y - height / 2);
 
-    this.tileBoundingBox.xStart = Math.max(0, Math.min(map.width, xStart));
-    this.tileBoundingBox.yStart = Math.max(0, Math.min(map.height, yStart));
-    this.tileBoundingBox.xEnd = Math.min(map.width, xStart + width + 3);
-    this.tileBoundingBox.yEnd = Math.min(
-      map.height,
-      (yStart + height + 2) / 0.75,
-    );
+    this.tileBoundingBox.xStart = Math.max(0, Math.min(w, xStart));
+    this.tileBoundingBox.yStart = Math.max(0, Math.min(h, yStart));
+    this.tileBoundingBox.xEnd = Math.min(w, xStart + width + 3);
+    this.tileBoundingBox.yEnd = Math.min(h, (yStart + height + 2) / 0.75);
   }
 }
 

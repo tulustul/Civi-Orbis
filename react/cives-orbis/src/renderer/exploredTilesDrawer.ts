@@ -2,13 +2,11 @@ import { bridge } from "@/bridge";
 import { Container } from "pixi.js";
 import { HexDrawer } from "./hexDrawer";
 
-export class FogOfWarDrawer {
+export class ExploredTilesDrawer {
   private hexDrawer: HexDrawer;
 
   constructor(private container: Container) {
     this.hexDrawer = new HexDrawer(this.container);
-
-    bridge.tiles.showed$.subscribe(() => this.bindToTrackedPlayer());
 
     bridge.tiles.showedAdded$.subscribe((tiles) =>
       this.hexDrawer.addTiles(tiles),
@@ -24,7 +22,7 @@ export class FogOfWarDrawer {
   }
 
   private async bindToTrackedPlayer() {
-    const visibleTiles = await bridge.tiles.getAllVisible();
-    this.hexDrawer.setTiles(visibleTiles);
+    const exploredTiles = await bridge.tiles.getAllExplored();
+    this.hexDrawer.setTiles(exploredTiles);
   }
 }

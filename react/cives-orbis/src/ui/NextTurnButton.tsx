@@ -1,10 +1,10 @@
-import { game } from "@/api";
 import { useObservable } from "@/utils";
 import { nextTurnService } from "./nextTurn";
 import { Spinner } from "./components";
+import { bridge } from "@/bridge";
 
 export function NextTurnButton() {
-  const nextTask = useObservable(game.nextTask$);
+  const nextTask = useObservable(bridge.nextTask$);
   const waiting = useObservable(nextTurnService.waiting$);
 
   function getCssClass() {

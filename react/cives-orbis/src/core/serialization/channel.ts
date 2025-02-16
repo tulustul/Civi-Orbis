@@ -1,13 +1,14 @@
-import { Yields } from "@/core/yields";
-import { ProductType, CityCore } from "@/core/city";
+import { CityCore, CityVisibility, ProductType } from "@/core/city";
 import { Game } from "@/core/game";
 import { PlayerCore } from "@/core/player";
-import { BaseTile, PlayerYields } from "@/shared";
-import { TilesMapCore } from "@/core/tiles-map";
-import { UnitOrder, UnitCore } from "@/core/unit";
-import { TileCore } from "@/core/tile";
 import { ResourceCore } from "@/core/resources";
+import { TileCore } from "@/core/tile";
+import { TilesMapCore } from "@/core/tiles-map";
+import { UnitCore, UnitOrder } from "@/core/unit";
+import { Yields } from "@/core/yields";
+import { BaseTile, PlayerYields } from "@/shared";
 import { UnitMoveCore } from "../collector";
+import { UnitDefinition, UnitTrait } from "../data.interface";
 
 export interface GameChanneled {
   turn: number;
@@ -17,6 +18,19 @@ export interface GameChanneled {
   units: UnitChanneled[];
   cities: CityChanneled[];
 }
+
+export type GameInfo = {
+  mapWidth: number;
+  mapHeight: number;
+  aiOnly: boolean;
+  turn: number;
+};
+
+export type GameStartInfo = {
+  gameInfo: GameInfo;
+  tileToGo: TileCoords | null;
+  unitIdToSelect: number | null;
+};
 
 export interface MapChanneled {
   width: number;
@@ -30,6 +44,7 @@ export interface TileChanneled extends BaseTile {
   unitsIds: number[];
   resource: ResourceChanneled | null;
   roads: string;
+  playerColor: number | null;
 }
 
 export interface TileDetailsChanneled extends TileChanneled {
@@ -40,6 +55,7 @@ export interface TileDetailsChanneled extends TileChanneled {
 
 export interface CityChanneled {
   id: number;
+  visibilityLevel: CityVisibility;
   name: string;
   size: number;
   tile: TileCoords;
@@ -60,6 +76,7 @@ export interface CityChanneled {
 
 export interface CityDetailsChanneled {
   id: number;
+  visibilityLevel: CityVisibility;
   name: string;
   size: number;
   tileId: number;
@@ -134,11 +151,12 @@ export interface UnitChanneled {
   playerId: number;
 }
 
-export interface UnitDetailsChanneled {
+export type UnitDetailsChanneled = {
   id: number;
-  tileId: number;
-  definitionId: string;
+  tile: TileCoords;
+  definition: UnitDefinition;
   type: "military" | "civilian";
+  trait: UnitTrait;
   cssColor: string;
   parentId: number | null;
   childrenIds: number[];
@@ -146,11 +164,17 @@ export interface UnitDetailsChanneled {
   health: number;
   supplies: number;
   order: UnitOrder;
-  path: number[][] | null;
+  path: TileCoords[][] | null;
   isSupplied: boolean;
-}
+  playerId: number;
+  canControl: boolean;
+};
 
 export type TileCoordsWithUnits = TileCoords & { units: number[] };
+
+export type TilesCoordsWithNeighbours = TileCoords & {
+  fullNeighbours: (number | null)[];
+};
 
 export interface UnitMoveChanneled {
   unitId: number;
@@ -165,7 +189,8 @@ export interface ResourceChanneled {
 
 export type AreaChanneled = {
   id: number;
-  tiles: TileCoords[];
+  color: number;
+  tiles: TilesCoordsWithNeighbours[];
 };
 
 export type TileCoords = {
@@ -182,6 +207,26 @@ export function gameToChannel(game: Game): GameChanneled {
     trackedPlayer: trackedPlayerToChannel(game.trackedPlayer),
     units: game.unitsManager.units.map((u) => unitToChannel(u)),
     cities: game.citiesManager.cities.map((c) => cityToChannel(c)),
+  };
+}
+
+export function gameToGameStartInfo(game: Game): GameStartInfo {
+  const unitToSelect = game.trackedPlayer.unitsWithoutOrders[0];
+  const city = game.trackedPlayer.cities[0];
+  let tileToGo = unitToSelect ? unitToSelect.tile : city ? city.tile : null;
+  if (!tileToGo) {
+    tileToGo = game.trackedPlayer.units[0]?.tile ?? null;
+  }
+
+  return {
+    gameInfo: {
+      mapWidth: game.map.width,
+      mapHeight: game.map.height,
+      aiOnly: game.players.every((p) => p.ai),
+      turn: game.turn,
+    },
+    tileToGo: tileToGo ? tileToTileCoords(tileToGo) : null,
+    unitIdToSelect: unitToSelect?.id ?? null,
   };
 }
 
@@ -223,6 +268,7 @@ export function tileToChannel(tile: TileCore): TileChanneled {
     roads: tile.fullNeighbours
       .map((n) => (!n || n.road === null ? "0" : "1"))
       .join(""),
+    playerColor: tile.areaOf?.player.color ?? null,
   };
 }
 
@@ -237,6 +283,7 @@ export function resourceToChannel(resource: ResourceCore): ResourceChanneled {
 export function cityToChannel(city: CityCore): CityChanneled {
   return {
     id: city.id,
+    visibilityLevel: city.getVisibilityFor(city.player.game.trackedPlayer),
     name: city.name,
     size: city.size,
     playerId: city.player.id,
@@ -263,6 +310,7 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
 
   return {
     id: city.id,
+    visibilityLevel: city.getVisibilityFor(city.player.game.trackedPlayer),
     name: city.name,
     size: city.size,
     playerId: city.player.id,
@@ -346,8 +394,9 @@ export function unitDetailsToChannel(unit: UnitCore): UnitDetailsChanneled {
   return {
     id: unit.id,
     type: unit.definition.strength > 0 ? "military" : "civilian",
-    tileId: unit.tile.id,
-    definitionId: unit.definition.id,
+    tile: tileToTileCoords(unit.tile),
+    definition: unit.definition,
+    trait: unit.definition.trait,
     cssColor: unit.player.cssColor,
     parentId: unit.parent?.id || null,
     childrenIds: unit.children.map((c) => c.id),
@@ -355,8 +404,10 @@ export function unitDetailsToChannel(unit: UnitCore): UnitDetailsChanneled {
     health: unit.health,
     supplies: unit.supplies,
     order: unit.order,
-    path: unit.path?.map((row) => row.map((tile) => tile.id)) || null,
+    path: unit.path?.map((row) => row.map(tileToTileCoords)) || null,
     isSupplied: unit.isSupplied,
+    playerId: unit.player.id,
+    canControl: unit.player === unit.player.game.trackedPlayer,
   };
 }
 
@@ -383,11 +434,18 @@ export function tileToTileCoords(tile: TileCore): TileCoords {
   return { id: tile.id, x: tile.x, y: tile.y };
 }
 
-function tileToTileCoordsWithUnits(tile: TileCore): TileCoordsWithUnits {
+export function tileToTileCoordsWithUnits(tile: TileCore): TileCoordsWithUnits {
   return {
-    id: tile.id,
-    x: tile.x,
-    y: tile.y,
+    ...tileToTileCoords(tile),
     units: tile.units.map((u) => u.id),
+  };
+}
+
+export function tilesToTileCoordsWithNeighbours(
+  tile: TileCore,
+): TilesCoordsWithNeighbours {
+  return {
+    ...tileToTileCoords(tile),
+    fullNeighbours: tile.fullNeighbours.map((t) => t?.id ?? null),
   };
 }

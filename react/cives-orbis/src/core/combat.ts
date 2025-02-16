@@ -188,7 +188,7 @@ function getDefenderModifiers(
 
 function getDamage(ratio: number): number {
   // https://forums.civfanatics.com/threads/getting-the-combat-damage-math.646582/#post-15468029
-  let modifier = (Math.pow((ratio + 3) / 4, 4) + 1) / 2;
+  const modifier = (Math.pow((ratio + 3) / 4, 4) + 1) / 2;
   return Math.round(30 * modifier);
 }
 

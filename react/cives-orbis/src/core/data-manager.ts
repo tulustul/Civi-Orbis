@@ -2,15 +2,15 @@ import { BUILDINGS } from "../data/products/buildings";
 import { IDLE_PRODUCTS } from "../data/products/idle-products";
 import { UNITS_DEFINITIONS } from "../data/products/units";
 
-import {
-  UnitDefinition,
-  Building,
-  IdleProduct,
-  GovernmentOption,
-  ResourceDefinition,
-} from "./data.interface";
-import { Entity, HaveRequirements } from "./data.interface";
 import { RESOURCES_DEFINITIONS } from "../data/resources";
+import {
+  Building,
+  Entity,
+  HaveRequirements,
+  IdleProduct,
+  ResourceDefinition,
+  UnitDefinition,
+} from "./data.interface";
 
 const ENTITIES_MAP = new Map<string, Entity & HaveRequirements>();
 

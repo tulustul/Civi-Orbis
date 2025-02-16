@@ -144,7 +144,7 @@ export class MultiValueAnimation implements Animation<number[]> {
   }
 }
 
-export class AnimationSequence implements Animation<any> {
+export class AnimationSequence {
   private progress = 0;
   private currentAnimation?: Animation;
   private animations: Animation[];

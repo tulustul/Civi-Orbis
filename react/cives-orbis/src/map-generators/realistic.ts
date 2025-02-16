@@ -177,7 +177,7 @@ export class RealisticMapGenerator implements MapGenerator {
       this.seed,
     );
 
-    for (let [tile, value, _] of this.getNoisedTiles(coastlineNoise)) {
+    for (const [tile, value, _] of this.getNoisedTiles(coastlineNoise)) {
       let height = 0;
 
       // Adjust horizontal map edges to be more likely sea.

@@ -1,7 +1,6 @@
-import { AiOperation } from "./ai-operations";
 import { TileCore } from "../core/tile";
 import { UnitCore } from "../core/unit";
-import { AIPlayer } from "./ai-player";
+import { AiOperation } from "./ai-operations";
 import { AISystem } from "./ai-system";
 
 export class FoundCityOperation extends AiOperation {
@@ -18,7 +17,7 @@ export class SettlingAI extends AISystem {
     return [];
   }
 
-  private findCityLocation(startTile: TileCore): TileCore | null {
+  public findCityLocation(startTile: TileCore): TileCore | null {
     const tiles = startTile.getTilesInRange(5);
 
     let bestSweetSpotValue = 0;

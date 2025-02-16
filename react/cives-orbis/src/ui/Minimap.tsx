@@ -18,7 +18,7 @@ export function Minimap() {
   }, []);
 
   async function create(canvas: HTMLCanvasElement) {
-    minimap.calculateSize();
+    await minimap.calculateSize();
 
     const app = new Application();
     await app.init({

@@ -1,16 +1,18 @@
-import { game } from "@/api";
+import { bridge } from "@/bridge";
 import { useUiState } from "@/ui/uiState";
+import { useObservable } from "@/utils";
 import styles from "./GameMenu.module.css";
 import { useMenu } from "./gameMenuStore";
-import { camera } from "@/renderer/camera";
 
 export function MainMenu() {
   const uiState = useUiState();
 
   const menu = useMenu();
 
+  const startInfo = useObservable(bridge.game.start$);
+
   async function start() {
-    await game.newGame({
+    await bridge.game.new({
       aiPlayersCount: 5,
       width: 50,
       height: 40,
@@ -21,11 +23,6 @@ export function MainMenu() {
     });
 
     menu.hide();
-
-    const unit = game.state?.trackedPlayer.units[0];
-    if (unit) {
-      camera.moveToTile(unit.tile);
-    }
 
     uiState.setMode("map");
   }
@@ -41,7 +38,7 @@ export function MainMenu() {
       <div className={styles.item} onClick={() => menu.setView("load")}>
         Load
       </div>
-      {game.state && (
+      {startInfo && (
         <>
           <div className={styles.item} onClick={() => menu.setView("save")}>
             Save

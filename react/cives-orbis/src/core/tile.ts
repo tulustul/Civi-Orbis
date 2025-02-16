@@ -80,7 +80,11 @@ export class TileCore implements BaseTile {
   // canBeSuppliedByCities = new Set<CityCore>();
   // suppliedByUnits = new Set<UnitCore>();
 
-  constructor(public id: number, public x: number, public y: number) {}
+  constructor(
+    public id: number,
+    public x: number,
+    public y: number,
+  ) {}
 
   computeMovementCosts() {
     for (const neighbour of this.neighbours) {
@@ -189,7 +193,7 @@ export class TileCore implements BaseTile {
   getTilesInRange(range: number): Set<TileCore> {
     const result = new Set<TileCore>([this]);
     for (let i = 0; i < range; i++) {
-      let neighbours = new Set<TileCore>();
+      const neighbours = new Set<TileCore>();
       for (const tile of result) {
         for (const neighbour of tile.neighbours) {
           neighbours.add(neighbour);
@@ -206,7 +210,7 @@ export class TileCore implements BaseTile {
     yield [this, 0];
     const visited = new Set<TileCore>([this]);
     for (let i = 0; i < range; i++) {
-      let neighbours = new Set<TileCore>();
+      const neighbours = new Set<TileCore>();
       for (const tile of visited) {
         for (const neighbour of tile.neighbours) {
           neighbours.add(neighbour);

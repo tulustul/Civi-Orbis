@@ -6,16 +6,12 @@ import { MapMode } from "./ui/MapMode";
 import { useUiState } from "./ui/uiState";
 import { GameMenu, useMenu } from "./ui/gameMenu";
 import { CitiesLayer } from "./ui/mapElements/CitiesLayer";
-import { useObservable } from "./utils";
-import { game } from "./api";
 
 function App() {
   const [loading, setLoading] = useState(true);
 
   const uiState = useUiState();
   const menu = useMenu();
-
-  const gameState = useObservable(game.state$);
 
   useEffect(() => {
     loadAssets().then(() => {
@@ -53,7 +49,7 @@ function App() {
     <>
       {menu.enabled && <GameMenu />}
       <GameCanvas />
-      {gameState && <CitiesLayer />}
+      <CitiesLayer />
       {getContent()}
     </>
   );

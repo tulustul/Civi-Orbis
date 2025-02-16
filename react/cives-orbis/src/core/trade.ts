@@ -8,17 +8,17 @@ import { UnitCore } from "./unit";
 export class TradeManager {
   routes: TradeRoute[] = [];
 
-  private graph = new TradeGraph();
+  // private graph = new TradeGraph();
 
-  getAvailableRoutes(from: CityCore): TradeRoute[] {
+  getAvailableRoutes(_: CityCore): TradeRoute[] {
     return [];
   }
 
-  establishRoute(route: TradeRoute): void {}
+  establishRoute(_: TradeRoute): void {}
 
-  deleteRoute(route: TradeRoute): void {}
+  deleteRoute(_: TradeRoute): void {}
 
-  pillage(route: TradeRoute, pillager: UnitCore): void {}
+  pillage(_: TradeRoute, __: UnitCore): void {}
 
   nextTurn() {}
 }
@@ -27,13 +27,13 @@ export class TradeGraph {
   nodes!: TradeNode[];
   nodesMap = new Map<CityCore, TradeNode>();
 
-  findRoute(from: CityCore, to: CityCore): TradeRoute | null {
+  findRoute(_: CityCore, __: CityCore): TradeRoute | null {
     return null;
   }
 
-  addNode(city: CityCore) {}
+  addNode(_: CityCore) {}
 
-  removeNode(city: CityCore) {}
+  removeNode(_: CityCore) {}
 
   balance() {}
 }
@@ -66,9 +66,9 @@ export class TradeEdge {
     return [];
   }
 
-  addRoute(route: TradeRoute) {}
+  addRoute(_: TradeRoute) {}
 
-  removeRoute(route: TradeRoute) {}
+  removeRoute(_: TradeRoute) {}
 
   computeGoods() {}
 }

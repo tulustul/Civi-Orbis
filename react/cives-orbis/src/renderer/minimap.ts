@@ -1,20 +1,24 @@
 import {
-  Graphics,
-  Container,
-  Sprite,
   Application,
+  Container,
+  Graphics,
   RenderTexture,
-  Texture,
+  Sprite,
 } from "pixi.js";
 
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
-import { Transform, Camera, camera } from "../renderer/camera";
+import { bridge } from "@/bridge";
+import {
+  GameInfo,
+  TileChanneled,
+  TileCoords,
+} from "@/core/serialization/channel";
+import { Climate, SeaLevel, TileDirection } from "@/shared";
+import { camera, Transform } from "../renderer/camera";
+import { renderer } from "./renderer";
 import { drawHex } from "./utils";
-import { GameRenderer, renderer } from "./renderer";
-import { SeaLevel, Climate, TileDirection } from "@/shared";
-import { game, Tile } from "@/api";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,
@@ -49,67 +53,53 @@ export class MinimapRenderer {
 
   private mapTexture!: RenderTexture;
 
-  private tilesMap = new Map<Tile, Container[]>();
+  private tilesMap = new Map<number, Container>();
 
   public app!: Application;
 
   private destroyed$ = new Subject<void>();
 
   constructor() {
-    game.init$.subscribe((state) => {
-      state.trackedPlayer$
-        .pipe(takeUntil(this.destroyed$))
-        .subscribe((player) => {
-          this.hideAllTiles();
-          this.reveal(player.exploredTiles);
-          this.updateMap();
-        });
+    bridge.tiles.explored$.subscribe((tiles) => {
+      this.reveal(tiles);
+      this.updateMap();
+    });
 
-      state.tilesExplored$
-        .pipe(takeUntil(this.destroyed$))
-        .subscribe((tiles) => {
-          this.reveal(tiles);
-          this.updateMap();
-        });
+    bridge.player.tracked$.subscribe(async () => {
+      this.hideAllTiles();
+      const tiles = await bridge.tiles.getAllExplored();
+      this.reveal(tiles);
+      this.updateMap();
+    });
 
-      state.tilesUpdated$
-        .pipe(takeUntil(this.destroyed$))
-        .subscribe((tiles) => {
-          for (const tile of tiles) {
-            this.drawTile(tile);
-          }
-          this.updateMap();
-        });
+    bridge.tiles.updated$.subscribe((tiles) => {
+      this.drawTiles(tiles);
+      this.updateMap();
     });
 
     this.container.addChild(this.mapSprite);
     this.container.addChild(this.cameraGraphics);
   }
 
-  calculateSize() {
-    if (!game.state) {
-      return;
-    }
+  async calculateSize() {
+    const startInfo = await bridge.game.getInfo();
 
-    const map = game.state.map;
+    const w = startInfo.gameInfo.mapWidth;
+    const h = startInfo.gameInfo.mapHeight;
 
-    if (map.width > map.height) {
+    if (w > h) {
       this.width = maxSize;
-      this.height = maxSize / (map.width / map.height);
-      this.scale = maxSize / map.width;
+      this.height = maxSize / (w / h);
+      this.scale = maxSize / w;
     } else {
-      this.width = maxSize / (map.height / map.width);
+      this.width = maxSize / (h / w);
       this.height = maxSize;
-      this.scale = maxSize / map.height;
+      this.scale = maxSize / h;
     }
     this.height *= 0.75;
   }
 
-  create(app: Application) {
-    if (!game.state) {
-      return;
-    }
-
+  async create(app: Application) {
     this.app = app;
 
     this.mapTexture = RenderTexture.create({
@@ -118,10 +108,12 @@ export class MinimapRenderer {
     });
     this.mapSprite.texture = this.mapTexture;
 
-    this.drawMap();
+    const allTiles = await bridge.tiles.getAll();
+    this.drawTiles(allTiles);
 
     this.hideAllTiles();
-    this.reveal(game.state.trackedPlayer.exploredTiles);
+    const exploredTiles = await bridge.tiles.getAllExplored();
+    this.reveal(exploredTiles);
 
     this.app.stage.addChild(this.container);
 
@@ -140,35 +132,31 @@ export class MinimapRenderer {
     }
     this.mapTexture.destroy();
     this.mapSprite.destroy();
-    for (const objects of this.tilesMap.values()) {
-      for (const obj of objects) {
-        obj.destroy();
-      }
+    for (const container of this.tilesMap.values()) {
+      container.destroy();
     }
     this.destroyed$.next();
     this.destroyed$.complete();
   }
 
   private hideAllTiles() {
-    for (const obj of this.mapScene.children) {
-      obj.visible = false;
+    for (const container of this.tilesMap.values()) {
+      container.visible = false;
     }
   }
 
-  private reveal(tiles: Iterable<Tile>) {
+  private reveal(tiles: TileCoords[]) {
     for (const tile of tiles) {
-      const displayObjects = this.tilesMap.get(tile);
-      if (displayObjects) {
-        for (const obj of displayObjects) {
-          obj.visible = true;
-        }
+      const container = this.tilesMap.get(tile.id);
+      if (container) {
+        container.visible = true;
       }
     }
   }
 
   private updateCamera(t: Transform) {
-    let width = renderer.canvas.width / t.scale;
-    let height = renderer.canvas.height / t.scale;
+    const width = renderer.canvas.width / t.scale;
+    const height = renderer.canvas.height / t.scale;
 
     const xStart = (t.x - width / 2) * this.scale;
     const yStart = (t.y - height / 2) * this.scale;
@@ -193,85 +181,75 @@ export class MinimapRenderer {
     this.app.render();
   }
 
-  private drawMap() {
-    if (!game.state) {
-      return;
-    }
-
-    for (let y = 0; y < game.state.map.height; y++) {
-      for (let x = 0; x < game.state.map.width; x++) {
-        this.drawTile(game.state.map.tiles[x][y]);
-      }
+  private drawTiles(tiles: TileChanneled[]) {
+    for (const tile of tiles) {
+      this.drawTile(tile);
     }
   }
 
-  private drawTile(tile: Tile) {
+  private drawTile(tile: TileChanneled) {
     let color: number;
 
     if (tile.seaLevel !== SeaLevel.none) {
       color = SEA_COLORS[tile.seaLevel];
-    } else if (tile.areaOf) {
-      color = tile.areaOf.player.color;
+    } else if (tile.playerColor) {
+      color = tile.playerColor;
     } else {
       color = CLIMATE_COLORS[tile.climate];
     }
 
     const g = new Graphics();
-    drawHex(g, tile.x, tile.y);
-    g.fill({ color });
-
     g.scale.x = this.scale;
     g.scale.y = this.scale;
 
+    drawHex(g, tile.x, tile.y);
+    g.fill({ color });
+
     this.mapScene.addChild(g);
-    this.tilesMap.set(tile, [g]);
+    this.tilesMap.set(tile.id, g);
 
     this.renderRivers(tile, g);
-
-    if (!game.state!.trackedPlayer.exploredTiles.has(tile)) {
-      g.visible = false;
-    }
   }
 
-  private renderRivers(tile: Tile, graphics: Graphics) {
+  private renderRivers(tile: TileChanneled, graphics: Graphics) {
     if (!tile.riverParts.length) {
       return;
     }
-
-    graphics.setStrokeStyle({ width: 0.3, color: SEA_COLORS[SeaLevel.deep] });
+    const x = tile.x + (tile.y % 2 ? 0.5 : 0);
+    const y = tile.y * 0.75;
 
     for (const river of tile.riverParts) {
       if (river === TileDirection.NW) {
-        graphics.moveTo(0, 0.25);
-        graphics.lineTo(0.5, 0);
+        graphics.moveTo(x, y + 0.25);
+        graphics.lineTo(x + 0.5, y);
       }
 
       if (river === TileDirection.NE) {
-        graphics.moveTo(0.5, 0);
-        graphics.lineTo(1, 0.25);
+        graphics.moveTo(x + 0.5, y);
+        graphics.lineTo(x + 1, y + 0.25);
       }
 
       if (river === TileDirection.E) {
-        graphics.moveTo(1, 0.25);
-        graphics.lineTo(1, 0.75);
+        graphics.moveTo(x + 1, y + 0.25);
+        graphics.lineTo(x + 1, y + 0.75);
       }
 
       if (river === TileDirection.SE) {
-        graphics.moveTo(1, 0.75);
-        graphics.lineTo(0.5, 1);
+        graphics.moveTo(x + 1, y + 0.75);
+        graphics.lineTo(x + 0.5, y + 1);
       }
 
       if (river === TileDirection.SW) {
-        graphics.moveTo(0.5, 1);
-        graphics.lineTo(0, 0.75);
+        graphics.moveTo(x + 0.5, y + 1);
+        graphics.lineTo(x + 0, y + 0.75);
       }
 
       if (river === TileDirection.W) {
-        graphics.moveTo(0, 0.75);
-        graphics.lineTo(0, 0.25);
+        graphics.moveTo(x + 0, y + 0.75);
+        graphics.lineTo(x + 0, y + 0.25);
       }
     }
 
-    graphics.stroke();
+    graphics.stroke({ width: 0.3, color: SEA_COLORS[SeaLevel.deep] });
   }
 }

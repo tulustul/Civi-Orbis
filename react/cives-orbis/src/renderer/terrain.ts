@@ -1,14 +1,11 @@
-import { takeUntil } from "rxjs/operators";
-
-import { game } from "@/api";
-import { GameState } from "@/api/state";
-import { Tile } from "@/api/tile.interface";
+import { bridge } from "@/bridge";
+import { TileChanneled } from "@/core/serialization/channel";
 import { TileImprovement } from "@/core/tile-improvements";
 import { Climate, LandForm, SeaLevel, TileDirection } from "@/shared";
 import { measureTime } from "@/utils";
 import { Container, Graphics, Sprite } from "pixi.js";
 import { getAssets } from "./assets";
-import { PoliticsDrawer } from "./politics";
+import { PoliticsDrawer } from "./politicsDrawer";
 import { drawTileSprite, drawTileSpriteCentered } from "./utils";
 
 const SEA_TEXTURES: Record<SeaLevel, string> = {
@@ -69,9 +66,10 @@ export class MapDrawer {
   yieldsContainer = new Container({ label: "yields", isRenderGroup: true });
   terrainContainer = new Container({ label: "terrain", isRenderGroup: true });
 
-  tileContainers = new Map<Tile, Container>();
+  tilesById = new Map<number, TileChanneled>();
+  tileContainers = new Map<number, Container>();
   // Yields are not using per tile container but use a separate container for easy toggling.
-  tileYields = new Map<Tile, Graphics>();
+  tileYields = new Map<number, Graphics>();
 
   politicsDrawer!: PoliticsDrawer;
 
@@ -83,34 +81,15 @@ export class MapDrawer {
     container.addChild(this.yieldsContainer);
     this.yieldsContainer.zIndex = 10;
 
-    game.init$.subscribe((state) => {
-      measureTime("build map", () => this.build(state));
-
-      state.tilesUpdated$.pipe(takeUntil(game.stop$)).subscribe((tiles) => {
-        for (const tile of tiles) {
-          this.updateTile(tile);
-        }
-      });
-
-      // cities
-      state.citySpawned$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((city) => this.updateTile(city.tile));
-
-      // state.cityUpdated$
-      //   .pipe(takeUntil(game.stop$))
-      //   .subscribe((city) => this.updateTile(city.tile));
-
-      state.cityDestroyed$
-        .pipe(takeUntil(game.stop$))
-        .subscribe((city) => this.updateTile(city.tile));
-
-      // mapUi.yieldsVisible$
-      //   .pipe(takeUntil(game.stop$))
-      //   .subscribe((visible) => (this.yieldsContainer.visible = visible));
+    bridge.tiles.updated$.subscribe((tiles) => {
+      for (const tile of tiles) {
+        this.updateTile(tile);
+      }
     });
 
-    game.stop$.subscribe(() => this.clear());
+    bridge.game.start$.subscribe(() => {
+      measureTime("build map", () => this.build());
+    });
   }
 
   clear() {
@@ -121,37 +100,38 @@ export class MapDrawer {
     this.tileYields.clear();
   }
 
-  private build(gameState: GameState) {
-    this.politicsDrawer = new PoliticsDrawer(gameState, this.container);
+  private async build() {
+    const tiles = await bridge.tiles.getAll();
 
-    for (let x = 0; x < gameState.map.width; x++) {
-      for (let y = 0; y < gameState.map.height; y++) {
-        const tile = gameState.map.tiles[x][y];
-        const container = new Container();
-        container.zIndex = y;
-        this.tileContainers.set(tile, container);
-        this.terrainContainer.addChild(container);
-        this.drawTile(tile, container);
-      }
+    this.politicsDrawer = new PoliticsDrawer(this.container);
+
+    for (const tile of tiles) {
+      this.tilesById.set(tile.id, tile);
+      const container = new Container();
+      container.zIndex = tile.y;
+      this.tileContainers.set(tile.id, container);
+      this.terrainContainer.addChild(container);
+      this.drawTile(tile, container);
     }
   }
 
-  private updateTile(tile: Tile) {
+  private updateTile(tile: TileChanneled) {
+    this.tilesById.set(tile.id, tile);
     const container = this.clearTile(tile);
     if (container) {
       this.drawTile(tile, container);
     }
   }
 
-  private clearTile(tile: Tile) {
-    const container = this.tileContainers.get(tile);
+  private clearTile(tile: TileChanneled) {
+    const container = this.tileContainers.get(tile.id);
     if (container) {
       for (const child of container.children) {
         child.destroy();
       }
     }
 
-    const yieldsGraphics = this.tileYields.get(tile);
+    const yieldsGraphics = this.tileYields.get(tile.id);
     if (yieldsGraphics) {
       yieldsGraphics.destroy();
     }
@@ -159,7 +139,7 @@ export class MapDrawer {
     return container;
   }
 
-  private drawTile(tile: Tile, container: Container) {
+  private drawTile(tile: TileChanneled, container: Container) {
     this.drawTerrain(tile, container);
     this.drawImprovement(tile, container);
     this.drawResource(tile, container);
@@ -169,7 +149,7 @@ export class MapDrawer {
     this.drawYields(tile);
   }
 
-  private drawTerrain(tile: Tile, container: Container) {
+  private drawTerrain(tile: TileChanneled, container: Container) {
     let textureName: string;
 
     if (tile.wetlands) {
@@ -199,7 +179,7 @@ export class MapDrawer {
     container.addChild(sprite);
   }
 
-  private drawImprovement(tile: Tile, container: Container) {
+  private drawImprovement(tile: TileChanneled, container: Container) {
     let sprite: Sprite | null = null;
     if (tile.improvement === TileImprovement.farm) {
       sprite = drawTileSpriteCentered(tile, this.tilesTextures["field.png"]);
@@ -217,7 +197,7 @@ export class MapDrawer {
     }
   }
 
-  private drawResource(tile: Tile, container: Container) {
+  private drawResource(tile: TileChanneled, container: Container) {
     if (!tile.resource) {
       return;
     }
@@ -232,30 +212,26 @@ export class MapDrawer {
     container.addChild(sprite);
   }
 
-  private drawRoads(tile: Tile, container: Container) {
+  private drawRoads(tile: TileChanneled, container: Container) {
     if (tile.road === null) {
       return;
     }
 
-    const roadId = tile.fullNeighbours
-      .map((n) => (!n || n.road === null ? "0" : "1"))
-      .join("");
-
-    const textureName = `hexRoad-${roadId}-00.png`;
+    const textureName = `hexRoad-${tile.roads}-00.png`;
     const sprite = drawTileSprite(tile, this.tilesTextures[textureName]);
     container.addChild(sprite);
   }
 
-  private drawCity(tile: Tile, container: Container) {
-    if (!tile.city) {
+  private drawCity(tile: TileChanneled, container: Container) {
+    if (tile.cityId === null) {
       return;
     }
 
-    const g = drawTileSprite(tile.city.tile, this.tilesTextures["village.png"]);
+    const g = drawTileSprite(tile, this.tilesTextures["village.png"]);
     container.addChild(g);
   }
 
-  private drawRiver(tile: Tile, container: Container) {
+  private drawRiver(tile: TileChanneled, container: Container) {
     if (!tile.riverParts.length) {
       return;
     }
@@ -303,7 +279,7 @@ export class MapDrawer {
     g.stroke();
   }
 
-  private drawYields(tile: Tile) {
+  private drawYields(tile: TileChanneled) {
     const g = new Graphics();
 
     g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
@@ -313,7 +289,7 @@ export class MapDrawer {
     this.drawYield(g, 0.65, tile.yields.production, 0xffaa00);
 
     this.yieldsContainer.addChild(g);
-    this.tileYields.set(tile, g);
+    this.tileYields.set(tile.id, g);
 
     return [g];
   }

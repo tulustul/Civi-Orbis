@@ -46,7 +46,7 @@ export class CityHaveBuildingRequirement extends Requirement {
     this.context = { buildingId };
   }
 
-  check(player: PlayerCore, city: CityCore | null) {
+  check(_: PlayerCore, city: CityCore | null) {
     if (!city) {
       return false;
     }
@@ -62,7 +62,7 @@ export class CitySizeRequirement extends Requirement {
     this.context = { size };
   }
 
-  check(player: PlayerCore, city: CityCore | null) {
+  check(_: PlayerCore, city: CityCore | null) {
     if (!city) {
       return false;
     }
@@ -73,7 +73,7 @@ export class CitySizeRequirement extends Requirement {
 export class CoastlineCityRequirement extends Requirement {
   override id = "coastlineCity";
 
-  check(player: PlayerCore, city: CityCore | null) {
+  check(_: PlayerCore, city: CityCore | null) {
     if (!city) {
       return false;
     }

@@ -24,6 +24,8 @@ import { IDLE_PRODUCTS } from "../data/products/idle-products";
 import { checkRequirements } from "./requirements";
 import { SuppliesProducer } from "./supplies";
 
+export type CityVisibility = "all" | "basic" | "hidden";
+
 export type ProductType = "unit" | "building" | "idleProduct";
 
 export interface Product {
@@ -495,7 +497,7 @@ export class CityCore {
 
     const cityTiles = Array.from(this.tiles);
 
-    let index = oldOwner.cities.indexOf(this);
+    const index = oldOwner.cities.indexOf(this);
     if (index !== -1) {
       oldOwner.cities.splice(index, 1);
       oldOwner.area.removeBulk(cityTiles);
@@ -507,7 +509,7 @@ export class CityCore {
     newOwner.updateYields();
     oldOwner.updateYields();
 
-    // TODO explored area should be bigger then city tiles. Change this once fog of war is implement (probably a city should store it's visible tiles)
+    // TODO explored area should be bigger then city tiles. Change this once fog of war is implement 1(probably a city should store it's visible tiles)
     newOwner.exploreTiles(this.tiles);
 
     this.cancelProduction();
@@ -518,5 +520,17 @@ export class CityCore {
     for (const tile of this.tiles) {
       collector.tiles.add(tile);
     }
+  }
+
+  getVisibilityFor(player: PlayerCore): CityVisibility {
+    if (player === this.player) {
+      return "all";
+    }
+
+    if (player.exploredTiles.has(this.tile)) {
+      return "basic";
+    }
+
+    return "hidden";
   }
 }

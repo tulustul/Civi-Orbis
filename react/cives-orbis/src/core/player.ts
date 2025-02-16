@@ -58,7 +58,7 @@ export class PlayerCore {
     public game: Game,
     public color: number,
   ) {
-    this.area = this.game.areasManager.make();
+    this.area = this.game.areasManager.make(this.color);
     this.cssColor = "#" + color.toString(16).padStart(6, "0");
   }
 

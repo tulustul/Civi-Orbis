@@ -1,8 +1,6 @@
 import { Container, Geometry, Graphics, Sprite, Texture } from "pixi.js";
 
-import { TILE_SIZE } from "./constants";
-import { Tile } from "../api/tile.interface";
-import { TileChanneled, TileCoords } from "@/core/serialization/channel";
+import { TileCoords } from "@/core/serialization/channel";
 
 // prettier-ignore
 const HEX_VERTICES = [
@@ -19,7 +17,7 @@ export const HEX_GEOMETRY = new Geometry({
   },
 });
 
-export function getTileCenter(tile: Tile): [number, number] {
+export function getTileCenter(tile: TileCoords): [number, number] {
   return [0.5 + tile.x + (tile.y % 2 ? 0.5 : 0), tile.y * 0.75 + 0.5];
 }
 

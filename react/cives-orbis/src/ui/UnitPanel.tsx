@@ -1,20 +1,31 @@
-import { useObservable, useforceRender } from "@/utils";
+import { useObservable, useForceRender } from "@/utils";
 import { Panel } from "./components";
 import { mapUi } from "./mapUi";
 import clsx from "clsx";
 import { UnitOrder } from "@/core/unit";
 import { ACTIONS, UnitAction } from "@/core/unit-actions";
 import styles from "./UnitPanel.module.css";
+import { bridge } from "@/bridge";
 
 export function UnitPanel() {
   const unit = useObservable(mapUi.selectedUnit$);
-  const forceRender = useforceRender();
+  const forceRender = useForceRender();
 
   function destroy() {}
 
   async function setOrder(order: UnitOrder) {
-    await unit?.setOrder(order);
+    if (!unit) {
+      return;
+    }
+    await bridge.units.setOrder({ unitId: unit.id, order });
     forceRender();
+  }
+
+  async function doAction(action: UnitAction) {
+    if (!unit) {
+      return;
+    }
+    await bridge.units.doAction({ action, unitId: unit.id });
   }
 
   function getActionName(action: UnitAction) {
@@ -23,6 +34,10 @@ export function UnitPanel() {
 
   if (!unit) {
     return null;
+  }
+
+  function canDoAction(action: UnitAction) {
+    return !!action;
   }
 
   return (
@@ -52,8 +67,8 @@ export function UnitPanel() {
         {unit.definition.actions.map((action, i) => (
           <button
             key={i}
-            className={clsx("btn", { disabled: !unit.canDoAction(action) })}
-            onClick={() => unit.doAction(action)}
+            className={clsx("btn", { disabled: !canDoAction(action) })}
+            onClick={() => doAction(action)}
           >
             {getActionName(action)}
           </button>

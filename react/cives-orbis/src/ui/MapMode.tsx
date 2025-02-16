@@ -4,16 +4,24 @@ import { NextTurnButton } from "./NextTurnButton";
 
 import styles from "./MapMode.module.css";
 import { UnitPanel } from "./UnitPanel";
+import { useObservable } from "@/utils";
+import { mapUi } from "./mapUi";
+import { CityView } from "./city";
 
 export function MapMode() {
+  const city = useObservable(mapUi.selectedCity$);
+
   return (
     <>
-      <Panel corner="bottom-right" className={styles.minimap}>
-        <NextTurnButton />
-        <Minimap />
-      </Panel>
+      {city && <CityView city={city} />}
+      <div style={{ visibility: city ? "hidden" : "visible" }}>
+        <Panel corner="bottom-right" className={styles.minimap}>
+          <NextTurnButton />
+          <Minimap />
+        </Panel>
 
-      <UnitPanel />
+        <UnitPanel />
+      </div>
     </>
   );
 }

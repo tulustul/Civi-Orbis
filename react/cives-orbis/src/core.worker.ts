@@ -1,51 +1,57 @@
 /// <reference lib="webworker" />
 
-import { RealisticMapGenerator } from "./map-generators/realistic";
-import { MapGeneratorOptions } from "./api/game.interface";
-import { Game } from "./core/game";
-import { PlayerCore, PLAYER_COLORS } from "./core/player";
 import { AIPlayer } from "./ai/ai-player";
+import { CityCore } from "./core/city";
 import { collector } from "./core/collector";
-import { UnitAction } from "./core/unit-actions";
-import { UnitOrder } from "./core/unit";
-import { findPath } from "./core/pathfinding";
-import { BaseTile, PlayerTask } from "./shared";
 import { CombatSimulation, simulateCombat } from "./core/combat";
 import {
-  gameToChannel,
-  trackedPlayerToChannel,
-  unitDetailsToChannel,
-  cityDetailsToChannel,
-  GameChanneled,
-  tileDetailsToChannel,
-  TileDetailsChanneled,
-  UnitChanneled,
-  unitToChannel,
-  tileToChannel,
-  cityToChannel,
-  tileToTileCoords,
-} from "./core/serialization/channel";
-import { dumpGame, loadGame } from "./core/serialization/dump";
-import {
-  getEntityById,
   getBuildingById,
-  getUnitById,
+  getEntityById,
   getIdleProductById,
   getResourceDefinitionById,
+  getUnitById,
 } from "./core/data-manager";
-import { CityCore } from "./core/city";
-import { getFailedWeakRequirements } from "./core/requirements";
-import { moveAlongPath } from "./core/movement";
-import { ResourceCore } from "./core/resources";
 import { ResourceDefinition } from "./core/data.interface";
+import { Game } from "./core/game";
+import { moveAlongPath } from "./core/movement";
+import { findPath } from "./core/pathfinding";
+import { PLAYER_COLORS, PlayerCore } from "./core/player";
+import { getFailedWeakRequirements } from "./core/requirements";
+import { ResourceCore } from "./core/resources";
+import {
+  AreaChanneled,
+  CityDetailsChanneled,
+  cityDetailsToChannel,
+  cityToChannel,
+  GameInfo,
+  GameStartInfo,
+  gameToGameStartInfo,
+  TileChanneled,
+  TileDetailsChanneled,
+  tileDetailsToChannel,
+  TilesCoordsWithNeighbours,
+  tilesToTileCoordsWithNeighbours,
+  tileToChannel,
+  tileToTileCoords,
+  trackedPlayerToChannel,
+  UnitChanneled,
+  unitDetailsToChannel,
+  unitToChannel,
+} from "./core/serialization/channel";
+import { dumpGame, loadGame } from "./core/serialization/dump";
+import { UnitOrder } from "./core/unit";
+import { UnitAction } from "./core/unit-actions";
+import { RealisticMapGenerator } from "./map-generators/realistic";
+import { BaseTile, PlayerTask } from "./shared";
 
 let game: Game;
 
 const HANDLERS = {
   "game.new": newGameHandler,
-  "game.saveDump": saveDumpHandler,
-  "game.loadDump": loadDumpHandler,
+  "game.dump": dumpHandler,
+  "game.load": loadHandler,
   "game.nextPlayer": nextPlayerHandler,
+  "game.getInfo": getGameInfo,
 
   "trackedPlayer.revealWorld": revealWorld,
   "trackedPlayer.set": setTrackedPlayer,
@@ -66,6 +72,7 @@ const HANDLERS = {
 
   "tile.getAll": tileGetAll,
   "tile.getAllVisible": tileGetAllVisible,
+  "tile.getAllExplored": tileGetAllExplored,
   "tile.getDetails": tileGetDetails,
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
@@ -80,12 +87,15 @@ const HANDLERS = {
   "city.unworkTile": cityUnworkTile,
   "city.optimizeYields": cityOptimizeYields,
 
+  "area.getAll": getAllArea,
   "area.getTiles": getAreaTiles,
 
   "entity.getFailedWeakRequirements": entityGetFailedWeakRequirements,
 };
 
 addEventListener("message", ({ data }) => {
+  console.debug("Core: received command", data.command);
+
   const handler = (HANDLERS as any)[data.command];
   if (!handler) {
     console.error(`No handler for command "${data.command}".`);
@@ -128,13 +138,24 @@ function getNextTask(): PlayerTask | null {
   return null;
 }
 
-function newGameHandler(data: MapGeneratorOptions): GameChanneled {
+export interface MapGeneratorOptions {
+  width: number;
+  height: number;
+  uniformity: number;
+  seaLevel: number;
+  resources: number;
+  humanPlayersCount: number;
+  aiPlayersCount: number;
+  seed?: string;
+}
+
+function newGameHandler(options: MapGeneratorOptions): GameStartInfo {
   game = new Game();
 
-  for (let i = 0; i < data.humanPlayersCount + data.aiPlayersCount; i++) {
+  for (let i = 0; i < options.humanPlayersCount + options.aiPlayersCount; i++) {
     const player = new PlayerCore(game, PLAYER_COLORS[i]);
 
-    if (i >= data.humanPlayersCount) {
+    if (i >= options.humanPlayersCount) {
       player.ai = new AIPlayer(player);
     }
 
@@ -143,12 +164,12 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
 
   const generator = new RealisticMapGenerator(game.players.length);
   game.map = generator.generate(
-    data.width,
-    data.height,
-    data.seed,
-    data.uniformity,
-    data.seaLevel,
-    data.resources,
+    options.width,
+    options.height,
+    options.seed,
+    options.uniformity,
+    options.seaLevel,
+    options.resources,
   );
   game.map.precompute();
 
@@ -161,17 +182,28 @@ function newGameHandler(data: MapGeneratorOptions): GameChanneled {
 
   game.start();
 
-  return gameToChannel(game);
+  const startInfo = gameToGameStartInfo(game);
+  collector.changes.push({ type: "game.start", data: startInfo });
+
+  return startInfo;
 }
 
-function saveDumpHandler(): string {
+function getGameInfo() {
+  return gameToGameStartInfo(game);
+}
+
+function dumpHandler(): string {
   // TODO we might compress the save
   return JSON.stringify(dumpGame(game));
 }
 
-function loadDumpHandler(data: string) {
+function loadHandler(data: string) {
   game = loadGame(JSON.parse(data));
-  return gameToChannel(game);
+
+  const startInfo = gameToGameStartInfo(game);
+  collector.changes.push({ type: "game.start", data: startInfo });
+
+  return startInfo;
 }
 
 function nextPlayerHandler() {
@@ -196,24 +228,29 @@ function setTrackedPlayer(playerId: number) {
   return trackedPlayerToChannel(game.trackedPlayer);
 }
 
-function getSuppliedTiles(playerId: number): number[] {
+function getSuppliedTiles(playerId: number): TilesCoordsWithNeighbours[] {
   const player = game.playersMap.get(playerId);
   if (!player) {
     return [];
   }
 
-  return Array.from(player.suppliedTiles).map((t) => t.id);
+  return Array.from(player.suppliedTiles).map(tilesToTileCoordsWithNeighbours);
 }
 
-function unitSpawn(data: any) {
-  const tile = game.map.tilesMap.get(data.tileId);
-  const player = game.playersMap.get(data.playerId);
+export type UnitSpawnOptions = {
+  tileId: number;
+  playerId: number;
+  definitionId: string;
+};
+function unitSpawn(options: UnitSpawnOptions): void {
+  const tile = game.map.tilesMap.get(options.tileId);
+  const player = game.playersMap.get(options.playerId);
 
   if (!tile || !player) {
     return;
   }
 
-  game.unitsManager.spawn(data.definitionId, tile, player);
+  game.unitsManager.spawn(options.definitionId, tile, player);
 }
 
 function getUnitDetails(unitId: number) {
@@ -225,7 +262,11 @@ function getUnitDetails(unitId: number) {
   return unitDetailsToChannel(unit);
 }
 
-function unitDoAction(data: { unitId: number; action: UnitAction }) {
+export type UnitDoActionOptions = {
+  unitId: number;
+  action: UnitAction;
+};
+function unitDoAction(data: UnitDoActionOptions) {
   const unit = game.unitsManager.unitsMap.get(data.unitId);
   if (!unit) {
     return null;
@@ -236,7 +277,11 @@ function unitDoAction(data: { unitId: number; action: UnitAction }) {
   return unitDetailsToChannel(unit);
 }
 
-function unitSetOrder(data: { unitId: number; order: UnitOrder }) {
+export type UnitSetOrderOptions = {
+  unitId: number;
+  order: UnitOrder;
+};
+function unitSetOrder(data: UnitSetOrderOptions) {
   const unit = game.unitsManager.unitsMap.get(data.unitId);
   if (!unit) {
     return null;
@@ -247,7 +292,11 @@ function unitSetOrder(data: { unitId: number; order: UnitOrder }) {
   return unitDetailsToChannel(unit);
 }
 
-function unitFindPath(data: { unitId: number; destinationId: number }) {
+export type UnitFindPathOptions = {
+  unitId: number;
+  destinationId: number;
+};
+function unitFindPath(data: UnitFindPathOptions) {
   const unit = game.unitsManager.unitsMap.get(data.unitId);
   const tile = game.map.tilesMap.get(data.destinationId);
   if (!unit || !tile) {
@@ -259,10 +308,10 @@ function unitFindPath(data: { unitId: number; destinationId: number }) {
   return unitDetailsToChannel(unit);
 }
 
-function unitDisband(unitId: number) {
+function unitDisband(unitId: number): void {
   const unit = game.unitsManager.unitsMap.get(unitId);
   if (!unit) {
-    return null;
+    return;
   }
 
   game.unitsManager.destroy(unit);
@@ -279,7 +328,7 @@ function unitMoveAlongPath(unitId: number) {
   return unitDetailsToChannel(unit);
 }
 
-function unitGetRange(unitId: number): number[] {
+function unitGetRange(unitId: number): TilesCoordsWithNeighbours[] {
   const unit = game.unitsManager.unitsMap.get(unitId);
   if (!unit) {
     return [];
@@ -287,10 +336,16 @@ function unitGetRange(unitId: number): number[] {
 
   const tiles = unit.getRange();
 
-  return Array.from(tiles).map((tile) => tile.id);
+  return Array.from(tiles).map(tilesToTileCoordsWithNeighbours);
 }
 
-function unitGetFailedActionRequirements(data: any): string[] {
+export type UnitGetFailedActionRequirementsOptions = {
+  unitId: number;
+  action: UnitAction;
+};
+function unitGetFailedActionRequirements(
+  data: UnitGetFailedActionRequirementsOptions,
+): string[] {
   const unit = game.unitsManager.unitsMap.get(data.unitId);
   if (!unit) {
     return [];
@@ -299,7 +354,13 @@ function unitGetFailedActionRequirements(data: any): string[] {
   return unit.getFailedActionRequirements(data.action);
 }
 
-function unitSimulateCombat(data: any): CombatSimulation | null {
+export type UnitSimulateCombatOptions = {
+  attackerId: number;
+  defenderId: number;
+};
+function unitSimulateCombat(
+  data: UnitSimulateCombatOptions,
+): CombatSimulation | null {
   const attacker = game.unitsManager.unitsMap.get(data.attackerId);
   const defender = game.unitsManager.unitsMap.get(data.defenderId);
   if (!attacker || !defender) {
@@ -313,29 +374,25 @@ function unitGetAll(): UnitChanneled[] {
   return game.unitsManager.units.map((unit) => unitToChannel(unit));
 }
 
-export function tileGetAll() {
+export function tileGetAll(): TileChanneled[] {
   return Array.from(game.map.tilesMap.values()).map(tileToChannel);
+}
+
+export function tileGetAllExplored() {
+  return Array.from(game.trackedPlayer.exploredTiles).map(tileToTileCoords);
 }
 
 export function tileGetAllVisible() {
   return Array.from(game.trackedPlayer.visibleTiles).map(tileToTileCoords);
 }
 
-export function tileGetDetails(data: {
-  tileId: number;
-  playerId: number;
-}): TileDetailsChanneled | null {
-  const tile = game.map.tilesMap.get(data.tileId);
+export function tileGetDetails(tileId: number): TileDetailsChanneled | null {
+  const tile = game.map.tilesMap.get(tileId);
   if (!tile) {
     return null;
   }
 
-  const player = game.playersMap.get(data.playerId);
-  if (!player) {
-    return null;
-  }
-
-  return tileDetailsToChannel(tile, player);
+  return tileDetailsToChannel(tile, game.trackedPlayer);
 }
 
 export function tileUpdate(tile: Partial<BaseTile>) {
@@ -379,59 +436,80 @@ export function getAllRevealed() {
     .map(cityToChannel);
 }
 
-export function getCityDetails(cityId: number) {
+export function getCityDetails(cityId: number): CityDetailsChanneled | null {
   const city = game.citiesManager.citiesMap.get(cityId);
   if (!city) {
-    return;
+    return null;
   }
 
   return cityDetailsToChannel(city);
 }
 
-export function cityProduce(data: any) {
-  const city = game.citiesManager.citiesMap.get(data.cityId);
+export type CityProduceOptions = {
+  cityId: number;
+  productId: string;
+  productType: "building" | "unit" | "idleProduct";
+};
+export function cityProduce(options: CityProduceOptions) {
+  const city = game.citiesManager.citiesMap.get(options.cityId);
 
   if (!city) {
     return;
   }
 
-  if (data.type === "building") {
-    city.produceBuilding(getBuildingById(data.productId)!);
-  } else if (data.type === "unit") {
-    city.produceUnit(getUnitById(data.productId)!);
+  if (options.productType === "building") {
+    city.produceBuilding(getBuildingById(options.productId)!);
+  } else if (options.productType === "unit") {
+    city.produceUnit(getUnitById(options.productId)!);
   } else {
-    city.workOnIdleProduct(getIdleProductById(data.productId)!);
+    city.workOnIdleProduct(getIdleProductById(options.productId)!);
   }
 
   return cityDetailsToChannel(city);
 }
 
-export function cityGetRange(cityId: number) {
+export function cityGetRange(
+  cityId: number,
+): TilesCoordsWithNeighbours[] | null {
   const city = game.citiesManager.citiesMap.get(cityId);
 
   if (!city) {
-    return;
+    return null;
   }
 
-  return Array.from(city.tiles).map((tile) => tile.id);
+  return Array.from(city.tiles).map(tilesToTileCoordsWithNeighbours);
 }
 
-export function cityGetWorkTiles(cityId: number) {
+export type CityGetWorkTilesResult = {
+  workedTiles: TilesCoordsWithNeighbours[];
+  notWorkedTiles: TilesCoordsWithNeighbours[];
+};
+export function cityGetWorkTiles(
+  cityId: number,
+): CityGetWorkTilesResult | null {
   const city = game.citiesManager.citiesMap.get(cityId);
 
   if (!city) {
-    return {};
+    return null;
   }
 
   return {
-    workedTiles: Array.from(city.workedTiles).map((tile) => tile.id),
-    notWorkedTiles: Array.from(city.notWorkedTiles).map((tile) => tile.id),
+    workedTiles: Array.from(city.workedTiles).map(
+      tilesToTileCoordsWithNeighbours,
+    ),
+    notWorkedTiles: Array.from(city.notWorkedTiles).map(
+      tilesToTileCoordsWithNeighbours,
+    ),
   };
 }
 
-export function cityWorkTile(data: any) {
-  const city = game.citiesManager.citiesMap.get(data.cityId);
-  const tile = game.map.tilesMap.get(data.tileId);
+export type CityWorkTileOptions = {
+  cityId: number;
+  tileId: number;
+};
+export function cityWorkTile(options: CityWorkTileOptions) {
+  const city = game.citiesManager.citiesMap.get(options.cityId);
+  const tile = game.map.tilesMap.get(options.tileId);
 
   if (!city || !tile) {
     return null;
@@ -442,9 +520,9 @@ export function cityWorkTile(data: any) {
   return cityDetailsToChannel(city);
 }
 
-export function cityUnworkTile(data: any) {
-  const city = game.citiesManager.citiesMap.get(data.cityId);
-  const tile = game.map.tilesMap.get(data.tileId);
+export function cityUnworkTile(options: CityWorkTileOptions) {
+  const city = game.citiesManager.citiesMap.get(options.cityId);
+  const tile = game.map.tilesMap.get(options.tileId);
 
   if (!city || !tile) {
     return null;
@@ -467,13 +545,21 @@ export function cityOptimizeYields(cityId: number) {
   return cityDetailsToChannel(city);
 }
 
-export function getAreaTiles(areaId: number): number[] {
+export function getAllArea(): AreaChanneled[] {
+  return Array.from(game.areasManager.areasMap.values()).map((area) => ({
+    id: area.id,
+    color: area.color,
+    tiles: Array.from(area.tiles).map(tilesToTileCoordsWithNeighbours),
+  }));
+}
+
+export function getAreaTiles(areaId: number): TilesCoordsWithNeighbours[] {
   const area = game.areasManager.areasMap.get(areaId);
   if (!area) {
     return [];
   }
 
-  return Array.from(area.tiles).map((tile) => tile.id);
+  return Array.from(area.tiles).map(tilesToTileCoordsWithNeighbours);
 }
 
 export function entityGetFailedWeakRequirements(data: any): [string, any][] {

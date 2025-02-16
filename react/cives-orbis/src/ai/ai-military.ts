@@ -8,11 +8,11 @@ export class MilitartOperation extends AiOperation {
 
 export class MilitaryAI extends AISystem {
   plan() {
-    const militaryUnits = this.player.units.filter;
+    // const militaryUnits = this.player.units.filter;
     return [];
   }
 
-  private findCityLocation(startTile: TileCore): TileCore | null {
+  public findCityLocation(startTile: TileCore): TileCore | null {
     const tiles = startTile.getTilesInRange(5);
 
     let bestSweetSpotValue = 0;

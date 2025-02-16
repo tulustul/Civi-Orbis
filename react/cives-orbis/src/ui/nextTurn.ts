@@ -1,8 +1,9 @@
 import { BehaviorSubject } from "rxjs";
 
-import { game } from "@/api";
 import { mapUi } from "./mapUi";
 import { camera } from "@/renderer/camera";
+import { bridge } from "@/bridge";
+import { PlayerTask } from "@/shared";
 
 export class NextTurnService {
   private _waiting$ = new BehaviorSubject<boolean>(false);
@@ -13,46 +14,50 @@ export class NextTurnService {
 
   autoplayEnabled = false;
 
+  nextTask: PlayerTask | null = null;
+
   constructor() {
-    game.init$.subscribe(() => {
-      let isAiOnlyMatch = true;
-      for (const player of game.state!.players) {
-        if (!player.isAi) {
-          isAiOnlyMatch = false;
-          break;
-        }
-      }
-      this._isAiOnlyMatch$.next(isAiOnlyMatch);
+    bridge.game.start$.subscribe((startInfo) => {
+      this._isAiOnlyMatch$.next(startInfo.gameInfo.aiOnly);
       this.autoplayEnabled = false;
     });
+
+    bridge.nextTask$.subscribe((nextTask) => (this.nextTask = nextTask));
   }
 
   async next() {
+    await this.executeTask(this.nextTask, { withAnimations: true });
+  }
+
+  async executeTask(
+    task: PlayerTask | null,
+    options: { withAnimations?: boolean } = {},
+  ) {
     if (this._waiting$.value) {
       return;
     }
 
-    const nextTask = game.nextTask;
-
-    if (!nextTask) {
+    if (!task) {
       this._waiting$.next(true);
-      await game.nextPlayer();
+      await bridge.game.nextPlayer();
       this._waiting$.next(false);
       return;
     }
 
-    const state = game.state!;
-
-    switch (nextTask.task) {
+    switch (task.task) {
       case "city":
-        const city = state.citiesMap.get(nextTask.id)!;
-        mapUi.selectCity(city);
+        mapUi.selectCity(task.id);
         break;
 
       case "unit":
-        const unit = state.unitsMap.get(nextTask.id)!;
-        mapUi.selectUnit(unit);
-        camera.moveToTileWithEasing(unit.tile);
+        await mapUi.selectUnit(task.id);
+        if (mapUi.selectedUnit) {
+          if (options.withAnimations) {
+            camera.moveToTileWithEasing(mapUi.selectedUnit.tile);
+          } else {
+            camera.moveToTile(mapUi.selectedUnit.tile);
+          }
+        }
         break;
     }
   }

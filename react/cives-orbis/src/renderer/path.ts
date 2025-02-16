@@ -1,3 +1,5 @@
+import { TileCoords } from "@/core/serialization/channel";
+import { mapUi } from "@/ui/mapUi";
 import {
   CanvasTextMetrics,
   Container,
@@ -5,10 +7,8 @@ import {
   Text,
   TextStyle,
 } from "pixi.js";
-import { Tile } from "../api/tile.interface";
-import { getTileCenter } from "./utils";
 import { camera } from "./camera";
-import { mapUi } from "@/ui/mapUi";
+import { getTileCenter } from "./utils";
 
 export class PathRenderer {
   pathGraphics = new Graphics();
@@ -30,7 +30,7 @@ export class PathRenderer {
     this.labels = [];
   }
 
-  buildPath(path: Tile[][] | null) {
+  buildPath(path: TileCoords[][] | null) {
     this.clear();
 
     const g = this.pathGraphics;
@@ -40,11 +40,10 @@ export class PathRenderer {
       g.visible = false;
       return;
     }
-
     g.visible = true;
 
     g.setStrokeStyle({ width: 0.1, color: 0xff0000 });
-    g.moveTo(...getTileCenter(unit.tile));
+    g.moveTo(...getTileCenter(path[0][0]));
     for (const turn of path) {
       for (const tile of turn) {
         g.lineTo(...getTileCenter(tile));

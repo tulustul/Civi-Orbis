@@ -1,4 +1,3 @@
-import { game } from "@/api";
 import { bridge } from "@/bridge";
 import {
   TileCoordsWithUnits,
@@ -18,9 +17,11 @@ export class UnitsDrawer {
   private selectedDrawer: UnitDrawer | null = null;
 
   constructor(private container: Container) {
-    game.init$.subscribe(() => this.build());
+    // bridge.game.new$.subscribe(() => this.build());
 
-    bridge.units.updated$.subscribe((unit) => this.updateUnit(unit));
+    bridge.units.updated$.subscribe((unit) => {
+      this.updateUnit(unit);
+    });
 
     bridge.units.destroyed$.subscribe((unitId) => {
       const drawer = this.units.get(unitId);
@@ -31,6 +32,9 @@ export class UnitsDrawer {
     });
 
     bridge.units.moved$.subscribe((move) => {
+      if (move.tiles.length === 0) {
+        return;
+      }
       const drawer = this.units.get(move.unitId);
       if (drawer) {
         drawer.animatePosition(move.tiles);
@@ -56,13 +60,13 @@ export class UnitsDrawer {
     });
   }
 
-  private async build() {
-    const units = await bridge.units.getAll();
-    for (const unit of units) {
-      this.makeUnitDrawer(unit);
-    }
-    this.setScale(camera.transform.scale);
-  }
+  // private async build() {
+  //   const units = await bridge.units.getAll();
+  //   for (const unit of units) {
+  //     this.makeUnitDrawer(unit);
+  //   }
+  //   this.setScale(camera.transform.scale);
+  // }
 
   private updateUnit(unit: UnitChanneled) {
     let drawer = this.units.get(unit.id);
@@ -93,15 +97,16 @@ export class UnitsDrawer {
     const drawer = new UnitDrawer(unit);
     this.container.addChild(drawer.container);
     this.units.set(unit.id, drawer);
+
+    const [unitScale, alpha] = getAlphaAndScale(camera.transform.scale);
+    drawer.container.alpha = alpha;
+    drawer.container.scale.set(unitScale);
+
     return drawer;
   }
 
   public setScale(scale: number) {
-    let alpha = 1;
-    if (scale < 20) {
-      alpha = Math.max(0, 1 - (20 - scale) / 8);
-    }
-    const unitScale = Math.pow(0.5 / TILE_SIZE / scale, 0.5);
+    const [unitScale, alpha] = getAlphaAndScale(scale);
     for (const drawer of this.units.values()) {
       drawer.container.alpha = alpha;
       drawer.container.scale.set(unitScale);
@@ -114,6 +119,15 @@ export class UnitsDrawer {
     }
     this.units.clear();
   }
+}
+
+function getAlphaAndScale(scale: number) {
+  let alpha = 1;
+  if (scale < 20) {
+    alpha = Math.max(0, 1 - (20 - scale) / 8);
+  }
+  const unitScale = Math.pow(0.5 / TILE_SIZE / scale, 0.5);
+  return [unitScale, alpha];
 }
 
 export class UnitDrawer {
@@ -149,7 +163,7 @@ export class UnitDrawer {
     this.container.interactive = true;
     this.container.on("pointerover", () => this.highlight());
     this.container.on("pointerout", () => this.dehighlight());
-    this.container.on("click", () => mapUi.selectUnit(this.unit));
+    this.container.on("click", () => mapUi.selectUnit(this.unit.id));
   }
 
   destroy() {

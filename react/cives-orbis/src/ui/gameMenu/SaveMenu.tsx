@@ -1,9 +1,9 @@
-import { game } from "@/api";
-import { saveGameData } from "@/api/saving";
+import { saveGameData } from "@/saving";
 import { useState } from "react";
 import styles from "./GameMenu.module.css";
 import { SavesList } from "./SavesList";
 import { useMenu } from "./gameMenuStore";
+import { bridge } from "@/bridge";
 
 export function SaveMenu() {
   const [saveName, setSaveName] = useState("");
@@ -11,7 +11,7 @@ export function SaveMenu() {
 
   async function save() {
     if (saveName) {
-      const data = await game.saveGame();
+      const data = await bridge.game.dump();
       saveGameData(data, saveName);
       menu.hide();
     }

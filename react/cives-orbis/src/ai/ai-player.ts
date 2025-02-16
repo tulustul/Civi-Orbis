@@ -21,7 +21,7 @@ export class AIPlayer {
 
   nextTurn() {
     // new ai
-    let operations = this.exploringAi.plan();
+    const operations = this.exploringAi.plan();
     operations.push(...this.settlingAi.plan());
     operations.push(...this.cityAi.plan());
 

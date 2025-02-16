@@ -51,7 +51,7 @@ export function exportSave(saveName: string) {
 
 export async function importSave(file: File) {
   const extension = ".json";
-  let filename = file.name;
+  const filename = file.name;
 
   if (!filename.endsWith(extension)) {
     return;

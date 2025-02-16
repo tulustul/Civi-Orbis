@@ -1,12 +1,10 @@
-import { Tile } from "../api/tile.interface";
-import { GameApi } from "src/app/api";
-import { takeUntil } from "rxjs/operators";
-import { Camera } from "./camera";
-import { drawTileSprite } from "./utils";
-import { GameRenderer } from "./renderer";
-import { GameState } from "src/app/api/state";
 import { Container, Sprite } from "pixi.js";
 import { bridge } from "react/cives-orbis/src/bridge";
+import { GameApi } from "src/app/api";
+import { Tile } from "../api/tile.interface";
+import { Camera } from "./camera";
+import { GameRenderer } from "./renderer";
+import { drawTileSprite } from "./utils";
 
 export class FogOfWarDrawer {
   private renderedTiles = new Map<Tile, Sprite>();
@@ -27,7 +25,7 @@ export class FogOfWarDrawer {
 
     bridge.player.tracked$.subscribe(() => this.bindToTrackedPlayer());
 
-    this.game.init$.subscribe((state) => {
+    bridge.game.new$.subscribe(() => {
       this.bindToTrackedPlayer();
     });
   }

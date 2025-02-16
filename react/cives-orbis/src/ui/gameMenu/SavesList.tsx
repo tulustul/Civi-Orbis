@@ -1,4 +1,4 @@
-import { deleteSaveGame, exportSave, listSaveGames } from "@/api/saving";
+import { deleteSaveGame, exportSave, listSaveGames } from "@/saving";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import styles from "./GameMenu.module.css";

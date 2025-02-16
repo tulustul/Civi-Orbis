@@ -15,13 +15,10 @@ export class InfluenceFieldEmitter<T extends Entity> {
   pressureSpreadModifier!: number;
   minInfluenceToSpread!: number;
 
-  constructor(options: InfluenceFieldEmitterOptions<T>) {
+  constructor(options: any) {
     Object.assign(this, options);
   }
 }
-
-export interface InfluenceFieldEmitterOptions<T extends Entity>
-  extends InfluenceFieldEmitter<T> {}
 
 interface TileInfluence {
   pressure: number;
@@ -33,7 +30,7 @@ export class InfluenceField<T extends Entity> {
 
   private emitters: InfluenceFieldEmitter<T>[] = [];
 
-  constructor(private map: TilesMapCore) {
+  constructor(map: TilesMapCore) {
     for (let x = 0; x < map.width; x++) {
       for (let y = 0; y < map.height; y++) {
         this.tiles.set(map.tiles[x][y], new Map());
@@ -71,13 +68,13 @@ export class InfluenceField<T extends Entity> {
     }
 
     // Calculate new pressures for all tiles.
-    for (const emitter of this.emitters) {
-    }
+    // for (const emitter of this.emitters) {
+    // }
   }
 
   private calculateInfluences() {
-    for (let x = 0; x < this.map.width; x++) {
-      for (let y = 0; y < this.map.height; y++) {}
-    }
+    // for (let x = 0; x < this.map.width; x++) {
+    //   for (let y = 0; y < this.map.height; y++) {}
+    // }
   }
 }

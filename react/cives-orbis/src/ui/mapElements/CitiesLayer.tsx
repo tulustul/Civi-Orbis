@@ -1,6 +1,7 @@
 import { bridge } from "@/bridge";
 import { CityChanneled } from "@/core/serialization/channel";
 import { camera } from "@/renderer/camera";
+import { useObservable } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import styles from "./CitiesLayer.module.css";
 import { CityInfo } from "./CityInfo";
@@ -10,16 +11,22 @@ export function CitiesLayer() {
 
   const [cities, setCities] = useState<CityChanneled[]>([]);
 
+  const gameInfo = useObservable(bridge.game.start$);
+
   useEffect(() => {
-    const subscription = bridge.cities.revealed$.subscribe((city) => {
-      setCities((c) => [...c, city]);
+    const subscription = bridge.cities.revealed$.subscribe((revealed) => {
+      setCities((c) => [...c, revealed.city]);
       setTimeout(transform);
     });
 
-    build();
-
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (gameInfo) {
+      build();
+    }
+  }, [gameInfo]);
 
   useEffect(() => {
     const subscription = camera.transform$.subscribe(transform);

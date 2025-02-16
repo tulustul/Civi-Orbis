@@ -37,7 +37,7 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
       }
     }
 
-    let [turn, actionPointsLeft, ..._] = cameFrom.get(nextTile)!;
+    let [turn, actionPointsLeft] = cameFrom.get(nextTile)!;
 
     if (!actionPointsLeft) {
       actionPointsLeft = unit.definition.actionPoints;
@@ -67,7 +67,7 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
 
         let moveCost = getMoveCost(unit, moveResult, nextTile, neighbour);
 
-        let newActionPointsLeft = Math.max(0, actionPointsLeft - moveCost);
+        const newActionPointsLeft = Math.max(0, actionPointsLeft - moveCost);
 
         moveCost *= turnCost;
 
