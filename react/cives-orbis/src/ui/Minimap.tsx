@@ -1,9 +1,9 @@
 import { camera } from "@/renderer/camera";
 import { MinimapRenderer } from "@/renderer/minimap";
 import { Application } from "pixi.js";
-import { MouseEvent, useEffect, useRef } from "react";
+import { memo, MouseEvent, useEffect, useRef } from "react";
 
-export function Minimap() {
+function Minimap_() {
   const minimapRef = useRef<MinimapRenderer>(null);
   if (!minimapRef.current) {
     minimapRef.current = new MinimapRenderer();
@@ -53,3 +53,5 @@ export function Minimap() {
     ></canvas>
   );
 }
+
+export const Minimap = memo(Minimap_);

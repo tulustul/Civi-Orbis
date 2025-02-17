@@ -53,7 +53,7 @@ export class MinimapRenderer {
 
   private mapTexture!: RenderTexture;
 
-  private tilesMap = new Map<number, Container>();
+  private tilesMap = new Map<number, Graphics>();
 
   public app!: Application;
 
@@ -132,24 +132,24 @@ export class MinimapRenderer {
     }
     this.mapTexture.destroy();
     this.mapSprite.destroy();
-    for (const container of this.tilesMap.values()) {
-      container.destroy();
+    for (const g of this.tilesMap.values()) {
+      g.destroy();
     }
     this.destroyed$.next();
     this.destroyed$.complete();
   }
 
   private hideAllTiles() {
-    for (const container of this.tilesMap.values()) {
-      container.visible = false;
+    for (const g of this.tilesMap.values()) {
+      g.visible = false;
     }
   }
 
   private reveal(tiles: TileCoords[]) {
     for (const tile of tiles) {
-      const container = this.tilesMap.get(tile.id);
-      if (container) {
-        container.visible = true;
+      const g = this.tilesMap.get(tile.id);
+      if (g) {
+        g.visible = true;
       }
     }
   }
@@ -188,6 +188,15 @@ export class MinimapRenderer {
   }
 
   private drawTile(tile: TileChanneled) {
+    let g = this.tilesMap.get(tile.id);
+    if (!g) {
+      g = new Graphics();
+      this.mapScene.addChild(g);
+      this.tilesMap.set(tile.id, g);
+    } else {
+      g.clear();
+    }
+
     let color: number;
 
     if (tile.seaLevel !== SeaLevel.none) {
@@ -198,15 +207,12 @@ export class MinimapRenderer {
       color = CLIMATE_COLORS[tile.climate];
     }
 
-    const g = new Graphics();
+    g.clear();
     g.scale.x = this.scale;
     g.scale.y = this.scale;
 
     drawHex(g, tile.x, tile.y);
     g.fill({ color });
-
-    this.mapScene.addChild(g);
-    this.tilesMap.set(tile.id, g);
 
     this.renderRivers(tile, g);
   }

@@ -28,11 +28,12 @@ import {
 import { PlayerTask, PlayerYields } from "@/shared";
 import { makeCommand, makeObservable } from "./worker";
 import { CityRevealedResult } from "@/core/collector";
+import { shareReplay } from "rxjs";
 
 export const bridge = {
   nextTask$: makeObservable<PlayerTask | null>("nextTask"),
   game: {
-    start$: makeObservable<GameStartInfo>("game.start"),
+    start$: makeObservable<GameStartInfo>("game.start").pipe(shareReplay(1)),
     turn$: makeObservable<number>("game.turn"),
     new: (options: MapGeneratorOptions) =>
       makeCommand<GameInfo>("game.new", options),
