@@ -1,3 +1,4 @@
+import { TileCore } from "@/core/tile";
 import { TileDirection } from "../shared";
 import { BaseTile } from "./tile.interface";
 
@@ -112,10 +113,10 @@ export function getDirectionTo(
   return TileDirection.NONE;
 }
 
-export function getTilesInRange(tile: BaseTile, range: number): Set<BaseTile> {
-  const result = new Set<BaseTile>([tile]);
+export function getTilesInRange(tile: TileCore, range: number): Set<TileCore> {
+  const result = new Set<TileCore>([tile]);
   for (let i = 0; i < range; i++) {
-    const neighbours = new Set<BaseTile>();
+    const neighbours = new Set<TileCore>();
     for (const tile of result) {
       for (const neighbour of (tile as any).neighbours) {
         // TODO fix typing

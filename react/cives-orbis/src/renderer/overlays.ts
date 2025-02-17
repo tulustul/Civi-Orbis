@@ -44,23 +44,21 @@ export class OverlaysRenderer {
   }
 
   buildHoveredTileGraphics() {
-    this.hoveredTileGraphics.setStrokeStyle({
+    drawClosedHex(this.hoveredTileGraphics);
+    this.hoveredTileGraphics.fill({ color: 0xffffff, alpha: 0.1 }).stroke({
       width: 0.02,
       color: 0xffffff,
       alpha: 0.5,
     });
-    drawClosedHex(this.hoveredTileGraphics);
-    this.hoveredTileGraphics.fill({ color: 0xffffff, alpha: 0.1 });
   }
 
   buildSelectedTileGraphics() {
-    this.selectedTileGraphics.setStrokeStyle({
+    drawClosedHex(this.selectedTileGraphics);
+    this.selectedTileGraphics.stroke({
       width: 0.05,
       color: 0xff0000,
       alpha: 0.5,
     });
-    drawClosedHex(this.selectedTileGraphics);
-    this.selectedTileGraphics.fill({ color: 0xffffff, alpha: 0.1 });
   }
 
   buildHighlightedTiles(tiles: Set<TileCoords>) {

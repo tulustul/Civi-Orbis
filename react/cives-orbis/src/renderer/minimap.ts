@@ -189,12 +189,12 @@ export class MinimapRenderer {
 
   private drawTile(tile: TileChanneled) {
     let g = this.tilesMap.get(tile.id);
-    if (!g) {
+    if (g) {
+      g.clear();
+    } else {
       g = new Graphics();
       this.mapScene.addChild(g);
       this.tilesMap.set(tile.id, g);
-    } else {
-      g.clear();
     }
 
     let color: number;

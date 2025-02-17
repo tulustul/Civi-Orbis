@@ -23,7 +23,6 @@ import {
   CityDetailsChanneled,
   cityDetailsToChannel,
   cityToChannel,
-  GameInfo,
   GameStartInfo,
   gameToGameStartInfo,
   TileChanneled,
@@ -43,6 +42,7 @@ import { UnitOrder } from "./core/unit";
 import { UnitAction } from "./core/unit-actions";
 import { RealisticMapGenerator } from "./map-generators/realistic";
 import { BaseTile, PlayerTask } from "./shared";
+import { getTilesInRange } from "./shared/hex-math";
 
 let game: Game;
 
@@ -74,6 +74,7 @@ const HANDLERS = {
   "tile.getAllVisible": tileGetAllVisible,
   "tile.getAllExplored": tileGetAllExplored,
   "tile.getDetails": tileGetDetails,
+  "tile.getInRange": tileGetInRange,
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
   "tile.setResource": tileSetResource,
@@ -395,35 +396,78 @@ export function tileGetDetails(tileId: number): TileDetailsChanneled | null {
   return tileDetailsToChannel(tile, game.trackedPlayer);
 }
 
-export function tileUpdate(tile: Partial<BaseTile>) {
-  const tileCore = game.map.tilesMap.get(tile.id!);
-  if (!tileCore) {
+export type TileGetInRangeOptions = {
+  tileId: number;
+  range: number;
+};
+export function tileGetInRange(
+  options: TileGetInRangeOptions,
+): TilesCoordsWithNeighbours[] {
+  const tile = game.map.tilesMap.get(options.tileId);
+  if (!tile) {
+    return [];
+  }
+  return Array.from(getTilesInRange(tile, options.range)).map(
+    tilesToTileCoordsWithNeighbours,
+  );
+}
+
+export type TileUpdateOptions = { id: number } & Partial<
+  Pick<
+    BaseTile,
+    | "climate"
+    | "landForm"
+    | "seaLevel"
+    | "riverParts"
+    | "forest"
+    | "wetlands"
+    | "improvement"
+    | "road"
+  >
+>;
+export function tileUpdate(options: TileUpdateOptions) {
+  const tile = game.map.tilesMap.get(options.id);
+  if (!tile) {
     return;
   }
 
-  Object.assign(tileCore, tile);
-  tileCore.update();
+  console.log({ options, tile });
+  if (options.road !== undefined && options.road !== tile.road) {
+    for (const n of tile.neighbours) {
+      collector.tiles.add(n);
+    }
+  }
+
+  Object.assign(tile, options);
+  tile.update();
+
+  console.log(collector.tiles);
 }
 
-export function tileBulkUpdate(tiles: Partial<BaseTile>[]) {
+export function tileBulkUpdate(tiles: TileUpdateOptions[]) {
   for (const tile of tiles) {
     tileUpdate(tile);
   }
 }
 
-export function tileSetResource(data: any) {
-  const tile = game.map.tilesMap.get(data.tileId);
+export type TileSetResourceOptions = {
+  tileId: number;
+  resourceId: string | null;
+  quantity: number;
+};
+export function tileSetResource(options: TileSetResourceOptions) {
+  const tile = game.map.tilesMap.get(options.tileId);
   if (!tile) {
     return;
   }
 
   let resource: ResourceDefinition | null = null;
-  if (data.resourceId) {
-    resource = getResourceDefinitionById(data.resourceId);
+  if (options.resourceId) {
+    resource = getResourceDefinitionById(options.resourceId);
   }
 
   if (resource) {
-    tile.resource = new ResourceCore(resource, tile, data.quantity);
+    tile.resource = new ResourceCore(resource, tile, options.quantity);
   } else {
     tile.resource = null;
   }

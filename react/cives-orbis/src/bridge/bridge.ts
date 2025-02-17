@@ -3,6 +3,9 @@ import {
   CityProduceOptions,
   CityWorkTileOptions,
   MapGeneratorOptions,
+  TileGetInRangeOptions,
+  TileSetResourceOptions,
+  TileUpdateOptions,
   UnitDoActionOptions,
   UnitFindPathOptions,
   UnitGetFailedActionRequirementsOptions,
@@ -63,6 +66,14 @@ export const bridge = {
     getAllVisible: () => makeCommand<TileCoords[]>("tile.getAllVisible"),
     getDetails: (tileId: number) =>
       makeCommand<TileDetailsChanneled>("tile.getDetails", tileId),
+    getInRange: (options: TileGetInRangeOptions) =>
+      makeCommand<TilesCoordsWithNeighbours[]>("tile.getInRange", options),
+    update: (options: TileUpdateOptions) =>
+      makeCommand<void>("tile.update", options),
+    bulkUpdate: (options: TileUpdateOptions[]) =>
+      makeCommand<void>("tile.bulkUpdate", options),
+    setResource: (options: TileSetResourceOptions) =>
+      makeCommand<void>("tile.setResource", options),
   },
   units: {
     updated$: makeObservable<UnitChanneled>("unit.updated"),

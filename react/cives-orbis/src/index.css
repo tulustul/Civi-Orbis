@@ -1,19 +1,19 @@
 :root {
   --tile-size: 256px;
 
-  --color-primary-0: #9491a6; /* Main Primary color */
+  --color-primary-0: #9491a6;
   --color-primary-1: #636078;
   --color-primary-2: #514e64;
   --color-primary-3: #3c3a4a;
   --color-primary-4: #22212b;
 
-  --color-secondary-1-0: #886892; /* Main Secondary color (1) */
+  --color-secondary-1-0: #886892;
   --color-secondary-1-1: #6d5973;
   --color-secondary-1-2: #5a485f;
   --color-secondary-1-3: #433546;
   --color-secondary-1-4: #261e29;
 
-  --color-secondary-2-0: #54676c; /* Main Secondary color (2) */
+  --color-secondary-2-0: #54676c;
   --color-secondary-2-1: #445559;
   --color-secondary-2-2: #323f42;
   --color-secondary-2-3: #1c2426;

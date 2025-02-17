@@ -6,6 +6,7 @@ import { MapMode } from "./ui/MapMode";
 import { useUiState } from "./ui/uiState";
 import { GameMenu, useMenu } from "./ui/gameMenu";
 import { CitiesLayer } from "./ui/mapElements/CitiesLayer";
+import { EditorMode } from "./ui/EditorMode";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -30,19 +31,20 @@ function App() {
   }
 
   function getContent() {
-    if (uiState.mode === "map") {
-      return <MapMode />;
+    if (uiState.mode === "none") {
+      return null;
     }
 
-    if (uiState.mode === "editor") {
-      return getEditorMode();
-    }
-
-    return null;
-  }
-
-  function getEditorMode() {
-    return null;
+    return (
+      <>
+        <div
+          style={{ visibility: uiState.mode === "map" ? "visible" : "hidden" }}
+        >
+          <MapMode />
+        </div>
+        {uiState.mode === "editor" && <EditorMode />}
+      </>
+    );
   }
 
   return (

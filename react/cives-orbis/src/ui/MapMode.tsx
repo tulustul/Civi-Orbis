@@ -7,6 +7,7 @@ import { UnitPanel } from "./UnitPanel";
 import { useObservable } from "@/utils";
 import { mapUi } from "./mapUi";
 import { CityView } from "./city";
+import { Toolbar } from "./Toolbar";
 
 export function MapMode() {
   const city = useObservable(mapUi.selectedCity$);
@@ -18,6 +19,10 @@ export function MapMode() {
         <Panel corner="bottom-right" className={styles.minimap}>
           <NextTurnButton />
           <Minimap />
+        </Panel>
+
+        <Panel corner="top-right">
+          <Toolbar />
         </Panel>
 
         <UnitPanel />

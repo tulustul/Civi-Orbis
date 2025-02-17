@@ -63,13 +63,11 @@ const FOREST_TEXTURES: Record<Climate, string> = {
 };
 
 export class MapDrawer {
-  yieldsContainer = new Container({ label: "yields", isRenderGroup: true });
-  terrainContainer = new Container({ label: "terrain", isRenderGroup: true });
+  terrainContainer = new Container({ label: "terrain" });
 
   tilesById = new Map<number, TileChanneled>();
   tileContainers = new Map<number, Container>();
   // Yields are not using per tile container but use a separate container for easy toggling.
-  tileYields = new Map<number, Graphics>();
 
   politicsDrawer!: PoliticsDrawer;
 
@@ -78,8 +76,6 @@ export class MapDrawer {
 
   constructor(private container: Container) {
     container.addChild(this.terrainContainer);
-    container.addChild(this.yieldsContainer);
-    this.yieldsContainer.zIndex = 10;
 
     bridge.tiles.updated$.subscribe((tiles) => {
       for (const tile of tiles) {
@@ -95,9 +91,7 @@ export class MapDrawer {
   clear() {
     this.politicsDrawer.clear();
     this.terrainContainer.removeChildren();
-    this.yieldsContainer.removeChildren();
     this.tileContainers.clear();
-    this.tileYields.clear();
   }
 
   private async build() {
@@ -125,17 +119,7 @@ export class MapDrawer {
 
   private clearTile(tile: TileChanneled) {
     const container = this.tileContainers.get(tile.id);
-    if (container) {
-      for (const child of container.children) {
-        child.destroy();
-      }
-    }
-
-    const yieldsGraphics = this.tileYields.get(tile.id);
-    if (yieldsGraphics) {
-      yieldsGraphics.destroy();
-    }
-
+    container?.removeChildren();
     return container;
   }
 
@@ -146,7 +130,7 @@ export class MapDrawer {
     this.drawRoads(tile, container);
     this.drawCity(tile, container);
     this.drawRiver(tile, container);
-    this.drawYields(tile);
+    this.drawYields(tile, container);
   }
 
   private drawTerrain(tile: TileChanneled, container: Container) {
@@ -279,19 +263,16 @@ export class MapDrawer {
     g.stroke();
   }
 
-  private drawYields(tile: TileChanneled) {
+  private drawYields(tile: TileChanneled, container: Container) {
     const g = new Graphics();
 
     g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
-    g.position.y = tile.y * 0.75;
+    g.position.y = tile.y * 0.75 - 0.35;
 
     this.drawYield(g, 0.55, tile.yields.food, 0x00ff00);
     this.drawYield(g, 0.65, tile.yields.production, 0xffaa00);
 
-    this.yieldsContainer.addChild(g);
-    this.tileYields.set(tile.id, g);
-
-    return [g];
+    container.addChild(g);
   }
 
   private drawYield(g: Graphics, y: number, quantity: number, color: number) {

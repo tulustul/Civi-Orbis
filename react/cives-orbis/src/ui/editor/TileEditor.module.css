@@ -1,0 +1,6 @@
+.tile {
+  display: flex;
+}
+.tile > * {
+  margin-right: 50px;
+}

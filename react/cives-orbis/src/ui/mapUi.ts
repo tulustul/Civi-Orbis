@@ -57,6 +57,19 @@ export class MapUi {
   allowMapPanning = true;
 
   constructor() {
+    bridge.tiles.updated$.subscribe(async (tiles) => {
+      const selectedTile = this._selectedTile$.value;
+      if (selectedTile) {
+        const newSelectedTile = tiles.find(
+          (tile) => tile.id === selectedTile.id,
+        );
+        if (newSelectedTile) {
+          const tileDetails = await bridge.tiles.getDetails(newSelectedTile.id);
+          this._selectedTile$.next(tileDetails);
+        }
+      }
+    });
+
     this.clickedTile$.subscribe(async (tile) => {
       const tileDetails = await bridge.tiles.getDetails(tile.id);
       if (!tileDetails) {
