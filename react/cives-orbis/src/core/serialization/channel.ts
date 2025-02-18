@@ -120,6 +120,7 @@ export interface CityDetailsChanneled {
 export interface PlayerChanneled {
   id: number;
   color: number;
+  cssColor: string;
   areaId: number;
   isAi: boolean;
 }
@@ -149,6 +150,7 @@ export interface UnitChanneled {
   health: number;
   supplies: number;
   playerId: number;
+  canControl: boolean;
 }
 
 export type UnitDetailsChanneled = {
@@ -348,6 +350,7 @@ export function playerToChannel(player: PlayerCore): PlayerChanneled {
   return {
     id: player.id,
     color: player.color,
+    cssColor: player.cssColor,
     areaId: player.area.id,
     isAi: !!player.ai,
   };
@@ -381,6 +384,7 @@ export function unitToChannel(unit: UnitCore): UnitChanneled {
     supplies: unit.supplies,
     actionPointsLeft: unit.actionPointsLeft,
     playerId: unit.player.id,
+    canControl: unit.player === unit.player.game.trackedPlayer,
     actions:
       unit.actionPointsLeft === unit.definition.actionPoints
         ? "all"

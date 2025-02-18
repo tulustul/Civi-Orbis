@@ -17,8 +17,6 @@ export class UnitsDrawer {
   private selectedDrawer: UnitDrawer | null = null;
 
   constructor(private container: Container) {
-    // bridge.game.new$.subscribe(() => this.build());
-
     bridge.units.updated$.subscribe((unit) => {
       this.updateUnit(unit);
     });
@@ -172,19 +170,24 @@ export class UnitDrawer {
 
   updateUi() {
     this.g.clear();
-    this.g
-      .circle(-35, -35, 8)
-      .stroke({ width: 4, color: 0x000000 })
-      .fill(this.getStatusColor());
+
+    if (this.unit.canControl) {
+      this.g
+        .circle(-35, -35, 8)
+        .stroke({ width: 4, color: 0x000000 })
+        .fill(this.getStatusColor());
+    }
   }
 
   private updatePosition() {
+    this.updateZIndex();
     const [x, y] = this.tileToUnitPosition(this.unit.tile);
     this.container.x = x;
     this.container.y = y;
   }
 
   correctPosition() {
+    this.updateZIndex();
     Animations.run({
       from: [this.container.x, this.container.y],
       to: this.tileToUnitPosition(this.unit.tile),
@@ -232,7 +235,7 @@ export class UnitDrawer {
   }
 
   highlight() {
-    if (this.isSelected) {
+    if (this.isSelected || !this.unit.canControl) {
       return;
     }
     this.container.filters = [UnitDrawer.highlightFilter];
@@ -247,14 +250,19 @@ export class UnitDrawer {
 
   select() {
     this.isSelected = true;
-    this.container.zIndex = 1;
+    this.updateZIndex();
+    this.container.zIndex += 1000;
     this.container.filters = [UnitDrawer.selectionFilter];
   }
 
   deselect() {
     this.isSelected = false;
     this.container.filters = [];
-    this.container.zIndex = 0;
+    this.updateZIndex();
+  }
+
+  updateZIndex() {
+    this.container.zIndex = this.unit.tile.units.indexOf(this.unit.id);
   }
 
   tileToUnitPosition(
@@ -265,7 +273,7 @@ export class UnitDrawer {
 
     if (!ignoreOthers && tile.units.length > 1) {
       const index = tile.units.indexOf(this.unit.id);
-      x += (index - (tile.units.length - 1) / 2) * 0.3;
+      x += ((index - (tile.units.length - 1) / 2) / tile.units.length) * 0.8;
     }
 
     return [x, (tile.y + 0.75) * 0.75];

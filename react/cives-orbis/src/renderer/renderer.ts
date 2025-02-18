@@ -100,15 +100,15 @@ export class GameRenderer {
     this.unitsAndCitiesContainer.zIndex = 1000;
 
     this.unitsAndCitiesContainer.filters = [
-      // new MaskFilter({
-      //   sprite: this.fogOfWarLayer.sprite,
-      // }),
+      new MaskFilter({
+        sprite: this.fogOfWarLayer.sprite,
+      }),
     ];
     this.mapLayer.sprite.filters = [
-      // new MaskFilter({
-      //   sprite: this.exploredTilesLayer.sprite,
-      // }),
-      // new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
+      new MaskFilter({
+        sprite: this.exploredTilesLayer.sprite,
+      }),
+      new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
     ];
 
     this.grid = new Grid();

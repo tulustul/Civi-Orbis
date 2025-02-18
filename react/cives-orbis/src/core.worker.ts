@@ -25,6 +25,7 @@ import {
   cityToChannel,
   GameStartInfo,
   gameToGameStartInfo,
+  playerToChannel,
   TileChanneled,
   TileDetailsChanneled,
   tileDetailsToChannel,
@@ -52,6 +53,7 @@ const HANDLERS = {
   "game.load": loadHandler,
   "game.nextPlayer": nextPlayerHandler,
   "game.getInfo": getGameInfo,
+  "game.getAllPlayers": getAllPlayers,
 
   "trackedPlayer.revealWorld": revealWorld,
   "trackedPlayer.set": setTrackedPlayer,
@@ -191,6 +193,10 @@ function newGameHandler(options: MapGeneratorOptions): GameStartInfo {
 
 function getGameInfo() {
   return gameToGameStartInfo(game);
+}
+
+function getAllPlayers() {
+  return game.players.map(playerToChannel);
 }
 
 function dumpHandler(): string {

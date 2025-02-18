@@ -1,4 +1,7 @@
+import { TileImprovement } from "@/core/tile-improvements";
+import { Climate, LandForm, SeaLevel } from "@/shared";
 import { Option, Radio } from "@/ui/components";
+import { useEffect, useRef, useState } from "react";
 import {
   CLIMATE_OPTIONS,
   FOREST_OPTIONS,
@@ -7,17 +10,17 @@ import {
   SEA_LEVEL_OPTIONS,
   WETLANDS_OPTIONS,
 } from "./constants";
-import { Climate, LandForm, SeaLevel } from "@/shared";
-import { TileImprovement } from "@/core/tile-improvements";
-import { useEffect, useState } from "react";
 
-import styles from "./TilePainter.module.css";
-import { useObservable } from "@/utils";
-import { mapUi } from "../mapUi";
-import { renderer } from "@/renderer/renderer";
-import { TilesCoordsWithNeighbours } from "@/core/serialization/channel";
 import { bridge } from "@/bridge";
+import {
+  TileCoords,
+  TilesCoordsWithNeighbours,
+} from "@/core/serialization/channel";
 import { controls } from "@/renderer/controls";
+import { renderer } from "@/renderer/renderer";
+import { useSubscription } from "@/utils";
+import { mapUi } from "../mapUi";
+import styles from "./TilePainter.module.css";
 
 type PaintData = {
   size: number;
@@ -74,18 +77,41 @@ export function TilesPainter() {
   const [paintData, setPaintData] = useState<PaintData>({
     ...DEFAULT_PAINT_DATA,
   });
-
-  const hoveredTile = useObservable(mapUi.hoveredTile$);
+  const paintDataRef = useRef(paintData);
+  const hoveredTileRef = useRef<TileCoords | null>(null);
 
   useEffect(() => {
-    onHover();
-  }, [hoveredTile]);
+    paintDataRef.current = paintData;
+  }, [paintData]);
 
-  async function onHover() {
+  useSubscription(mapUi.hoveredTile$, onHover);
+
+  useSubscription(controls.mouseButton$, onMouseButton);
+
+  async function onMouseButton(button: number | null) {
+    if (!hoveredTileRef.current) {
+      return;
+    }
+
+    if (button === 2) {
+      const tiles = await bridge.tiles.getInRange({
+        tileId: hoveredTileRef.current.id,
+        range: paintDataRef.current.size - 1,
+      });
+
+      paint(tiles);
+    }
+  }
+
+  async function onHover(hoveredTile: TileCoords | null) {
+    hoveredTileRef.current = hoveredTile;
+
     if (!hoveredTile) {
       renderer.areaDrawer.editorArea.clear();
       return;
     }
+
+    const paintData = paintDataRef.current;
 
     const tiles = await bridge.tiles.getInRange({
       tileId: hoveredTile.id,
@@ -99,9 +125,7 @@ export function TilesPainter() {
   }
 
   function paint(tiles: TilesCoordsWithNeighbours[]) {
-    if (!hoveredTile) {
-      return;
-    }
+    const paintData = paintDataRef.current;
 
     const filteredPaintData = Object.fromEntries(
       Object.entries(paintData).filter(

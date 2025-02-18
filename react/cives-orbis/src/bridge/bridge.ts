@@ -20,6 +20,7 @@ import {
   CityDetailsChanneled,
   GameInfo,
   GameStartInfo,
+  PlayerChanneled,
   TileChanneled,
   TileCoords,
   TileDetailsChanneled,
@@ -44,6 +45,7 @@ export const bridge = {
     load: (data: string) => makeCommand<GameInfo>("game.load", data),
     nextPlayer: () => makeCommand<void>("game.nextPlayer"),
     getInfo: () => makeCommand<GameStartInfo>("game.getInfo"),
+    getAllPlayers: () => makeCommand<PlayerChanneled[]>("game.getAllPlayers"),
   },
   player: {
     tracked$: makeObservable<number>("trackedPlayer.set"),
