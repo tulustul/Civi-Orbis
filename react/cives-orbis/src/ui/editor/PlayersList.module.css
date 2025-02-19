@@ -1,0 +1,21 @@
+.playersList {
+  overflow-y: auto;
+}
+.item {
+  display: flex;
+  margin-bottom: 5px;
+  padding: 5px;
+  cursor: pointer;
+}
+.item > * {
+  margin-right: 15px;
+}
+.item.selected {
+  background-color: var(--color-primary-4);
+}
+.colorBox {
+  width: 30px;
+  min-width: 30px;
+  border-radius: 4px;
+  height: 30px;
+}

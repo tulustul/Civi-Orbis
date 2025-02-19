@@ -232,7 +232,14 @@ function setTrackedPlayer(playerId: number) {
 
   game.trackedPlayer = player;
 
-  return trackedPlayerToChannel(game.trackedPlayer);
+  const data = trackedPlayerToChannel(game.trackedPlayer);
+
+  collector.changes.push({
+    type: "trackedPlayer.changed",
+    data,
+  });
+
+  return data;
 }
 
 function getSuppliedTiles(playerId: number): TilesCoordsWithNeighbours[] {

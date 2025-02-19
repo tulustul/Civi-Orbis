@@ -48,13 +48,15 @@ export const bridge = {
     getAllPlayers: () => makeCommand<PlayerChanneled[]>("game.getAllPlayers"),
   },
   player: {
-    tracked$: makeObservable<number>("trackedPlayer.set"),
+    tracked$: makeObservable<number>("trackedPlayer.changed"),
     yields$: makeObservable<PlayerYields>("trackedPlayer.yields"),
     getSuppliedTiles: (playerId: number) =>
       makeCommand<TilesCoordsWithNeighbours[]>(
         "player.getSuppliedTiles",
         playerId,
       ),
+    trackPlayer: (playerId: number) =>
+      makeCommand<PlayerChanneled>("trackedPlayer.set", playerId),
   },
   tiles: {
     updated$: makeObservable<TileChanneled[]>("tiles.updated"),
