@@ -1,15 +1,26 @@
-import { Tab, Tabs } from "@/ui/components";
+import { Switch, Tab, Tabs } from "@/ui/components";
 import { useUiState } from "../uiState";
 
+import { useObservable } from "@/utils";
+import { mapUi } from "../mapUi";
+import { CitiesEditor } from "./CitiesEditor";
 import styles from "./Editor.module.css";
+import { PlayersEditor } from "./PlayersEditor";
 import { TileEditor } from "./TileEditor";
 import { TilesPainter } from "./TilesPainter";
 import { UnitsPainter } from "./UnitsPainter";
-import { CitiesEditor } from "./CitiesEditor";
-import { PlayersEditor } from "./PlayersEditor";
+import { useEffect } from "react";
 
 export function Editor() {
+  const fogOfWarEnabled = useObservable(mapUi.fogOfWarEnabled$);
+
   const uiState = useUiState();
+
+  useEffect(() => {
+    return () => {
+      mapUi.fogOfWarEnabled = true;
+    };
+  }, []);
 
   return (
     <div className={styles.editor}>
@@ -31,8 +42,17 @@ export function Editor() {
         </Tab>
       </Tabs>
 
-      <div className={styles.closeWrapper}>
-        <button onClick={() => uiState.setMode("map")}>Close</button>
+      <div className={styles.options}>
+        <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <Switch
+              label="Fog of war"
+              checked={fogOfWarEnabled ?? true}
+              onChange={() => (mapUi.fogOfWarEnabled = !fogOfWarEnabled)}
+            />
+          </div>
+          <button onClick={() => uiState.setMode("map")}>Close</button>
+        </div>
       </div>
     </div>
   );

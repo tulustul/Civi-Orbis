@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import { loadAssets } from "./renderer/assets";
 import { GameCanvas } from "./ui/GameCanvas";
 import { MapMode } from "./ui/MapMode";
@@ -7,6 +6,8 @@ import { useUiState } from "./ui/uiState";
 import { GameMenu, useMenu } from "./ui/gameMenu";
 import { CitiesLayer } from "./ui/mapElements/CitiesLayer";
 import { EditorMode } from "./ui/EditorMode";
+
+import styles from "./App.module.css";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -36,14 +37,12 @@ function App() {
     }
 
     return (
-      <>
-        <div
-          style={{ visibility: uiState.mode === "map" ? "visible" : "hidden" }}
-        >
+      <div className={styles.wrapper}>
+        <div className={styles.mapMode}>
           <MapMode />
         </div>
         {uiState.mode === "editor" && <EditorMode />}
-      </>
+      </div>
     );
   }
 

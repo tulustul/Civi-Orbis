@@ -19,6 +19,7 @@ import { FogOfWarFilter } from "./filters/fog-of-war-filter";
 import { UnitsDrawer } from "./unitsDrawer";
 import { animationsManager } from "./animation";
 import { AreasDrawer } from "./areasDrawer";
+import { mapUi } from "@/ui/mapUi";
 
 export class GameRenderer {
   app!: Application;
@@ -53,6 +54,12 @@ export class GameRenderer {
 
   private _tick$ = new Subject<void>();
   tick$ = this._tick$.asObservable();
+
+  constructor() {
+    mapUi.fogOfWarEnabled$.subscribe(() => {
+      this.updateForOfWarEnabled();
+    });
+  }
 
   async setCanvas(canvas: HTMLCanvasElement) {
     if (this.app) {
@@ -99,18 +106,6 @@ export class GameRenderer {
     this.mapContainer.addChild(this.unitsAndCitiesContainer);
     this.unitsAndCitiesContainer.zIndex = 1000;
 
-    this.unitsAndCitiesContainer.filters = [
-      new MaskFilter({
-        sprite: this.fogOfWarLayer.sprite,
-      }),
-    ];
-    this.mapLayer.sprite.filters = [
-      new MaskFilter({
-        sprite: this.exploredTilesLayer.sprite,
-      }),
-      new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
-    ];
-
     this.grid = new Grid();
     this.mapLayer.stage.addChild(this.grid.sprite);
 
@@ -131,6 +126,8 @@ export class GameRenderer {
       this.overlaysContainer.updateTransform(transform);
       this.fogOfWarLayer.stage.updateTransform(transform);
       this.exploredTilesLayer.stage.updateTransform(transform);
+
+      this.updateForOfWarEnabled();
     });
 
     this.app.ticker.add(() => {
@@ -188,6 +185,25 @@ export class GameRenderer {
     this.visibleTilesDrawer.clear();
     this.unitsDrawer.clear();
     // this.citiesDrawer.clear();
+  }
+
+  updateForOfWarEnabled() {
+    if (mapUi.fogOfWarEnabled) {
+      this.unitsAndCitiesContainer.filters = [
+        new MaskFilter({
+          sprite: this.fogOfWarLayer.sprite,
+        }),
+      ];
+      this.mapLayer.sprite.filters = [
+        new MaskFilter({
+          sprite: this.exploredTilesLayer.sprite,
+        }),
+        new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
+      ];
+    } else {
+      this.unitsAndCitiesContainer.filters = [];
+      this.mapLayer.sprite.filters = [];
+    }
   }
 }
 

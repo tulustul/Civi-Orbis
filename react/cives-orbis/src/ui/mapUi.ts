@@ -54,6 +54,12 @@ export class MapUi {
   private _cityLabelsVisible$ = new BehaviorSubject<boolean>(true);
   cityLabelsVisible$ = this._cityLabelsVisible$.pipe(distinctUntilChanged());
 
+  private _fogOfWarEnabled$ = new BehaviorSubject<boolean>(true);
+  fogOfWarEnabled$ = this._fogOfWarEnabled$.pipe(distinctUntilChanged());
+
+  private _gridEnabled$ = new BehaviorSubject<boolean>(true);
+  gridEnabled$ = this._gridEnabled$.pipe(distinctUntilChanged());
+
   allowMapPanning = true;
 
   constructor() {
@@ -211,6 +217,20 @@ export class MapUi {
 
   get selectedCity() {
     return this._selectedCity$.value;
+  }
+
+  get fogOfWarEnabled() {
+    return this._fogOfWarEnabled$.value;
+  }
+  set fogOfWarEnabled(enabled: boolean) {
+    this._fogOfWarEnabled$.next(enabled);
+  }
+
+  get gridEnabled() {
+    return this._gridEnabled$.value;
+  }
+  set gridEnabled(enabled: boolean) {
+    this._gridEnabled$.next(enabled);
   }
 
   clear() {

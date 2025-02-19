@@ -21,6 +21,7 @@ import { renderer } from "@/renderer/renderer";
 import { useSubscription } from "@/utils";
 import { mapUi } from "../mapUi";
 import styles from "./TilePainter.module.css";
+import { useStateRef } from "@/utils/useStateRef";
 
 type PaintData = {
   size: number;
@@ -74,15 +75,10 @@ const DEFAULT_PAINT_DATA: PaintData = {
 };
 
 export function TilesPainter() {
-  const [paintData, setPaintData] = useState<PaintData>({
+  const [paintData, setPaintData, paintDataRef] = useStateRef<PaintData>({
     ...DEFAULT_PAINT_DATA,
   });
-  const paintDataRef = useRef(paintData);
   const hoveredTileRef = useRef<TileCoords | null>(null);
-
-  useEffect(() => {
-    paintDataRef.current = paintData;
-  }, [paintData]);
 
   useSubscription(mapUi.hoveredTile$, onHover);
 

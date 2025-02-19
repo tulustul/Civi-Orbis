@@ -6,3 +6,4 @@ export * from "./Tabs";
 export * from "./Radio";
 export * from "./Multiselect";
 export * from "./types";
+export * from "./Switch";

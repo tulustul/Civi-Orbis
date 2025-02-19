@@ -8,6 +8,7 @@ import { useObservable } from "@/utils";
 import { mapUi } from "./mapUi";
 import { CityView } from "./city";
 import { Toolbar } from "./Toolbar";
+import { MapSettings } from "./MapSettings";
 
 export function MapMode() {
   const city = useObservable(mapUi.selectedCity$);
@@ -15,17 +16,29 @@ export function MapMode() {
   return (
     <>
       {city && <CityView city={city} />}
-      <div style={{ visibility: city ? "hidden" : "visible" }}>
-        <Panel corner="bottom-right" className={styles.minimap}>
-          <NextTurnButton />
-          <Minimap />
-        </Panel>
+      <div
+        className={styles.layout}
+        style={{ visibility: city ? "hidden" : "visible" }}
+      >
+        <div className={styles.minimap}>
+          <MapSettings />
+          <Panel corner="bottom-right">
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <NextTurnButton />
+              <Minimap />
+            </div>
+          </Panel>
+        </div>
 
-        <Panel corner="top-right">
-          <Toolbar />
-        </Panel>
+        <div className={styles.toolbar}>
+          <Panel corner="top-right">
+            <Toolbar />
+          </Panel>
+        </div>
 
-        <UnitPanel />
+        <div className={styles.unit}>
+          <UnitPanel />
+        </div>
       </div>
     </>
   );

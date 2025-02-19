@@ -11,29 +11,21 @@
   border-color: var(--color-primary-0);
   border-width: 3px;
   z-index: 10;
-  position: absolute;
+  pointer-events: all;
 }
 .bottom-right {
   border-radius: var(--border-radius) 0 0 0;
   border-width: 3px 0 0 3px;
-  right: 0;
-  bottom: 0;
 }
 .bottom-left {
   border-radius: 0 var(--border-radius) 0 0;
   border-width: 3px 3px 0 0;
-  left: 0;
-  bottom: 0;
 }
 .top-right {
   border-radius: 0 0 0 var(--border-radius);
   border-width: 0 0 3px 3px;
-  top: 0;
-  right: 0;
 }
 .top-left {
   border-radius: 0 0 var(--border-radius) 0;
   border-width: 0 3px 3px 0;
-  top: 0;
-  left: 0;
 }
