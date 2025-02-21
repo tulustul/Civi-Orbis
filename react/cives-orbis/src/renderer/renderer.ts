@@ -3,6 +3,8 @@ import {
   Container,
   MaskFilter,
   UpdateTransformOptions,
+  RenderLayer,
+  IRenderLayer,
 } from "pixi.js";
 
 import { Subject } from "rxjs";
@@ -36,6 +38,7 @@ export class GameRenderer {
   path!: PathRenderer;
 
   mapLayer!: Layer;
+  yieldsLayer!: IRenderLayer;
 
   fogOfWarLayer!: Layer;
 
@@ -58,6 +61,14 @@ export class GameRenderer {
   constructor() {
     mapUi.fogOfWarEnabled$.subscribe(() => {
       this.updateForOfWarEnabled();
+    });
+
+    mapUi.yieldsEnabled$.subscribe((enabled) => {
+      if (enabled) {
+        this.mapLayer.stage.addChild(this.yieldsLayer);
+      } else {
+        this.mapLayer.stage.removeChild(this.yieldsLayer);
+      }
     });
   }
 
@@ -86,8 +97,9 @@ export class GameRenderer {
     this.mapLayer = new Layer(this.app, "mapLayer");
     this.fogOfWarLayer = new Layer(this.app, "fogOfWarLayer");
     this.exploredTilesLayer = new Layer(this.app, "visibleTilesLayer");
+    this.yieldsLayer = new RenderLayer();
 
-    this.mapDrawer = new MapDrawer(this.mapLayer.stage);
+    this.mapDrawer = new MapDrawer(this.mapLayer.stage, this.yieldsLayer);
 
     this.fogOfWarDrawer = new FogOfWarDrawer(this.fogOfWarLayer.stage);
     this.visibleTilesDrawer = new ExploredTilesDrawer(
@@ -108,6 +120,7 @@ export class GameRenderer {
 
     this.grid = new Grid();
     this.mapLayer.stage.addChild(this.grid.sprite);
+    this.mapLayer.stage.addChild(this.yieldsLayer);
 
     camera.transform$.subscribe((t) => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;

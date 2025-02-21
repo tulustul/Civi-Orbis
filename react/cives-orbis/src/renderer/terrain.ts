@@ -3,7 +3,7 @@ import { TileChanneled } from "@/core/serialization/channel";
 import { TileImprovement } from "@/core/tile-improvements";
 import { Climate, LandForm, SeaLevel, TileDirection } from "@/shared";
 import { measureTime } from "@/utils";
-import { Container, Graphics, Sprite } from "pixi.js";
+import { Container, Graphics, IRenderLayer, Sprite } from "pixi.js";
 import { getAssets } from "./assets";
 import { PoliticsDrawer } from "./politicsDrawer";
 import { drawTileSprite, drawTileSpriteCentered } from "./utils";
@@ -67,14 +67,16 @@ export class MapDrawer {
 
   tilesById = new Map<number, TileChanneled>();
   tileContainers = new Map<number, Container>();
-  // Yields are not using per tile container but use a separate container for easy toggling.
 
   politicsDrawer!: PoliticsDrawer;
 
   tilesTextures = getAssets().tilesSpritesheet.textures;
   iconsTextures = getAssets().iconsSpritesheet.textures;
 
-  constructor(private container: Container) {
+  constructor(
+    private container: Container,
+    private yieldsLayer: IRenderLayer,
+  ) {
     container.addChild(this.terrainContainer);
 
     bridge.tiles.updated$.subscribe((tiles) => {
@@ -264,7 +266,7 @@ export class MapDrawer {
   }
 
   private drawYields(tile: TileChanneled, container: Container) {
-    const g = new Graphics();
+    const g = new Graphics({});
 
     g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
     g.position.y = tile.y * 0.75 - 0.35;
@@ -273,6 +275,7 @@ export class MapDrawer {
     this.drawYield(g, 0.65, tile.yields.production, 0xffaa00);
 
     container.addChild(g);
+    this.yieldsLayer.attach(g);
   }
 
   private drawYield(g: Graphics, y: number, quantity: number, color: number) {

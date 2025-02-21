@@ -73,6 +73,9 @@ export class MapUi {
   private _gridEnabled$ = new BehaviorSubject<boolean>(true);
   gridEnabled$ = this._gridEnabled$.pipe(distinctUntilChanged());
 
+  private _yieldsEnabled$ = new BehaviorSubject<boolean>(true);
+  yieldsEnabled$ = this._yieldsEnabled$.pipe(distinctUntilChanged());
+
   allowMapPanning = true;
 
   constructor() {
@@ -244,6 +247,13 @@ export class MapUi {
   }
   set gridEnabled(enabled: boolean) {
     this._gridEnabled$.next(enabled);
+  }
+
+  get yieldsEnabled() {
+    return this._yieldsEnabled$.value;
+  }
+  set yieldsEnabled(enabled: boolean) {
+    this._yieldsEnabled$.next(enabled);
   }
 
   clear() {
