@@ -9,6 +9,7 @@ import { mapUi } from "./mapUi";
 import { CityView } from "./city";
 import { Toolbar } from "./Toolbar";
 import { MapSettings } from "./MapSettings";
+import { CombatInfo } from "./CombatInfo";
 
 export function MapMode() {
   const city = useObservable(mapUi.selectedCity$);
@@ -37,6 +38,7 @@ export function MapMode() {
         </div>
 
         <div className={styles.unit}>
+          <CombatInfo />
           <UnitPanel />
         </div>
       </div>

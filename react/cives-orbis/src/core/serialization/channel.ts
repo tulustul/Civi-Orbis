@@ -9,6 +9,7 @@ import { Yields } from "@/core/yields";
 import { BaseTile, PlayerYields } from "@/shared";
 import { UnitMoveCore } from "../collector";
 import { UnitDefinition, UnitTrait } from "../data.interface";
+import { CombatSimulation } from "../combat";
 
 export interface GameChanneled {
   turn: number;
@@ -52,6 +53,17 @@ export interface TileDetailsChanneled extends TileChanneled {
   zocNoMansLand: boolean;
   isSupplied: boolean;
 }
+
+export type CombatSimulationChanneled = {
+  attacker: UnitDetailsChanneled;
+  defender: UnitDetailsChanneled;
+  simulation: CombatSimulation;
+};
+
+export type TileHoverDetails = {
+  tile: TileDetailsChanneled;
+  combatSimulation: CombatSimulationChanneled | null;
+};
 
 export interface CityChanneled {
   id: number;

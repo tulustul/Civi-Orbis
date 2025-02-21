@@ -9,10 +9,6 @@ export class Grid {
   private texture = getAssets().textures.grid;
 
   constructor() {
-    mapUi.gridEnabled$.subscribe((enabled) => {
-      this.sprite.visible = enabled;
-    });
-
     this.sprite = new TilingSprite(this.texture);
     this.sprite.zIndex = 10;
     this.sprite.tileScale.set(1 / 128, 1 / 126.65);
@@ -22,6 +18,10 @@ export class Grid {
     bridge.game.start$.subscribe((startInfo) => {
       this.sprite.width = startInfo.gameInfo.mapWidth;
       this.sprite.height = startInfo.gameInfo.mapHeight * 0.75;
+    });
+
+    mapUi.gridEnabled$.subscribe((enabled) => {
+      this.sprite.visible = enabled;
     });
   }
 }

@@ -3,6 +3,7 @@ import {
   CityProduceOptions,
   CityWorkTileOptions,
   MapGeneratorOptions,
+  TileGetHoverDetailsOptions,
   TileGetInRangeOptions,
   TileSetResourceOptions,
   TileUpdateOptions,
@@ -24,6 +25,7 @@ import {
   TileChanneled,
   TileCoords,
   TileDetailsChanneled,
+  TileHoverDetails,
   TilesCoordsWithNeighbours,
   UnitChanneled,
   UnitDetailsChanneled,
@@ -70,6 +72,8 @@ export const bridge = {
     getAllVisible: () => makeCommand<TileCoords[]>("tile.getAllVisible"),
     getDetails: (tileId: number) =>
       makeCommand<TileDetailsChanneled>("tile.getDetails", tileId),
+    getHoverDetails: (options: TileGetHoverDetailsOptions) =>
+      makeCommand<TileHoverDetails>("tile.getHoverDetails", options),
     getInRange: (options: TileGetInRangeOptions) =>
       makeCommand<TilesCoordsWithNeighbours[]>("tile.getInRange", options),
     update: (options: TileUpdateOptions) =>

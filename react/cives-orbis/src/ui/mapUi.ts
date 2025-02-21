@@ -4,15 +4,28 @@ import {
   TileChanneled,
   TileCoords,
   TileDetailsChanneled,
+  TileHoverDetails,
   UnitChanneled,
   UnitDetailsChanneled,
 } from "@/core/serialization/channel";
 import { BehaviorSubject, Subject } from "rxjs";
-import { distinctUntilChanged } from "rxjs/operators";
+import { distinctUntilChanged, map } from "rxjs/operators";
 
 export class MapUi {
   private _hoveredTile$ = new BehaviorSubject<TileCoords | null>(null);
   hoveredTile$ = this._hoveredTile$.asObservable().pipe(distinctUntilChanged());
+
+  private _tileHoverDetails$ = new BehaviorSubject<TileHoverDetails | null>(
+    null,
+  );
+  tileHoverDetails$ = this._tileHoverDetails$
+    .asObservable()
+    .pipe(distinctUntilChanged());
+
+  combatSimulation$ = this.tileHoverDetails$.pipe(
+    map((d) => d?.combatSimulation),
+    distinctUntilChanged(),
+  );
 
   private _clickedTile$ = new Subject<TileCoords>();
   clickedTile$ = this._clickedTile$.asObservable();
@@ -98,19 +111,19 @@ export class MapUi {
 
     this.hoveredTile$.subscribe(async (tile) => {
       if (!tile) {
+        this._tileHoverDetails$.next(null);
         return;
       }
-      const tileDetails = await bridge.tiles.getDetails(tile.id);
-      if (!tileDetails) {
+      const tileHoverDetails = await bridge.tiles.getHoverDetails({
+        tileId: tile.id,
+        selectedUnitId: this.selectedUnit?.id ?? null,
+      });
+      this._tileHoverDetails$.next(tileHoverDetails);
+      if (!tileHoverDetails) {
         return;
       }
       if (!this._selectedCity$.value) {
-        this.hoverCity(tileDetails?.cityId ?? null);
-        // if (tileDetails.unitsIds.length) {
-        //   this._hoveredUnit$.next(tileDetails.unitsIds[0]);
-        // } else {
-        //   this._hoveredUnit$.next(null);
-        // }
+        this.hoverCity(tileHoverDetails.tile.cityId ?? null);
       }
     });
 

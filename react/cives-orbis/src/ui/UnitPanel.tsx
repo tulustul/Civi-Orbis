@@ -1,15 +1,18 @@
-import { useObservable, useForceRender } from "@/utils";
-import { Panel } from "./components";
-import { mapUi } from "./mapUi";
-import clsx from "clsx";
+import { bridge } from "@/bridge";
 import { UnitOrder } from "@/core/unit";
 import { ACTIONS, UnitAction } from "@/core/unit-actions";
+import { useForceRender, useObservable } from "@/utils";
+import clsx from "clsx";
+import { Panel } from "./components";
+import { mapUi } from "./mapUi";
 import styles from "./UnitPanel.module.css";
-import { bridge } from "@/bridge";
 
 export function UnitPanel() {
   const unit = useObservable(mapUi.selectedUnit$);
+  const combatSimulation = useObservable(mapUi.combatSimulation$);
   const forceRender = useForceRender();
+
+  console.log(combatSimulation);
 
   function destroy() {}
 

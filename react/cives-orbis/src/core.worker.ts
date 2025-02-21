@@ -23,12 +23,14 @@ import {
   CityDetailsChanneled,
   cityDetailsToChannel,
   cityToChannel,
+  CombatSimulationChanneled,
   GameStartInfo,
   gameToGameStartInfo,
   playerToChannel,
   TileChanneled,
   TileDetailsChanneled,
   tileDetailsToChannel,
+  TileHoverDetails,
   TilesCoordsWithNeighbours,
   tilesToTileCoordsWithNeighbours,
   tileToChannel,
@@ -40,7 +42,7 @@ import {
 } from "./core/serialization/channel";
 import { dumpGame, loadGame } from "./core/serialization/dump";
 import { UnitOrder } from "./core/unit";
-import { UnitAction } from "./core/unit-actions";
+import { NoRoadRequirement, UnitAction } from "./core/unit-actions";
 import { RealisticMapGenerator } from "./map-generators/realistic";
 import { BaseTile, PlayerTask } from "./shared";
 import { getTilesInRange } from "./shared/hex-math";
@@ -76,6 +78,7 @@ const HANDLERS = {
   "tile.getAllVisible": tileGetAllVisible,
   "tile.getAllExplored": tileGetAllExplored,
   "tile.getDetails": tileGetDetails,
+  "tile.getHoverDetails": tileGetHoverDetails,
   "tile.getInRange": tileGetInRange,
   "tile.update": tileUpdate,
   "tile.bulkUpdate": tileBulkUpdate,
@@ -407,6 +410,41 @@ export function tileGetDetails(tileId: number): TileDetailsChanneled | null {
   }
 
   return tileDetailsToChannel(tile, game.trackedPlayer);
+}
+
+export type TileGetHoverDetailsOptions = {
+  tileId: number;
+  selectedUnitId: number | null;
+};
+export function tileGetHoverDetails(
+  options: TileGetHoverDetailsOptions,
+): TileHoverDetails | null {
+  const tile = game.map.tilesMap.get(options.tileId);
+  if (!tile) {
+    return null;
+  }
+
+  let combatSimulation: CombatSimulationChanneled | null = null;
+
+  if (options.selectedUnitId) {
+    const selectedUnit = game.unitsManager.unitsMap.get(options.selectedUnitId);
+    if (selectedUnit) {
+      const enemyUnit = tile.getFirstEnemyUnit(selectedUnit);
+      if (enemyUnit) {
+        const simulation = simulateCombat(selectedUnit, enemyUnit);
+        combatSimulation = {
+          simulation,
+          attacker: unitDetailsToChannel(selectedUnit),
+          defender: unitDetailsToChannel(enemyUnit),
+        };
+      }
+    }
+  }
+
+  return {
+    tile: tileDetailsToChannel(tile, game.trackedPlayer),
+    combatSimulation,
+  };
 }
 
 export type TileGetInRangeOptions = {

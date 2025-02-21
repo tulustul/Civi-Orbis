@@ -188,6 +188,10 @@ export class GameRenderer {
   }
 
   updateForOfWarEnabled() {
+    if (!this.mapLayer) {
+      return;
+    }
+
     if (mapUi.fogOfWarEnabled) {
       this.unitsAndCitiesContainer.filters = [
         new MaskFilter({
