@@ -6,7 +6,11 @@ import { measureTime } from "@/utils";
 import { Container, Graphics, IRenderLayer, Sprite } from "pixi.js";
 import { getAssets } from "./assets";
 import { PoliticsDrawer } from "./politicsDrawer";
-import { drawTileSprite, drawTileSpriteCentered } from "./utils";
+import {
+  drawTileSprite,
+  putContainerAtTile,
+  putSpriteAtTileCentered,
+} from "./utils";
 
 const SEA_TEXTURES: Record<SeaLevel, string> = {
   [SeaLevel.deep]: "hexOcean00.png",
@@ -62,16 +66,18 @@ const FOREST_TEXTURES: Record<Climate, string> = {
   [Climate.arctic]: "",
 };
 
+const IMPROVEMENT_TEXTURES: Record<TileImprovement, string> = {
+  [TileImprovement.farm]: "field.png",
+  [TileImprovement.mine]: "mines.png",
+  [TileImprovement.sawmill]: "forester_hut.png",
+};
+
 export class MapDrawer {
   terrainContainer = new Container({ label: "terrain" });
 
-  tilesById = new Map<number, TileChanneled>();
-  tileContainers = new Map<number, Container>();
+  tileDrawers = new Map<number, TileDrawer>();
 
   politicsDrawer!: PoliticsDrawer;
-
-  tilesTextures = getAssets().tilesSpritesheet.textures;
-  iconsTextures = getAssets().iconsSpritesheet.textures;
 
   constructor(
     private container: Container,
@@ -80,9 +86,12 @@ export class MapDrawer {
     container.addChild(this.terrainContainer);
 
     bridge.tiles.updated$.subscribe((tiles) => {
+      const t0 = performance.now();
       for (const tile of tiles) {
         this.updateTile(tile);
       }
+      const t1 = performance.now();
+      console.log("Call to updateTile took " + (t1 - t0) + " milliseconds.");
     });
 
     bridge.game.start$.subscribe(() => {
@@ -93,7 +102,7 @@ export class MapDrawer {
   clear() {
     this.politicsDrawer.clear();
     this.terrainContainer.removeChildren();
-    this.tileContainers.clear();
+    this.tileDrawers.clear();
   }
 
   private async build() {
@@ -102,187 +111,238 @@ export class MapDrawer {
     this.politicsDrawer = new PoliticsDrawer(this.container);
 
     for (const tile of tiles) {
-      this.tilesById.set(tile.id, tile);
-      const container = new Container();
-      container.zIndex = tile.y;
-      this.tileContainers.set(tile.id, container);
-      this.terrainContainer.addChild(container);
-      this.drawTile(tile, container);
+      const drawer = new TileDrawer(tile, this.yieldsLayer);
+      this.tileDrawers.set(tile.id, drawer);
+      this.terrainContainer.addChild(drawer.container);
+      drawer.draw(tile);
     }
   }
 
   private updateTile(tile: TileChanneled) {
-    this.tilesById.set(tile.id, tile);
-    const container = this.clearTile(tile);
-    if (container) {
-      this.drawTile(tile, container);
+    const drawer = this.tileDrawers.get(tile.id);
+    if (drawer) {
+      drawer.draw(tile);
     }
   }
+}
 
-  private clearTile(tile: TileChanneled) {
-    const container = this.tileContainers.get(tile.id);
-    container?.removeChildren();
-    return container;
+class TileDrawer {
+  container = new Container();
+
+  tilesTextures = getAssets().tilesSpritesheet.textures;
+  iconsTextures = getAssets().iconsSpritesheet.textures;
+
+  yieldsGraphics = new Graphics();
+  terrainSprite = new Sprite(this.tilesTextures["hexPlains00.png"]);
+  resourceSprite: Sprite | null = null;
+  improvementSprite: Sprite | null = null;
+  roadSprite: Sprite | null = null;
+  citySprite: Sprite | null = null;
+  riverGraphics: Graphics | null = null;
+
+  constructor(
+    private tile: TileChanneled,
+    private yieldsLayer: IRenderLayer,
+  ) {
+    this.container.zIndex = tile.y;
+
+    putContainerAtTile(this.terrainSprite, tile);
+    this.container.addChild(this.terrainSprite);
   }
 
-  private drawTile(tile: TileChanneled, container: Container) {
-    this.drawTerrain(tile, container);
-    this.drawImprovement(tile, container);
-    this.drawResource(tile, container);
-    this.drawRoads(tile, container);
-    this.drawCity(tile, container);
-    this.drawRiver(tile, container);
-    this.drawYields(tile, container);
+  public draw(tile: TileChanneled) {
+    this.tile = tile;
+    this.drawTerrain();
+    this.drawImprovement();
+    this.drawResource();
+    this.drawRoads();
+    this.drawCity();
+    this.drawRiver();
+    this.drawYields();
   }
 
-  private drawTerrain(tile: TileChanneled, container: Container) {
+  private drawTerrain() {
     let textureName: string;
 
-    if (tile.wetlands) {
-      if (tile.forest) {
+    if (this.tile.wetlands) {
+      if (this.tile.forest) {
         textureName = "hexSwamp00.png";
       } else {
         textureName = "hexMarsh00.png";
       }
-    } else if (tile.forest) {
-      textureName = FOREST_TEXTURES[tile.climate];
-    } else if (tile.seaLevel === SeaLevel.none) {
+    } else if (this.tile.forest) {
+      textureName = FOREST_TEXTURES[this.tile.climate];
+    } else if (this.tile.seaLevel === SeaLevel.none) {
       if (
-        tile.climate === Climate.desert &&
-        tile.landForm === LandForm.plains &&
-        tile.riverParts.length
+        this.tile.climate === Climate.desert &&
+        this.tile.landForm === LandForm.plains &&
+        this.tile.riverParts.length
       ) {
         textureName = "hexGrassySand00.png";
       } else {
-        textureName = CLIMATE_TEXTURES[tile.climate][tile.landForm];
+        textureName = CLIMATE_TEXTURES[this.tile.climate][this.tile.landForm];
       }
     } else {
-      textureName = SEA_TEXTURES[tile.seaLevel];
+      textureName = SEA_TEXTURES[this.tile.seaLevel];
     }
 
-    const sprite = drawTileSprite(tile, this.tilesTextures[textureName]);
-
-    container.addChild(sprite);
+    this.terrainSprite.texture = this.tilesTextures[textureName];
   }
 
-  private drawImprovement(tile: TileChanneled, container: Container) {
-    let sprite: Sprite | null = null;
-    if (tile.improvement === TileImprovement.farm) {
-      sprite = drawTileSpriteCentered(tile, this.tilesTextures["field.png"]);
-    } else if (tile.improvement === TileImprovement.mine) {
-      sprite = drawTileSpriteCentered(tile, this.tilesTextures["mines.png"]);
-    } else if (tile.improvement === TileImprovement.sawmill) {
-      sprite = drawTileSpriteCentered(
-        tile,
-        this.tilesTextures["forester_hut.png"],
-      );
-    }
-
-    if (sprite) {
-      container.addChild(sprite);
-    }
-  }
-
-  private drawResource(tile: TileChanneled, container: Container) {
-    if (!tile.resource) {
+  private drawImprovement() {
+    if (this.tile.improvement === null) {
+      if (this.improvementSprite) {
+        this.improvementSprite.visible = false;
+      }
       return;
     }
 
-    const textureName = `${tile.resource.id}.png`;
-    const sprite = drawTileSpriteCentered(
-      tile,
-      this.iconsTextures[textureName],
-      0.4,
-    );
-    sprite.y += 0.3;
-    container.addChild(sprite);
+    if (!this.improvementSprite) {
+      this.improvementSprite = new Sprite();
+      this.container.addChild(this.improvementSprite);
+    }
+
+    this.improvementSprite.visible = true;
+
+    let textureName = IMPROVEMENT_TEXTURES[this.tile.improvement];
+    this.improvementSprite.texture = this.tilesTextures[textureName];
+    putSpriteAtTileCentered(this.improvementSprite, this.tile);
   }
 
-  private drawRoads(tile: TileChanneled, container: Container) {
-    if (tile.road === null) {
+  private drawResource() {
+    if (this.tile.resource === null) {
+      if (this.resourceSprite) {
+        this.resourceSprite.visible = false;
+      }
       return;
     }
 
-    const textureName = `hexRoad-${tile.roads}-00.png`;
-    const sprite = drawTileSprite(tile, this.tilesTextures[textureName]);
-    container.addChild(sprite);
+    if (!this.resourceSprite) {
+      this.resourceSprite = new Sprite();
+      this.container.addChild(this.resourceSprite);
+    }
+
+    this.resourceSprite.visible = true;
+
+    const textureName = `${this.tile.resource.id}.png`;
+    this.resourceSprite.texture = this.iconsTextures[textureName];
+    putSpriteAtTileCentered(this.resourceSprite, this.tile, 0.4);
+    this.resourceSprite.y += 0.3;
   }
 
-  private drawCity(tile: TileChanneled, container: Container) {
-    if (tile.cityId === null) {
+  private drawRoads() {
+    if (this.tile.road === null) {
+      if (this.roadSprite) {
+        this.roadSprite.visible = false;
+      }
       return;
     }
 
-    const g = drawTileSprite(tile, this.tilesTextures["village.png"]);
-    container.addChild(g);
+    if (!this.roadSprite) {
+      this.roadSprite = new Sprite();
+      this.container.addChild(this.roadSprite);
+    }
+
+    this.roadSprite.visible = true;
+
+    const textureName = `hexRoad-${this.tile.roads}-00.png`;
+    this.roadSprite.texture = this.tilesTextures[textureName];
+    putContainerAtTile(this.roadSprite, this.tile);
   }
 
-  private drawRiver(tile: TileChanneled, container: Container) {
-    if (!tile.riverParts.length) {
+  private drawCity() {
+    if (this.tile.cityId === null) {
+      if (this.citySprite) {
+        this.citySprite.visible = false;
+      }
       return;
     }
+
+    if (!this.citySprite) {
+      this.citySprite = new Sprite();
+      this.citySprite.texture = this.tilesTextures["village.png"];
+      this.container.addChild(this.citySprite);
+      putContainerAtTile(this.citySprite, this.tile);
+    }
+
+    this.citySprite.visible = true;
+  }
+
+  private drawRiver() {
+    if (!this.tile.riverParts.length) {
+      if (this.riverGraphics) {
+        this.riverGraphics.clear();
+        this.riverGraphics.visible = false;
+      }
+      return;
+    }
+
+    if (!this.riverGraphics) {
+      this.riverGraphics = new Graphics();
+      this.container.addChild(this.riverGraphics);
+    }
+
+    this.riverGraphics.visible = true;
 
     // TODO avoid rendering the same river twice.
 
-    const g = new Graphics();
-    g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
-    g.position.y = tile.y * 0.75;
-    container.addChild(g);
+    this.riverGraphics.position.x = this.tile.x + (this.tile.y % 2 ? 0.5 : 0);
+    this.riverGraphics.position.y = this.tile.y * 0.75;
+    this.container.addChild(this.riverGraphics);
 
-    g.setStrokeStyle({ width: 0.15, color: 0x4169e1 });
-
-    for (const river of tile.riverParts) {
+    for (const river of this.tile.riverParts) {
       if (river === TileDirection.NW) {
-        g.moveTo(0, 0.25);
-        g.lineTo(0.5, 0);
+        this.riverGraphics.moveTo(0, 0.25);
+        this.riverGraphics.lineTo(0.5, 0);
       }
 
       if (river === TileDirection.NE) {
-        g.moveTo(0.5, 0);
-        g.lineTo(1, 0.25);
+        this.riverGraphics.moveTo(0.5, 0);
+        this.riverGraphics.lineTo(1, 0.25);
       }
 
       if (river === TileDirection.E) {
-        g.moveTo(1, 0.25);
-        g.lineTo(1, 0.75);
+        this.riverGraphics.moveTo(1, 0.25);
+        this.riverGraphics.lineTo(1, 0.75);
       }
 
       if (river === TileDirection.SE) {
-        g.moveTo(1, 0.75);
-        g.lineTo(0.5, 1);
+        this.riverGraphics.moveTo(1, 0.75);
+        this.riverGraphics.lineTo(0.5, 1);
       }
 
       if (river === TileDirection.SW) {
-        g.moveTo(0.5, 1);
-        g.lineTo(0, 0.75);
+        this.riverGraphics.moveTo(0.5, 1);
+        this.riverGraphics.lineTo(0, 0.75);
       }
 
       if (river === TileDirection.W) {
-        g.moveTo(0, 0.75);
-        g.lineTo(0, 0.25);
+        this.riverGraphics.moveTo(0, 0.75);
+        this.riverGraphics.lineTo(0, 0.25);
       }
     }
-    g.stroke();
+    this.riverGraphics.stroke({ width: 0.15, color: 0x4169e1 });
   }
 
-  private drawYields(tile: TileChanneled, container: Container) {
-    const g = new Graphics({});
+  private drawYields() {
+    this.yieldsGraphics.clear();
 
-    g.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.025;
-    g.position.y = tile.y * 0.75 - 0.35;
+    this.yieldsGraphics.position.x =
+      this.tile.x + (this.tile.y % 2 ? 0.5 : 0) + 0.025;
+    this.yieldsGraphics.position.y = this.tile.y * 0.75 - 0.35;
 
-    this.drawYield(g, 0.55, tile.yields.food, 0x00ff00);
-    this.drawYield(g, 0.65, tile.yields.production, 0xffaa00);
+    this.drawYield(0.55, this.tile.yields.food, 0x00ff00);
+    this.drawYield(0.65, this.tile.yields.production, 0xffaa00);
 
-    container.addChild(g);
-    this.yieldsLayer.attach(g);
+    this.container.addChild(this.yieldsGraphics);
+    this.yieldsLayer.attach(this.yieldsGraphics);
   }
 
-  private drawYield(g: Graphics, y: number, quantity: number, color: number) {
+  private drawYield(y: number, quantity: number, color: number) {
     for (let i = 0; i < quantity; i++) {
       const x = 0.5 - (quantity / 2) * 0.1 + 0.1 * i;
-      g.rect(x, y, 0.05, 0.05);
+      this.yieldsGraphics.rect(x, y, 0.05, 0.05);
     }
-    g.fill({ color });
+    this.yieldsGraphics.fill({ color });
   }
 }

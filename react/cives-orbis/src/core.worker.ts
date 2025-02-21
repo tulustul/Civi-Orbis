@@ -482,7 +482,6 @@ export function tileUpdate(options: TileUpdateOptions) {
     return;
   }
 
-  console.log({ options, tile });
   if (options.road !== undefined && options.road !== tile.road) {
     for (const n of tile.neighbours) {
       collector.tiles.add(n);
@@ -491,8 +490,6 @@ export function tileUpdate(options: TileUpdateOptions) {
 
   Object.assign(tile, options);
   tile.update();
-
-  console.log(collector.tiles);
 }
 
 export function tileBulkUpdate(tiles: TileUpdateOptions[]) {

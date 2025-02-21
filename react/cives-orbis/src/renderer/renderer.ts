@@ -64,6 +64,9 @@ export class GameRenderer {
     });
 
     mapUi.yieldsEnabled$.subscribe((enabled) => {
+      if (!this.mapLayer) {
+        return;
+      }
       if (enabled) {
         this.mapLayer.stage.addChild(this.yieldsLayer);
       } else {

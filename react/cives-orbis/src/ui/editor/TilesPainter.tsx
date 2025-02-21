@@ -84,6 +84,12 @@ export function TilesPainter() {
 
   useSubscription(controls.mouseButton$, onMouseButton);
 
+  useEffect(() => {
+    return () => {
+      renderer.areaDrawer.editorArea.clear();
+    };
+  }, []);
+
   async function onMouseButton(button: number | null) {
     if (!hoveredTileRef.current) {
       return;

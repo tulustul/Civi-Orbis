@@ -9,10 +9,7 @@ import styles from "./UnitPanel.module.css";
 
 export function UnitPanel() {
   const unit = useObservable(mapUi.selectedUnit$);
-  const combatSimulation = useObservable(mapUi.combatSimulation$);
   const forceRender = useForceRender();
-
-  console.log(combatSimulation);
 
   function destroy() {}
 

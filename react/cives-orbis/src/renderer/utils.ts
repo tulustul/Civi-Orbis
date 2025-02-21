@@ -58,10 +58,16 @@ export function getTileVariants(tileName: string, variants: number): string[] {
 
 export function drawTileSprite(tile: TileCoords, texture: Texture) {
   const sprite = new Sprite(texture);
-  sprite.scale.set(1 / texture.width, 1 / texture.width);
+  putContainerAtTile(sprite, tile);
+  return sprite;
+}
+
+export function putContainerAtTile(sprite: Sprite, tile: TileCoords) {
+  sprite.scale.set(1 / sprite.texture.width, 1 / sprite.texture.width);
   sprite.anchor.set(0, 1);
   sprite.zIndex = -tile.y;
-  putContainerAtTile(tile, sprite);
+  sprite.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
+  sprite.position.y = tile.y * 0.75 + 1;
   return sprite;
 }
 
@@ -71,17 +77,16 @@ export function drawTileSpriteCentered(
   scale = 1,
 ) {
   const sprite = new Sprite(texture);
-  sprite.scale.set(scale / texture.width, scale / texture.width);
-  putSpriteAtTileCentered(tile, sprite);
+  putSpriteAtTileCentered(sprite, tile, scale);
   return sprite;
 }
 
-export function putContainerAtTile(tile: TileCoords, container: Container) {
-  container.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
-  container.position.y = tile.y * 0.75 + 1;
-}
-
-export function putSpriteAtTileCentered(tile: TileCoords, sprite: Sprite) {
+export function putSpriteAtTileCentered(
+  sprite: Sprite,
+  tile: TileCoords,
+  scale = 1,
+) {
+  sprite.scale.set(scale / sprite.texture.width, scale / sprite.texture.width);
   sprite.position.x = tile.x + (tile.y % 2 ? 0.5 : 0) + 0.5 - sprite.width / 2;
   sprite.position.y = tile.y * 0.75 + 0.5 - sprite.height / 2;
 }
