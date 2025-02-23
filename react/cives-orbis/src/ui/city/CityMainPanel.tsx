@@ -1,14 +1,17 @@
 import {
   CityDetailsChanneled,
   CityProductChanneled,
+  ProductDefinitionChanneled,
 } from "@/core/serialization/channel";
-import { ProgressBar } from "@/ui/components";
+import { ProgressBar, Tooltip } from "@/ui/components";
 import clsx from "clsx";
-import { Icon } from "../Icon";
+import { Icon } from "../components/Icon";
 
 import { bridge } from "@/bridge";
 import { mapUi } from "../mapUi";
 import styles from "./City.module.scss";
+import { ProductRequirements } from "./ProductRequirements";
+import { Children, PropsWithChildren } from "react";
 
 type Props = {
   city: CityDetailsChanneled;
@@ -35,26 +38,33 @@ export function CityMainPanel({ city }: Props) {
       <div className="size-and-growth margin">
         <span className="size">{city.size}</span>
 
-        <ProgressBar
-          className={styles.growthBar}
-          // [appTooltip]="growthTooltipTmpl"
-          progress={city.totalFood}
-          nextProgress={city.totalFood + city.perTurn.food}
-          total={city.foodToGrow}
+        <Tooltip
+          content=<div className="growth-color">
+            {city.totalFood.toFixed(1)} (+{city.yields.food}) /{city.foodToGrow}
+          </div>
         >
-          {city.perTurn.food > 0 && (
-            <span className="turns">will grow in {city.turnsToGrow} turns</span>
-          )}
+          <ProgressBar
+            className={styles.growthBar}
+            progress={city.totalFood}
+            nextProgress={city.totalFood + city.perTurn.food}
+            total={city.foodToGrow}
+          >
+            {city.perTurn.food > 0 && (
+              <span className="turns">
+                will grow in {city.turnsToGrow} turns
+              </span>
+            )}
 
-          {city.perTurn.food < 0 && (
-            <span className="turns">
-              will shrink in {-city.turnsToGrow} turns
-            </span>
-          )}
-          {city.perTurn.food === 0 && (
-            <span className="turns">growth stalled</span>
-          )}
-        </ProgressBar>
+            {city.perTurn.food < 0 && (
+              <span className="turns">
+                will shrink in {-city.turnsToGrow} turns
+              </span>
+            )}
+            {city.perTurn.food === 0 && (
+              <span className="turns">growth stalled</span>
+            )}
+          </ProgressBar>
+        </Tooltip>
       </div>
 
       <h3>Yields</h3>
@@ -88,60 +98,97 @@ export function CityMainPanel({ city }: Props) {
 
       <h3>Expansion</h3>
 
-      <ProgressBar
-        className={clsx(styles.cultureBar, "margin")}
-        // [appTooltip]="expansionTooltipTmpl"
-        progress={city.totalCulture}
-        nextProgress={city.totalCulture + city.perTurn.culture}
-        total={city.cultureToExpand}
+      <Tooltip
+        content={
+          <div className="culture-color">
+            {city.totalCulture.toFixed(1)} (+{city.yields.culture}) /
+            {city.cultureToExpand}
+          </div>
+        }
       >
-        <span className="turns">
-          borders will expand in {city.turnsToExpand} turns
-        </span>
-      </ProgressBar>
+        <ProgressBar
+          className={clsx(styles.cultureBar, "margin")}
+          progress={city.totalCulture}
+          nextProgress={city.totalCulture + city.perTurn.culture}
+          total={city.cultureToExpand}
+        >
+          <span className="turns">
+            borders will expand in {city.turnsToExpand} turns
+          </span>
+        </ProgressBar>
+      </Tooltip>
 
       <div className="separator"></div>
 
       <h3>Production</h3>
 
       {city.product && (
-        <ProgressBar
-          className={clsx(styles.productionBar, "margin")}
-          // [appTooltip]="buildingTooltipTmpl"
-          // [tooltipContext]="{ building: city().product?.productDefinition }"
-          progress={city.totalProduction}
-          nextProgress={city.totalProduction + city.perTurn.production}
-          total={city.product.definition.productionCost}
-        >
-          <div className={styles.progressBarContent}>
-            <span className="product-name-and-icon">
-              <Icon name={city.product.definition.id} scale={0.3} />
-              <span className="name">{city.product.definition.name}</span>
-            </span>
-            <span className="turns">{city.turnsToProductionEnd} turns</span>
-          </div>
-        </ProgressBar>
+        <ProductTooltip city={city} product={city.product.definition}>
+          <ProgressBar
+            className={clsx(styles.productionBar, "margin")}
+            progress={city.totalProduction}
+            nextProgress={city.totalProduction + city.perTurn.production}
+            total={city.product.definition.productionCost}
+          >
+            <div className={styles.progressBarContent}>
+              <span className="product-name-and-icon">
+                <Icon name={city.product.definition.id} scale={0.3} />
+                <span className="name">{city.product.definition.name}</span>
+              </span>
+              <span className="turns">{city.turnsToProductionEnd} turns</span>
+            </div>
+          </ProgressBar>
+        </ProductTooltip>
       )}
 
       {city.availableProducts.map((product) => (
-        <div
+        <ProductTooltip
           key={product.definition.id}
-          className={clsx(styles.product, {
-            [styles.disabled]: !product.enabled,
-          })}
-          // appTooltip]="unitTooltipTmpl"
-          // tooltipContext="{ unit: unit }"
-          onClick={() => produce(product)}
+          city={city}
+          product={product.definition}
         >
-          <span>
-            <Icon name={product.definition.id} scale={0.3} />
-            <span className="name">{product.definition.name}</span>
-          </span>
-          <span className={clsx(styles.turns, "small")}>
-            {product.turnsToProduce} turns
-          </span>
-        </div>
+          <div
+            className={clsx(styles.product, {
+              [styles.disabled]: !product.enabled,
+            })}
+            // appTooltip]="unitTooltipTmpl"
+            // tooltipContext="{ unit: unit }"
+            onClick={() => produce(product)}
+          >
+            <span>
+              <Icon name={product.definition.id} scale={0.3} />
+              <span className="name">{product.definition.name}</span>
+            </span>
+            <span className={clsx(styles.turns, "small")}>
+              {product.turnsToProduce} turns
+            </span>
+          </div>
+        </ProductTooltip>
       ))}
     </>
+  );
+}
+
+function ProductTooltip({
+  children,
+  city,
+  product,
+}: PropsWithChildren & {
+  city: CityDetailsChanneled;
+  product: ProductDefinitionChanneled;
+}) {
+  return (
+    <Tooltip
+      content={
+        <>
+          <b>{product.name}</b>
+          <ProductRequirements product={product} city={city} />
+          {/* <app-bonuses bonuses={building.bonuses} /> */}
+          <div>Cost: {product.productionCost}</div>
+        </>
+      }
+    >
+      {children}
+    </Tooltip>
   );
 }

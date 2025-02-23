@@ -79,7 +79,7 @@ button.btn-primary {
 button.btn-danger {
   background-color: var(--color-danger-text);
 }
-button[disabled] {
+button.disabled {
   color: var(--color-secondary-text);
   background-color: var(--color-primary-3);
 }

@@ -655,7 +655,13 @@ export function getAreaTiles(areaId: number): TilesCoordsWithNeighbours[] {
   return Array.from(area.tiles).map(tilesToTileCoordsWithNeighbours);
 }
 
-export function entityGetFailedWeakRequirements(data: any): [string, any][] {
+export type EntityGetFailedWeakRequirements = {
+  entityId: string;
+  cityId: number | null;
+};
+export function entityGetFailedWeakRequirements(
+  data: EntityGetFailedWeakRequirements,
+): [string, any][] {
   const entityId: string = data.entityId;
   const cityId: number | null = data.cityId;
 

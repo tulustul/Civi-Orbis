@@ -182,7 +182,7 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
       new OwnTileRequirement(),
       new ImprovementNotYetBuiltRequirement(TileImprovement.farm),
       new IsImprovementPossibleRequirement(TileImprovement.farm),
-      new PublicWorksPointsRequirement(),
+      // new PublicWorksPointsRequirement(),
     ],
   },
   buildMine: {
@@ -193,7 +193,7 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
       new OwnTileRequirement(),
       new ImprovementNotYetBuiltRequirement(TileImprovement.mine),
       new IsImprovementPossibleRequirement(TileImprovement.mine),
-      new PublicWorksPointsRequirement(),
+      // new PublicWorksPointsRequirement(),
     ],
   },
   buildSawmill: {
@@ -204,7 +204,7 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
       new OwnTileRequirement(),
       new ImprovementNotYetBuiltRequirement(TileImprovement.sawmill),
       new IsImprovementPossibleRequirement(TileImprovement.sawmill),
-      new PublicWorksPointsRequirement(),
+      // new PublicWorksPointsRequirement(),
     ],
   },
   buildRoad: {
@@ -214,7 +214,7 @@ export const ACTIONS: Record<UnitAction, ActionDefinition> = {
     requirements: [
       new NoRoadRequirement(),
       new isRoadPossibleRequirement(),
-      new PublicWorksPointsRequirement(),
+      // new PublicWorksPointsRequirement(),
     ],
   },
 };

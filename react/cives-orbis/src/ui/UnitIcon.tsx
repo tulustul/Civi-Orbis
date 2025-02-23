@@ -1,5 +1,5 @@
 import { UnitChanneled } from "@/core/serialization/channel";
-import { Icon } from "./Icon";
+import { Icon } from "./components/Icon";
 import styles from "./UnitIcon.module.css";
 import clsx from "clsx";
 import { mapUi } from "./mapUi";

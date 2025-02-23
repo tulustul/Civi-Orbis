@@ -2,6 +2,7 @@ import {
   CityGetWorkTilesResult,
   CityProduceOptions,
   CityWorkTileOptions,
+  EntityGetFailedWeakRequirements,
   MapGeneratorOptions,
   TileGetHoverDetailsOptions,
   TileGetInRangeOptions,
@@ -82,6 +83,10 @@ export const bridge = {
       makeCommand<void>("tile.bulkUpdate", options),
     setResource: (options: TileSetResourceOptions) =>
       makeCommand<void>("tile.setResource", options),
+  },
+  entities: {
+    getFailedWeakRequirements: (options: EntityGetFailedWeakRequirements) =>
+      makeCommand<[string, any][]>("entity.getFailedWeakRequirements", options),
   },
   units: {
     updated$: makeObservable<UnitChanneled>("unit.updated"),

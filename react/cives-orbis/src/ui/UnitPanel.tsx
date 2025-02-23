@@ -3,9 +3,10 @@ import { UnitOrder } from "@/core/unit";
 import { ACTIONS, UnitAction } from "@/core/unit-actions";
 import { useForceRender, useObservable } from "@/utils";
 import clsx from "clsx";
-import { Panel } from "./components";
+import { Panel, Tooltip } from "./components";
 import { mapUi } from "./mapUi";
 import styles from "./UnitPanel.module.css";
+import { PropsWithChildren, ReactNode, useState } from "react";
 
 export function UnitPanel() {
   const unit = useObservable(mapUi.selectedUnit$);
@@ -65,13 +66,14 @@ export function UnitPanel() {
 
       <div className={styles.actions}>
         {unit.definition.actions.map((action, i) => (
-          <button
-            key={i}
-            className={clsx("btn", { disabled: !canDoAction(action) })}
-            onClick={() => doAction(action)}
-          >
-            {getActionName(action)}
-          </button>
+          <Tooltip key={i} content={<div>DIPA</div>}>
+            <button
+              className={clsx("btn", { disabled: !canDoAction(action) })}
+              onClick={() => doAction(action)}
+            >
+              {getActionName(action)}
+            </button>
+          </Tooltip>
         ))}
       </div>
     </Panel>

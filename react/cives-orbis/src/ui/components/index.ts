@@ -7,3 +7,5 @@ export * from "./Radio";
 export * from "./Multiselect";
 export * from "./types";
 export * from "./Switch";
+export * from "./Icon";
+export * from "./Tooltip";
