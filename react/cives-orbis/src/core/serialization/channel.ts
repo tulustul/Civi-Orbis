@@ -48,7 +48,8 @@ export interface TileChanneled extends BaseTile {
   playerColor: number | null;
 }
 
-export interface TileDetailsChanneled extends TileChanneled {
+export interface TileDetailsChanneled extends Omit<TileChanneled, "unitsIds"> {
+  units: UnitChanneled[];
   zocPlayerId: number | null;
   zocNoMansLand: boolean;
   isSupplied: boolean;
@@ -184,7 +185,9 @@ export type UnitDetailsChanneled = {
   canControl: boolean;
 };
 
-export type TileCoordsWithUnits = TileCoords & { units: number[] };
+export type TileCoordsWithUnits = TileCoords & {
+  units: { id: number; parentId: number | null }[];
+};
 
 export type TilesCoordsWithNeighbours = TileCoords & {
   fullNeighbours: (number | null)[];
@@ -443,6 +446,7 @@ export function tileDetailsToChannel(
     zocPlayerId: tile.zocPlayer?.id ?? null,
     zocNoMansLand: tile.zocNoMansLand,
     isSupplied: tile.isSuppliedByPlayer(forPlayer),
+    units: tile.units.map((u) => unitToChannel(u)),
   };
 }
 
@@ -453,7 +457,9 @@ export function tileToTileCoords(tile: TileCore): TileCoords {
 export function tileToTileCoordsWithUnits(tile: TileCore): TileCoordsWithUnits {
   return {
     ...tileToTileCoords(tile),
-    units: tile.units.map((u) => u.id),
+    units: tile.units.map((u) => {
+      return { id: u.id, parentId: u.parent?.id ?? null };
+    }),
   };
 }
 

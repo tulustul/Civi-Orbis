@@ -157,7 +157,7 @@ export function moveAlongPath(unit: UnitCore) {
   unit.setOrder(unit.path.length ? "go" : null);
 
   collector.units.add(unit);
-  const tiles: TileCore[] = [];
+  const tiles: TileCore[] = [unit.tile];
   collector.moves.push({ unit, tiles });
 
   while (unit.actionPointsLeft && unit.path.length) {
@@ -170,9 +170,10 @@ export function moveAlongPath(unit: UnitCore) {
         return;
       }
       move(unit, targetTile);
+      if (unit.tile.id === targetTile.id) {
+        tiles.push(targetTile);
+      }
     }
-
-    tiles.push(targetTile);
 
     unit.path[0].shift();
     if (!unit.path[0].length) {

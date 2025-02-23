@@ -40,7 +40,7 @@ export function CombatInfoSide({
             <div
               key={modifier.type}
               className={clsx(styles.modifier, {
-                positive: modifier.value > 0,
+                [styles.positive]: modifier.value > 0,
               })}
             >
               {modifier.value > 0 ? "+" : ""}

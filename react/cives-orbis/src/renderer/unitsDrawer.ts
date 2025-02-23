@@ -5,7 +5,7 @@ import {
 } from "@/core/serialization/channel";
 import { mapUi } from "@/ui/mapUi";
 import { OutlineFilter } from "pixi-filters";
-import { Container, Graphics, Sprite } from "pixi.js";
+import { Container, Graphics, Sprite, Text } from "pixi.js";
 import { Animations } from "./animation";
 import { getAssets } from "./assets";
 import { camera } from "./camera";
@@ -58,14 +58,6 @@ export class UnitsDrawer {
     });
   }
 
-  // private async build() {
-  //   const units = await bridge.units.getAll();
-  //   for (const unit of units) {
-  //     this.makeUnitDrawer(unit);
-  //   }
-  //   this.setScale(camera.transform.scale);
-  // }
-
   private updateUnit(unit: UnitChanneled) {
     let drawer = this.units.get(unit.id);
     if (drawer) {
@@ -82,8 +74,8 @@ export class UnitsDrawer {
   }
 
   private updateNeighbours(drawer: UnitDrawer, tile: TileCoordsWithUnits) {
-    for (const unitId of tile.units) {
-      const otherDrawer = this.units.get(unitId);
+    for (const unit of tile.units) {
+      const otherDrawer = this.units.get(unit.id);
       if (otherDrawer && otherDrawer !== drawer) {
         otherDrawer.unit.tile = tile;
         otherDrawer.correctPosition();
@@ -105,8 +97,8 @@ export class UnitsDrawer {
 
   public setScale(scale: number) {
     const [unitScale, alpha] = getAlphaAndScale(scale);
+    this.container.alpha = alpha;
     for (const drawer of this.units.values()) {
-      drawer.container.alpha = alpha;
       drawer.container.scale.set(unitScale);
     }
   }
@@ -122,6 +114,7 @@ export class UnitsDrawer {
 function getAlphaAndScale(scale: number) {
   let alpha = 1;
   if (scale < 20) {
+    // alpha = 0;
     alpha = Math.max(0, 1 - (20 - scale) / 8);
   }
   const unitScale = Math.pow(0.5 / TILE_SIZE / scale, 0.5);
@@ -130,7 +123,9 @@ function getAlphaAndScale(scale: number) {
 
 export class UnitDrawer {
   public container = new Container();
+  public iconContainer = new Container();
   private g = new Graphics();
+  private childrenCountText: Text | null = null;
   private isSelected = false;
 
   static selectionFilter = new OutlineFilter({
@@ -156,7 +151,9 @@ export class UnitDrawer {
     icon.anchor.set(0.5, 0.5);
     this.updateUi();
     this.updatePosition();
-    this.container.addChild(banner, icon, this.g);
+
+    this.iconContainer.addChild(banner, icon);
+    this.container.addChild(this.iconContainer, this.g);
 
     this.container.interactive = true;
     this.container.on("pointerover", () => this.highlight());
@@ -169,14 +166,61 @@ export class UnitDrawer {
   }
 
   updateUi() {
+    this.container.visible = this.unit.parentId === null;
     this.g.clear();
 
     if (this.unit.canControl) {
-      this.g
-        .circle(-35, -35, 8)
-        .stroke({ width: 4, color: 0x000000 })
-        .fill(this.getStatusColor());
+      this.iconContainer.alpha = this.unit.actions === "none" ? 0.5 : 1;
     }
+
+    this.drawHealthBar();
+    this.drawChildrenCount();
+  }
+
+  private drawHealthBar() {
+    if (this.unit.health === 100) {
+      return;
+    }
+
+    this.g
+      .rect(-40, -65, 80, 13)
+      .stroke({ width: 5, color: 0x333333 })
+      .fill(0x999999);
+
+    let healthColor = 0x45d845;
+    if (this.unit.health < 35) {
+      healthColor = 0xff0000;
+    } else if (this.unit.health < 70) {
+      healthColor = 0xffa500;
+    }
+    this.g.rect(-40, -65, (this.unit.health / 100) * 80, 13).fill(healthColor);
+  }
+
+  private drawChildrenCount() {
+    if (this.unit.childrenIds.length === 0) {
+      if (this.childrenCountText) {
+        this.childrenCountText.visible = false;
+      }
+      return;
+    }
+
+    if (!this.childrenCountText) {
+      this.childrenCountText = new Text({
+        style: { fontSize: 30, fill: "white" },
+      });
+      this.childrenCountText.position.set(-35, -35);
+      this.childrenCountText.anchor.set(0.5, 0.5);
+      this.childrenCountText.zIndex = 10;
+      this.container.addChild(this.childrenCountText);
+    }
+
+    this.g
+      .circle(-35, -35, 16)
+      .stroke({ width: 6, color: 0x333333 })
+      .fill(0x555555);
+
+    this.childrenCountText.visible = true;
+    this.childrenCountText.text = this.unit.childrenIds.length.toString();
   }
 
   private updatePosition() {
@@ -222,18 +266,6 @@ export class UnitDrawer {
     });
   }
 
-  private getStatusColor() {
-    if (this.unit.actions === "all") {
-      return 0x00ff00;
-    }
-
-    if (this.unit.actions === "none") {
-      return 0xff0000;
-    }
-
-    return 0xffff00;
-  }
-
   highlight() {
     if (this.isSelected || !this.unit.canControl) {
       return;
@@ -262,7 +294,9 @@ export class UnitDrawer {
   }
 
   updateZIndex() {
-    this.container.zIndex = this.unit.tile.units.indexOf(this.unit.id);
+    this.container.zIndex = this.unit.tile.units.findIndex(
+      (u) => u.id === this.unit.id,
+    );
   }
 
   tileToUnitPosition(
@@ -271,9 +305,10 @@ export class UnitDrawer {
   ): [number, number] {
     let x = tile.x + (tile.y % 2 ? 1 : 0.5);
 
-    if (!ignoreOthers && tile.units.length > 1) {
-      const index = tile.units.indexOf(this.unit.id);
-      x += ((index - (tile.units.length - 1) / 2) / tile.units.length) * 0.8;
+    const parentUnits = tile.units.filter((u) => u.parentId === null);
+    if (!ignoreOthers && parentUnits.length > 1) {
+      const index = parentUnits.findIndex((u) => u.id === this.unit.id);
+      x += ((index - (parentUnits.length - 1) / 2) / parentUnits.length) * 0.8;
     }
 
     return [x, (tile.y + 0.75) * 0.75];

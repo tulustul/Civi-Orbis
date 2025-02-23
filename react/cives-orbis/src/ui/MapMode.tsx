@@ -2,14 +2,15 @@ import { Panel } from "./components";
 import { Minimap } from "./Minimap";
 import { NextTurnButton } from "./NextTurnButton";
 
-import styles from "./MapMode.module.css";
-import { UnitPanel } from "./UnitPanel";
 import { useObservable } from "@/utils";
-import { mapUi } from "./mapUi";
 import { CityView } from "./city";
-import { Toolbar } from "./Toolbar";
-import { MapSettings } from "./MapSettings";
 import { CombatInfo } from "./CombatInfo";
+import styles from "./MapMode.module.css";
+import { MapSettings } from "./MapSettings";
+import { mapUi } from "./mapUi";
+import { Toolbar } from "./Toolbar";
+import { UnitPanel } from "./UnitPanel";
+import { TileUnits } from "./TileUnits";
 
 export function MapMode() {
   const city = useObservable(mapUi.selectedCity$);
@@ -38,8 +39,11 @@ export function MapMode() {
         </div>
 
         <div className={styles.unit}>
-          <CombatInfo />
-          <UnitPanel />
+          <div>
+            <CombatInfo />
+            <UnitPanel />
+          </div>
+          <TileUnits />
         </div>
       </div>
     </>

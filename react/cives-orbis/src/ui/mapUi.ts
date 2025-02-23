@@ -8,7 +8,7 @@ import {
   UnitChanneled,
   UnitDetailsChanneled,
 } from "@/core/serialization/channel";
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 
 export class MapUi {
@@ -27,8 +27,12 @@ export class MapUi {
     distinctUntilChanged(),
   );
 
-  private _clickedTile$ = new Subject<TileCoords>();
+  private _clickedTile$ = new BehaviorSubject<TileCoords | null>(null);
   clickedTile$ = this._clickedTile$.asObservable();
+
+  private _clickedTileDetails$ =
+    new BehaviorSubject<TileDetailsChanneled | null>(null);
+  clickedTileDetails$ = this._clickedTileDetails$.asObservable();
 
   private _selectedTile$ = new BehaviorSubject<TileDetailsChanneled | null>(
     null,
@@ -93,13 +97,18 @@ export class MapUi {
     });
 
     this.clickedTile$.subscribe(async (tile) => {
+      if (!tile) {
+        this._clickedTileDetails$.next(null);
+        return;
+      }
       const tileDetails = await bridge.tiles.getDetails(tile.id);
       if (!tileDetails) {
         return;
       }
+      this._clickedTileDetails$.next(tileDetails);
       if (this.selectingTileEnabled) {
         this._selectedTile$.next(tileDetails);
-      } else if (tileDetails.unitsIds.length) {
+      } else if (tileDetails.units.length) {
         if (this.selectedUnit?.tile.id !== tile.id) {
           this.selectFirstUnitFromTile(tileDetails);
         }
@@ -145,7 +154,12 @@ export class MapUi {
       }
     });
 
-    bridge.game.turn$.subscribe(() => this.setPath(null));
+    bridge.game.turn$.subscribe(() => {
+      this.setPath(null);
+      if (this._clickedTile$.value) {
+        this.clickTile(this._clickedTile$.value);
+      }
+    });
 
     // game.stop$.subscribe(() => this.clear());
   }
@@ -221,9 +235,9 @@ export class MapUi {
     this._selectedUnit$.next(null);
   }
 
-  private async selectFirstUnitFromTile(tile: TileChanneled) {
-    if (tile.unitsIds.length) {
-      this.selectUnit(tile.unitsIds[0]);
+  private async selectFirstUnitFromTile(tile: TileDetailsChanneled) {
+    if (tile.units.length) {
+      this.selectUnit(tile.units[0].id);
     }
   }
 

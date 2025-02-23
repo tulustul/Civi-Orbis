@@ -36,12 +36,12 @@
   background-color: var(--danger-color);
 }
 .side {
-  --positive-color: var(--color-danger-text);
-  --negative-color: var(--growth-color);
-}
-.invertedColors {
   --positive-color: var(--growth-color);
   --negative-color: var(--color-danger-text);
+}
+.invertedColors {
+  --positive-color: var(--color-danger-text);
+  --negative-color: var(--growth-color);
 }
 .modifier {
   color: var(--negative-color);
