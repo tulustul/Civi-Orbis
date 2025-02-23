@@ -6,7 +6,7 @@ import {
 import { mapUi } from "@/ui/mapUi";
 import { OutlineFilter } from "pixi-filters";
 import { Container, Graphics, Sprite, Text } from "pixi.js";
-import { Animations } from "./animation";
+import { Animation, Animations, AnimationSequence } from "./animation";
 import { getAssets } from "./assets";
 import { camera } from "./camera";
 import { TILE_SIZE } from "./constants";
@@ -127,6 +127,7 @@ export class UnitDrawer {
   private g = new Graphics();
   private childrenCountText: Text | null = null;
   private isSelected = false;
+  private animation: Animation<any> | AnimationSequence | null = null;
 
   static selectionFilter = new OutlineFilter({
     color: 0xffffff,
@@ -162,6 +163,7 @@ export class UnitDrawer {
   }
 
   destroy() {
+    this.cancelAnimation();
     this.container.destroy();
   }
 
@@ -231,8 +233,9 @@ export class UnitDrawer {
   }
 
   correctPosition() {
+    this.cancelAnimation();
     this.updateZIndex();
-    Animations.run({
+    this.animation = Animations.run({
       from: [this.container.x, this.container.y],
       to: this.tileToUnitPosition(this.unit.tile),
       duration: 100,
@@ -240,15 +243,18 @@ export class UnitDrawer {
         this.container.x = pos[0];
         this.container.y = pos[1];
       },
+      onComplete: () => (this.animation = null),
     });
   }
 
   animatePosition(tiles: TileCoordsWithUnits[]) {
+    this.cancelAnimation();
+
     const positions = tiles
       .slice(1)
       .map((tile) => this.tileToUnitPosition(tile));
 
-    Animations.sequence({
+    this.animation = Animations.sequence({
       animations: positions.map((pos, i) => {
         return Animations.new({
           from: [
@@ -258,12 +264,24 @@ export class UnitDrawer {
           to: pos,
           duration: 150,
           fn: (pos) => {
-            this.container.x = pos[0];
-            this.container.y = pos[1];
+            if (this.container) {
+              this.container.x = pos[0];
+              this.container.y = pos[1];
+            } else {
+              console.warn("not found container");
+            }
           },
+          onComplete: () => (this.animation = null),
         });
       }),
     });
+  }
+
+  private cancelAnimation() {
+    if (this.animation) {
+      Animations.cancel(this.animation);
+      this.animation = null;
+    }
   }
 
   highlight() {

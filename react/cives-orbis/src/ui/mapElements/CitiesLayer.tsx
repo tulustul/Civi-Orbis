@@ -14,12 +14,24 @@ export function CitiesLayer() {
   const gameInfo = useObservable(bridge.game.start$);
 
   useEffect(() => {
-    const subscription = bridge.cities.revealed$.subscribe((revealed) => {
+    const revealSubscription = bridge.cities.revealed$.subscribe((revealed) => {
       setCities((c) => [...c, revealed.city]);
       setTimeout(transform);
     });
 
-    return () => subscription.unsubscribe();
+    const updateSubscription = bridge.cities.updated$.subscribe((updated) => {
+      const updatedIds = new Set(updated.map((u) => u.id));
+      setCities((cities) => {
+        const notUpdated = cities.filter((city) => !updatedIds.has(city.id));
+        return [...notUpdated, ...updated];
+      });
+      setTimeout(transform);
+    });
+
+    return () => {
+      revealSubscription.unsubscribe();
+      updateSubscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {

@@ -59,9 +59,13 @@ class Collector {
       changes.push({ type: "unit.destroyed", data: id });
     }
 
-    for (const city of this.cities) {
-      changes.push({ type: "city.updated", data: cityToChannel(city) });
+    if (this.cities.size) {
+      changes.push({
+        type: "city.updated",
+        data: Array.from(this.cities).map((city) => cityToChannel(city)),
+      });
     }
+
     for (const city of this.citiesRevealed) {
       const isTracked = city.player === city.player.game.trackedPlayer;
       const data: CityRevealedResult = {

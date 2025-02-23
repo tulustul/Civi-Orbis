@@ -1,0 +1,48 @@
+.product {
+  padding: 5px 15px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-primary-3);
+  &:not(.disabled) {
+    cursor: pointer;
+    &:hover {
+      background-color: var(--color-primary-3);
+    }
+  }
+  &.disabled {
+    color: var(--color-secondary-text);
+    background-color: var(--color-primary-4);
+  }
+  .turns {
+    margin-left: 15px;
+  }
+}
+
+.growthBar {
+  --progress-bar-color: var(--growth-color);
+}
+.productionBar {
+  --progress-bar-color: var(--production-color);
+}
+.cultureBar {
+  --progress-bar-color: var(--culture-color);
+}
+
+.progressBarContent {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.yield {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--color-primary-3);
+  }
+  .label {
+    font-weight: bold;
+    margin-right: 15px;
+  }
+}

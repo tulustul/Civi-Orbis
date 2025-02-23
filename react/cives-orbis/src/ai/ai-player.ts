@@ -81,7 +81,7 @@ export class AIPlayer {
     }
 
     const buildings = city.availableBuildings.filter(
-      (b) => !city.disabledBuildings.has(b),
+      (b) => !city.disabledProducts.has(b),
     );
     if (buildings.length) {
       city.produceBuilding(buildings[0]);

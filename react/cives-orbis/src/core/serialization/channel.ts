@@ -1,4 +1,4 @@
-import { CityCore, CityVisibility, ProductType } from "@/core/city";
+import { CityCore, CityVisibility } from "@/core/city";
 import { Game } from "@/core/game";
 import { PlayerCore } from "@/core/player";
 import { ResourceCore } from "@/core/resources";
@@ -8,7 +8,12 @@ import { UnitCore, UnitOrder } from "@/core/unit";
 import { Yields } from "@/core/yields";
 import { BaseTile, PlayerYields } from "@/shared";
 import { UnitMoveCore } from "../collector";
-import { UnitDefinition, UnitTrait } from "../data.interface";
+import {
+  ProductDefinition,
+  ProductType,
+  UnitDefinition,
+  UnitTrait,
+} from "../data.interface";
 import { CombatSimulation } from "../combat";
 
 export interface GameChanneled {
@@ -110,25 +115,30 @@ export interface CityDetailsChanneled {
   yields: Yields;
   perTurn: Yields;
 
-  productId: string | null;
-  productType: ProductType | null;
-
   buildingsIds: string[];
 
   tiles: number[];
 
   workedTiles: number[];
 
-  availableBuildings: string[];
+  turnsToExpand: number;
 
-  disabledBuildings: string[];
-
-  availableUnits: string[];
-  disabledUnits: string[];
-
-  availableIdleProducts: string[];
-  disabledIdleProducts: string[];
+  availableProducts: CityProductChanneled[];
+  product: CityProductChanneled | null;
 }
+
+export type CityProductChanneled = {
+  enabled: boolean;
+  turnsToProduce: number;
+  definition: ProductDefinitionChanneled;
+};
+
+export type ProductDefinitionChanneled = {
+  id: string;
+  productType: ProductType;
+  name: string;
+  productionCost: number;
+};
 
 export interface PlayerChanneled {
   id: number;
@@ -314,11 +324,9 @@ export function cityToChannel(city: CityCore): CityChanneled {
 
     totalProduction: city.totalProduction,
     productionPerTurn: city.yields.production,
-    productionRequired: city.product
-      ? city.product.productDefinition.productionCost
-      : null,
+    productionRequired: city.product ? city.product.productionCost : null,
     turnsToProductionEnd: city.turnsToProductionEnd,
-    productName: city.product ? city.product.productDefinition.name : null,
+    productName: city.product ? city.product.name : null,
   };
 }
 
@@ -339,25 +347,22 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
 
     totalProduction: city.totalProduction,
     turnsToProductionEnd: city.turnsToProductionEnd,
-    availableBuildings: city.availableBuildings.map((b) => b.id),
-    availableIdleProducts: city.availableIdleProducts.map((p) => p.id),
-    availableUnits: city.availableUnits.map((u) => u.id),
     buildingsIds: Array.from(city.buildingsIds),
     cultureToExpand: city.getCultureToExpand(),
-    disabledBuildings: Array.from(city.disabledBuildings).map((b) => b.id),
-    disabledIdleProducts: Array.from(city.disabledIdleProducts).map(
-      (p) => p.id,
-    ),
-    disabledUnits: Array.from(city.disabledUnits).map((u) => u.id),
     foodConsumed: city.foodConsumed,
     perTurn: city.perTurn,
-    productId: city.product?.productDefinition.id || null,
-    productType: city.product?.type || null,
     tileYields: city.tileYields,
     tiles: Array.from(city.tiles).map((t) => t.id),
     totalCulture: city.totalCulture,
     workedTiles: Array.from(city.workedTiles).map((t) => t.id),
     yields: city.yields,
+    turnsToExpand: city.turnsToExpand,
+    availableProducts: [
+      ...city.availableUnits,
+      ...city.availableBuildings,
+      ...city.availableIdleProducts,
+    ].map((p) => cityProductToChannel(city, p, city.disabledProducts)),
+    product: city.product ? cityProductToChannel(city, city.product) : null,
   };
 }
 
@@ -469,5 +474,22 @@ export function tilesToTileCoordsWithNeighbours(
   return {
     ...tileToTileCoords(tile),
     fullNeighbours: tile.fullNeighbours.map((t) => t?.id ?? null),
+  };
+}
+
+export function cityProductToChannel(
+  city: CityCore,
+  product: ProductDefinition,
+  disabledProducts?: Set<ProductDefinition>,
+): CityProductChanneled {
+  return {
+    enabled: disabledProducts ? !disabledProducts.has(product) : true,
+    turnsToProduce: Math.ceil(product.productionCost / city.yields.production),
+    definition: {
+      id: product.id,
+      productType: product.productType,
+      name: product.name,
+      productionCost: product.productionCost,
+    },
   };
 }

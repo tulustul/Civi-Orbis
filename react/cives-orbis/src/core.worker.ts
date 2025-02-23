@@ -42,7 +42,7 @@ import {
 } from "./core/serialization/channel";
 import { dumpGame, loadGame } from "./core/serialization/dump";
 import { UnitOrder } from "./core/unit";
-import { NoRoadRequirement, UnitAction } from "./core/unit-actions";
+import { UnitAction } from "./core/unit-actions";
 import { RealisticMapGenerator } from "./map-generators/realistic";
 import { BaseTile, PlayerTask } from "./shared";
 import { getTilesInRange } from "./shared/hex-math";
@@ -549,6 +549,7 @@ export function cityProduce(options: CityProduceOptions) {
     return;
   }
 
+  console.log(options);
   if (options.productType === "building") {
     city.produceBuilding(getBuildingById(options.productId)!);
   } else if (options.productType === "unit") {

@@ -33,7 +33,7 @@ export class Animations {
     return animation;
   }
 
-  static cancel(animation: Animation<any>) {
+  static cancel(animation: Animation<any> | AnimationSequence) {
     animationsManager.cancel(animation);
   }
 

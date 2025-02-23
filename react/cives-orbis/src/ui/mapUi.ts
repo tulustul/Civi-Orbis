@@ -205,6 +205,10 @@ export class MapUi {
     }
   }
 
+  setCityDetails(city: CityDetailsChanneled) {
+    this._selectedCity$.next(city);
+  }
+
   hoverCity(cityId: number | null) {
     this._hoveredCity$.next(cityId);
   }

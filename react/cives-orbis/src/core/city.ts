@@ -26,13 +26,6 @@ import { SuppliesProducer } from "./supplies";
 
 export type CityVisibility = "all" | "basic" | "hidden";
 
-export type ProductType = "unit" | "building" | "idleProduct";
-
-export interface Product {
-  type: ProductType;
-  productDefinition: ProductDefinition;
-}
-
 export class CityCore {
   id!: number;
   name!: string;
@@ -47,7 +40,7 @@ export class CityCore {
   yields: Yields = { ...EMPTY_YIELDS };
   perTurn: Yields = { ...EMPTY_YIELDS };
 
-  product: Product | null = null;
+  product: ProductDefinition | null = null;
   totalProduction = 0;
 
   buildings: Building[] = [];
@@ -62,13 +55,12 @@ export class CityCore {
   notWorkedTiles = new Set<TileCore>();
 
   availableBuildings: Building[] = [];
-  disabledBuildings = new Set<Building>();
 
   availableUnits: UnitDefinition[] = [];
-  disabledUnits = new Set<UnitDefinition>();
 
   availableIdleProducts: IdleProduct[] = [];
-  disabledIdleProducts = new Set<IdleProduct>();
+
+  disabledProducts = new Set<ProductDefinition>();
 
   changedSize = false;
 
@@ -114,16 +106,16 @@ export class CityCore {
 
     this.totalProduction += this.yields.production;
 
-    if (this.totalProduction >= this.product.productDefinition.productionCost) {
-      if (this.product.type === "unit") {
+    if (this.totalProduction >= this.product.productionCost) {
+      if (this.product.productType === "unit") {
         this.player.game.unitsManager.spawn(
-          this.product.productDefinition.id,
+          this.product.id,
           this.tile,
           this.player,
         );
-      } else if (this.product.type === "building") {
-        this.buildings.push(this.product.productDefinition as Building);
-        this.buildingsIds.add(this.product.productDefinition.id);
+      } else if (this.product.productType === "building") {
+        this.buildings.push(this.product as Building);
+        this.buildingsIds.add(this.product.id);
       }
       this.totalProduction = 0;
       this.product = null;
@@ -178,33 +170,24 @@ export class CityCore {
   }
 
   produceUnit(unit: UnitDefinition) {
-    this.startProducing({
-      type: "unit",
-      productDefinition: unit,
-    });
+    this.startProducing(unit);
   }
 
   produceBuilding(building: Building) {
     if (this.canConstruct(building)) {
-      this.startProducing({
-        type: "building",
-        productDefinition: building,
-      });
+      this.startProducing(building);
     }
   }
 
   workOnIdleProduct(idleProduct: IdleProduct) {
-    this.startProducing({
-      type: "idleProduct",
-      productDefinition: idleProduct,
-    });
+    this.startProducing(idleProduct);
     this.updateYields();
     this.player.updateYields();
   }
 
   cancelProduction() {
     if (this.product) {
-      const type = this.product.type;
+      const type = this.product.productType;
       this.product = null;
       if (type === "idleProduct") {
         this.updateYields();
@@ -213,8 +196,8 @@ export class CityCore {
     }
   }
 
-  private startProducing(product: Product) {
-    if (!this.canProduce(product.productDefinition)) {
+  private startProducing(product: ProductDefinition) {
+    if (!this.canProduce(product)) {
       return;
     }
 
@@ -239,7 +222,7 @@ export class CityCore {
       return null;
     }
     const remainingProduction =
-      this.product.productDefinition.productionCost - this.totalProduction;
+      this.product.productionCost - this.totalProduction;
 
     return Math.ceil(remainingProduction / this.yields.production);
   }
@@ -271,8 +254,8 @@ export class CityCore {
       this.applyBonuses(building.bonuses);
     }
 
-    if (this.product?.type === "idleProduct") {
-      const idleProduct = this.product.productDefinition as IdleProduct;
+    if (this.product?.productType === "idleProduct") {
+      const idleProduct = this.product as IdleProduct;
       this.applyBonuses(idleProduct.bonuses);
     }
     roundYields(this.yields);
@@ -466,22 +449,21 @@ export class CityCore {
   updateProductsList() {
     this.availableUnits =
       this.getAvailableProducts<UnitDefinition>(UNITS_DEFINITIONS);
-    this.disabledUnits = this.getDisabledProducts<UnitDefinition>(
-      this.availableUnits,
-    );
 
     const notBuildBuildings = BUILDINGS.filter(
-      (b) =>
-        this.product?.productDefinition !== b && !this.buildings.includes(b),
+      (b) => this.product !== b && !this.buildings.includes(b),
     );
 
     this.availableBuildings =
       this.getAvailableProducts<Building>(notBuildBuildings);
-    this.disabledBuildings = this.getDisabledProducts<Building>(
-      this.availableBuildings,
-    );
 
     this.availableIdleProducts = IDLE_PRODUCTS;
+
+    this.disabledProducts = this.getDisabledProducts<ProductDefinition>([
+      ...this.availableUnits,
+      ...this.availableBuildings,
+      ...this.availableIdleProducts,
+    ]);
   }
 
   changeOwner(newOwner: PlayerCore) {

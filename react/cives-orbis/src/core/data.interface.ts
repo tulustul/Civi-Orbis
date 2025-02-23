@@ -21,7 +21,10 @@ export interface HaveBonuses {
   bonuses: Bonuses;
 }
 
+export type ProductType = "unit" | "building" | "idleProduct";
+
 export interface ProductDefinition extends Entity, HaveRequirements {
+  productType: ProductType;
   productionCost: number;
 }
 
@@ -39,6 +42,7 @@ export enum UnitTrait {
 }
 
 export interface UnitDefinition extends ProductDefinition {
+  productType: "unit";
   actionPoints: number;
   strength: number;
   actions: UnitAction[];
@@ -48,8 +52,14 @@ export interface UnitDefinition extends ProductDefinition {
   supplyRange: number;
 }
 
-export type Building = ProductDefinition & HaveBonuses;
-export type IdleProduct = ProductDefinition & HaveBonuses;
+export type Building = ProductDefinition &
+  HaveBonuses & {
+    productType: "building";
+  };
+export type IdleProduct = ProductDefinition &
+  HaveBonuses & {
+    productType: "idleProduct";
+  };
 
 export enum GovernmentSection {
   organization,

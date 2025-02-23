@@ -8,6 +8,7 @@ import {
 export const UNITS_DEFINITIONS: UnitDefinition[] = [
   {
     id: "unit_settler",
+    productType: "unit",
     name: "Settler",
     type: UnitType.land,
     trait: UnitTrait.settler,
@@ -25,6 +26,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   },
   {
     id: "unit_worker",
+    productType: "unit",
     name: "Worker",
     type: UnitType.land,
     trait: UnitTrait.worker,
@@ -39,6 +41,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   },
   {
     id: "unit_scout",
+    productType: "unit",
     name: "Scout",
     type: UnitType.land,
     trait: UnitTrait.explorer,
@@ -53,6 +56,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   },
   {
     id: "unit_warrior",
+    productType: "unit",
     name: "Warrior",
     type: UnitType.land,
     trait: UnitTrait.military,
@@ -67,6 +71,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   },
   {
     id: "unit_tireme",
+    productType: "unit",
     name: "Tireme",
     type: UnitType.naval,
     trait: UnitTrait.military,
@@ -81,6 +86,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   },
   {
     id: "unit_galley",
+    productType: "unit",
     name: "Galley",
     type: UnitType.naval,
     trait: UnitTrait.military,
@@ -95,6 +101,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   },
   {
     id: "unit_scout_ship",
+    productType: "unit",
     name: "Scout vessel",
     type: UnitType.naval,
     trait: UnitTrait.explorer,
@@ -109,6 +116,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
   },
   {
     id: "unit_supply_wagon",
+    productType: "unit",
     name: "Supply wagon",
     type: UnitType.land,
     trait: UnitTrait.supply,
