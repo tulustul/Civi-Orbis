@@ -97,7 +97,7 @@ export interface CityDetailsChanneled {
   visibilityLevel: CityVisibility;
   name: string;
   size: number;
-  tileId: number;
+  tile: TileCoords;
   playerId: number;
 
   totalFood: number;
@@ -117,9 +117,8 @@ export interface CityDetailsChanneled {
 
   buildingsIds: string[];
 
-  tiles: number[];
-
-  workedTiles: number[];
+  tiles: TileCoords[];
+  workedTiles: TilesCoordsWithNeighbours[];
 
   turnsToExpand: number;
 
@@ -339,7 +338,7 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
     name: city.name,
     size: city.size,
     playerId: city.player.id,
-    tileId: city.tile.id,
+    tile: tileToTileCoords(city.tile),
 
     totalFood: city.totalFood,
     foodToGrow: city.getFoodToGrow(),
@@ -352,9 +351,11 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
     foodConsumed: city.foodConsumed,
     perTurn: city.perTurn,
     tileYields: city.tileYields,
-    tiles: Array.from(city.tiles).map((t) => t.id),
+    tiles: Array.from(city.tiles).map(tileToTileCoords),
     totalCulture: city.totalCulture,
-    workedTiles: Array.from(city.workedTiles).map((t) => t.id),
+    workedTiles: Array.from(city.workedTiles).map(
+      tilesToTileCoordsWithNeighbours,
+    ),
     yields: city.yields,
     turnsToExpand: city.turnsToExpand,
     availableProducts: [

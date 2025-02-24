@@ -118,33 +118,16 @@ export class AreasDrawer {
       return;
     }
 
-    // if (city.playerId === game.state?.trackedPlayer.id) {
-    //   const data = await bridge.cities.getWorkTiles(city.id);
-    //   if (!data) {
-    //     return;
-    //   }
-    //   this.cityWorkedTilesArea.setTiles(data.workedTiles);
-    //   this.cityNotWorkedTilesArea.setTiles(data.notWorkedTiles);
-    //   this.cityBordersOnlyArea.setTiles(
-    //     data.notWorkedTiles.concat(data.workedTiles),
-    //   );
-    // } else {
-    const tiles = await bridge.cities.getRange(cityId);
-    if (tiles) {
-      this.cityRangeArea.setTiles(tiles);
+    const cityRange = await bridge.cities.getRange(cityId);
+    if (cityRange) {
+      this.cityRangeArea.setTiles(cityRange.tiles);
+      this.cityWorkedTilesArea.setTiles(cityRange.workedTiles);
     }
-    // }
   }
 
   private async onSelectedCity(city: CityDetailsChanneled | null) {
-    if (city) {
-      const tiles = await bridge.cities.getRange(city.id);
-      if (tiles) {
-        this.cityRangeArea.setTiles(tiles);
-      }
-    } else {
-      this.cityRangeArea.clear();
-    }
+    this.cityRangeArea.setTiles([]);
+    this.cityWorkedTilesArea.setTiles(city?.workedTiles || []);
   }
 
   private async onSelectedUnit(unit: UnitDetailsChanneled | null) {

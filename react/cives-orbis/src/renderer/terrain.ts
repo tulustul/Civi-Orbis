@@ -77,10 +77,8 @@ export class MapDrawer {
 
   tileDrawers = new Map<number, TileDrawer>();
 
-  politicsDrawer!: PoliticsDrawer;
-
   constructor(
-    private container: Container,
+    container: Container,
     private yieldsLayer: IRenderLayer,
   ) {
     container.addChild(this.terrainContainer);
@@ -100,15 +98,12 @@ export class MapDrawer {
   }
 
   clear() {
-    this.politicsDrawer.clear();
     this.terrainContainer.removeChildren();
     this.tileDrawers.clear();
   }
 
   private async build() {
     const tiles = await bridge.tiles.getAll();
-
-    this.politicsDrawer = new PoliticsDrawer(this.container);
 
     for (const tile of tiles) {
       const drawer = new TileDrawer(tile, this.yieldsLayer);

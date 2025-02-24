@@ -8,6 +8,7 @@ import {
   UnitChanneled,
   UnitDetailsChanneled,
 } from "@/core/serialization/channel";
+import { camera } from "@/renderer/camera";
 import { BehaviorSubject } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 
@@ -105,6 +106,30 @@ export class MapUi {
       if (!tileDetails) {
         return;
       }
+
+      const selectedCity = this.selectedCity;
+      if (selectedCity && tileDetails.areaOf === selectedCity.id) {
+        const isWorked = !!selectedCity.workedTiles.find(
+          (t) => t.id === tileDetails.id,
+        );
+        let updatedCityDetails: CityDetailsChanneled | null;
+        if (isWorked) {
+          updatedCityDetails = await bridge.cities.unworkTile({
+            cityId: selectedCity.id,
+            tileId: tileDetails.id,
+          });
+        } else {
+          updatedCityDetails = await bridge.cities.workTile({
+            cityId: selectedCity.id,
+            tileId: tileDetails.id,
+          });
+        }
+        if (updatedCityDetails) {
+          this.setCityDetails(updatedCityDetails);
+        }
+        return;
+      }
+
       this._clickedTileDetails$.next(tileDetails);
       if (this.selectingTileEnabled) {
         this._selectedTile$.next(tileDetails);
@@ -112,7 +137,7 @@ export class MapUi {
         if (this.selectedUnit?.tile.id !== tile.id) {
           this.selectFirstUnitFromTile(tileDetails);
         }
-      } else if (tileDetails.cityId) {
+      } else if (tileDetails.cityId !== null) {
         this.selectCity(tileDetails.cityId);
       } else {
         this.selectUnit(null);
@@ -194,14 +219,15 @@ export class MapUi {
   async selectCity(cityId: number | null) {
     if (cityId === null) {
       this._selectedCity$.next(null);
-      this.allowMapPanning = true;
+      // this.allowMapPanning = true;
       return;
     }
 
     const city = await bridge.cities.getDetails(cityId);
     if (city?.visibilityLevel === "all") {
       this._selectedCity$.next(city);
-      this.allowMapPanning = false;
+      camera.moveToTileWithEasing(city.tile);
+      // this.allowMapPanning = false;
     }
   }
 

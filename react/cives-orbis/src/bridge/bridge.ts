@@ -1,6 +1,7 @@
 import {
   CityGetWorkTilesResult,
   CityProduceOptions,
+  CityRange,
   CityWorkTileOptions,
   EntityGetFailedWeakRequirements,
   MapGeneratorOptions,
@@ -125,7 +126,7 @@ export const bridge = {
     produce: (options: CityProduceOptions) =>
       makeCommand<CityDetailsChanneled>("city.produce", options),
     getRange: (cityId: number) =>
-      makeCommand<TilesCoordsWithNeighbours[] | null>("city.getRange", cityId),
+      makeCommand<CityRange | null>("city.getRange", cityId),
     getWorkTiles: (cityId: number) =>
       makeCommand<CityGetWorkTilesResult | null>("city.getWorkTiles", cityId),
     workTile: (options: CityWorkTileOptions) =>

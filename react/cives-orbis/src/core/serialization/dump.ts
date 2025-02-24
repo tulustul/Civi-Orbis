@@ -1,5 +1,5 @@
 import { Game } from "../game";
-import { ProductType, CityCore } from "@/core/city";
+import { CityCore } from "@/core/city";
 import { Yields } from "@/core/yields";
 import { PlayerCore } from "@/core/player";
 import { AIPlayer } from "@/ai/ai-player";
@@ -8,7 +8,7 @@ import { TileImprovement, TileRoad } from "@/core/tile-improvements";
 import { TileCore } from "@/core/tile";
 import { TilesMapCore } from "@/core/tiles-map";
 import { UnitCore, UnitOrder } from "@/core/unit";
-import { ProductDefinition } from "@/core/data.interface";
+import { ProductDefinition, ProductType } from "@/core/data.interface";
 import {
   getUnitById,
   getBuildingById,
@@ -287,10 +287,7 @@ function loadCity(game: Game, cityData: CitySerialized) {
       productDefinition = getIdleProductById(cityData.product.id)!;
     }
 
-    city.product = {
-      type: cityData.product.type,
-      productDefinition,
-    };
+    city.product = productDefinition;
   }
 
   city.buildings = cityData.buildings.map((b) => getBuildingById(b)!);
@@ -310,8 +307,8 @@ function dumpCity(city: CityCore): CitySerialized {
     totalCulture: city.totalCulture,
     product: city.product
       ? {
-          type: city.product.type,
-          id: city.product.productDefinition.id,
+          type: city.product.productType,
+          id: city.product.id,
         }
       : null,
     tiles: Array.from(city.tiles).map((tile) => tile.id),

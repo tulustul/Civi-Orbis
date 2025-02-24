@@ -86,6 +86,12 @@ export function CityInfo({ city }: Props) {
       className={styles.city}
       ref={elRef}
       onClick={() => mapUi.selectCity(city.id)}
+      // onMouseOver={() => {
+      //   mapUi.hoverCity(city.id);
+      // }}
+      // onMouseOut={() => {
+      //   mapUi.hoverCity(null);
+      // }}
       onMouseDown={(e) => controls.onMouseDown(e.nativeEvent)}
       onMouseUp={() => controls.onMouseUp()}
       onMouseMove={(e) => controls.onMouseMove(e.nativeEvent)}

@@ -561,16 +561,22 @@ export function cityProduce(options: CityProduceOptions) {
   return cityDetailsToChannel(city);
 }
 
-export function cityGetRange(
-  cityId: number,
-): TilesCoordsWithNeighbours[] | null {
+export type CityRange = {
+  tiles: TilesCoordsWithNeighbours[];
+  workedTiles: TilesCoordsWithNeighbours[];
+};
+export function cityGetRange(cityId: number): CityRange | null {
   const city = game.citiesManager.citiesMap.get(cityId);
 
   if (!city) {
     return null;
   }
-
-  return Array.from(city.tiles).map(tilesToTileCoordsWithNeighbours);
+  return {
+    tiles: Array.from(city.tiles).map(tilesToTileCoordsWithNeighbours),
+    workedTiles: Array.from(city.workedTiles).map(
+      tilesToTileCoordsWithNeighbours,
+    ),
+  };
 }
 
 export type CityGetWorkTilesResult = {

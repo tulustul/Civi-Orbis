@@ -5,9 +5,10 @@ import {
   UpdateTransformOptions,
   RenderLayer,
   IRenderLayer,
+  Filter,
 } from "pixi.js";
 
-import { Subject } from "rxjs";
+import { merge, Subject } from "rxjs";
 
 import { FogOfWarDrawer } from "./fog-of-war";
 import { Grid } from "./grid";
@@ -19,9 +20,12 @@ import { ExploredTilesDrawer } from "./exploredTilesDrawer";
 import { camera } from "./camera";
 import { FogOfWarFilter } from "./filters/fog-of-war-filter";
 import { UnitsDrawer } from "./unitsDrawer";
-import { animationsManager } from "./animation";
+import { Animations, animationsManager } from "./animation";
 import { AreasDrawer } from "./areasDrawer";
 import { mapUi } from "@/ui/mapUi";
+import { CityFocusDrawer } from "./cityFocusDrawer";
+import { GrayscaleFilter } from "./filters/grayscaleFilter";
+import { PoliticsDrawer } from "./politicsDrawer";
 
 export class GameRenderer {
   app!: Application;
@@ -32,6 +36,7 @@ export class GameRenderer {
 
   fogOfWarDrawer!: FogOfWarDrawer;
   visibleTilesDrawer!: ExploredTilesDrawer;
+  cityFocusDrawer!: CityFocusDrawer;
 
   overlays!: OverlaysRenderer;
 
@@ -41,15 +46,18 @@ export class GameRenderer {
   yieldsLayer!: IRenderLayer;
 
   fogOfWarLayer!: Layer;
-
   exploredTilesLayer!: Layer;
+  cityFocusLayer!: Layer;
 
   overlaysContainer = new Container({ label: "overlays" });
   mapContainer = new Container({ label: "map" });
-  unitsAndCitiesContainer = new Container({ label: "unitsAndCities" });
-  unitsDrawer = new UnitsDrawer(this.unitsAndCitiesContainer);
-  // citiesDrawer = new CitiesDrawer(this.unitsAndCitiesContainer);
+  unitsContainer = new Container({ label: "unitsAndCities" });
+  politicsContainer = new Container({ label: "politics" });
+  unitsDrawer = new UnitsDrawer(this.unitsContainer);
   areaDrawer = new AreasDrawer(this.overlaysContainer);
+  politicsDrawer = new PoliticsDrawer(this.politicsContainer);
+
+  cityFocusFilter!: GrayscaleFilter;
 
   grid!: Grid;
 
@@ -60,7 +68,11 @@ export class GameRenderer {
 
   constructor() {
     mapUi.fogOfWarEnabled$.subscribe(() => {
-      this.updateForOfWarEnabled();
+      this.updateMapFilters();
+    });
+
+    mapUi.selectedCity$.subscribe(() => {
+      this.updateMapFilters();
     });
 
     mapUi.yieldsEnabled$.subscribe((enabled) => {
@@ -100,6 +112,7 @@ export class GameRenderer {
     this.mapLayer = new Layer(this.app, "mapLayer");
     this.fogOfWarLayer = new Layer(this.app, "fogOfWarLayer");
     this.exploredTilesLayer = new Layer(this.app, "visibleTilesLayer");
+    this.cityFocusLayer = new Layer(this.app, "cityFocusLayer");
     this.yieldsLayer = new RenderLayer();
 
     this.mapDrawer = new MapDrawer(this.mapLayer.stage, this.yieldsLayer);
@@ -108,6 +121,11 @@ export class GameRenderer {
     this.visibleTilesDrawer = new ExploredTilesDrawer(
       this.exploredTilesLayer.stage,
     );
+    this.cityFocusFilter = new GrayscaleFilter({
+      sprite: this.cityFocusLayer.sprite,
+    });
+    this.cityFocusFilter.enabled = false;
+    this.cityFocusDrawer = new CityFocusDrawer(this.cityFocusLayer.stage);
 
     this.overlays = new OverlaysRenderer(this.overlaysContainer);
 
@@ -117,9 +135,12 @@ export class GameRenderer {
 
     this.app.stage.addChild(this.mapLayer.sprite);
     this.app.stage.addChild(this.overlaysContainer);
+    this.app.stage.addChild(this.politicsContainer);
     this.app.stage.addChild(this.mapContainer);
-    this.mapContainer.addChild(this.unitsAndCitiesContainer);
-    this.unitsAndCitiesContainer.zIndex = 1000;
+    this.mapContainer.addChild(this.unitsContainer);
+    this.unitsContainer.zIndex = 1000;
+    this.politicsContainer.zIndex = 2000;
+    this.overlaysContainer.zIndex = 3000;
 
     this.grid = new Grid();
     this.mapLayer.stage.addChild(this.grid.sprite);
@@ -140,10 +161,12 @@ export class GameRenderer {
       this.mapLayer.stage.updateTransform(transform);
       this.mapContainer.updateTransform(transform);
       this.overlaysContainer.updateTransform(transform);
+      this.politicsContainer.updateTransform(transform);
       this.fogOfWarLayer.stage.updateTransform(transform);
+      this.cityFocusLayer.stage.updateTransform(transform);
       this.exploredTilesLayer.stage.updateTransform(transform);
 
-      this.updateForOfWarEnabled();
+      this.updateMapFilters();
     });
 
     this.app.ticker.add(() => {
@@ -159,7 +182,7 @@ export class GameRenderer {
         // this.citiesDrawer.setScale(scale);
       }
 
-      if (this.mapDrawer.politicsDrawer) {
+      if (this.politicsDrawer) {
         const backgroundOpacity = Math.min(
           0.4,
           Math.max(0, (70 - scale) / 150),
@@ -167,7 +190,7 @@ export class GameRenderer {
 
         const borderShadow = Math.max(0.4, Math.min(0.7, (150 - scale) / 100));
 
-        for (const area of this.mapDrawer.politicsDrawer.areas.values()) {
+        for (const area of this.politicsDrawer.areas.values()) {
           area.drawer.backgroundShader.resources["uniforms"].uniforms.opacity =
             backgroundOpacity;
           area.drawer.borderShader.resources["uniforms"].uniforms.borderShadow =
@@ -178,6 +201,7 @@ export class GameRenderer {
       this.mapLayer.renderToTarget();
       this.fogOfWarLayer.renderToTarget();
       this.exploredTilesLayer.renderToTarget();
+      this.cityFocusLayer.renderToTarget();
     });
   }
 
@@ -186,11 +210,6 @@ export class GameRenderer {
     this.mapLayer.resize(width, height);
     this.fogOfWarLayer.resize(width, height);
     this.exploredTilesLayer.resize(width, height);
-
-    // A new texture is created when resizing, need to update the filter. Could just update uniforms but whatever.
-    // this.mapContainer.filters = [
-    //   new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
-    // ];
   }
 
   clear() {
@@ -199,45 +218,52 @@ export class GameRenderer {
     this.overlays.clear();
     this.fogOfWarDrawer.clear();
     this.visibleTilesDrawer.clear();
+    this.cityFocusDrawer.clear();
     this.unitsDrawer.clear();
-    // this.citiesDrawer.clear();
+    this.politicsDrawer.clear();
   }
 
-  updateForOfWarEnabled() {
+  updateMapFilters() {
     if (!this.mapLayer) {
       return;
     }
 
+    const mapFilters: Filter[] = [];
+    const unitsFilters: Filter[] = [];
+    const politicsFilters: Filter[] = [];
     if (mapUi.fogOfWarEnabled) {
-      this.unitsAndCitiesContainer.filters = [
+      unitsFilters.push(
         new MaskFilter({
           sprite: this.fogOfWarLayer.sprite,
         }),
-      ];
-      this.mapLayer.sprite.filters = [
+      );
+
+      mapFilters.push(
         new MaskFilter({
           sprite: this.exploredTilesLayer.sprite,
         }),
         new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
-      ];
+      );
+
+      politicsFilters.push(
+        new MaskFilter({
+          sprite: this.exploredTilesLayer.sprite,
+        }),
+      );
+    }
+
+    if (mapUi.selectedCity) {
+      mapFilters.push(this.cityFocusFilter);
+    }
+
+    this.mapLayer.sprite.filters = mapFilters;
+    this.unitsContainer.filters = unitsFilters;
+    this.politicsContainer.filters = politicsFilters;
+
+    if (mapUi.fogOfWarEnabled) {
     } else {
-      this.unitsAndCitiesContainer.filters = [];
-      this.mapLayer.sprite.filters = [];
     }
   }
 }
 
 export let renderer = new GameRenderer();
-
-if (import.meta.hot) {
-  console.log("renderer.ts is hot");
-
-  const hotData = import.meta.hot.data as { renderer?: GameRenderer };
-  if (hotData.renderer) {
-    renderer = hotData.renderer;
-  }
-  import.meta.hot.accept(() => {
-    console.log("accept renderer");
-    import.meta.hot!.data.renderer = renderer;
-  });
-}
