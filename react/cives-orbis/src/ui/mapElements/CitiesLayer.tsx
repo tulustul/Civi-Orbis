@@ -14,11 +14,6 @@ export function CitiesLayer() {
   const gameInfo = useObservable(bridge.game.start$);
 
   useEffect(() => {
-    const revealSubscription = bridge.cities.revealed$.subscribe((revealed) => {
-      setCities((c) => [...c, revealed.city]);
-      setTimeout(transform);
-    });
-
     const updateSubscription = bridge.cities.updated$.subscribe((updated) => {
       const updatedIds = new Set(updated.map((u) => u.id));
       setCities((cities) => {
@@ -29,7 +24,6 @@ export function CitiesLayer() {
     });
 
     return () => {
-      revealSubscription.unsubscribe();
       updateSubscription.unsubscribe();
     };
   }, []);

@@ -62,9 +62,8 @@ export class CitiesManager {
 
     city.suppliesProducers.add();
 
-    collector.cities.add(city);
     if (this.game.trackedPlayer.exploredTiles.has(city.tile)) {
-      collector.citiesRevealed.add(city);
+      collector.cities.add(city);
     }
 
     return city;

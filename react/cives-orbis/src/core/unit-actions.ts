@@ -9,6 +9,8 @@ import {
   ROAD_PUBLIC_WORKS_COSTS_PER_TURN,
 } from "./tile-improvements";
 import { isImprovementPossible, isRoadPossible } from "../shared";
+import { collector } from "./collector";
+import { cityToChannel } from "./serialization/channel";
 
 export type UnitAction =
   | "foundCity"
@@ -129,6 +131,7 @@ function foundCity(game: Game, unit: UnitCore) {
   const city = game.citiesManager.spawn(unit.tile, unit.player);
   if (city) {
     game.unitsManager.destroy(unit);
+    collector.changes.push({ type: "city.spawned", data: cityToChannel(city) });
   }
 }
 

@@ -1,5 +1,13 @@
 Bugs:
-  ☐ next turn should hide city view
+  ☐ clear unit range when destroyed
+  ✔ city info double rendering @done(25-02-25 23:47)
+  ✔ Encountered two children with the same key, @done(25-02-26 00:08)
+  ☐ incomplete city border when founded
+  ✔ no unit range on next turn @done(25-02-26 00:14)
+  ☐ resizing canvas not working
+  ☐ proper destroying of renderer
+  ☐ imprecise tile selection
+  ✘ next turn should hide city view @cancelled(25-02-26 00:15)
   ☐ map generator: fix rivers placement - loops, dead ends etc.
   ☐ unit path is showing wrong turns count
   ☐ webgl fonts scaling
@@ -17,12 +25,16 @@ Performance:
   ☐ partial collector flush (make max buffer size of 10)
 
 Refactor:
-  ☐ renderer: still a mess
+  ✔ renderer: still a mess @done(25-02-25 23:32)
   ☐ core: minimize boilerplate in serialization (not sure if worth it)
 
 Minor features:
+  ☐ store game settings in local storage
+  ☐ better visibility of current unit order (on the map)
+  ☐ style city view
+  ☐ minimap autoscale to explored area
   ☐ closing city view should restore previous camera transform
-  ☐ nicer start game view
+  ☐ start game view
   ☐ tooltips for more ui elements
   ☐ autosaving
   ☐ city production queue
@@ -34,7 +46,8 @@ Minor features:
   ☐ improve unit visibility range
   ☐ improve city visibility range
   ☐ pathfinding: verify path each turn
-  ☐ unit animations
+  ✔ unit move animations @done(25-02-25 23:32)
+  ☐ combat animations
 
 Major features:
   ✔ naval units @done(20-06-06 15:05)
@@ -44,7 +57,7 @@ Major features:
   ☐ resources - increase tile yields
   ☐ happiness
   ✔ `fog of war` - grey out tiles not visible by units and cities @done(20-06-07 23:03)
-  ☐ tile improvements damaging when not enough public works
+  ✘ tile improvements damaging when not enough public works @cancelled(25-02-25 23:30)
   ✔ embarkment @done(20-06-14 19:50)
   ☐ armies/generals
   ☐ supply lines

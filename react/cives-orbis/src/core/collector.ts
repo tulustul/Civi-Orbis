@@ -35,7 +35,6 @@ class Collector {
   moves: UnitMoveCore[] = [];
 
   cities = new Set<CityCore>();
-  citiesRevealed = new Set<CityCore>();
   citiesDestroyed = new Set<number>();
 
   areaTilesAdded = new Map<number, TileCore[]>();
@@ -62,18 +61,14 @@ class Collector {
     if (this.cities.size) {
       changes.push({
         type: "city.updated",
-        data: Array.from(this.cities).map((city) => cityToChannel(city)),
+        data: Array.from(this.cities)
+          .filter((city) =>
+            city.player.game.trackedPlayer.exploredTiles.has(city.tile),
+          )
+          .map((city) => cityToChannel(city)),
       });
     }
 
-    for (const city of this.citiesRevealed) {
-      const isTracked = city.player === city.player.game.trackedPlayer;
-      const data: CityRevealedResult = {
-        city: cityToChannel(city),
-        action: isTracked && !city.player.ai ? "center" : "none",
-      };
-      changes.push({ type: "city.revealed", data });
-    }
     for (const id of this.citiesDestroyed) {
       changes.push({ type: "city.destroyed", data: id });
     }
@@ -144,7 +139,6 @@ class Collector {
     this.moves = [];
 
     this.cities.clear();
-    this.citiesRevealed.clear();
     this.citiesDestroyed.clear();
 
     this.areaTilesAdded.clear();

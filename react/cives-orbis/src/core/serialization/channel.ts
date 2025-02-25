@@ -58,6 +58,7 @@ export interface TileDetailsChanneled extends Omit<TileChanneled, "unitsIds"> {
   zocPlayerId: number | null;
   zocNoMansLand: boolean;
   isSupplied: boolean;
+  isExplored: boolean;
 }
 
 export type CombatSimulationChanneled = {
@@ -453,6 +454,7 @@ export function tileDetailsToChannel(
     zocNoMansLand: tile.zocNoMansLand,
     isSupplied: tile.isSuppliedByPlayer(forPlayer),
     units: tile.units.map((u) => unitToChannel(u)),
+    isExplored: forPlayer.exploredTiles.has(tile),
   };
 }
 

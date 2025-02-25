@@ -69,7 +69,7 @@ export class PlayerCore {
         if (this.id === this.game.trackedPlayer.id) {
           collector.tilesExplored.add(tile);
           if (tile.city) {
-            collector.citiesRevealed.add(tile.city);
+            collector.cities.add(tile.city);
           }
         }
       }

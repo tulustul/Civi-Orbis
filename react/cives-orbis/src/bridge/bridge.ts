@@ -117,7 +117,6 @@ export const bridge = {
   },
   cities: {
     spawned$: makeObservable<CityChanneled>("city.spawned"),
-    revealed$: makeObservable<CityRevealedResult>("city.revealed"),
     updated$: makeObservable<CityChanneled[]>("city.updated"),
     destroyed$: makeObservable<number>("city.destroyed"),
     getAllRevealed: () => makeCommand<CityChanneled[]>("city.getAllRevealed"),

@@ -6,7 +6,6 @@ import clsx from "clsx";
 import { Panel, Tooltip } from "./components";
 import { mapUi } from "./mapUi";
 import styles from "./UnitPanel.module.css";
-import { PropsWithChildren, ReactNode, useState } from "react";
 
 export function UnitPanel() {
   const unit = useObservable(mapUi.selectedUnit$);

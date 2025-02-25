@@ -155,6 +155,11 @@ export class MapUi {
         tileId: tile.id,
         selectedUnitId: this.selectedUnit?.id ?? null,
       });
+      if (!tileHoverDetails.tile.isExplored) {
+        this._tileHoverDetails$.next(null);
+        this.hoverCity(null);
+        return;
+      }
       this._tileHoverDetails$.next(tileHoverDetails);
       if (!tileHoverDetails) {
         return;
@@ -173,16 +178,17 @@ export class MapUi {
       this.setPath(null);
     });
 
-    bridge.cities.revealed$.subscribe((data) => {
-      if (data.action === "center") {
-        this.selectCity(data.city.id);
-      }
+    bridge.cities.spawned$.subscribe((city) => {
+      this.selectCity(city.id);
     });
 
     bridge.game.turn$.subscribe(() => {
       this.setPath(null);
       if (this._clickedTile$.value) {
         this.clickTile(this._clickedTile$.value);
+      }
+      if (this.selectedUnit) {
+        this.selectUnit(this.selectedUnit.id);
       }
     });
 
@@ -240,10 +246,6 @@ export class MapUi {
   }
 
   async selectUnit(unitId: number | null) {
-    if (unitId === this.selectedUnit?.id) {
-      return;
-    }
-
     if (unitId === null) {
       this.clearSelectedUnit();
       return;
@@ -251,13 +253,8 @@ export class MapUi {
 
     const unit = await bridge.units.getDetails(unitId);
     if (unit?.canControl) {
-      if (unit) {
-        // const unitDetails = new UnitDetails(game.state!, data);
-        this._selectedUnit$.next(unit);
-        this.setPath(unit.path);
-      } else {
-        this.setPath(null);
-      }
+      this._selectedUnit$.next(unit);
+      this.setPath(unit.path);
     }
   }
 
