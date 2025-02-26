@@ -1,3 +1,4 @@
+import { camera } from "@/renderer/camera";
 import { controls } from "@/renderer/controls";
 import { renderer } from "@/renderer/renderer";
 import { memo } from "react";
@@ -5,6 +6,11 @@ import { useEventListener } from "usehooks-ts";
 
 function GameCanvas_() {
   useEventListener("keydown", (event) => controls.onKeyDown(event));
+
+  useEventListener("resize", () => {
+    renderer.resize(window.innerWidth, window.innerHeight);
+    camera.refresh();
+  });
 
   return (
     <canvas

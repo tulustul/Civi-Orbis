@@ -172,7 +172,6 @@ export class GameRenderer {
 
     this.app.ticker.add(() => {
       animationsManager.update(this.app.ticker.deltaMS);
-      // camera.update();
       this._tick$.next();
 
       const scale = camera.transform.scale;
@@ -180,7 +179,6 @@ export class GameRenderer {
       if (scale != this.lastScale) {
         this.lastScale = scale;
         this.unitsDrawer.setScale(scale);
-        // this.citiesDrawer.setScale(scale);
       }
 
       if (this.politicsDrawer) {

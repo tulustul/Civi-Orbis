@@ -72,6 +72,10 @@ export class Camera {
     this.updateBoundingBox();
   }
 
+  refresh() {
+    this.moveTo(this.transform.x, this.transform.y);
+  }
+
   moveToTileWithEasing(tile: TileCoords) {
     const t = this.transform;
     const [x, y] = getTileCoords(tile);
@@ -156,18 +160,17 @@ export class Camera {
     x = x - (yi % 2 ? 0.5 : 0);
     let xi = Math.floor(x);
 
-    let y1 = 0.25 - (y - yi) * 0.75;
+    const y1 = 0.25 - (y - yi) * 0.75;
     if (y1 > 0) {
-      let x1 = x - xi;
-      let y2 = 0;
+      const x1 = x - xi;
       if (x1 < 0.5) {
-        y2 = t * x1;
+        const y2 = t * x1;
         if (y1 > y2) {
           xi += yi % 2 ? 0 : -1;
           yi -= 1;
         }
       } else {
-        y2 = t * (1 - x1);
+        const y2 = t * (1 - x1);
         if (y1 > y2) {
           xi += yi % 2 ? 1 : 0;
           yi -= 1;
