@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "debug": "vite --debug hmr"
+    "debug": "vite --debug hmr",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@pixi/react": "^8.0.0-beta.23",
@@ -33,6 +35,7 @@
     "spritesheet-js": "^1.2.8",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
-    "vite": "^6.1.0"
+    "vite": "^6.1.0",
+    "vitest": "^3.0.7"
   }
 }
