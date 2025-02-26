@@ -26,10 +26,6 @@ export class OverlaysRenderer {
     mapUi.selectedTile$.subscribe((tile) => {
       this.displayAtTile(this.selectedTileGraphics, tile);
     });
-
-    mapUi.highlightedTiles$.subscribe((tiles) => {
-      this.buildHighlightedTiles(tiles);
-    });
   }
 
   private displayAtTile(obj: Container, tile: TileCoords | null) {

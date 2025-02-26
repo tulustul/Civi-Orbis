@@ -40,11 +40,6 @@ export class MapUi {
   );
   selectedTile$ = this._selectedTile$.asObservable();
 
-  private _highlightedTiles$ = new BehaviorSubject<Set<TileChanneled>>(
-    new Set(),
-  );
-  highlightedTiles$ = this._highlightedTiles$.asObservable();
-
   private _activePath$ = new BehaviorSubject<TileCoords[][] | null>(null);
   activePath$ = this._activePath$.asObservable();
 
@@ -307,7 +302,6 @@ export class MapUi {
     this.selectingTileEnabled = false;
     this._hoveredTile$.next(null);
     this._selectedTile$.next(null);
-    this._highlightedTiles$.next(new Set());
   }
 }
 

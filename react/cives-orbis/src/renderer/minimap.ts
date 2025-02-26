@@ -6,19 +6,13 @@ import {
   Sprite,
 } from "pixi.js";
 
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-
 import { bridge } from "@/bridge";
-import {
-  GameInfo,
-  TileChanneled,
-  TileCoords,
-} from "@/core/serialization/channel";
+import { TileChanneled, TileCoords } from "@/core/serialization/channel";
 import { Climate, SeaLevel, TileDirection } from "@/shared";
 import { camera, Transform } from "../renderer/camera";
 import { renderer } from "./renderer";
 import { drawHex } from "./utils";
+import { skip } from "rxjs";
 
 const SEA_COLORS: Record<SeaLevel, number> = {
   [SeaLevel.deep]: 0x25619a,
@@ -57,9 +51,12 @@ export class MinimapRenderer {
 
   public app!: Application;
 
-  private destroyed$ = new Subject<void>();
-
   constructor() {
+    bridge.game.start$.pipe(skip(1)).subscribe(() => {
+      this.clear();
+      this.build();
+    });
+
     bridge.tiles.explored$.subscribe((tiles) => {
       this.reveal(tiles);
       this.updateMap();
@@ -100,6 +97,9 @@ export class MinimapRenderer {
   }
 
   async create(app: Application) {
+    if (this.app) {
+      return;
+    }
     this.app = app;
 
     this.mapTexture = RenderTexture.create({
@@ -108,6 +108,16 @@ export class MinimapRenderer {
     });
     this.mapSprite.texture = this.mapTexture;
 
+    this.app.stage.addChild(this.container);
+
+    camera.transform$.subscribe((transform) => {
+      this.updateCamera(transform);
+    });
+
+    await this.build();
+  }
+
+  async build() {
     const allTiles = await bridge.tiles.getAll();
     this.drawTiles(allTiles);
 
@@ -115,28 +125,23 @@ export class MinimapRenderer {
     const exploredTiles = await bridge.tiles.getAllExplored();
     this.reveal(exploredTiles);
 
-    this.app.stage.addChild(this.container);
-
-    camera.transform$
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe((transform) => {
-        this.updateCamera(transform);
-      });
-
     this.updateMap();
+  }
+
+  clear() {
+    for (const g of this.tilesMap.values()) {
+      g.destroy();
+    }
+    this.tilesMap.clear();
   }
 
   destroy() {
     if (!this.app) {
       return;
     }
+    this.clear();
     this.mapTexture.destroy();
     this.mapSprite.destroy();
-    for (const g of this.tilesMap.values()) {
-      g.destroy();
-    }
-    this.destroyed$.next();
-    this.destroyed$.complete();
   }
 
   private hideAllTiles() {

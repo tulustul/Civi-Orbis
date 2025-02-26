@@ -41,6 +41,10 @@ export class UnitsDrawer {
       }
     });
 
+    bridge.game.start$.subscribe(() => {
+      this.clear();
+    });
+
     mapUi.selectedUnit$.subscribe((unit) => {
       if (this.selectedDrawer) {
         this.selectedDrawer.deselect();

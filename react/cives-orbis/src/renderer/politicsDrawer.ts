@@ -24,6 +24,8 @@ export class PoliticsDrawer {
   }
 
   async build() {
+    this.clear();
+
     const areas = await bridge.areas.getAll();
 
     for (const bridgeArea of areas) {

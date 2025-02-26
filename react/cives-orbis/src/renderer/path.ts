@@ -9,6 +9,7 @@ import {
 } from "pixi.js";
 import { camera } from "./camera";
 import { getTileCenter } from "./utils";
+import { bridge } from "@/bridge";
 
 export class PathRenderer {
   pathGraphics = new Graphics();
@@ -19,6 +20,10 @@ export class PathRenderer {
     this.container.addChild(this.pathGraphics);
 
     mapUi.activePath$.subscribe((path) => this.buildPath(path));
+
+    bridge.game.start$.subscribe(() => {
+      this.clear();
+    });
   }
 
   clear() {

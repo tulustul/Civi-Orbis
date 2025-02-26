@@ -5,7 +5,8 @@ Bugs:
   ✔ incomplete city border when founded @done(25-02-26 20:58)
   ✔ no unit range on next turn @done(25-02-26 00:14)
   ✔ resizing canvas not working @done(25-02-26 23:00)
-  ☐ proper destroying of renderer
+  ✔ proper destroying of renderer @done(25-02-26 23:57)
+  ☐ saving map resources
   ✔ imprecise tile selection @done(25-02-26 22:48)
   ✘ next turn should hide city view @cancelled(25-02-26 00:15)
   ☐ map generator: fix rivers placement - loops, dead ends etc.

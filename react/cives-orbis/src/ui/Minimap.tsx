@@ -18,6 +18,10 @@ function Minimap_() {
   }, []);
 
   async function create(canvas: HTMLCanvasElement) {
+    if (minimap.app) {
+      return;
+    }
+
     await minimap.calculateSize();
 
     const app = new Application();

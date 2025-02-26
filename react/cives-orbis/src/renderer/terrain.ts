@@ -5,12 +5,7 @@ import { Climate, LandForm, SeaLevel, TileDirection } from "@/shared";
 import { measureTime } from "@/utils";
 import { Container, Graphics, IRenderLayer, Sprite } from "pixi.js";
 import { getAssets } from "./assets";
-import { PoliticsDrawer } from "./politicsDrawer";
-import {
-  drawTileSprite,
-  putContainerAtTile,
-  putSpriteAtTileCentered,
-} from "./utils";
+import { putContainerAtTile, putSpriteAtTileCentered } from "./utils";
 
 const SEA_TEXTURES: Record<SeaLevel, string> = {
   [SeaLevel.deep]: "hexOcean00.png",
@@ -98,11 +93,14 @@ export class MapDrawer {
   }
 
   clear() {
-    this.terrainContainer.removeChildren();
+    for (const drawer of this.tileDrawers.values()) {
+      drawer.destroy();
+    }
     this.tileDrawers.clear();
   }
 
   private async build() {
+    this.clear();
     const tiles = await bridge.tiles.getAll();
 
     for (const tile of tiles) {
@@ -143,6 +141,11 @@ class TileDrawer {
 
     putContainerAtTile(this.terrainSprite, tile);
     this.container.addChild(this.terrainSprite);
+  }
+
+  public destroy() {
+    this.yieldsLayer.detach(this.yieldsGraphics);
+    this.container.destroy({ children: true });
   }
 
   public draw(tile: TileChanneled) {

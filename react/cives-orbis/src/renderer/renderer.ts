@@ -26,6 +26,7 @@ import { mapUi } from "@/ui/mapUi";
 import { CityFocusDrawer } from "./cityFocusDrawer";
 import { GrayscaleFilter } from "./filters/grayscaleFilter";
 import { PoliticsDrawer } from "./politicsDrawer";
+import { bridge } from "@/bridge";
 
 export class GameRenderer {
   app!: Application;
@@ -209,17 +210,6 @@ export class GameRenderer {
     this.mapLayer.resize(width, height);
     this.fogOfWarLayer.resize(width, height);
     this.exploredTilesLayer.resize(width, height);
-  }
-
-  clear() {
-    this.mapDrawer.clear();
-    this.path.clear();
-    this.overlays.clear();
-    this.fogOfWarDrawer.clear();
-    this.visibleTilesDrawer.clear();
-    this.cityFocusDrawer.clear();
-    this.unitsDrawer.clear();
-    this.politicsDrawer.clear();
   }
 
   updateMapFilters() {
