@@ -136,6 +136,7 @@ export class GameRenderer {
     this.app.stage.addChild(this.mapLayer.sprite);
     this.app.stage.addChild(this.overlaysContainer);
     this.app.stage.addChild(this.politicsContainer);
+    // this.app.stage.addChild(this.exploredTilesLayer.sprite);
     this.app.stage.addChild(this.mapContainer);
     this.mapContainer.addChild(this.unitsContainer);
     this.unitsContainer.zIndex = 1000;
@@ -259,10 +260,6 @@ export class GameRenderer {
     this.mapLayer.sprite.filters = mapFilters;
     this.unitsContainer.filters = unitsFilters;
     this.politicsContainer.filters = politicsFilters;
-
-    if (mapUi.fogOfWarEnabled) {
-    } else {
-    }
   }
 }
 

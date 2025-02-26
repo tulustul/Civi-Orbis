@@ -1,8 +1,8 @@
 Bugs:
-  ☐ clear unit range when destroyed
+  ✔ clear unit range when destroyed @done(25-02-26 20:26)
   ✔ city info double rendering @done(25-02-25 23:47)
   ✔ Encountered two children with the same key, @done(25-02-26 00:08)
-  ☐ incomplete city border when founded
+  ✔ incomplete city border when founded @done(25-02-26 20:58)
   ✔ no unit range on next turn @done(25-02-26 00:14)
   ☐ resizing canvas not working
   ☐ proper destroying of renderer
@@ -33,6 +33,8 @@ Minor features:
   ☐ better visibility of current unit order (on the map)
   ☐ style city view
   ☐ minimap autoscale to explored area
+  ☐ limit map panning/zoom to explored map area
+  ☐ nicer rendering of out of map area
   ☐ closing city view should restore previous camera transform
   ☐ start game view
   ☐ tooltips for more ui elements
@@ -68,6 +70,7 @@ Major features:
   ☐ diplomacy
   ☐ nations
   ☐ trade
+  ☐ knowledge
 
 Others:
   ☐ think about unit tests (how to nicely mock the map?)

@@ -549,7 +549,6 @@ export function cityProduce(options: CityProduceOptions) {
     return;
   }
 
-  console.log(options);
   if (options.productType === "building") {
     city.produceBuilding(getBuildingById(options.productId)!);
   } else if (options.productType === "unit") {

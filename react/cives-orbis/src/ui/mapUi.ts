@@ -192,6 +192,12 @@ export class MapUi {
       }
     });
 
+    bridge.units.destroyed$.subscribe((unitId) => {
+      if (unitId === this.selectedUnit?.id) {
+        this.clearSelectedUnit();
+      }
+    });
+
     // game.stop$.subscribe(() => this.clear());
   }
 

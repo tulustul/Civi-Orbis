@@ -8,8 +8,6 @@ import { bridge } from "@/bridge";
 import { GameInfo, TileCoords } from "@/core/serialization/channel";
 
 export class Controls {
-  isMousePressed = false;
-
   private _mouseButton$ = new BehaviorSubject<number | null>(null);
   mouseButton$ = this._mouseButton$.asObservable();
 
@@ -31,7 +29,6 @@ export class Controls {
 
   onMouseDown(event: MouseEvent) {
     this.hasMouseMoved = false;
-    this.isMousePressed = true;
     this._mouseButton$.next(event.button);
     event.preventDefault();
     event.stopPropagation();
@@ -88,7 +85,6 @@ export class Controls {
       // }
     }
 
-    this.isMousePressed = false;
     this._mouseButton$.next(null);
   }
 
@@ -110,10 +106,8 @@ export class Controls {
       }
     }
 
-    if (mapUi.allowMapPanning && this.isMousePressed) {
-      if (this.mouseButton === 0) {
-        camera.moveBy(event.movementX, event.movementY);
-      }
+    if (mapUi.allowMapPanning && event.buttons === 1) {
+      camera.moveBy(event.movementX, event.movementY);
     }
   }
 
@@ -163,7 +157,7 @@ export class Controls {
     if (this.gameInfo === null) {
       return null;
     }
-    const [x, y] = camera.screenToGame(event.clientX, event.clientY);
+    const [x, y] = camera.screenToTileCoords(event.clientX, event.clientY);
     if (
       x < 0 ||
       y < 0 ||
@@ -172,6 +166,7 @@ export class Controls {
     ) {
       return null;
     }
+
     const id = x * this.gameInfo.mapWidth + y;
     return { id, x, y };
   }

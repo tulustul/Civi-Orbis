@@ -56,14 +56,18 @@ export function getTileVariants(tileName: string, variants: number): string[] {
   return result;
 }
 
-export function drawTileSprite(tile: TileCoords, texture: Texture) {
+export function drawTileSprite(tile: TileCoords, texture: Texture, scale = 1) {
   const sprite = new Sprite(texture);
-  putContainerAtTile(sprite, tile);
+  putContainerAtTile(sprite, tile, scale);
   return sprite;
 }
 
-export function putContainerAtTile(sprite: Sprite, tile: TileCoords) {
-  sprite.scale.set(1 / sprite.texture.width, 1 / sprite.texture.width);
+export function putContainerAtTile(
+  sprite: Sprite,
+  tile: TileCoords,
+  scale = 1,
+) {
+  sprite.scale.set(scale / sprite.texture.width, scale / sprite.texture.width);
   sprite.anchor.set(0, 1);
   sprite.zIndex = -tile.y;
   sprite.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);

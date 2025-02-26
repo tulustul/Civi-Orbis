@@ -2,6 +2,7 @@ import {
   Container,
   Geometry,
   Mesh,
+  Rectangle,
   Shader,
   ShaderFromResources,
 } from "pixi.js";
@@ -54,6 +55,8 @@ const RIGHT_SIDE_TRIANGLES: number[][] = [
 ];
 
 const borderGeometries = new Map<string, Geometry>();
+
+const tileBounds = new Rectangle(0, 0, 1, 1);
 
 function makeBorderGeometry(borders: string): Geometry {
   const vertices: number[] = [];
@@ -273,6 +276,7 @@ class AreaDrawer {
     });
     mesh.position.x = tile.x + (tile.y % 2 ? 0.5 : 0);
     mesh.position.y = tile.y * 0.75;
+    mesh.boundsArea = tileBounds;
 
     this.options.container.addChild(mesh);
     this.backgroundMap.set(tile.id, mesh);

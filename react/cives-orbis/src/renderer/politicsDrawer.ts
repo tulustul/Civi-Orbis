@@ -7,7 +7,6 @@ export class PoliticsDrawer {
 
   constructor(private container: Container) {
     bridge.areas.tilesAdded$.subscribe((bridgeArea) => {
-      console.log(bridgeArea);
       const area = this.areas.get(bridgeArea.id);
       if (area) {
         area.addTiles(bridgeArea.tiles);
