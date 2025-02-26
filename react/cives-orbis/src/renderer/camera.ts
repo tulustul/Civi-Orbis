@@ -148,11 +148,33 @@ export class Camera {
     ];
   }
 
-  screenToGame(screenX: number, screenY: number): [number, number] {
+  screenToTileCoords(screenX: number, screenY: number): [number, number] {
+    const t = Math.tan(Math.PI / 6);
     let [x, y] = this.screenToCanvas(screenX, screenY);
-    y = Math.floor(y / 0.75);
-    x = Math.floor(x - (y % 2 ? 0.5 : 0));
-    return [x, y];
+    y /= 0.75;
+    let yi = Math.floor(y);
+    x = x - (yi % 2 ? 0.5 : 0);
+    let xi = Math.floor(x);
+
+    let y1 = 0.25 - (y - yi) * 0.75;
+    if (y1 > 0) {
+      let x1 = x - xi;
+      let y2 = 0;
+      if (x1 < 0.5) {
+        y2 = t * x1;
+        if (y1 > y2) {
+          xi += yi % 2 ? 0 : -1;
+          yi -= 1;
+        }
+      } else {
+        y2 = t * (1 - x1);
+        if (y1 > y2) {
+          xi += yi % 2 ? 1 : 0;
+          yi -= 1;
+        }
+      }
+    }
+    return [xi, yi];
   }
 
   canvasToScreen(canvasX: number, canvasY: number): [number, number] {
