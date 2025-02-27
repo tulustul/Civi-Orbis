@@ -8,6 +8,7 @@
   justify-content: space-between;
   padding: 0 15px;
   text-shadow: 0 0 4px black;
+  height: var(--progress-bar-height);
 }
 .progress {
   position: absolute;
@@ -22,4 +23,8 @@
 }
 .negative {
   background-color: #c22929;
+}
+.empty {
+  background-color: var(--progress-bar-total-color);
+  height: var(--progress-bar-height);
 }

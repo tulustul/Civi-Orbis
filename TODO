@@ -6,7 +6,7 @@ Bugs:
   ✔ no unit range on next turn @done(25-02-26 00:14)
   ✔ resizing canvas not working @done(25-02-26 23:00)
   ✔ proper destroying of renderer @done(25-02-26 23:57)
-  ☐ conquered city does not change color
+  ✔ conquered city does not change color @done(25-02-27 18:54)
   ✔ saving map resources @done(25-02-27 18:46)
   ✔ imprecise tile selection @done(25-02-26 22:48)
   ✘ next turn should hide city view @cancelled(25-02-26 00:15)

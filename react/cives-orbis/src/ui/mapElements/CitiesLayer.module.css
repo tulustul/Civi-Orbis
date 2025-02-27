@@ -39,9 +39,6 @@
   justify-content: center;
   background-color: var(--player-color);
 }
-.progressBar {
-  height: 20px;
-}
 .turns {
   margin-left: 15px;
 }

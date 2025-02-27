@@ -6,6 +6,7 @@ import styles from "./CitiesLayer.module.css";
 import { getTileCoords } from "@/renderer/utils";
 import { controls } from "@/renderer/controls";
 import { mapUi } from "../mapUi";
+import { formatTurns } from "@/utils";
 
 type Props = {
   city: CityChanneled;
@@ -24,7 +25,7 @@ export function CityInfo({ city }: Props) {
       return;
     }
     elRef.current.style.setProperty("--player-color", city.cssColor);
-  }, []);
+  }, [city]);
 
   function transform(t: Transform) {
     if (!elRef.current) {
@@ -64,8 +65,9 @@ export function CityInfo({ city }: Props) {
           nextProgress={city.totalFood + city.foodPerTurn}
           total={city.foodToGrow}
         >
-          <span>{city.name}</span>
-          <span>({city.turnsToGrow})</span>
+          <span>
+            {city.name} ({formatTurns(city.turnsToGrow)})
+          </span>
         </ProgressBar>
 
         <ProgressBar
@@ -74,8 +76,9 @@ export function CityInfo({ city }: Props) {
           nextProgress={city.totalProduction + city.productionPerTurn}
           total={city.productionRequired ?? 0}
         >
-          <span>{city.productName}</span>
-          <span>({city.turnsToProductionEnd})</span>
+          <span>
+            {city.productName} ({formatTurns(city.turnsToProductionEnd)})
+          </span>
         </ProgressBar>
       </div>
     );

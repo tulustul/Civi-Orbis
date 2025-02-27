@@ -27,6 +27,7 @@ export class UnitsManager {
     tile.units.push(unit);
 
     unit.player.exploreTiles(unit.tile.getTilesInRange(2));
+    unit.player.showTiles(unit.tile.getTilesInRange(2));
 
     unit.player.unitsWithoutOrders.push(unit);
 

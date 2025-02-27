@@ -20,7 +20,7 @@ export function ProgressBar({
   const nextPercent = nextProgress ? (nextProgress / total) * 100 : 0;
 
   if (!total) {
-    return null;
+    return <div className={styles.empty} />;
   }
 
   return (
@@ -29,10 +29,10 @@ export function ProgressBar({
         <div
           className={clsx(styles.progress, styles.next)}
           style={{ width: `${nextPercent}%` }}
-        ></div>
+        />
       )}
 
-      <div className={styles.progress} style={{ width: `${percent}%` }}></div>
+      <div className={styles.progress} style={{ width: `${percent}%` }} />
 
       {nextProgress < progress && (
         <div
@@ -41,7 +41,7 @@ export function ProgressBar({
             width: `${percent - nextPercent}%`,
             left: `${nextPercent}%`,
           }}
-        ></div>
+        />
       )}
 
       {children}
