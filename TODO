@@ -31,6 +31,7 @@ Refactor:
   ☐ core: minimize boilerplate in serialization (not sure if worth it)
 
 Minor features:
+  ☐ show on map that using is sleeping/skipping move
   ☐ store game settings in local storage
   ☐ better visibility of current unit order (on the map)
   ☐ style city view

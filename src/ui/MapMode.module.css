@@ -1,0 +1,35 @@
+.layout {
+  display: grid;
+  grid-template-areas:
+    "yields toolbar"
+    "unit minimap";
+  width: 100%;
+}
+
+.minimap {
+  display: flex;
+  grid-area: minimap;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.toolbar {
+  grid-area: toolbar;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.unit {
+  grid-area: unit;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.yields {
+  display: flex;
+  grid-area: yields;
+  align-items: flex-start;
+  justify-content: flex-start;
+}

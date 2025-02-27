@@ -32,7 +32,7 @@
 
 ## Overview
 
-`Civi Orbis` is a turn-based strategy game inspired by the Civilization series. Some may even say it's a Civilization clone. The base concept is the same as in Sid Meier's famous title and a lot of mechanics are very similar. For this reason, I won't write a lot about the game's concept. Let's just say it is about **leading a civilization from prehistory to modern times**.
+`Cives Orbis` is a turn-based strategy game inspired by the Civilization series. Some may even say it's a Civilization clone. The base concept is the same as in Sid Meier's famous title and a lot of mechanics are very similar. For this reason, I won't write a lot about the game's concept. Let's just say it is about **leading a civilization from prehistory to modern times**.
 Despite being the civ clone, the game has some distinct attributes which in my opinion justify is's creation.
 
 ### Why another civ clone?
@@ -40,8 +40,8 @@ Despite being the civ clone, the game has some distinct attributes which in my o
 - There is no good open-source alternative to civ.
   - [FreeCiv](http://www.freeciv.org/) mimics old and outdated civ 2 and is written in an unsafe language.
   - [Unciv](https://github.com/yairm210/Unciv) is a pure civ 5 clone so why not play civ 5?
-- I disagree with a lot of design choices in Civilization series, `Civi Orbis` is going to be my interpretation of the Sid Meier's idea.
-- Civilization games and most of its clones require a powerful gaming pc. I have a brand new business laptop and I can barely run Civ 5 which is already a 10 years old game. Therefore `Civi Orbis` is going to have a simple, clear 2d graphics and low spec requirements.
+- I disagree with a lot of design choices in Civilization series, `Cives Orbis` is going to be my interpretation of the Sid Meier's idea.
+- Civilization games and most of its clones require a powerful gaming pc. I have a brand new business laptop and I can barely run Civ 5 which is already a 10 years old game. Therefore `Cives Orbis` is going to have a simple, clear 2d graphics and low spec requirements.
 - It will run in your browser. Accessible everywhere, runs on anything, clear path to mobile version.
 - The turn times in classic civ games are terrible, especially in the late game. This can be improved.
 - Classic civ games have no proper Linux support.
@@ -58,7 +58,7 @@ A decision making in a classic civ game is a choice between one benefit and the 
 
 ### Game title
 
-`Civi Orbis` means `People of the world`. At least I hope so because I don't know Latin :) First and foremost it sounds cool. It also corresponds with one of the game's main distinct features -> nations.
+`Cives Orbis` means `Citizens of the world`. First and foremost it sounds cool. It also corresponds with one of the game's main distinct features -> nations.
 
 ## The world
 
@@ -394,7 +394,7 @@ TODO
 
 # The beginning of the game
 
-Defining the number of civilizations at the start of the game, like in the Civ games, is highly artificial and makes the game predictable. `Civi Orbis` takes another approach.
+Defining the number of civilizations at the start of the game, like in the Civ games, is highly artificial and makes the game predictable. `Cives Orbis` takes another approach.
 
 - The player can set "civilization density" at the map creation phase.
 - The game starts only with the settler which can found an encampment.

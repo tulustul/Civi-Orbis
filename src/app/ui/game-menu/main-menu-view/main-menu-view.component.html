@@ -1,7 +1,0 @@
-<div class="item" (click)="change.next('new-game-view')">New</div>
-<div class="item" (click)="change.next('load-view')">Load</div>
-
-<ng-container *ngIf="game.init$ | async">
-  <div class="item" (click)="change.next('save-view')">Save</div>
-  <div class="item" (click)="return()">Return</div>
-</ng-container>
