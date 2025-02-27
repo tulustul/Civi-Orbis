@@ -14,6 +14,8 @@ import {
   getBuildingById,
   getIdleProductById,
 } from "../data-manager";
+import { ResourceCore } from "../resources";
+import { RESOURCES_DEFINITIONS } from "@/data/resources";
 
 export interface GameSerialized {
   turn: number;
@@ -31,6 +33,11 @@ interface MapSerialized {
   tiles: TileSerialized[];
 }
 
+type ResourceSerialized = {
+  id: string;
+  quantity: number;
+};
+
 interface TileSerialized {
   climate?: Climate;
   landForm?: LandForm;
@@ -40,6 +47,7 @@ interface TileSerialized {
   riverParts?: TileDirection[];
   forest?: boolean;
   wetlands?: boolean;
+  resource?: ResourceSerialized;
 }
 
 interface ProductSerialized {
@@ -142,12 +150,14 @@ function dumpMap(map: TilesMapCore): MapSerialized {
 
 function dumpTiles(map: TilesMapCore): TileSerialized[] {
   // Store only changes from the last tile to keep save size minimal
-  const result: Partial<TileCore>[] = [];
+  const result: Partial<Omit<TileCore, "resource">>[] = [];
   let lastTile: Partial<TileCore> = {};
   for (let x = 0; x < map.width; x++) {
     for (let y = 0; y < map.height; y++) {
       const tile = map.tiles[x][y];
-      const diff: Partial<TileCore> = {};
+      const diff: Partial<Omit<TileCore, "resource">> & {
+        resource?: ResourceSerialized;
+      } = {};
 
       if (tile.seaLevel !== lastTile.seaLevel) {
         diff.seaLevel = tile.seaLevel;
@@ -171,7 +181,15 @@ function dumpTiles(map: TilesMapCore): TileSerialized[] {
         diff.road = tile.road;
       }
 
-      // The rivers tends to not repeat in subsequent tiles so instead of using diff let's just ignore empty rivers.
+      // Resources don't repeat.
+      if (tile.resource) {
+        diff.resource = {
+          id: tile.resource.definition.id,
+          quantity: tile.resource.quantity,
+        };
+      }
+
+      // The rivers tend to not repeat in subsequent tiles so instead of using diff let's just ignore empty rivers.
       if (tile.riverParts.length) {
         diff.riverParts = tile.riverParts;
       }
@@ -212,6 +230,19 @@ function loadMap(mapData: MapSerialized) {
           : lastTile.improvement;
 
       tile.road = tileData.road !== undefined ? tileData.road! : lastTile.road;
+
+      if (tileData.resource) {
+        const resourceDef = RESOURCES_DEFINITIONS.find(
+          (r) => r.id === tileData.resource?.id,
+        );
+        if (resourceDef) {
+          tile.resource = new ResourceCore(
+            resourceDef,
+            tile,
+            tileData.resource.quantity,
+          );
+        }
+      }
 
       tile.riverParts = tileData.riverParts || [];
 
