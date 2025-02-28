@@ -176,6 +176,12 @@ export interface UnitChanneled {
   canControl: boolean;
 }
 
+export type UnitPathChanneled = {
+  turns: TileCoords[][];
+  startTurn: number;
+  endType: "move" | "attack";
+};
+
 export type UnitDetailsChanneled = {
   id: number;
   tile: TileCoords;
@@ -189,7 +195,7 @@ export type UnitDetailsChanneled = {
   health: number;
   supplies: number;
   order: UnitOrder;
-  path: TileCoords[][] | null;
+  path: UnitPathChanneled | null;
   isSupplied: boolean;
   playerId: number;
   canControl: boolean;
@@ -355,7 +361,7 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
     tiles: Array.from(city.tiles).map(tileToTileCoords),
     totalCulture: city.totalCulture,
     workedTiles: Array.from(city.workedTiles).map(
-      tilesToTileCoordsWithNeighbours,
+      tilesToTileCoordsWithNeighbours
     ),
     yields: city.yields,
     turnsToExpand: city.turnsToExpand,
@@ -379,7 +385,7 @@ export function playerToChannel(player: PlayerCore): PlayerChanneled {
 }
 
 export function trackedPlayerToChannel(
-  player: PlayerCore,
+  player: PlayerCore
 ): TrackedPlayerChanneled {
   return {
     id: player.id,
@@ -411,8 +417,8 @@ export function unitToChannel(unit: UnitCore): UnitChanneled {
       unit.actionPointsLeft === unit.definition.actionPoints
         ? "all"
         : unit.actionPointsLeft > 0
-          ? "some"
-          : "none",
+        ? "some"
+        : "none",
   };
 }
 
@@ -430,10 +436,27 @@ export function unitDetailsToChannel(unit: UnitCore): UnitDetailsChanneled {
     health: unit.health,
     supplies: unit.supplies,
     order: unit.order,
-    path: unit.path?.map((row) => row.map(tileToTileCoords)) || null,
+    path: unitToUnitPathChannelled(unit),
     isSupplied: unit.isSupplied,
     playerId: unit.player.id,
     canControl: unit.player === unit.player.game.trackedPlayer,
+  };
+}
+
+export function unitToUnitPathChannelled(
+  unit: UnitCore
+): UnitPathChanneled | null {
+  if (!unit.path) {
+    return null;
+  }
+
+  const i = unit.path.length - 1;
+  const lastTile = unit.path[i][unit.path[i].length - 1];
+
+  return {
+    turns: unit.path?.map((row) => row.map(tileToTileCoords)) || null,
+    startTurn: unit.actionPointsLeft > 0 ? 0 : 1,
+    endType: lastTile.getFirstEnemyUnit(unit) ? "attack" : "move",
   };
 }
 
@@ -446,7 +469,7 @@ export function unitMoveToChannel(move: UnitMoveCore): UnitMoveChanneled {
 
 export function tileDetailsToChannel(
   tile: TileCore,
-  forPlayer: PlayerCore,
+  forPlayer: PlayerCore
 ): TileDetailsChanneled {
   return {
     ...tileToChannel(tile),
@@ -472,7 +495,7 @@ export function tileToTileCoordsWithUnits(tile: TileCore): TileCoordsWithUnits {
 }
 
 export function tilesToTileCoordsWithNeighbours(
-  tile: TileCore,
+  tile: TileCore
 ): TilesCoordsWithNeighbours {
   return {
     ...tileToTileCoords(tile),
@@ -483,7 +506,7 @@ export function tilesToTileCoordsWithNeighbours(
 export function cityProductToChannel(
   city: CityCore,
   product: ProductDefinition,
-  disabledProducts?: Set<ProductDefinition>,
+  disabledProducts?: Set<ProductDefinition>
 ): CityProductChanneled {
   return {
     enabled: disabledProducts ? !disabledProducts.has(product) : true,

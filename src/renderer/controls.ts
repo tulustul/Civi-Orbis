@@ -66,23 +66,16 @@ export class Controls {
   }
 
   onMouseUp() {
-    // const [x, y] = camera.screenToGame(event.clientX, event.clientY);
-
     const selectedUnit = mapUi.selectedUnit;
     if (selectedUnit && this.mouseButton === 2) {
-      // const tile = game.state!.map.get(x, y);
-      // if (tile) {
       bridge.units.moveAlongPath(selectedUnit.id).then(async (unit) => {
         if (!unit) {
           return;
         }
-        mapUi.setPath(selectedUnit.path);
-        // to refresh the ui
-        mapUi["_selectedUnit$"].next(selectedUnit);
+        mapUi["_selectedUnit$"].next(unit);
+        mapUi.setPath(unit.path);
         mapUi.clickTile(unit.tile);
-        // mapUi.unitRangeArea.setTiles(await selectedUnit.getRange());
       });
-      // }
     }
 
     this._mouseButton$.next(null);
@@ -116,7 +109,7 @@ export class Controls {
       1 + (event.deltaY > 0 ? -0.3 : 0.3),
       event.clientX,
       event.clientY,
-      300,
+      300
     );
   }
 

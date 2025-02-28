@@ -16,7 +16,7 @@ export enum MoveResult {
 export function getMoveResult(
   unit: UnitCore,
   from: TileCore,
-  to: TileCore,
+  to: TileCore
 ): MoveResult {
   if (!unit.player.exploredTiles.has(to)) {
     return MoveResult.move;
@@ -70,7 +70,7 @@ export function getMoveCost(
   unit: UnitCore,
   moveResult: MoveResult,
   from: TileCore,
-  to: TileCore,
+  to: TileCore
 ): number {
   const cost = from.neighboursCosts.get(to) ?? Infinity;
 
@@ -175,9 +175,11 @@ export function moveAlongPath(unit: UnitCore) {
       }
     }
 
-    unit.path[0].shift();
-    if (!unit.path[0].length) {
-      unit.path.shift();
+    if (unit.actionPointsLeft) {
+      unit.path[0].shift();
+      if (!unit.path[0].length) {
+        unit.path.shift();
+      }
     }
     if (!unit.path.length) {
       unit.path = null;

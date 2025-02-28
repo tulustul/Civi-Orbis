@@ -24,7 +24,7 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
   const turnCost = 1 / unit.definition.actionPoints;
   tilesToVisit.set(start, 0);
   costsSoFar.set(start, 0);
-  cameFrom.set(start, [0, unit.definition.actionPoints, null]);
+  cameFrom.set(start, [0, unit.actionPointsLeft, null]);
 
   while (tilesToVisit.size) {
     let nextTile!: TileCore;
@@ -84,7 +84,7 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
           costsSoFar.set(neighbour, costSoFar);
           tilesToVisit.set(
             neighbour,
-            costSoFar + getEuclideanDistance(neighbour, end) * turnCost,
+            costSoFar + getEuclideanDistance(neighbour, end) * turnCost
           );
           cameFrom.set(neighbour, [turn, newActionPointsLeft, nextTile]);
         }
@@ -101,13 +101,13 @@ export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
 function getEuclideanDistance(start: TileCore, end: TileCore) {
   return Math.sqrt(
     (start.x - end.x) * (start.x - end.x) +
-      (start.y - end.y) * (start.y - end.y),
+      (start.y - end.y) * (start.y - end.y)
   );
 }
 
 function reconstructPath(
   cameFrom: Map<TileCore, [number, number, TileCore | null]>,
-  target: TileCore,
+  target: TileCore
 ): TileCore[][] {
   let lastTile = target;
   let lastTurn: number | null = null;

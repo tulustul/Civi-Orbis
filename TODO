@@ -11,7 +11,7 @@ Bugs:
   ✔ imprecise tile selection @done(25-02-26 22:48)
   ✘ next turn should hide city view @cancelled(25-02-26 00:15)
   ☐ map generator: fix rivers placement - loops, dead ends etc.
-  ☐ unit path is showing wrong turns count
+  ✔ unit path is showing wrong turns count @done(25-02-28 20:16)
   ☐ webgl fonts scaling
   ✔ yields change received when selecting a unit @done(20-06-09 20:01)
   ✔ yields change received when using pathfinding @done(20-06-09 20:01)
@@ -31,9 +31,9 @@ Refactor:
   ☐ core: minimize boilerplate in serialization (not sure if worth it)
 
 Minor features:
+  ☐ selected unit marker
   ☐ show on map that using is sleeping/skipping move
   ☐ store game settings in local storage
-  ☐ better visibility of current unit order (on the map)
   ☐ style city view
   ☐ minimap autoscale to explored area
   ☐ limit map panning/zoom to explored map area

@@ -34,9 +34,8 @@ import {
   UnitMoveChanneled,
 } from "@/core/serialization/channel";
 import { PlayerTask, PlayerYields } from "@/shared";
-import { makeCommand, makeObservable } from "./worker";
-import { CityRevealedResult } from "@/core/collector";
 import { shareReplay } from "rxjs";
+import { makeCommand, makeObservable } from "./worker";
 
 export const bridge = {
   nextTask$: makeObservable<PlayerTask | null>("nextTask"),
@@ -57,7 +56,7 @@ export const bridge = {
     getSuppliedTiles: (playerId: number) =>
       makeCommand<TilesCoordsWithNeighbours[]>(
         "player.getSuppliedTiles",
-        playerId,
+        playerId
       ),
     trackPlayer: (playerId: number) =>
       makeCommand<PlayerChanneled>("trackedPlayer.set", playerId),
@@ -67,7 +66,7 @@ export const bridge = {
     explored$: makeObservable<TileCoords[]>("trackedPlayer.tilesExplored"),
     showed$: makeObservable<TileCoords[]>("trackedPlayer.tilesShowed"),
     showedAdded$: makeObservable<TileCoords[]>(
-      "trackedPlayer.tilesShowedAdded",
+      "trackedPlayer.tilesShowedAdded"
     ),
     getAll: () => makeCommand<TileChanneled[]>("tile.getAll"),
     getAllExplored: () => makeCommand<TileCoords[]>("tile.getAllExplored"),
@@ -110,7 +109,7 @@ export const bridge = {
     moveAlongPath: (unitId: number) =>
       makeCommand<UnitDetailsChanneled | null>("unit.moveAlongPath", unitId),
     getFailedActionRequirements: (
-      options: UnitGetFailedActionRequirementsOptions,
+      options: UnitGetFailedActionRequirementsOptions
     ) => makeCommand<string[]>("unit.getFailedActionRequirements", options),
     simulateCombat: (options: UnitSimulateCombatOptions) =>
       makeCommand<CombatSimulation | null>("unit.simulateCombat", options),

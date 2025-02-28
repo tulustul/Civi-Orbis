@@ -7,6 +7,7 @@ import {
   TileHoverDetails,
   UnitChanneled,
   UnitDetailsChanneled,
+  UnitPathChanneled,
 } from "@/core/serialization/channel";
 import { camera } from "@/renderer/camera";
 import { BehaviorSubject } from "rxjs";
@@ -17,7 +18,7 @@ export class MapUi {
   hoveredTile$ = this._hoveredTile$.asObservable().pipe(distinctUntilChanged());
 
   private _tileHoverDetails$ = new BehaviorSubject<TileHoverDetails | null>(
-    null,
+    null
   );
   tileHoverDetails$ = this._tileHoverDetails$
     .asObservable()
@@ -25,7 +26,7 @@ export class MapUi {
 
   combatSimulation$ = this.tileHoverDetails$.pipe(
     map((d) => d?.combatSimulation),
-    distinctUntilChanged(),
+    distinctUntilChanged()
   );
 
   private _clickedTile$ = new BehaviorSubject<TileCoords | null>(null);
@@ -36,18 +37,18 @@ export class MapUi {
   clickedTileDetails$ = this._clickedTileDetails$.asObservable();
 
   private _selectedTile$ = new BehaviorSubject<TileDetailsChanneled | null>(
-    null,
+    null
   );
   selectedTile$ = this._selectedTile$.asObservable();
 
-  private _activePath$ = new BehaviorSubject<TileCoords[][] | null>(null);
+  private _activePath$ = new BehaviorSubject<UnitPathChanneled | null>(null);
   activePath$ = this._activePath$.asObservable();
 
   private _yieldsVisible$ = new BehaviorSubject<boolean>(true);
   yieldsVisible$ = this._yieldsVisible$.pipe(distinctUntilChanged());
 
   private _selectedUnit$ = new BehaviorSubject<UnitDetailsChanneled | null>(
-    null,
+    null
   );
   selectedUnit$ = this._selectedUnit$.asObservable();
 
@@ -58,7 +59,7 @@ export class MapUi {
   hoveredCity$ = this._hoveredCity$.pipe(distinctUntilChanged());
 
   private _selectedCity$ = new BehaviorSubject<CityDetailsChanneled | null>(
-    null,
+    null
   );
   selectedCity$ = this._selectedCity$.pipe(distinctUntilChanged());
 
@@ -83,7 +84,7 @@ export class MapUi {
       const selectedTile = this._selectedTile$.value;
       if (selectedTile) {
         const newSelectedTile = tiles.find(
-          (tile) => tile.id === selectedTile.id,
+          (tile) => tile.id === selectedTile.id
         );
         if (newSelectedTile) {
           const tileDetails = await bridge.tiles.getDetails(newSelectedTile.id);
@@ -105,7 +106,7 @@ export class MapUi {
       const selectedCity = this.selectedCity;
       if (selectedCity && tileDetails.areaOf === selectedCity.id) {
         const isWorked = !!selectedCity.workedTiles.find(
-          (t) => t.id === tileDetails.id,
+          (t) => t.id === tileDetails.id
         );
         let updatedCityDetails: CityDetailsChanneled | null;
         if (isWorked) {
@@ -219,7 +220,7 @@ export class MapUi {
     this._hoveredTile$.next(tile);
   }
 
-  setPath(path: TileCoords[][] | null) {
+  setPath(path: UnitPathChanneled | null) {
     this._activePath$.next(path);
   }
 
