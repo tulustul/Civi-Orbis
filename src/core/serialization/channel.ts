@@ -174,6 +174,7 @@ export interface UnitChanneled {
   supplies: number;
   playerId: number;
   canControl: boolean;
+  order: UnitOrder;
 }
 
 export type UnitPathChanneled = {
@@ -413,6 +414,7 @@ export function unitToChannel(unit: UnitCore): UnitChanneled {
     actionPointsLeft: unit.actionPointsLeft,
     playerId: unit.player.id,
     canControl: unit.player === unit.player.game.trackedPlayer,
+    order: unit.order,
     actions:
       unit.actionPointsLeft === unit.definition.actionPoints
         ? "all"

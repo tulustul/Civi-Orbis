@@ -41,6 +41,14 @@ export class UnitsDrawer {
       }
     });
 
+    bridge.units.updated$.subscribe((unit) => {
+      const drawer = this.units.get(unit.id);
+      if (drawer) {
+        drawer.unit = unit;
+        drawer.updateUi();
+      }
+    });
+
     bridge.game.start$.subscribe(() => {
       this.clear();
     });
@@ -176,11 +184,35 @@ export class UnitDrawer {
     this.g.clear();
 
     if (this.unit.canControl) {
-      this.iconContainer.alpha = this.unit.actions === "none" ? 0.5 : 1;
+      if (this.unit.actions === "none") {
+        this.iconContainer.alpha = 0.5;
+        // } else if (this.unit.order === "skip" || this.unit.order === "sleep") {
+        //   this.iconContainer.alpha = 0.7;
+      } else {
+        this.iconContainer.alpha = 1;
+      }
     }
 
+    this.drawStatusIcon();
     this.drawHealthBar();
     this.drawChildrenCount();
+  }
+
+  private drawStatusIcon() {
+    let color = 0;
+
+    if (!this.unit.actionPointsLeft) {
+      color = 0xff2222;
+    } else if (this.unit.order === "skip" || this.unit.order === "sleep") {
+      color = 0x6666ff;
+    }
+
+    if (color) {
+      this.g
+        .circle(35, -35, 8)
+        .stroke({ width: 10, color: 0x333333 })
+        .fill(color);
+    }
   }
 
   private drawHealthBar() {
@@ -317,13 +349,13 @@ export class UnitDrawer {
 
   updateZIndex() {
     this.container.zIndex = this.unit.tile.units.findIndex(
-      (u) => u.id === this.unit.id,
+      (u) => u.id === this.unit.id
     );
   }
 
   tileToUnitPosition(
     tile: TileCoordsWithUnits,
-    ignoreOthers = false,
+    ignoreOthers = false
   ): [number, number] {
     let x = tile.x + (tile.y % 2 ? 1 : 0.5);
 

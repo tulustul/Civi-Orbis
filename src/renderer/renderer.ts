@@ -1,32 +1,32 @@
 import {
   Application,
   Container,
-  MaskFilter,
-  UpdateTransformOptions,
-  RenderLayer,
-  IRenderLayer,
   Filter,
+  IRenderLayer,
+  MaskFilter,
+  RenderLayer,
+  UpdateTransformOptions,
 } from "pixi.js";
 
-import { merge, Subject } from "rxjs";
+import { Subject } from "rxjs";
 
+import { mapUi } from "@/ui/mapUi";
+import { animationsManager } from "./animation";
+import { AreasDrawer } from "./areasDrawer";
+import { camera } from "./camera";
+import { CityFocusDrawer } from "./cityFocusDrawer";
+import { ExploredTilesDrawer } from "./exploredTilesDrawer";
+import { FogOfWarFilter } from "./filters/fog-of-war-filter";
+import { GrayscaleFilter } from "./filters/grayscaleFilter";
 import { FogOfWarDrawer } from "./fog-of-war";
 import { Grid } from "./grid";
 import { Layer } from "./layer";
 import { OverlaysRenderer } from "./overlays";
 import { PathRenderer } from "./path";
-import { MapDrawer } from "./terrain";
-import { ExploredTilesDrawer } from "./exploredTilesDrawer";
-import { camera } from "./camera";
-import { FogOfWarFilter } from "./filters/fog-of-war-filter";
-import { UnitsDrawer } from "./unitsDrawer";
-import { Animations, animationsManager } from "./animation";
-import { AreasDrawer } from "./areasDrawer";
-import { mapUi } from "@/ui/mapUi";
-import { CityFocusDrawer } from "./cityFocusDrawer";
-import { GrayscaleFilter } from "./filters/grayscaleFilter";
 import { PoliticsDrawer } from "./politicsDrawer";
-import { bridge } from "@/bridge";
+import { MapDrawer } from "./terrain";
+import { UnitsDrawer } from "./unitsDrawer";
+import { SelectedUnitDrawer } from "./selectedUnitDrawer";
 
 export class GameRenderer {
   app!: Application;
@@ -57,6 +57,7 @@ export class GameRenderer {
   unitsDrawer = new UnitsDrawer(this.unitsContainer);
   areaDrawer = new AreasDrawer(this.overlaysContainer);
   politicsDrawer = new PoliticsDrawer(this.politicsContainer);
+  selectedUnitDrawer = new SelectedUnitDrawer(this.mapContainer);
 
   cityFocusFilter!: GrayscaleFilter;
 
@@ -105,6 +106,7 @@ export class GameRenderer {
       height,
       preference: "webgl",
       antialias: true,
+      bezierSmoothness: 1,
     });
 
     camera.setApp(this.app);
@@ -120,7 +122,7 @@ export class GameRenderer {
 
     this.fogOfWarDrawer = new FogOfWarDrawer(this.fogOfWarLayer.stage);
     this.visibleTilesDrawer = new ExploredTilesDrawer(
-      this.exploredTilesLayer.stage,
+      this.exploredTilesLayer.stage
     );
     this.cityFocusFilter = new GrayscaleFilter({
       sprite: this.cityFocusLayer.sprite,
@@ -173,6 +175,7 @@ export class GameRenderer {
 
     this.app.ticker.add(() => {
       animationsManager.update(this.app.ticker.deltaMS);
+      this.selectedUnitDrawer.tick(this.app.ticker.deltaMS);
       this._tick$.next();
 
       const scale = camera.transform.scale;
@@ -185,7 +188,7 @@ export class GameRenderer {
       if (this.politicsDrawer) {
         const backgroundOpacity = Math.min(
           0.4,
-          Math.max(0, (70 - scale) / 150),
+          Math.max(0, (70 - scale) / 150)
         );
 
         const borderShadow = Math.max(0.4, Math.min(0.7, (150 - scale) / 100));
@@ -224,20 +227,20 @@ export class GameRenderer {
       unitsFilters.push(
         new MaskFilter({
           sprite: this.fogOfWarLayer.sprite,
-        }),
+        })
       );
 
       mapFilters.push(
         new MaskFilter({
           sprite: this.exploredTilesLayer.sprite,
         }),
-        new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite }),
+        new FogOfWarFilter({ sprite: this.fogOfWarLayer.sprite })
       );
 
       politicsFilters.push(
         new MaskFilter({
           sprite: this.exploredTilesLayer.sprite,
-        }),
+        })
       );
     }
 

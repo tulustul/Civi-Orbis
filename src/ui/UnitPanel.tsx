@@ -1,7 +1,7 @@
 import { bridge } from "@/bridge";
 import { UnitOrder } from "@/core/unit";
 import { ACTIONS, UnitAction } from "@/core/unit-actions";
-import { useForceRender, useObservable } from "@/utils";
+import { useObservable } from "@/utils";
 import clsx from "clsx";
 import { Panel, Tooltip } from "./components";
 import { mapUi } from "./mapUi";
@@ -9,7 +9,6 @@ import styles from "./UnitPanel.module.css";
 
 export function UnitPanel() {
   const unit = useObservable(mapUi.selectedUnit$);
-  const forceRender = useForceRender();
 
   function destroy() {}
 
@@ -17,15 +16,23 @@ export function UnitPanel() {
     if (!unit) {
       return;
     }
-    await bridge.units.setOrder({ unitId: unit.id, order });
-    forceRender();
+    const updatedUnit = await bridge.units.setOrder({ unitId: unit.id, order });
+    if (updatedUnit) {
+      mapUi.setUnitDetails(updatedUnit);
+    }
   }
 
   async function doAction(action: UnitAction) {
     if (!unit) {
       return;
     }
-    await bridge.units.doAction({ action, unitId: unit.id });
+    const updatedUnit = await bridge.units.doAction({
+      action,
+      unitId: unit.id,
+    });
+    if (updatedUnit) {
+      mapUi.setUnitDetails(updatedUnit);
+    }
   }
 
   function getActionName(action: UnitAction) {

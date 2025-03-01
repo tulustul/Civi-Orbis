@@ -243,6 +243,10 @@ export class MapUi {
     this._selectedCity$.next(city);
   }
 
+  setUnitDetails(unit: UnitDetailsChanneled) {
+    this._selectedUnit$.next(unit);
+  }
+
   hoverCity(cityId: number | null) {
     this._hoveredCity$.next(cityId);
   }
