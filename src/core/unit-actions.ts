@@ -79,7 +79,7 @@ export class ImprovementNotYetBuiltRequirement extends ActionRequirement {
   }
 
   check(unit: UnitCore) {
-    return unit.tile.improvement !== this.improvement;
+    return !unit.tile.city && unit.tile.improvement !== this.improvement;
   }
 }
 export class IsImprovementPossibleRequirement extends ActionRequirement {

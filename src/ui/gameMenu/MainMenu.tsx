@@ -13,7 +13,7 @@ export function MainMenu() {
 
   async function start() {
     await bridge.game.new({
-      aiPlayersCount: 5,
+      aiPlayersCount: 15,
       width: 50,
       height: 40,
       humanPlayersCount: 0,

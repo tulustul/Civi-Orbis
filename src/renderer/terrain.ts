@@ -72,10 +72,7 @@ export class MapDrawer {
 
   tileDrawers = new Map<number, TileDrawer>();
 
-  constructor(
-    container: Container,
-    private yieldsLayer: IRenderLayer,
-  ) {
+  constructor(container: Container, private yieldsLayer: IRenderLayer) {
     container.addChild(this.terrainContainer);
 
     bridge.tiles.updated$.subscribe((tiles) => {
@@ -133,10 +130,7 @@ class TileDrawer {
   citySprite: Sprite | null = null;
   riverGraphics: Graphics | null = null;
 
-  constructor(
-    private tile: TileChanneled,
-    private yieldsLayer: IRenderLayer,
-  ) {
+  constructor(private tile: TileChanneled, private yieldsLayer: IRenderLayer) {
     this.container.zIndex = tile.y;
 
     putContainerAtTile(this.terrainSprite, tile);
@@ -217,6 +211,7 @@ class TileDrawer {
 
     if (!this.resourceSprite) {
       this.resourceSprite = new Sprite();
+      this.resourceSprite.zIndex = 20;
       this.container.addChild(this.resourceSprite);
     }
 
@@ -238,6 +233,7 @@ class TileDrawer {
 
     if (!this.roadSprite) {
       this.roadSprite = new Sprite();
+      this.roadSprite.zIndex = 10;
       this.container.addChild(this.roadSprite);
     }
 

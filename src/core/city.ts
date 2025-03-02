@@ -203,6 +203,7 @@ export class CityCore {
         this.updateYields();
         this.player.updateYields();
       }
+      this.player.citiesWithoutProduction.push(this);
     }
   }
 

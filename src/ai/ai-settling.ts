@@ -17,10 +17,10 @@ export class SettlingAI extends AISystem {
 
   private processCities() {
     const settler = getUnitById("unit_settler")!;
-    console.log(this.player.id, this.player.citiesWithoutProduction);
     for (const city of this.player.citiesWithoutProduction) {
       if (Math.random() > 0.7 && city.canProduce(settler)) {
         const newCityLocation = this.findCityLocation(city.tile);
+        console.log({ newCityLocation });
         if (newCityLocation) {
           this.operations.push({
             group: "city-produce",

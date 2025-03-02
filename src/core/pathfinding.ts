@@ -2,16 +2,22 @@ import { TileCore } from "./tile";
 import { UnitCore } from "./unit";
 import { getMoveCost, getMoveResult, MoveResult } from "./movement";
 
-export function findPath(unit: UnitCore, end: TileCore): TileCore[][] | null {
+export function findPath(
+  unit: UnitCore,
+  end: TileCore,
+  start?: TileCore
+): TileCore[][] | null {
   const startTime = performance.now();
 
-  const start = unit.tile;
+  if (!start) {
+    start = unit.tile;
+  }
 
   if (start === end) {
     return null;
   }
 
-  const moveResult = getMoveResult(unit, unit.tile, end);
+  const moveResult = getMoveResult(unit, start, end);
   if (moveResult === MoveResult.none) {
     return null;
   }

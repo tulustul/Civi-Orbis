@@ -6,6 +6,7 @@ import { SettlingAI } from "./ai-settling";
 import { AISystem } from "./ai-system";
 import { AiOperation } from "./types";
 import { ProductionAI } from "./ai-production";
+import { WorkerAI } from "./ai-worker";
 
 export type AiPriorities = {
   expansion: number;
@@ -18,10 +19,11 @@ export class AIPlayer {
   productionAi = new ProductionAI(this);
 
   systems: AISystem[] = [
-    new SettlingAI(this),
     new CityAI(this),
+    new SettlingAI(this),
     new ExploringAI(this),
     new MilitaryAI(this),
+    new WorkerAI(this),
     this.productionAi,
   ];
 
@@ -37,9 +39,15 @@ export class AIPlayer {
   nextTurn() {
     const operations = this.prepareOperations();
 
+    this.updatePriorities();
+
     for (const op of operations) {
       op.perform();
     }
+  }
+
+  private updatePriorities() {
+    this.priorites.expansion = Math.max(1, 5 / this.player.cities.length);
   }
 
   private prepareOperations(): AiOperation[] {

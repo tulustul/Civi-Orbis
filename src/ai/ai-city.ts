@@ -1,10 +1,16 @@
-import { getIdleProductById } from "@/core/data-manager";
 import { CityCore } from "@/core/city";
+import { ProductDefinition } from "@/core/data.interface";
 import { AISystem } from "./ai-system";
 
 export class CityAI extends AISystem {
   plan() {
     this.operations = [];
+    for (const city of this.player.cities) {
+      if (city.product?.productType === "idleProduct" && Math.random() > 0.9) {
+        city.cancelProduction();
+      }
+    }
+
     for (const city of this.player.citiesWithoutProduction) {
       this.processCityProduct(city);
     }
@@ -16,21 +22,25 @@ export class CityAI extends AISystem {
       (b) => !city.disabledProducts.has(b)
     );
 
-    let perform: () => void;
+    let product: ProductDefinition;
 
     if (buildings.length) {
-      perform = () => city.produceBuilding(buildings[0]);
+      product = buildings[Math.floor(Math.random() * buildings.length)];
     } else {
-      perform = () =>
-        city.workOnIdleProduct(getIdleProductById("idle_product_culture")!);
+      product =
+        city.availableIdleProducts[
+          Math.floor(Math.random() * city.availableIdleProducts.length)
+        ];
     }
 
-    this.operations.push({
-      group: "city-produce",
-      entityId: city.id,
-      focus: "economy",
-      priority: 100,
-      perform,
-    });
+    if (product) {
+      this.operations.push({
+        group: "city-produce",
+        entityId: city.id,
+        focus: "economy",
+        priority: product.productType === "idleProduct" ? 10 : 100,
+        perform: () => city.produce(product),
+      });
+    }
   }
 }
