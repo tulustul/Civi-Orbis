@@ -8,17 +8,22 @@ import clsx from "clsx";
 import { Icon } from "../components/Icon";
 
 import { bridge } from "@/bridge";
+import { PropsWithChildren } from "react";
 import { mapUi } from "../mapUi";
 import styles from "./City.module.scss";
 import { ProductRequirements } from "./ProductRequirements";
-import { Children, PropsWithChildren } from "react";
 
 type Props = {
   city: CityDetailsChanneled;
 };
 
 export function CityMainPanel({ city }: Props) {
-  function optimizeYields() {}
+  async function optimizeYields() {
+    const updatedCity = await bridge.cities.optimizeYields(city.id);
+    if (updatedCity) {
+      mapUi.setCityDetails(updatedCity);
+    }
+  }
 
   async function produce(product: CityProductChanneled) {
     if (!product.enabled) {
@@ -30,7 +35,9 @@ export function CityMainPanel({ city }: Props) {
       productType: product.definition.productType,
     });
 
-    mapUi.setCityDetails(updatedCity);
+    if (updatedCity) {
+      mapUi.setCityDetails(updatedCity);
+    }
   }
 
   return (

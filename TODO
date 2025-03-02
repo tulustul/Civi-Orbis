@@ -9,26 +9,18 @@ Bugs:
   ✔ conquered city does not change color @done(25-02-27 18:54)
   ✔ saving map resources @done(25-02-27 18:46)
   ✔ imprecise tile selection @done(25-02-26 22:48)
-  ✘ next turn should hide city view @cancelled(25-02-26 00:15)
   ☐ map generator: fix rivers placement - loops, dead ends etc.
   ✔ unit path is showing wrong turns count @done(25-02-28 20:16)
-  ☐ webgl fonts scaling
+  ✔ webgl fonts scaling @done(25-03-01 15:06)
   ✔ yields change received when selecting a unit @done(20-06-09 20:01)
   ✔ yields change received when using pathfinding @done(20-06-09 20:01)
   ✔ land units can access sea and vice versa under some cirmumstances @done(21-04-03 12:41)
+  ☐ disembark + attack is broken
 
 Performance:
-  ☐ core: distinguish between commands that mutate the state and those which don't
-  ☐ core: disable collector while game is loading
-  ☐ renderer: render terrain to texture so that not the entire view have to been rerendered each frame
-  ☐ core: pathfinding is not optimized yet
-  ☐ core: avoid zoc and supplies recalculations when initializing the game. Those should be handled in a single precomputation pass.
-  ☐ core: update zoc and supplies once in moveAlongPath instead of in _move
-  ☐ partial collector flush (make max buffer size of 10)
 
 Refactor:
   ✔ renderer: still a mess @done(25-02-25 23:32)
-  ☐ core: minimize boilerplate in serialization (not sure if worth it)
 
 Minor features:
   ✔ selected unit marker @done(25-03-01 14:24)
@@ -38,9 +30,7 @@ Minor features:
   ☐ minimap autoscale to explored area
   ☐ limit map panning/zoom to explored map area
   ☐ nicer rendering of out of map area
-  ☐ closing city view should restore previous camera transform
   ☐ start game view
-  ☐ tooltips for more ui elements
   ☐ autosaving
   ☐ city production queue
   ☐ previous/next city button in the city view
@@ -48,9 +38,6 @@ Minor features:
   ☐ proper starting locations
   ☐ map generator: more realistic orogeny
   ☐ map generator: climate based on mountain ranges and sea currents
-  ☐ improve unit visibility range
-  ☐ improve city visibility range
-  ☐ pathfinding: verify path each turn
   ✔ unit move animations @done(25-02-25 23:32)
   ☐ combat animations
 

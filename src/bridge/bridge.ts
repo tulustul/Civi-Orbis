@@ -122,7 +122,7 @@ export const bridge = {
     getDetails: (cityId: number) =>
       makeCommand<CityDetailsChanneled | null>("city.getDetails", cityId),
     produce: (options: CityProduceOptions) =>
-      makeCommand<CityDetailsChanneled>("city.produce", options),
+      makeCommand<CityDetailsChanneled | null>("city.produce", options),
     getRange: (cityId: number) =>
       makeCommand<CityRange | null>("city.getRange", cityId),
     getWorkTiles: (cityId: number) =>
