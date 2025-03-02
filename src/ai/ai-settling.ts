@@ -1,23 +1,80 @@
-import { TileCore } from "../core/tile";
-import { UnitCore } from "../core/unit";
-import { AiOperation } from "./ai-operations";
+import { moveAlongPath } from "@/core/movement";
+import { TileCore } from "@/core/tile";
+import { UnitCore } from "@/core/unit";
+import { findPath } from "@/core/pathfinding";
+import { getUnitById } from "@/core/data-manager";
 import { AISystem } from "./ai-system";
-
-export class FoundCityOperation extends AiOperation {
-  target: TileCore | null = null;
-  settler: UnitCore | null = null;
-
-  perform() {}
-}
 
 export class SettlingAI extends AISystem {
   citySpots: TileCore[] = [];
 
   plan() {
-    return [];
+    this.operations = [];
+    this.processCities();
+    this.processSettlers();
+    return this.operations;
   }
 
-  public findCityLocation(startTile: TileCore): TileCore | null {
+  private processCities() {
+    const settler = getUnitById("unit_settler")!;
+    console.log(this.player.id, this.player.citiesWithoutProduction);
+    for (const city of this.player.citiesWithoutProduction) {
+      if (Math.random() > 0.7 && city.canProduce(settler)) {
+        const newCityLocation = this.findCityLocation(city.tile);
+        if (newCityLocation) {
+          this.operations.push({
+            group: "city-produce",
+            entityId: city.id,
+            focus: "expansion",
+            priority: 100,
+            perform: () => {
+              city.produce(settler);
+            },
+          });
+          return;
+        }
+      }
+    }
+  }
+
+  private processSettlers() {
+    for (const unit of this.player.units) {
+      if (unit.definition.actions.includes("foundCity")) {
+        this.processSettler(unit);
+      }
+    }
+  }
+
+  private processSettler(unit: UnitCore) {
+    this.operations.push({
+      group: "unit",
+      entityId: unit.id,
+      focus: "expansion",
+      priority: 100,
+      perform: () => {
+        const destination = unit.getPathDestination();
+        if (!destination || destination.areaOf) {
+          const bestCityLocation = this.findCityLocation(unit.tile);
+          if (!bestCityLocation) {
+            unit.order = "sleep";
+            return;
+          }
+
+          if (unit.tile === bestCityLocation) {
+            unit.doAction("foundCity");
+          } else {
+            unit.path = findPath(unit, bestCityLocation);
+          }
+        }
+
+        if (unit.path) {
+          moveAlongPath(unit);
+        }
+      },
+    });
+  }
+
+  private findCityLocation(startTile: TileCore): TileCore | null {
     const tiles = startTile.getTilesInRange(5);
 
     let bestSweetSpotValue = 0;

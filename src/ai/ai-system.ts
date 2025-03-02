@@ -1,5 +1,5 @@
-import { AiOperation } from "./ai-operations";
 import { AIPlayer } from "./ai-player";
+import { AiOperation } from "./types";
 
 export abstract class AISystem {
   protected operations: AiOperation[] = [];

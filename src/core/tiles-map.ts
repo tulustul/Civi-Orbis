@@ -2,9 +2,16 @@ import { TileCore } from "./tile";
 import { getTileNeighbours, getTileFullNeighbours } from "../shared/hex-math";
 import { LandForm, SeaLevel } from "../shared";
 
+export type PassableArea = {
+  id: number;
+  type: "land" | "water";
+  area: number;
+};
+
 export class TilesMapCore {
   tiles: TileCore[][] = [];
   tilesMap = new Map<number, TileCore>();
+  passableAreas = new Map<number, PassableArea>();
 
   constructor(public width: number, public height: number) {
     for (let x = 0; x < width; x++) {
@@ -50,19 +57,24 @@ export class TilesMapCore {
         }
 
         if (tile.landForm === LandForm.mountains) {
-          tile.passableArea = -1;
+          tile.passableArea = null;
           continue;
         }
-
-        this.computePassableArea(tile, areaId++, visited);
+        const passableArea: PassableArea = {
+          id: areaId++,
+          type: tile.seaLevel === SeaLevel.none ? "land" : "water",
+          area: 1,
+        };
+        this.passableAreas.set(passableArea.id, passableArea);
+        this.computePassableArea(tile, passableArea, visited);
       }
     }
   }
 
   private computePassableArea(
     startTile: TileCore,
-    areaId: number,
-    visited: Set<TileCore>,
+    passableArea: PassableArea,
+    visited: Set<TileCore>
   ) {
     // Cannot use recursion here because it fails with too many recursion levels on bigger maps. Using queue instead.
     const queue: TileCore[] = [startTile];
@@ -70,7 +82,7 @@ export class TilesMapCore {
 
     while (queue.length) {
       const tile = queue.shift()!;
-      tile.passableArea = areaId;
+      tile.passableArea = passableArea;
 
       for (const neighbour of tile.neighbours) {
         if (visited.has(neighbour)) {
@@ -90,6 +102,7 @@ export class TilesMapCore {
         if (!isMountains && (areBothLand || areBothWater)) {
           visited.add(neighbour);
           queue.push(neighbour);
+          passableArea.area++;
         }
       }
     }

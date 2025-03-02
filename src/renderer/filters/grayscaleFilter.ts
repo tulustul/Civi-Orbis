@@ -73,7 +73,7 @@ void main() {
 
   if (mask.r < 0.5) {
     vec3 outColor = desaturate(color.rgb, 1.0 * strength);
-    outColor = setContrast(outColor, 1.0 - 0.2 * strength);
+    outColor = setContrast(outColor, 1.0 - 0.5 * strength);
     gl_FragColor = vec4(outColor, color.a);
   } else {
     gl_FragColor = color;
@@ -132,12 +132,12 @@ export class GrayscaleFilter extends Filter {
     filterManager: FilterSystem,
     input: Texture,
     output: Texture,
-    clearMode: boolean,
+    clearMode: boolean
   ): void {
     filterManager
       .calculateSpriteMatrix(
         (this.resources as any).filterUniforms.uniforms.uFilterMatrix as Matrix,
-        this.sprite,
+        this.sprite
       )
       .prepend(this._textureMatrix.mapCoord);
 

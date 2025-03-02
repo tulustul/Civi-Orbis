@@ -557,12 +557,13 @@ export function cityProduce(options: CityProduceOptions) {
     return;
   }
 
+  city.produce;
   if (options.productType === "building") {
-    city.produceBuilding(getBuildingById(options.productId)!);
+    city.produce(getBuildingById(options.productId)!);
   } else if (options.productType === "unit") {
-    city.produceUnit(getUnitById(options.productId)!);
+    city.produce(getUnitById(options.productId)!);
   } else {
-    city.workOnIdleProduct(getIdleProductById(options.productId)!);
+    city.produce(getIdleProductById(options.productId)!);
   }
 
   return cityDetailsToChannel(city);

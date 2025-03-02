@@ -43,7 +43,7 @@ export class UnitsManager {
       unit.suppliesProducer = new SuppliesProducer(
         tile,
         player,
-        unit.definition.supplyRange,
+        unit.definition.supplyRange
       );
     }
 
@@ -110,7 +110,7 @@ export class UnitsManager {
       } else {
         unit.supplies = Math.max(0, unit.supplies - 20);
         if (!unit.supplies) {
-          unit.health -= 10;
+          // unit.health -= 10; // TODO disabled until fully implemented
           if (unit.health <= 0) {
             this.destroy(unit);
           }

@@ -14,6 +14,7 @@ import { collector } from "./collector";
 import { PlayerYields } from "../shared";
 import { InternalPolitics } from "./internal-politics";
 import { AreaCore } from "./area";
+import { PassableArea } from "./tiles-map";
 
 export const PLAYER_COLORS: number[] = [
   0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0x00ffff, 0xff00ff, 0x999999,
@@ -27,6 +28,8 @@ export class PlayerCore {
   exploredTiles = new Set<TileCore>();
 
   visibleTiles = new Set<TileCore>();
+
+  knownPassableAreas = new Set<PassableArea>();
 
   units: UnitCore[] = [];
 
@@ -54,10 +57,7 @@ export class PlayerCore {
 
   cssColor: string;
 
-  constructor(
-    public game: Game,
-    public color: number,
-  ) {
+  constructor(public game: Game, public color: number) {
     this.area = this.game.areasManager.make(this.color);
     this.cssColor = "#" + color.toString(16).padStart(6, "0");
   }
@@ -66,6 +66,9 @@ export class PlayerCore {
     for (const tile of tiles) {
       if (!this.exploredTiles.has(tile)) {
         this.exploredTiles.add(tile);
+        if (tile.passableArea) {
+          this.knownPassableAreas.add(tile.passableArea);
+        }
         if (this.id === this.game.trackedPlayer.id) {
           collector.tilesExplored.add(tile);
           if (tile.city) {
@@ -149,7 +152,7 @@ export class PlayerCore {
 
   updateUnitsWithoutOrders() {
     this.unitsWithoutOrders = this.units.filter(
-      (c) => !c.order && !c.parent && c.actionPointsLeft,
+      (c) => !c.order && !c.parent && c.actionPointsLeft
     );
   }
 

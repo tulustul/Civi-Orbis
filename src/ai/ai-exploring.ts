@@ -1,65 +1,67 @@
-import { AiOperation } from "./ai-operations";
-import { TileCore } from "../core/tile";
-import { UnitCore } from "../core/unit";
+import { UnitTrait } from "@/core/data.interface";
+import { getMoveResult, MoveResult } from "@/core/movement";
+import { findPath } from "@/core/pathfinding";
+import { TileCore } from "@/core/tile";
+import { UnitCore } from "@/core/unit";
 import { AISystem } from "./ai-system";
-import { findPath } from "../core/pathfinding";
-import { UnitTrait, UnitType } from "../core/data.interface";
-import { getMoveResult, MoveResult } from "../core/movement";
+import { getUnitById } from "@/core/data-manager";
 
-export class ExploreOperation extends AiOperation {
-  constructor(
-    public unit: UnitCore,
-    public target: TileCore,
-  ) {
-    super();
-  }
-
-  perform() {
-    if (!this.unit.path) {
-      this.unit.path = findPath(this.unit, this.target);
-    }
-  }
-}
+const TILES_PER_EXPLORER = 300;
+const MIN_EXPLORER_AREA = 10;
 
 export class ExploringAI extends AISystem {
-  explorers: UnitCore[] = [];
-
   plan() {
+    this.operations = [];
+
     const edgeOfUnknown = this.getEdgeOfUnknown();
 
-    const passableAreas = new Set<number>();
-    const areasType = new Map<number, UnitType>();
-    for (const tile of edgeOfUnknown) {
-      if (!areasType.has(tile.passableArea)) {
-        passableAreas.add(tile.passableArea);
-        const type = tile.isWater ? UnitType.naval : UnitType.land;
-        areasType.set(tile.passableArea, type);
-      }
-    }
-
-    const areaExplorers = new Map<number, UnitCore[]>();
+    const explorels = new Map<number, UnitCore[]>();
     for (const unit of this.ai.player.units) {
-      if (unit.definition.trait === UnitTrait.explorer) {
-        if (!areaExplorers.has(unit.tile.passableArea)) {
-          areaExplorers.set(unit.tile.passableArea, []);
+      if (
+        unit.definition.trait === UnitTrait.explorer &&
+        unit.tile.passableArea
+      ) {
+        if (!explorels.has(unit.tile.passableArea.id)) {
+          explorels.set(unit.tile.passableArea.id, []);
         }
-        areaExplorers.get(unit.tile.passableArea)!.push(unit);
+        explorels.get(unit.tile.passableArea.id)!.push(unit);
       }
     }
 
-    for (const area of passableAreas) {
-      if (!areaExplorers.has(area)) {
-        // const type = areasType.get(area)!;
-        // TODO make explorer
+    for (const passableArea of this.ai.player.knownPassableAreas.values()) {
+      if (passableArea.area < MIN_EXPLORER_AREA) {
+        continue;
+      }
+      const explorersNeeded = Math.floor(
+        passableArea.area / TILES_PER_EXPLORER
+      );
+      const haveExplorers = explorels.get(passableArea.id)?.length ?? 0;
+      if (haveExplorers < explorersNeeded) {
+        const product = getUnitById(
+          passableArea.type === "land" ? "unit_scout" : "unit_scout_ship"
+        )!;
+        this.ai.productionAi.request({
+          focus: "expansion",
+          priority: 100,
+          product,
+          passableArea,
+        });
       }
     }
 
-    for (const explorers of areaExplorers.values()) {
+    for (const explorers of explorels.values()) {
       for (const explorer of explorers) {
         const target = this.findTargetTile(edgeOfUnknown, explorer);
         if (target) {
-          // this.operations.push(new ExploreOperation(unit, target));
-          explorer.path = findPath(explorer, target);
+          this.operations.push({
+            group: "unit",
+            entityId: explorer.id,
+            focus: "expansion",
+            priority: 100,
+            perform: () => {
+              explorer.path = findPath(explorer, target);
+            },
+          });
         }
       }
     }
@@ -68,7 +70,7 @@ export class ExploringAI extends AISystem {
 
   private findTargetTile(
     edgeOfUnknown: Set<TileCore>,
-    unit: UnitCore,
+    unit: UnitCore
   ): TileCore | null {
     let closestTile: TileCore | null = null;
     let closestDistance = Infinity;

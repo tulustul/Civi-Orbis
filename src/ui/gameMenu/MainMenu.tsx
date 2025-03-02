@@ -16,7 +16,7 @@ export function MainMenu() {
       aiPlayersCount: 5,
       width: 50,
       height: 40,
-      humanPlayersCount: 1,
+      humanPlayersCount: 0,
       resources: 0.2,
       seaLevel: 0,
       uniformity: 0.5,

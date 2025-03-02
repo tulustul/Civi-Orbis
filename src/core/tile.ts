@@ -14,6 +14,7 @@ import { Nation } from "./data.interface";
 import { ResourceCore } from "./resources";
 import { PlayerCore } from "./player";
 import { SuppliesProducer } from "./supplies";
+import { PassableArea } from "./tiles-map";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
@@ -64,7 +65,7 @@ export class TileCore implements BaseTile {
   sweetSpotValue = 0;
 
   // used by pathfinding to quickly decide if a path between two tiles exists
-  passableArea = 0;
+  passableArea: PassableArea | null = null;
 
   isMapEdge = false;
 
@@ -80,11 +81,7 @@ export class TileCore implements BaseTile {
   // canBeSuppliedByCities = new Set<CityCore>();
   // suppliedByUnits = new Set<UnitCore>();
 
-  constructor(
-    public id: number,
-    public x: number,
-    public y: number,
-  ) {}
+  constructor(public id: number, public x: number, public y: number) {}
 
   computeMovementCosts() {
     for (const neighbour of this.neighbours) {
@@ -239,6 +236,14 @@ export class TileCore implements BaseTile {
       this.sweetSpotValue += tile.yields.food;
       this.sweetSpotValue += tile.yields.production;
     }
+
+    for (const neighbour of this.neighbours) {
+      if (neighbour.seaLevel !== SeaLevel.none) {
+        // Coastal cities are randked better.
+        this.sweetSpotValue *= 1.5;
+        break;
+      }
+    }
   }
 
   update() {
@@ -262,7 +267,7 @@ export class TileCore implements BaseTile {
   getFirstEnemyMilitaryUnit(unit: UnitCore): UnitCore | undefined {
     // TODO implement war state between players
     return this.units.find(
-      (u) => u.definition.strength && u.player !== unit.player,
+      (u) => u.definition.strength && u.player !== unit.player
     );
   }
 
@@ -276,7 +281,7 @@ export class TileCore implements BaseTile {
       (u) =>
         u.player === unit.player &&
         u.definition.capacity &&
-        u.children.length < u.definition.capacity,
+        u.children.length < u.definition.capacity
     );
   }
 

@@ -23,6 +23,7 @@ import { UNITS_DEFINITIONS } from "../data/products/units";
 import { IDLE_PRODUCTS } from "../data/products/idle-products";
 import { checkRequirements } from "./requirements";
 import { SuppliesProducer } from "./supplies";
+import { PassableArea } from "./tiles-map";
 
 export type CityVisibility = "all" | "basic" | "hidden";
 
@@ -66,21 +67,19 @@ export class CityCore {
 
   isCoastline = false;
 
-  passableAreas = new Set<number>();
+  passableAreas = new Set<PassableArea>();
 
   resources: ResourceDefinition[] = [];
 
   suppliesProducers: SuppliesProducer;
 
-  constructor(
-    public tile: TileCore,
-    public player: PlayerCore,
-  ) {
+  constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
 
-    this.passableAreas.add(tile.passableArea);
-    for (const neighbour of tile.neighbours) {
-      this.passableAreas.add(neighbour.passableArea);
+    for (const t of [tile, ...tile.neighbours]) {
+      if (t.passableArea) {
+        this.passableAreas.add(t.passableArea);
+      }
     }
 
     this.suppliesProducers = new SuppliesProducer(this.tile, this.player, 5);
@@ -93,6 +92,7 @@ export class CityCore {
     this.progressProduction();
     this.progressGrowth();
     this.updateYields();
+    this.updateProductsList();
 
     if (this.player === this.player.game.trackedPlayer || this.changedSize) {
       collector.cities.add(this);
@@ -111,7 +111,7 @@ export class CityCore {
         this.player.game.unitsManager.spawn(
           this.product.id,
           this.tile,
-          this.player,
+          this.player
         );
       } else if (this.product.productType === "building") {
         this.buildings.push(this.product as Building);
@@ -152,7 +152,7 @@ export class CityCore {
 
       const tile = this.pickBestTileToExpand(
         this.tile,
-        this.getTilesAvailableForExpansion(),
+        this.getTilesAvailableForExpansion()
       );
       if (tile) {
         this.addTile(tile);
@@ -183,6 +183,16 @@ export class CityCore {
     this.startProducing(idleProduct);
     this.updateYields();
     this.player.updateYields();
+  }
+
+  produce(product: ProductDefinition) {
+    if (product.productType === "unit") {
+      this.produceUnit(product as UnitDefinition);
+    } else if (product.productType === "building") {
+      this.produceBuilding(product as Building);
+    } else if (product.productType === "idleProduct") {
+      this.workOnIdleProduct(product as IdleProduct);
+    }
   }
 
   cancelProduction() {
@@ -374,7 +384,7 @@ export class CityCore {
 
   pickBestTileToExpand(
     cityTile: TileCore,
-    tiles: Set<TileCore>,
+    tiles: Set<TileCore>
   ): TileCore | null {
     let bestTile: TileCore | null = null;
     let bestScore = -Infinity;
@@ -416,7 +426,7 @@ export class CityCore {
   }
 
   private getAvailableProducts<T extends ProductDefinition>(
-    products: T[],
+    products: T[]
   ): T[] {
     const results: T[] = [];
     for (const p of products) {
@@ -435,7 +445,7 @@ export class CityCore {
   }
 
   private getDisabledProducts<T extends ProductDefinition>(
-    products: T[],
+    products: T[]
   ): Set<T> {
     const results = new Set<T>();
     for (const p of products) {
@@ -453,7 +463,7 @@ export class CityCore {
       this.getAvailableProducts<UnitDefinition>(UNITS_DEFINITIONS);
 
     const notBuildBuildings = BUILDINGS.filter(
-      (b) => this.product !== b && !this.buildings.includes(b),
+      (b) => this.product !== b && !this.buildings.includes(b)
     );
 
     this.availableBuildings =
