@@ -1,6 +1,6 @@
 import { CityCore } from "@/core/city";
 import { getUnitById } from "@/core/data-manager";
-import { UnitDefinition, UnitTrait } from "@/core/data.interface";
+import { UnitDefinition, UnitTrait, UnitType } from "@/core/data.interface";
 import { findPath } from "@/core/pathfinding";
 import { TileCore } from "@/core/tile";
 import { UnitCore } from "@/core/unit";
@@ -9,6 +9,7 @@ import { AISystem } from "./ai-system";
 export class MilitaryAI extends AISystem {
   // How many military units to maintain per city
   private UNITS_PER_CITY = 3;
+  private MAX_UNITS_PER_CITY = 10;
   // Minimum units needed for invasion
   private MIN_INVASION_FORCE = 4;
   // Maximum distance for opportunistic attacks on enemy cities
@@ -19,22 +20,71 @@ export class MilitaryAI extends AISystem {
     CITY_DEFENSE: 300,
     ATTACK_NEARBY_ENEMY: 200,
     CITY_INVASION: 100,
-    PRODUCE_MILITARY: 150,
   };
+
+  cityDefenders = new Map<CityCore, UnitCore[]>();
 
   plan() {
     this.operations = [];
 
-    const militaryUnits = this.player.units.filter(
+    let militaryUnits = this.player.units.filter(
       (unit) =>
         unit.definition.trait === UnitTrait.military && unit.parent === null
     );
+
+    let landUnits = militaryUnits.filter(
+      (unit) => unit.definition.type === UnitType.land
+    );
+    let navalUnits = militaryUnits.filter(
+      (unit) => unit.definition.type === UnitType.naval
+    );
+
+    const landDroductionPriority = Math.round(
+      (this.player.cities.length / landUnits.length) * 100
+    );
+    // Schedule production of new military units if needed
+    for (const city of this.player.citiesWithoutProduction) {
+      const unitDef = this.chooseUnitDef(city, UnitType.land);
+      if (unitDef) {
+        this.operations.push({
+          group: "city-produce",
+          entityId: city.id,
+          focus: "military",
+          priority: landDroductionPriority,
+          perform: () => {
+            city.produce(unitDef);
+          },
+        });
+      }
+    }
+
+    const navalDroductionPriority = Math.round(
+      (this.player.cities.length / navalUnits.length) * 70
+    );
+    // Schedule production of new military units if needed
+    for (const city of this.player.citiesWithoutProduction) {
+      if (city.tile.units.length >= this.MAX_UNITS_PER_CITY) {
+        continue;
+      }
+      const unitDef = this.chooseUnitDef(city, UnitType.naval);
+      if (unitDef) {
+        this.operations.push({
+          group: "city-produce",
+          entityId: city.id,
+          focus: "military",
+          priority: navalDroductionPriority,
+          perform: () => {
+            city.produce(unitDef);
+          },
+        });
+      }
+    }
 
     // Find enemy cities to attack
     const enemyCities = this.findEnemyCities();
     // Find enemy units to attack
     const enemyUnits = this.findEnemyUnits();
-    const cityDefenders = new Map<CityCore, UnitCore[]>();
+    this.cityDefenders.clear();
     // Track units assigned to invasions
     const invasionForces = new Map<CityCore, UnitCore[]>();
     // Initialize invasion forces for potential target cities
@@ -44,7 +94,7 @@ export class MilitaryAI extends AISystem {
 
     // Assign defenders to our cities
     for (const city of this.player.cities) {
-      cityDefenders.set(city, []);
+      this.cityDefenders.set(city, []);
     }
 
     // First priority: Retreat injured units to friendly territory for healing
@@ -103,9 +153,9 @@ export class MilitaryAI extends AISystem {
         i++
       ) {
         const unit = availableDefenders[i];
-        const defenders = cityDefenders.get(city) || [];
+        const defenders = this.cityDefenders.get(city) || [];
         defenders.push(unit);
-        cityDefenders.set(city, defenders);
+        this.cityDefenders.set(city, defenders);
 
         this.operations.push({
           group: "unit",
@@ -163,7 +213,7 @@ export class MilitaryAI extends AISystem {
 
     // Fourth priority: Standard city defense
     for (const city of this.player.cities) {
-      const defenders = cityDefenders.get(city) || [];
+      const defenders = this.cityDefenders.get(city) || [];
 
       // Ensure each city has at least minimum defenders
       const availableDefenders = militaryUnits.filter(
@@ -191,7 +241,7 @@ export class MilitaryAI extends AISystem {
       ) {
         const unit = availableDefenders[i];
         defenders.push(unit);
-        cityDefenders.set(city, defenders);
+        this.cityDefenders.set(city, defenders);
 
         this.operations.push({
           group: "unit",
@@ -211,104 +261,169 @@ export class MilitaryAI extends AISystem {
       }
     }
 
+    const desiredInvasionForce = Math.max(
+      this.MIN_INVASION_FORCE,
+      militaryUnits.length / 4
+    );
+
     // Fifth priority: Plan invasions of enemy cities
     if (
       enemyCities.length > 0 &&
-      militaryUnits.length >= this.MIN_INVASION_FORCE
+      militaryUnits.length >= desiredInvasionForce
     ) {
-      // Filter cities that are close enough to invade
-      const invasionTargets = enemyCities.filter((city) => {
-        // Find the average position of our military units
+      // Split units into land and naval units
+      const landUnits = militaryUnits.filter(
+        (unit) => unit.definition.type !== UnitType.naval
+      );
+      const navalUnits = militaryUnits.filter(
+        (unit) => unit.definition.type === UnitType.naval
+      );
+
+      // Process land invasion first if we have enough land units
+      if (landUnits.length >= desiredInvasionForce) {
+        this.planInvasion(
+          enemyCities,
+          landUnits,
+          invasionForces,
+          desiredInvasionForce
+        );
+      }
+
+      // Then process naval invasion separately if we have enough naval units
+      if (navalUnits.length >= desiredInvasionForce) {
+        // Filter to coastal cities for naval invasions
+        const coastalEnemyCities = enemyCities.filter(
+          (city) => city.isCoastline
+        );
+        this.planInvasion(
+          coastalEnemyCities,
+          navalUnits,
+          invasionForces,
+          desiredInvasionForce
+        );
+      }
+
+      // Update remaining military units after both invasion types have been planned
+      militaryUnits = militaryUnits.filter(
+        (unit) =>
+          landUnits.indexOf(unit) === -1 && navalUnits.indexOf(unit) === -1
+      );
+    }
+
+    return this.operations;
+  }
+
+  private planInvasion(
+    targetCities: CityCore[],
+    units: UnitCore[],
+    invasionForces: Map<CityCore, UnitCore[]>,
+    desiredInvasionForce: number
+  ) {
+    // Filter cities that are close enough to invade
+    const invasionTargets = targetCities.filter((city) => {
+      // Find the average position of our units
+      const avgX =
+        units.reduce((sum, unit) => sum + unit.tile.x, 0) / units.length;
+      const avgY =
+        units.reduce((sum, unit) => sum + unit.tile.y, 0) / units.length;
+
+      // Calculate distance from our military center to this city
+      const dx = Math.abs(city.tile.x - avgX);
+      const dy = Math.abs(city.tile.y - avgY);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      return distance <= this.MAX_INVASION_DISTANCE;
+    });
+
+    if (invasionTargets.length > 0) {
+      // Choose the closest target
+      const targetCity = invasionTargets.sort((a, b) => {
         const avgX =
-          militaryUnits.reduce((sum, unit) => sum + unit.tile.x, 0) /
-          militaryUnits.length;
+          units.reduce((sum, unit) => sum + unit.tile.x, 0) / units.length;
         const avgY =
-          militaryUnits.reduce((sum, unit) => sum + unit.tile.y, 0) /
-          militaryUnits.length;
+          units.reduce((sum, unit) => sum + unit.tile.y, 0) / units.length;
 
-        // Calculate distance from our military center to this city
-        const dx = Math.abs(city.tile.x - avgX);
-        const dy = Math.abs(city.tile.y - avgY);
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        return distance <= this.MAX_INVASION_DISTANCE;
-      });
-
-      if (invasionTargets.length > 0) {
-        // Choose the closest target
-        const targetCity = invasionTargets.sort((a, b) => {
-          const avgX =
-            militaryUnits.reduce((sum, unit) => sum + unit.tile.x, 0) /
-            militaryUnits.length;
-          const avgY =
-            militaryUnits.reduce((sum, unit) => sum + unit.tile.y, 0) /
-            militaryUnits.length;
-
-          const distA = Math.sqrt(
-            Math.pow(a.tile.x - avgX, 2) + Math.pow(a.tile.y - avgY, 2)
-          );
-
-          const distB = Math.sqrt(
-            Math.pow(b.tile.x - avgX, 2) + Math.pow(b.tile.y - avgY, 2)
-          );
-
-          return distA - distB;
-        })[0];
-
-        // Prepare invasion force
-        const invasionForce = militaryUnits.slice(
-          0,
-          Math.min(militaryUnits.length, this.MIN_INVASION_FORCE + 2)
-        );
-        invasionForces.set(targetCity, invasionForce);
-
-        // Calculate rally point near the target city
-        const rallyPoint = this.findRallyPoint(
-          targetCity.tile,
-          invasionForce[0].tile
+        const distA = Math.sqrt(
+          Math.pow(a.tile.x - avgX, 2) + Math.pow(a.tile.y - avgY, 2)
         );
 
-        // Send units to rally point first
-        for (const unit of invasionForce) {
+        const distB = Math.sqrt(
+          Math.pow(b.tile.x - avgX, 2) + Math.pow(b.tile.y - avgY, 2)
+        );
+
+        return distA - distB;
+      })[0];
+
+      // Prepare invasion force
+      const invasionForce = units.slice(
+        0,
+        Math.min(units.length, desiredInvasionForce)
+      );
+      invasionForces.set(targetCity, invasionForce);
+
+      // Calculate rally point near the target city
+      const rallyPoint = this.findRallyPoint(
+        targetCity.tile,
+        invasionForce[0].tile
+      );
+
+      // Check for units that are already at the rally point or adjacent to target
+      const unitsAtRallyPoint = invasionForce.filter(
+        (unit) => unit.tile.id === rallyPoint.id
+      );
+      const unitsAdjacentToTarget = invasionForce.filter((unit) =>
+        unit.tile.neighbours.some((n) => n.id === targetCity.tile.id)
+      );
+
+      // If we have enough units ready for attack, send them all at once
+      if (
+        unitsAtRallyPoint.length + unitsAdjacentToTarget.length >=
+        desiredInvasionForce
+      ) {
+        // Coordinate simultaneous attack
+        for (const unit of [...unitsAtRallyPoint, ...unitsAdjacentToTarget]) {
           this.operations.push({
             group: "unit",
             entityId: unit.id,
             focus: "military",
-            priority: this.PRIORITY.CITY_INVASION,
+            priority: this.PRIORITY.CITY_INVASION + 50, // Higher priority than moving to rally
             perform: () => {
-              // First path to rally point, then to city
-              unit.path = findPath(unit, rallyPoint);
-              // In a real implementation, you'd want to check when all units arrive
-              // at the rally point before proceeding to the target
+              // Direct attack on the city
+              unit.path = findPath(unit, targetCity.tile);
             },
           });
 
-          // Remove this unit from consideration for other tasks
-          const index = militaryUnits.indexOf(unit);
+          // Remove this unit from the invasion force to avoid duplicate operations
+          const index = invasionForce.indexOf(unit);
           if (index > -1) {
-            militaryUnits.splice(index, 1);
+            invasionForce.splice(index, 1);
           }
         }
       }
-    }
 
-    // Schedule production of new military units if needed
-    for (const city of this.player.citiesWithoutProduction) {
-      const defenders = cityDefenders.get(city) || [];
+      // Send remaining units to rally point first
+      for (const unit of invasionForce) {
+        this.operations.push({
+          group: "unit",
+          entityId: unit.id,
+          focus: "military",
+          priority: this.PRIORITY.CITY_INVASION,
+          perform: () => {
+            // Check if unit is already adjacent to target city
+            if (unit.tile.neighbours.some((n) => n.id === targetCity.tile.id)) {
+              // Direct attack on the city
+              unit.path = findPath(unit, targetCity.tile);
+            } else {
+              // First path to rally point
+              unit.path = findPath(unit, rallyPoint);
+            }
+          },
+        });
 
-      // If city needs more defenders and doesn't have production, build military units
-      if (defenders.length < this.UNITS_PER_CITY) {
-        const unitDef = this.chooseUnitDef(city);
-        if (unitDef) {
-          this.operations.push({
-            group: "city-produce",
-            entityId: city.id,
-            focus: "military",
-            priority: this.PRIORITY.PRODUCE_MILITARY,
-            perform: () => {
-              city.produce(unitDef);
-            },
-          });
+        // Remove this unit from consideration for other tasks
+        const index = units.indexOf(unit);
+        if (index > -1) {
+          units.splice(index, 1);
         }
       }
     }
@@ -316,22 +431,25 @@ export class MilitaryAI extends AISystem {
     return this.operations;
   }
 
-  private chooseUnitDef(city: CityCore): UnitDefinition | null {
-    // Check for naval units if coastal
-    const isCoastal = city.tile.neighbours.some((tile) => tile.isWater);
+  private chooseUnitDef(
+    city: CityCore,
+    unitType: UnitType
+  ): UnitDefinition | null {
+    if (unitType === UnitType.land) {
+      const warrior = getUnitById("unit_warrior");
+      if (city.canProduce(warrior)) {
+        return warrior;
+      }
+    }
 
-    // Randomly choose between land and naval units if coastal
-    if (isCoastal && Math.random() > 0.7) {
+    if (unitType === UnitType.naval) {
+      if (!city.isCoastline) {
+        return null;
+      }
       const navalUnit = getUnitById("unit_tireme");
       if (city.canProduce(navalUnit)) {
         return navalUnit;
       }
-    }
-
-    // Default to warrior
-    const warrior = getUnitById("unit_warrior");
-    if (city.canProduce(warrior)) {
-      return warrior;
     }
 
     return null;
@@ -360,14 +478,11 @@ export class MilitaryAI extends AISystem {
   private findEnemyUnits(): UnitCore[] {
     const result: UnitCore[] = [];
 
-    // Find enemy units in discovered tiles
-    for (const tile of this.player.exploredTiles) {
+    // Find enemy units in visible tiles
+    for (const tile of this.player.visibleTiles) {
       if (tile.units.length > 0) {
         for (const unit of tile.units) {
-          if (
-            unit.player !== this.player &&
-            unit.definition.trait === UnitTrait.military
-          ) {
+          if (unit.player !== this.player) {
             result.push(unit);
           }
         }

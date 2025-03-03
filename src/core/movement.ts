@@ -24,19 +24,24 @@ export function getMoveResult(
 
   if (unit.definition.type === UnitType.naval) {
     if (from.passableArea !== to.passableArea) {
-      if (
-        to.isLand &&
-        to.city?.isCoastline &&
-        to.city?.player === unit.player
-      ) {
-        return MoveResult.move;
+      if (to.isLand && to.city?.isCoastline) {
+        if (
+          unit.definition.trait === UnitTrait.military ||
+          to.city?.player !== unit.player
+        ) {
+          return MoveResult.attack;
+        } else if (to.city?.player === unit.player) {
+          return MoveResult.move;
+        } else {
+          return MoveResult.none;
+        }
       }
       if (to.isWater && from.city) {
         return MoveResult.move;
       }
       return MoveResult.none;
     }
-    if (to.isLand) {
+    if (to.isLand && !to.city?.isCoastline) {
       return MoveResult.none;
     }
   } else if (unit.definition.type === UnitType.land) {
