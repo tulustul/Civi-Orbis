@@ -20,7 +20,7 @@ export async function loadAssets() {
 
   const tilesAtlas = await Assets.load(atlasTilesUrl);
   const tilesSpritesheet = new Spritesheet(tilesAtlas, atlasTilesData);
-  tilesSpritesheet.textureSource.autoGenerateMipmaps = true;
+  // tilesSpritesheet.textureSource.autoGenerateMipmaps = true;
   tilesSpritesheet.textureSource.scaleMode = "nearest";
   await tilesSpritesheet.parse();
 

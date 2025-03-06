@@ -19,8 +19,7 @@ export const CLIMATE_OPTIONS: Option<Climate>[] = [
   { label: "tropical", value: Climate.tropical },
   { label: "savanna", value: Climate.savanna },
   { label: "desert", value: Climate.desert },
-  { label: "continental", value: Climate.continental },
-  { label: "oceanic", value: Climate.oceanic },
+  { label: "temperate", value: Climate.temperate },
   { label: "tundra", value: Climate.tundra },
   { label: "arctic", value: Climate.arctic },
 ];
@@ -61,5 +60,5 @@ export const RESOURCE_OPTIONS = [
 ].concat(
   RESOURCES_DEFINITIONS.map((r) => {
     return { label: r.name, value: r.id };
-  }),
+  })
 );

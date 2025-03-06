@@ -21,9 +21,8 @@ const SEA_COLORS: Record<SeaLevel, number> = {
 };
 
 const CLIMATE_COLORS: Record<Climate, number> = {
-  [Climate.continental]: 0x516733,
+  [Climate.temperate]: 0x516733,
   [Climate.desert]: 0xc7bd93,
-  [Climate.oceanic]: 0x678123,
   [Climate.savanna]: 0xb4a73f,
   [Climate.tropical]: 0x6c9b2b,
   [Climate.tundra]: 0x9cb3b6,

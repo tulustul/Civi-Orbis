@@ -94,9 +94,9 @@ export class RealisticMapGenerator implements MapGenerator {
       for (let y = 0; y < this.height; y++) {
         const tile = this.map.tiles[x][y];
         const metadata = this.metadata.get(tile)!;
-        if (metadata.height > 1.3) {
+        if (metadata.height > 1.4) {
           tile.landForm = LandForm.mountains;
-        } else if (metadata.height > 0.25) {
+        } else if (metadata.height > 0.75) {
           tile.landForm = LandForm.hills;
         }
 
@@ -114,10 +114,9 @@ export class RealisticMapGenerator implements MapGenerator {
         } else if (metadata.humidity < 0.3) {
           tile.climate = Climate.savanna;
         } else if (metadata.humidity < 0.7 && metadata.temperature < 0.5) {
-          tile.climate = Climate.continental;
+          tile.climate = Climate.temperate;
         } else {
-          tile.climate =
-            metadata.temperature > 0.5 ? Climate.tropical : Climate.oceanic;
+          tile.climate = Climate.tropical;
         }
       }
     }

@@ -75,7 +75,7 @@ export const RESOURCES_DEFINITIONS: ResourceDefinition[] = [
     },
     distribution: {
       seaLevel: SeaLevel.none,
-      climates: [Climate.continental, Climate.oceanic, Climate.savanna],
+      climates: [Climate.temperate, Climate.savanna],
       landFormProbability: {
         [LandForm.plains]: 0.25,
         [LandForm.hills]: 0.75,

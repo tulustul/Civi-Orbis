@@ -8,54 +8,48 @@ import { getAssets } from "./assets";
 import { putContainerAtTile, putSpriteAtTileCentered } from "./utils";
 
 const SEA_TEXTURES: Record<SeaLevel, string> = {
-  [SeaLevel.deep]: "hexOcean00.png",
-  [SeaLevel.shallow]: "hexShallowWater00.png",
+  [SeaLevel.deep]: "hexWaterDeep.png",
+  [SeaLevel.shallow]: "hexWaterShallow.png",
   [SeaLevel.none]: "",
 };
 
 const CLIMATE_TEXTURES: Record<Climate, Record<LandForm, string>> = {
-  [Climate.continental]: {
-    [LandForm.plains]: "hexPlainsCold00.png",
-    [LandForm.hills]: "hexHillsCold00.png",
-    [LandForm.mountains]: "hexMountain00.png",
+  [Climate.temperate]: {
+    [LandForm.plains]: "hexTemperatePlains.png",
+    [LandForm.hills]: "hexTemperateHills.png",
+    [LandForm.mountains]: "hexMountain.png",
   },
   [Climate.desert]: {
-    [LandForm.plains]: "hexSand00.png",
-    [LandForm.hills]: "hexHillsDesert00.png",
-    [LandForm.mountains]: "hexMountainDesert00.png",
-  },
-  [Climate.oceanic]: {
-    [LandForm.plains]: "hexPlains00.png",
-    [LandForm.hills]: "hexHighlands00.png",
-    [LandForm.mountains]: "hexMountain00.png",
+    [LandForm.plains]: "hexDesertPlains.png",
+    [LandForm.hills]: "hexDesertHills.png",
+    [LandForm.mountains]: "hexDesertMountain.png",
   },
   [Climate.savanna]: {
-    [LandForm.plains]: "hexScrublands00.png",
-    [LandForm.hills]: "hexHillsSavanna00.png",
-    [LandForm.mountains]: "hexMountainDesert00.png",
+    [LandForm.plains]: "hexSavannaPlains.png",
+    [LandForm.hills]: "hexSavannaHills.png",
+    [LandForm.mountains]: "hexDesertMountain.png",
   },
   [Climate.tropical]: {
-    [LandForm.plains]: "hexTropicalPlains00.png",
-    [LandForm.hills]: "hexHills00.png",
-    [LandForm.mountains]: "hexMountain00.png",
+    [LandForm.plains]: "hexTropicalPlains.png",
+    [LandForm.hills]: "hexTropicalHills.png",
+    [LandForm.mountains]: "hexMountain.png",
   },
   [Climate.tundra]: {
-    [LandForm.plains]: "hexPlainsColdSnowTransition00.png",
-    [LandForm.hills]: "hexHillsColdSnowTransition00.png",
-    [LandForm.mountains]: "hexMountainSnow00.png",
+    [LandForm.plains]: "hexTundraPlains.png",
+    [LandForm.hills]: "hexTundraHills.png",
+    [LandForm.mountains]: "hexArcticMountain.png",
   },
   [Climate.arctic]: {
-    [LandForm.plains]: "hexPlainsColdSnowCovered00.png",
-    [LandForm.hills]: "hexHillsColdSnowCovered00.png",
-    [LandForm.mountains]: "hexMountainSnow00.png",
+    [LandForm.plains]: "hexArcticPlains.png",
+    [LandForm.hills]: "hexArcticHills.png",
+    [LandForm.mountains]: "hexArcticMountain.png",
   },
 };
 
 const FOREST_TEXTURES: Record<Climate, string> = {
-  [Climate.continental]: "hexForestPine00.png",
-  [Climate.oceanic]: "hexForestBroadleaf00.png",
-  [Climate.tropical]: "hexJungle00.png",
-  [Climate.tundra]: "hexForestPineSnowTransition00.png",
+  [Climate.temperate]: "hexTemperateForest.png",
+  [Climate.tropical]: "hexTropicalForest.png",
+  [Climate.tundra]: "hexTundraForest.png",
   [Climate.savanna]: "",
   [Climate.desert]: "",
   [Climate.arctic]: "",
@@ -72,7 +66,11 @@ export class MapDrawer {
 
   tileDrawers = new Map<number, TileDrawer>();
 
-  constructor(container: Container, private yieldsLayer: IRenderLayer) {
+  constructor(
+    container: Container,
+    private yieldsLayer: IRenderLayer,
+    private resourcesLayer: IRenderLayer
+  ) {
     container.addChild(this.terrainContainer);
 
     bridge.tiles.updated$.subscribe((tiles) => {
@@ -101,7 +99,11 @@ export class MapDrawer {
     const tiles = await bridge.tiles.getAll();
 
     for (const tile of tiles) {
-      const drawer = new TileDrawer(tile, this.yieldsLayer);
+      const drawer = new TileDrawer(
+        tile,
+        this.yieldsLayer,
+        this.resourcesLayer
+      );
       this.tileDrawers.set(tile.id, drawer);
       this.terrainContainer.addChild(drawer.container);
       drawer.draw(tile);
@@ -123,14 +125,18 @@ class TileDrawer {
   iconsTextures = getAssets().iconsSpritesheet.textures;
 
   yieldsGraphics = new Graphics();
-  terrainSprite = new Sprite(this.tilesTextures["hexPlains00.png"]);
+  terrainSprite = new Sprite(this.tilesTextures["hexTropicalPlains.png"]);
   resourceSprite: Sprite | null = null;
   improvementSprite: Sprite | null = null;
   roadSprite: Sprite | null = null;
   citySprite: Sprite | null = null;
   riverGraphics: Graphics | null = null;
 
-  constructor(private tile: TileChanneled, private yieldsLayer: IRenderLayer) {
+  constructor(
+    private tile: TileChanneled,
+    private yieldsLayer: IRenderLayer,
+    private resourcesLayer: IRenderLayer
+  ) {
     this.container.zIndex = tile.y;
 
     putContainerAtTile(this.terrainSprite, tile);
@@ -139,6 +145,9 @@ class TileDrawer {
 
   public destroy() {
     this.yieldsLayer.detach(this.yieldsGraphics);
+    if (this.resourceSprite) {
+      this.resourcesLayer.detach(this.resourceSprite);
+    }
     this.container.destroy({ children: true });
   }
 
@@ -158,19 +167,31 @@ class TileDrawer {
 
     if (this.tile.wetlands) {
       if (this.tile.forest) {
-        textureName = "hexSwamp00.png";
+        textureName = "hexMarshForest.png";
       } else {
-        textureName = "hexMarsh00.png";
+        textureName = "hexMarsh.png";
       }
     } else if (this.tile.forest) {
-      textureName = FOREST_TEXTURES[this.tile.climate];
+      if (
+        this.tile.improvement === TileImprovement.sawmill &&
+        this.tile.climate === Climate.temperate
+      ) {
+        textureName = "hexTemperateForestCamp.png";
+      } else if (
+        this.tile.improvement === TileImprovement.sawmill &&
+        this.tile.climate === Climate.tundra
+      ) {
+        textureName = "hexTundraForestCamp.png";
+      } else {
+        textureName = FOREST_TEXTURES[this.tile.climate];
+      }
     } else if (this.tile.seaLevel === SeaLevel.none) {
       if (
         this.tile.climate === Climate.desert &&
         this.tile.landForm === LandForm.plains &&
         this.tile.riverParts.length
       ) {
-        textureName = "hexGrassySand00.png";
+        textureName = "hexDesertFlooded.png";
       } else {
         textureName = CLIMATE_TEXTURES[this.tile.climate][this.tile.landForm];
       }
@@ -182,7 +203,12 @@ class TileDrawer {
   }
 
   private drawImprovement() {
-    if (this.tile.improvement === null) {
+    if (
+      this.tile.improvement === null ||
+      (this.tile.improvement === TileImprovement.sawmill &&
+        this.tile.forest &&
+        this.tile.climate !== Climate.tropical)
+    ) {
       if (this.improvementSprite) {
         this.improvementSprite.visible = false;
       }
@@ -198,7 +224,7 @@ class TileDrawer {
 
     let textureName = IMPROVEMENT_TEXTURES[this.tile.improvement];
     this.improvementSprite.texture = this.tilesTextures[textureName];
-    putSpriteAtTileCentered(this.improvementSprite, this.tile);
+    putContainerAtTile(this.improvementSprite, this.tile);
   }
 
   private drawResource() {
@@ -213,6 +239,7 @@ class TileDrawer {
       this.resourceSprite = new Sprite();
       this.resourceSprite.zIndex = 20;
       this.container.addChild(this.resourceSprite);
+      this.resourcesLayer.attach(this.resourceSprite);
     }
 
     this.resourceSprite.visible = true;
@@ -224,7 +251,7 @@ class TileDrawer {
   }
 
   private drawRoads() {
-    if (this.tile.road === null) {
+    if (this.tile.road === null || this.tile.cityId !== null) {
       if (this.roadSprite) {
         this.roadSprite.visible = false;
       }
@@ -277,8 +304,6 @@ class TileDrawer {
     }
 
     this.riverGraphics.visible = true;
-
-    // TODO avoid rendering the same river twice.
 
     this.riverGraphics.position.x = this.tile.x + (this.tile.y % 2 ? 0.5 : 0);
     this.riverGraphics.position.y = this.tile.y * 0.75;

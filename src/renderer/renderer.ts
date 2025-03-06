@@ -45,6 +45,7 @@ export class GameRenderer {
 
   mapLayer!: Layer;
   yieldsLayer!: IRenderLayer;
+  resourcesLayer!: IRenderLayer;
 
   fogOfWarLayer!: Layer;
   exploredTilesLayer!: Layer;
@@ -117,8 +118,13 @@ export class GameRenderer {
     this.exploredTilesLayer = new Layer(this.app, "visibleTilesLayer");
     this.cityFocusLayer = new Layer(this.app, "cityFocusLayer");
     this.yieldsLayer = new RenderLayer();
+    this.resourcesLayer = new RenderLayer();
 
-    this.mapDrawer = new MapDrawer(this.mapLayer.stage, this.yieldsLayer);
+    this.mapDrawer = new MapDrawer(
+      this.mapLayer.stage,
+      this.yieldsLayer,
+      this.resourcesLayer
+    );
 
     this.fogOfWarDrawer = new FogOfWarDrawer(this.fogOfWarLayer.stage);
     this.visibleTilesDrawer = new ExploredTilesDrawer(
@@ -149,6 +155,7 @@ export class GameRenderer {
     this.grid = new Grid();
     this.mapLayer.stage.addChild(this.grid.sprite);
     this.mapLayer.stage.addChild(this.yieldsLayer);
+    this.mapLayer.stage.addChild(this.resourcesLayer);
 
     camera.transform$.subscribe((t) => {
       const x = (-t.x + this.canvas.width / 2 / t.scale) * t.scale;

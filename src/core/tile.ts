@@ -18,11 +18,10 @@ import { PassableArea } from "./tiles-map";
 
 const BASE_CLIMATE_YIELDS: Record<Climate, Yields> = {
   [Climate.arctic]: { ...EMPTY_YIELDS },
-  [Climate.continental]: { ...EMPTY_YIELDS, food: 1, production: 1 },
   [Climate.desert]: {
     ...EMPTY_YIELDS,
   },
-  [Climate.oceanic]: { ...EMPTY_YIELDS, food: 2, production: 1 },
+  [Climate.temperate]: { ...EMPTY_YIELDS, food: 2, production: 1 },
   [Climate.savanna]: { ...EMPTY_YIELDS, food: 1, production: 1 },
   [Climate.tropical]: { ...EMPTY_YIELDS, food: 1 },
   [Climate.tundra]: { ...EMPTY_YIELDS, production: 1 },
@@ -35,7 +34,7 @@ const BASE_LAND_FORM_YIELDS: Record<LandForm, Yields> = {
 };
 
 export class TileCore implements BaseTile {
-  climate = Climate.continental;
+  climate = Climate.temperate;
   landForm = LandForm.plains;
   seaLevel = SeaLevel.deep;
   riverParts: TileDirection[] = [];

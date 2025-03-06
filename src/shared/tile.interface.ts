@@ -16,8 +16,7 @@ export enum Climate {
   tropical,
   savanna,
   desert,
-  continental,
-  oceanic,
+  temperate,
   tundra,
   arctic,
 }
@@ -53,15 +52,13 @@ export interface BaseTile {
 }
 
 export const FORESTABLE_CLIMATES = new Set<Climate>([
-  Climate.continental,
-  Climate.oceanic,
+  Climate.temperate,
   Climate.tropical,
   Climate.tundra,
 ]);
 
 export const WETLANDS_CLIMATES = new Set<Climate>([
-  Climate.continental,
-  Climate.oceanic,
+  Climate.temperate,
   Climate.tropical,
 ]);
 
@@ -84,7 +81,7 @@ export function areWetlandsPossible(tile: BaseTile): boolean {
 
 export function isImprovementPossible(
   tile: BaseTile,
-  improvement: TileImprovement | null,
+  improvement: TileImprovement | null
 ): boolean {
   if (improvement === null) {
     return true;
@@ -113,7 +110,7 @@ export function isRoadPossible(tile: BaseTile) {
 
 export function isResourcePossible(
   tile: BaseTile,
-  resourceDef: ResourceDefinition | null,
+  resourceDef: ResourceDefinition | null
 ) {
   if (!resourceDef) {
     return true;

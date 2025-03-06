@@ -14,11 +14,11 @@ export function MainMenu() {
   async function start() {
     await bridge.game.new({
       aiPlayersCount: 5,
-      width: 30,
-      height: 20,
+      width: 40,
+      height: 30,
       humanPlayersCount: 0,
       resources: 0.2,
-      seaLevel: 0,
+      seaLevel: -0.1,
       uniformity: 0.5,
     });
 
