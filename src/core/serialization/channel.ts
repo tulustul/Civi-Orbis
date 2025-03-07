@@ -36,6 +36,7 @@ export type GameStartInfo = {
   gameInfo: GameInfo;
   tileToGo: TileCoords | null;
   unitIdToSelect: number | null;
+  aiOnly: boolean;
 };
 
 export interface MapChanneled {
@@ -261,6 +262,7 @@ export function gameToGameStartInfo(game: Game): GameStartInfo {
     },
     tileToGo: tileToGo ? tileToTileCoords(tileToGo) : null,
     unitIdToSelect: unitToSelect?.id ?? null,
+    aiOnly: game.players.every((p) => p.ai),
   };
 }
 

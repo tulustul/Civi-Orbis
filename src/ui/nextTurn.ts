@@ -9,19 +9,12 @@ export class NextTurnService {
   private _waiting$ = new BehaviorSubject<boolean>(false);
   waiting$ = this._waiting$.asObservable();
 
-  private _isAiOnlyMatch$ = new BehaviorSubject<boolean>(false);
-  isAiOnlyMatch$ = this._isAiOnlyMatch$.asObservable();
-
-  autoplayEnabled = false;
+  private _autoPlay$ = new BehaviorSubject<boolean>(false);
+  autoPlay$ = this._autoPlay$.asObservable();
 
   nextTask: PlayerTask | null = null;
 
   constructor() {
-    bridge.game.start$.subscribe((startInfo) => {
-      this._isAiOnlyMatch$.next(startInfo.gameInfo.aiOnly);
-      this.autoplayEnabled = false;
-    });
-
     bridge.nextTask$.subscribe((nextTask) => (this.nextTask = nextTask));
   }
 
@@ -31,7 +24,7 @@ export class NextTurnService {
 
   async executeTask(
     task: PlayerTask | null,
-    options: { withAnimations?: boolean } = {},
+    options: { withAnimations?: boolean } = {}
   ) {
     if (this._waiting$.value) {
       return;
@@ -62,18 +55,23 @@ export class NextTurnService {
     }
   }
 
-  enableAutoplay() {
-    this.autoplayEnabled = true;
-    this.autoplay();
+  setAutoplay(autoplay: boolean) {
+    if (this._autoPlay$.value === autoplay) {
+      return;
+    }
+    this._autoPlay$.next(autoplay);
+    if (autoplay) {
+      this.autoplay();
+    }
   }
 
-  stopAutoplay() {
-    this.autoplayEnabled = false;
+  get autoplayEnabled() {
+    return this._autoPlay$.value;
   }
 
   private autoplay() {
     this.next();
-    if (this.autoplayEnabled) {
+    if (this._autoPlay$.value) {
       setTimeout(() => this.autoplay());
     }
   }

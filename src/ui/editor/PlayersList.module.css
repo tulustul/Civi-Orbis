@@ -1,11 +1,14 @@
 .playersList {
   overflow-y: auto;
+  padding: 0;
 }
 .item {
   display: flex;
   margin-bottom: 5px;
-  padding: 5px;
+  padding: 2px 5px;
   cursor: pointer;
+  justify-content: space-between;
+  align-items: center;
 }
 .item > * {
   margin-right: 15px;

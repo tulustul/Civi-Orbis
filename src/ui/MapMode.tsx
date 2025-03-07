@@ -13,9 +13,13 @@ import { UnitPanel } from "./UnitPanel";
 import { TileUnits } from "./TileUnits";
 import { PlayerYields } from "./PlayerYields";
 import { TurnsCounter } from "./TurnCounter";
+import { bridge } from "@/bridge";
+import { SpectatorPanel } from "./SpectatorPanel";
 
 export function MapMode() {
   const city = useObservable(mapUi.selectedCity$);
+
+  const startInfo = useObservable(bridge.game.start$);
 
   return (
     <>
@@ -27,12 +31,15 @@ export function MapMode() {
       >
         <div className={styles.minimap}>
           <MapSettings />
-          <Panel corner="bottom-right">
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <NextTurnButton />
-              <Minimap />
-            </div>
-          </Panel>
+          <div className="flex flex-col items-end gap-5">
+            {startInfo?.aiOnly && <SpectatorPanel />}
+            <Panel corner="bottom-right">
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <NextTurnButton />
+                <Minimap />
+              </div>
+            </Panel>
+          </div>
         </div>
 
         <div className={styles.yields}>

@@ -12,6 +12,7 @@ import {
 import { camera } from "@/renderer/camera";
 import { BehaviorSubject } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
+import { nextTurnService } from "./nextTurn";
 
 export class MapUi {
   private _hoveredTile$ = new BehaviorSubject<TileCoords | null>(null);
@@ -175,7 +176,9 @@ export class MapUi {
     });
 
     bridge.cities.spawned$.subscribe((city) => {
-      this.selectCity(city.id);
+      if (!nextTurnService.autoplayEnabled) {
+        this.selectCity(city.id);
+      }
     });
 
     bridge.game.turn$.subscribe(() => {

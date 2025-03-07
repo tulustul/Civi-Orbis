@@ -2,6 +2,7 @@ import { useObservable } from "@/utils";
 import { nextTurnService } from "./nextTurn";
 import { Spinner } from "./components";
 import { bridge } from "@/bridge";
+import clsx from "clsx";
 
 export function NextTurnButton() {
   const nextTask = useObservable(bridge.nextTask$);
@@ -35,14 +36,18 @@ export function NextTurnButton() {
 
   if (waiting) {
     return (
-      <button>
-        <Spinner /> Wait for other players
-      </button>
+      <div className="flex gap-5 items-center px-5 h-11">
+        <Spinner size="small" />
+        <div className="text-xl">Wait for other players</div>
+      </div>
     );
   }
 
   return (
-    <button className={getCssClass()} onClick={() => nextTurnService.next()}>
+    <button
+      className={clsx(getCssClass(), "h-11 text-xl")}
+      onClick={() => nextTurnService.next()}
+    >
       {getLabel()}
     </button>
   );

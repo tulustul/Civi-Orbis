@@ -1,5 +1,12 @@
-.spinner {
+.small {
+  --spinner-size: 32px;
+}
+
+.normal {
   --spinner-size: 64px;
+}
+
+.spinner {
   display: inline-block;
 }
 
