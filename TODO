@@ -18,6 +18,7 @@ Bugs:
   ☐ disembark + attack is broken
 
 Performance:
+  ☐ optimize workers AI
 
 Refactor:
   ✔ renderer: still a mess @done(25-02-25 23:32)
@@ -38,8 +39,11 @@ Minor features:
   ☐ proper starting locations
   ☐ map generator: more realistic orogeny
   ☐ map generator: climate based on mountain ranges and sea currents
+  ☐ map generator: resources distribution
   ✔ unit move animations @done(25-02-25 23:32)
   ☐ combat animations
+  ☐ fog of war animation
+  ☐ spectator mode
 
 Major features:
   ✔ naval units @done(20-06-06 15:05)
