@@ -5,6 +5,8 @@ import {
   CityWorkTileOptions,
   EntityGetFailedWeakRequirements,
   MapGeneratorOptions,
+  StatsGetChanneled,
+  StatsGetOptions,
   TileGetHoverDetailsOptions,
   TileGetInRangeOptions,
   TileSetResourceOptions,
@@ -49,6 +51,10 @@ export const bridge = {
     nextPlayer: () => makeCommand<void>("game.nextPlayer"),
     getInfo: () => makeCommand<GameStartInfo>("game.getInfo"),
     getAllPlayers: () => makeCommand<PlayerChanneled[]>("game.getAllPlayers"),
+  },
+  stats: {
+    get: (options: StatsGetOptions) =>
+      makeCommand<StatsGetChanneled[]>("stats.get", options),
   },
   player: {
     tracked$: makeObservable<number>("trackedPlayer.changed"),

@@ -9,3 +9,5 @@ export * from "./types";
 export * from "./Switch";
 export * from "./Icon";
 export * from "./Tooltip";
+export * from "./Button";
+export * from "./charts";

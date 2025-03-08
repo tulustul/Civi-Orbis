@@ -8,6 +8,7 @@ import { CitiesLayer } from "./ui/mapElements/CitiesLayer";
 import { EditorMode } from "./ui/EditorMode";
 
 import styles from "./App.module.css";
+import { Stats } from "./ui/stats";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -42,6 +43,7 @@ function App() {
           <MapMode />
         </div>
         {uiState.mode === "editor" && <EditorMode />}
+        {uiState.view === "stats" && <Stats />}
       </div>
     );
   }

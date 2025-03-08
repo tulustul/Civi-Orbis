@@ -26,6 +26,7 @@ import {
   CombatSimulationChanneled,
   GameStartInfo,
   gameToGameStartInfo,
+  PlayerChanneled,
   playerToChannel,
   TileChanneled,
   TileDetailsChanneled,
@@ -41,6 +42,7 @@ import {
   unitToChannel,
 } from "./core/serialization/channel";
 import { dumpGame, loadGame } from "./core/serialization/dump";
+import { StatsData } from "./core/stats";
 import { UnitOrder } from "./core/unit";
 import { UnitAction } from "./core/unit-actions";
 import { RealisticMapGenerator } from "./map-generators/realistic";
@@ -97,6 +99,8 @@ const HANDLERS = {
   "area.getTiles": getAreaTiles,
 
   "entity.getFailedWeakRequirements": entityGetFailedWeakRequirements,
+
+  "stats.get": statsGet,
 };
 
 addEventListener("message", ({ data }) => {
@@ -690,4 +694,20 @@ export function entityGetFailedWeakRequirements(
   }
 
   return getFailedWeakRequirements(entity, game.trackedPlayer, city);
+}
+
+export type StatsGetOptions = {
+  type: keyof StatsData;
+};
+export type StatsGetChanneled = {
+  player: PlayerChanneled;
+  data: number[];
+};
+export function statsGet(options: StatsGetOptions): StatsGetChanneled[] {
+  return game.players.map((player) => {
+    return {
+      player: playerToChannel(player),
+      data: game.stats.data.get(player)![options.type],
+    } as StatsGetChanneled;
+  });
 }

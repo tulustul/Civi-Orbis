@@ -8,7 +8,7 @@ import {
 
 import { bridge } from "@/bridge";
 import { TileChanneled, TileCoords } from "@/core/serialization/channel";
-import { Climate, SeaLevel, TileDirection } from "@/shared";
+import { Climate, LandForm, SeaLevel, TileDirection } from "@/shared";
 import { camera, Transform } from "./camera";
 import { renderer } from "./renderer";
 import { drawHex } from "./utils";
@@ -28,6 +28,8 @@ const CLIMATE_COLORS: Record<Climate, number> = {
   [Climate.tundra]: 0x9cb3b6,
   [Climate.arctic]: 0xe5e5e5,
 };
+
+const MOUNTAIN_COLOR = 0x666666;
 
 const maxSize = 300;
 
@@ -207,6 +209,8 @@ export class MinimapRenderer {
       color = SEA_COLORS[tile.seaLevel];
     } else if (tile.playerColor) {
       color = tile.playerColor;
+    } else if (tile.landForm === LandForm.mountains) {
+      color = MOUNTAIN_COLOR;
     } else {
       color = CLIMATE_COLORS[tile.climate];
     }

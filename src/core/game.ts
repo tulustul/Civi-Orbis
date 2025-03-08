@@ -6,6 +6,7 @@ import { CitiesManager } from "./cities-manager";
 import { AreasManager } from "./areas-manager";
 import { collector } from "./collector";
 import { CitiesNetworks } from "./cities-network";
+import { Stats } from "./stats";
 
 export class Game {
   debug = new Debug();
@@ -31,6 +32,8 @@ export class Game {
 
   citiesNetworks = new CitiesNetworks(this);
 
+  stats = new Stats(this);
+
   start() {
     this.preprocessEntities();
     this.activePlayerIndex = -1;
@@ -45,6 +48,7 @@ export class Game {
       player.updateVisibleTiles();
     }
     this.citiesNetworks.update();
+    this.stats.prepare();
   }
 
   addPlayer(player: PlayerCore) {
@@ -83,6 +87,7 @@ export class Game {
     for (const player of this.players) {
       player.nextTurn();
     }
+    this.stats.nextTurn();
     this.turn++;
     collector.turn = this.turn;
   }

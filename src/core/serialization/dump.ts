@@ -16,6 +16,7 @@ import {
 } from "../data-manager";
 import { ResourceCore } from "../resources";
 import { RESOURCES_DEFINITIONS } from "@/data/resources";
+import { Stats, StatsData } from "../stats";
 
 export interface GameSerialized {
   turn: number;
@@ -25,7 +26,13 @@ export interface GameSerialized {
   trackedPlayerId: number;
   units: UnitSerialized[];
   cities: CitySerialized[];
+  stats: StatsSerialized[];
 }
+
+type StatsSerialized = {
+  playerId: number;
+  data: StatsData;
+};
 
 interface MapSerialized {
   width: number;
@@ -100,6 +107,7 @@ export function dumpGame(game: Game): GameSerialized {
     players: game.players.map((p) => dumpPlayer(p)),
     units: game.unitsManager.units.map((u) => dumpUnit(u)),
     cities: game.citiesManager.cities.map((c) => dumpCity(c)),
+    stats: dumpStats(game.stats),
   };
 }
 
@@ -134,6 +142,8 @@ export function loadGame(data: GameSerialized) {
   for (const city of data.cities) {
     loadCity(game, city);
   }
+
+  loadStats(game, data.stats);
 
   game.preprocessEntities();
 
@@ -233,13 +243,13 @@ function loadMap(mapData: MapSerialized) {
 
       if (tileData.resource) {
         const resourceDef = RESOURCES_DEFINITIONS.find(
-          (r) => r.id === tileData.resource?.id,
+          (r) => r.id === tileData.resource?.id
         );
         if (resourceDef) {
           tile.resource = new ResourceCore(
             resourceDef,
             tile,
-            tileData.resource.quantity,
+            tileData.resource.quantity
           );
         }
       }
@@ -348,6 +358,23 @@ function dumpCity(city: CityCore): CitySerialized {
   };
 }
 
+function dumpStats(stats: Stats): StatsSerialized[] {
+  return Array.from(stats.data.entries()).map(([player, data]) => ({
+    playerId: player.id,
+    data,
+  }));
+}
+
+function loadStats(game: Game, stats: StatsSerialized[]) {
+  game.stats.prepare();
+  for (const { playerId, data } of stats) {
+    const player = game.playersMap.get(playerId);
+    if (player) {
+      game.stats.data.set(player, data);
+    }
+  }
+}
+
 function dumpUnit(unit: UnitCore): UnitSerialized {
   return {
     id: unit.id,
@@ -374,6 +401,6 @@ function loadUnit(game: Game, unitData: UnitSerialized) {
 
   unit.path =
     unitData.path?.map((row) =>
-      row.map((tileId) => game.map.tilesMap.get(tileId)!),
+      row.map((tileId) => game.map.tilesMap.get(tileId)!)
     ) || null;
 }

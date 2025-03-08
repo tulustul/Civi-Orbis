@@ -1,6 +1,5 @@
 import { UnitTrait } from "@/core/data.interface";
 import { findPath } from "@/core/pathfinding";
-import { ResourceCore } from "@/core/resources";
 import { TileCore } from "@/core/tile";
 import { TileImprovement } from "@/core/tile-improvements";
 import { UnitCore } from "@/core/unit";

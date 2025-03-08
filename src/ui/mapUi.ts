@@ -72,7 +72,7 @@ export class MapUi {
   private _fogOfWarEnabled$ = new BehaviorSubject<boolean>(true);
   fogOfWarEnabled$ = this._fogOfWarEnabled$.pipe(distinctUntilChanged());
 
-  private _gridEnabled$ = new BehaviorSubject<boolean>(true);
+  private _gridEnabled$ = new BehaviorSubject<boolean>(false);
   gridEnabled$ = this._gridEnabled$.pipe(distinctUntilChanged());
 
   private _yieldsEnabled$ = new BehaviorSubject<boolean>(true);
