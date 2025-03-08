@@ -15,6 +15,7 @@ export class CitiesNetworks {
       let network: CitiesNetwork;
       if (!networksByCity.has(city)) {
         network = new CitiesNetwork();
+        city.network = network;
         this.networks.push(network);
         networksByCity.set(city, network);
       } else {
@@ -31,6 +32,7 @@ export class CitiesNetworks {
 
         if (tile.city && tile.city !== city) {
           networksByCity.set(tile.city, network);
+          tile.city.network = network;
           network.connect(node, tile.city, tiles);
           continue;
         }

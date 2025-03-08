@@ -20,7 +20,6 @@ export class SettlingAI extends AISystem {
     for (const city of this.player.citiesWithoutProduction) {
       if (Math.random() > 0.7 && city.canProduce(settler)) {
         const newCityLocation = this.findCityLocation(city.tile);
-        console.log({ newCityLocation });
         if (newCityLocation) {
           this.operations.push({
             group: "city-produce",

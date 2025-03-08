@@ -24,6 +24,7 @@ import { IDLE_PRODUCTS } from "../data/products/idle-products";
 import { checkRequirements } from "./requirements";
 import { SuppliesProducer } from "./supplies";
 import { PassableArea } from "./tiles-map";
+import { CitiesNetwork } from "./cities-network";
 
 export type CityVisibility = "all" | "basic" | "hidden";
 
@@ -72,6 +73,8 @@ export class CityCore {
   resources: ResourceDefinition[] = [];
 
   suppliesProducers: SuppliesProducer;
+
+  network: CitiesNetwork | null = null;
 
   constructor(public tile: TileCore, public player: PlayerCore) {
     this.addTile(tile);
