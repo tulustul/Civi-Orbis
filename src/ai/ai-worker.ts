@@ -9,15 +9,26 @@ import { AISystem } from "./ai-system";
 import { getUnitById } from "@/core/data-manager";
 import { AiOperation } from "./types";
 import { UnitAction } from "@/core/unit-actions";
+import { CityCore } from "@/core/city";
 import { PassableArea } from "@/core/tiles-map";
 
 const CITIES_PER_WORKER = 0.5;
 const MIN_WORKERS = 2;
-const MAX_ROAD_DISTANCE = 10;
+const MAX_ROAD_DISTANCE = 15; // Increased from 10 to 15 as per new rules
 
 export class WorkerAI extends AISystem {
   // Track assigned tasks to avoid duplicate work
   private assignedTiles = new Set<TileCore>();
+
+  // Cache optimal paths between cities
+  private cityRoadPaths = new Map<
+    string,
+    {
+      path: TileCore[][] | null;
+      lastComputedTurn: number;
+      existingPathLength?: number;
+    }
+  >();
 
   plan(): AiOperation[] {
     this.operations = [];
@@ -279,6 +290,62 @@ export class WorkerAI extends AISystem {
   }
 
   /**
+   * Generate a cache key for a pair of cities
+   */
+  private getCityPairKey(cityA: CityCore, cityB: CityCore): string {
+    // Use city IDs sorted to ensure consistent key regardless of order
+    const ids = [cityA.id, cityB.id].sort();
+    return `${ids[0]}-${ids[1]}`;
+  }
+
+  /**
+   * Check if a road already exists between two cities
+   */
+  private getExistingRoadPath(
+    cityA: CityCore,
+    cityB: CityCore
+  ): TileCore[] | null {
+    // Perform a breadth-first search to find a road path
+    const visitedTiles = new Set<TileCore>();
+    const queue: TileCore[] = [cityA.tile];
+    const cameFrom = new Map<TileCore, TileCore>();
+
+    visitedTiles.add(cityA.tile);
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+
+      if (current === cityB.tile) {
+        // Found a path, reconstruct it
+        const path: TileCore[] = [current];
+        let tile = current;
+
+        while (tile !== cityA.tile) {
+          tile = cameFrom.get(tile)!;
+          path.unshift(tile);
+        }
+
+        return path;
+      }
+
+      // Only follow road connections
+      for (const neighbor of current.neighbours) {
+        if (
+          !visitedTiles.has(neighbor) &&
+          (neighbor.road !== null || neighbor === cityB.tile) &&
+          neighbor.passableArea === cityA.tile.passableArea
+        ) {
+          visitedTiles.add(neighbor);
+          queue.push(neighbor);
+          cameFrom.set(neighbor, current);
+        }
+      }
+    }
+
+    return null; // No road path exists
+  }
+
+  /**
    * Find a tile where a road should be built
    */
   private findRoadPathToBuild(worker: UnitCore): TileCore | null {
@@ -292,6 +359,7 @@ export class WorkerAI extends AISystem {
 
     // Collect all viable road tiles first to find the closest one
     const viableRoadTiles: TileCore[] = [];
+    const currentTurn = this.player.game.turn;
 
     // Find pairs of cities that need roads
     for (let i = 0; i < cities.length; i++) {
@@ -303,18 +371,53 @@ export class WorkerAI extends AISystem {
           continue;
         }
 
-        // Find the path between the cities
-        const path = findPath(worker, cityA.tile, cityB.tile);
+        const pairKey = this.getCityPairKey(cityA, cityB);
+        const cachedData = this.cityRoadPaths.get(pairKey);
 
-        if (!path) {
+        // Check if we need to update the cache
+        let optimalPath: TileCore[][] | null = null;
+
+        if (!cachedData || currentTurn - cachedData.lastComputedTurn > 20) {
+          // Check if a road path already exists
+          const existingPath = this.getExistingRoadPath(cityA, cityB);
+
+          // Only compute optimal path if no existing path or it's time to refresh
+          optimalPath = findPath(worker, cityB.tile, cityA.tile);
+
+          // Cache the result
+          this.cityRoadPaths.set(pairKey, {
+            path: optimalPath,
+            lastComputedTurn: currentTurn,
+            existingPathLength: existingPath?.length,
+          });
+        } else {
+          // Use cached result
+          optimalPath = cachedData.path;
+        }
+
+        if (!optimalPath) {
           continue;
         }
 
-        // Check if there are tiles on the path without roads
-        for (const segment of path) {
-          for (const tile of segment) {
-            if (tile.road === null && !this.assignedTiles.has(tile)) {
-              viableRoadTiles.push(tile);
+        // Get the length of the optimal path
+        let optimalPathLength = 0;
+        for (const segment of optimalPath) {
+          optimalPathLength += segment.length;
+        }
+
+        // Check if we should build a new road (no existing road or much better path available)
+        const existingPathLength =
+          this.cityRoadPaths.get(pairKey)?.existingPathLength;
+        const shouldBuildNewRoad =
+          !existingPathLength || existingPathLength > optimalPathLength * 2;
+
+        if (shouldBuildNewRoad) {
+          // Check if there are tiles on the path without roads
+          for (const segment of optimalPath) {
+            for (const tile of segment) {
+              if (tile.road === null && !this.assignedTiles.has(tile)) {
+                viableRoadTiles.push(tile);
+              }
             }
           }
         }

@@ -1,10 +1,10 @@
-import { CityCore } from "./city";
-import { PlayerCore } from "./player";
-import { TileRoad } from "./tile-improvements";
-import { TileCore } from "./tile";
 import { LandForm, SeaLevel } from "../shared";
+import { CityCore } from "./city";
 import { collector } from "./collector";
 import { Game } from "./game";
+import { PlayerCore } from "./player";
+import { TileCore } from "./tile";
+import { TileRoad } from "./tile-improvements";
 
 export class CitiesManager {
   cities: CityCore[] = [];
@@ -33,7 +33,7 @@ export class CitiesManager {
     city.name = `City ${city.id}`;
     city.tile = tile;
     city.isCoastline = !!city.tile.neighbours.find(
-      (n) => n.seaLevel !== SeaLevel.none,
+      (n) => n.seaLevel !== SeaLevel.none
     );
     this.cities.push(city);
     this.citiesMap.set(city.id, city);

@@ -21,7 +21,7 @@ const defaultOptions: GameFactoryOptions = {
 function makeMap(
   mapData: string[],
   game: Game,
-  symbolCallbacks: SymbolCallbacks,
+  symbolCallbacks: SymbolCallbacks
 ) {
   const symbols = tokenizeMapSymbols(mapData);
 
@@ -37,14 +37,22 @@ function makeMap(
 function alterMap(
   mapData: string[],
   game: Game,
-  symbolCallbacks: SymbolCallbacks,
+  symbolCallbacks: SymbolCallbacks
 ) {
   const symbols = tokenizeMapSymbols(mapData);
-  for (const row of game.map.tiles) {
+  if (symbols.length !== game.map.height) {
+    throw `makeMap: number of rows in the map data (${symbols.length}) does not match the map height (${game.map.height})`;
+  }
+  for (const row of symbols) {
     if (row.length !== game.map.width) {
-      throw "makeMap: each row must have the same number of symbols";
+      throw `makeMap: each row must have the same number of symbols - map width (${game.map.width}); row width (${row.length})`;
     }
-    for (const tile of row) {
+  }
+
+  // The order of the loops is important here. It executes the callbacks in the order of a human reading the map. It makes it easier to reason about the map data.
+  for (let y = 0; y < game.map.height; y++) {
+    for (let x = 0; x < game.map.width; x++) {
+      const tile = game.map.tiles[x][y];
       tile.seaLevel = SeaLevel.none;
       const symbol = symbols[tile.y][tile.x];
       if (symbol !== ".") {
@@ -69,7 +77,7 @@ function tokenizeMapSymbols(mapData: string[]) {
 
 export function makeGame(
   mapData: string[],
-  userOptions: Partial<GameFactoryOptions>,
+  userOptions: Partial<GameFactoryOptions>
 ): Game {
   const options = { ...defaultOptions, ...userOptions };
 
@@ -89,7 +97,7 @@ export function makeGame(
 export function alterGame(
   game: Game,
   mapData: string[],
-  userOptions: Partial<GameFactoryOptions>,
+  userOptions: Partial<GameFactoryOptions>
 ) {
   const options = { ...defaultOptions, ...userOptions };
   alterMap(mapData, game, options.symbolCallbacks);
