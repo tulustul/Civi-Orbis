@@ -1,11 +1,11 @@
-import { BehaviorSubject, take } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 
-import { mapUi } from "@/ui/mapUi";
-import { camera } from "./camera";
-import { nextTurnService } from "@/ui/nextTurn";
-import { useMenu } from "@/ui/gameMenu";
 import { bridge } from "@/bridge";
 import { GameInfo, TileCoords } from "@/core/serialization/channel";
+import { useMenu } from "@/ui/gameMenu";
+import { mapUi } from "@/ui/mapUi";
+import { nextTurnService } from "@/ui/nextTurn";
+import { camera } from "./camera";
 
 export class Controls {
   private _mouseButton$ = new BehaviorSubject<number | null>(null);

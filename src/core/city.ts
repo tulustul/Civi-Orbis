@@ -169,7 +169,7 @@ export class CityCore {
   }
 
   getFoodToGrow() {
-    return Math.ceil(15 * Math.pow(1.2, this.size));
+    return Math.ceil(15 * this.size ** 2);
   }
 
   produceUnit(unit: UnitDefinition) {
@@ -274,7 +274,7 @@ export class CityCore {
     }
     roundYields(this.yields);
 
-    this.foodConsumed = this.size;
+    this.foodConsumed = this.size ** 1.5;
 
     copyYields(this.perTurn, this.yields);
     this.perTurn.food -= this.foodConsumed;

@@ -340,7 +340,7 @@ class TileDrawer {
         this.riverGraphics.lineTo(0, 0.25);
       }
     }
-    this.riverGraphics.stroke({ width: 0.15, color: 0x4169e1 });
+    this.riverGraphics.stroke({ width: 0.1, color: 0x4169e1 });
   }
 
   private drawYields() {

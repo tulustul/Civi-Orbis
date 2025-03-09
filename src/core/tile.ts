@@ -272,7 +272,9 @@ export class TileCore implements BaseTile {
 
   getFirstEnemyUnit(unit: UnitCore): UnitCore | undefined {
     // TODO implement war state between players
-    return this.units.find((u) => u.player !== unit.player);
+    return this.units.find(
+      (u) => u.player !== unit.player && u.definition.strength > 0
+    );
   }
 
   getEmbarkmentTarget(unit: UnitCore): UnitCore | undefined {
