@@ -1,32 +1,34 @@
-import { UnitAction } from "./unit-actions";
 import { Bonuses } from "./bonus";
 import { Requirement } from "./requirements";
 import { TileImprovement } from "./tile-improvements";
 import { SeaLevel, Climate, LandForm } from "../shared";
+import { UnitAction } from "./unit-actions";
 
-export interface Entity {
+export type Entity = {
   id: string;
   name: string;
-}
+};
 
-export interface HaveRequirements {
+export type HaveRequirements = {
   // entity will be hidden from player
   strongRequirements: Requirement[];
 
   // entity will be disabled for player
   weakRequirements: Requirement[];
-}
+};
 
-export interface HaveBonuses {
+export type HaveBonuses = {
   bonuses: Bonuses;
-}
+};
 
 export type ProductType = "unit" | "building" | "idleProduct";
 
-export interface ProductDefinition extends Entity, HaveRequirements {
-  productType: ProductType;
-  productionCost: number;
-}
+export type ProductDefinition = Entity &
+  HaveRequirements &
+  HaveBonuses & {
+    productType: ProductType;
+    productionCost: number;
+  };
 
 export enum UnitType {
   land,
@@ -41,7 +43,7 @@ export enum UnitTrait {
   supply,
 }
 
-export interface UnitDefinition extends ProductDefinition {
+export type UnitDefinition = ProductDefinition & {
   productType: "unit";
   actionPoints: number;
   strength: number;
@@ -50,16 +52,14 @@ export interface UnitDefinition extends ProductDefinition {
   trait: UnitTrait;
   capacity: number;
   supplyRange: number;
-}
+};
 
-export type Building = ProductDefinition &
-  HaveBonuses & {
-    productType: "building";
-  };
-export type IdleProduct = ProductDefinition &
-  HaveBonuses & {
-    productType: "idleProduct";
-  };
+export type Building = ProductDefinition & {
+  productType: "building";
+};
+export type IdleProduct = ProductDefinition & {
+  productType: "idleProduct";
+};
 
 export enum GovernmentSection {
   organization,
@@ -78,7 +78,7 @@ export type Nation = Entity & {
   citiesNames: string[];
 };
 
-export interface ResourceDistribution {
+export type ResourceDistribution = {
   // tile requirements
   seaLevel?: SeaLevel;
   climates?: Climate[];
@@ -95,14 +95,14 @@ export interface ResourceDistribution {
     [LandForm.plains]: number;
     [LandForm.hills]: number;
   };
-}
+};
 
-export interface ResourceDefinition extends Entity {
+export type ResourceDefinition = Entity & {
   requiredImprovement: TileImprovement;
   bonuses: Bonuses;
   bonusesWhenWorked: Bonuses;
   distribution: ResourceDistribution;
-}
+};
 
 export type PolicyArea = Entity & { options: PolicyArea[] };
 

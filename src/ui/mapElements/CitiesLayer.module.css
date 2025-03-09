@@ -6,6 +6,7 @@
   height: 100%;
   pointer-events: none;
   will-change: opacity;
+  --progress-bar-height: 18px;
 }
 .citiesLayer.hidden {
   display: none;

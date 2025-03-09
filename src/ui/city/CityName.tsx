@@ -1,6 +1,5 @@
 import { CityDetailsChanneled } from "@/core/serialization/channel";
 
-import styles from "./City.module.scss";
 import { mapUi } from "../mapUi";
 
 type Props = {
@@ -8,17 +7,36 @@ type Props = {
 };
 export function CityName({ city }: Props) {
   return (
-    <div className={styles.cityNameWrapper}>
+    <div className="flex flex-col items-center pt-5">
       <button
-        className={styles.returnBtn}
+        className="pointer-events-auto mb-8"
         onClick={() => mapUi.selectCity(null)}
       >
         Return
       </button>
-      <div className={styles.cityNameContent}>
-        <div className={styles.cityNameBorder} />
-        <div className={styles.cityName}>{city.name}</div>
-        <div className={styles.cityNameBorder} />
+      <div
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(20,20,20,0.8), transparent)",
+        }}
+      >
+        <div
+          className="w-full h-1"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgba(20,20,20), transparent)",
+          }}
+        />
+        <div className="text-5xl text-white font-light px-30 py-4">
+          {city.name}
+        </div>
+        <div
+          className="w-full h-1"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgba(20,20,20), transparent)",
+          }}
+        />
       </div>
     </div>
   );

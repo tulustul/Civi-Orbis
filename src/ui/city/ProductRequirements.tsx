@@ -5,8 +5,6 @@ import {
 } from "@/core/serialization/channel";
 import { useEffect, useState } from "react";
 
-import styles from "./ProductRequirements.module.css";
-
 type Props = {
   city: CityDetailsChanneled;
   product: ProductDefinitionChanneled;
@@ -14,7 +12,7 @@ type Props = {
 
 export function ProductRequirements({ city, product }: Props) {
   const [failedRequirements, setFailedRequirements] = useState<[string, any][]>(
-    [],
+    []
   );
 
   useEffect(() => {
@@ -30,7 +28,7 @@ export function ProductRequirements({ city, product }: Props) {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className="text-red-500">
       {failedRequirements.map(([key, value], index) => (
         <Requirement key={index} type={key} context={value} />
       ))}

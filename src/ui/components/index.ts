@@ -11,3 +11,4 @@ export * from "./Icon";
 export * from "./Tooltip";
 export * from "./Button";
 export * from "./charts";
+export * from "./Bonuses";

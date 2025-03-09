@@ -15,6 +15,7 @@ import {
   UnitTrait,
 } from "../data.interface";
 import { CombatSimulation } from "../combat";
+import { Bonuses } from "../bonus";
 
 export interface GameChanneled {
   turn: number;
@@ -94,6 +95,12 @@ export interface CityChanneled {
   productName: string | null;
 }
 
+export type CityBuildingChanneled = {
+  id: string;
+  name: string;
+  definition: ProductDefinitionChanneled;
+};
+
 export interface CityDetailsChanneled {
   id: number;
   visibilityLevel: CityVisibility;
@@ -117,7 +124,7 @@ export interface CityDetailsChanneled {
   yields: Yields;
   perTurn: Yields;
 
-  buildingsIds: string[];
+  buildings: CityBuildingChanneled[];
 
   tiles: TileCoords[];
   workedTiles: TilesCoordsWithNeighbours[];
@@ -139,6 +146,7 @@ export type ProductDefinitionChanneled = {
   productType: ProductType;
   name: string;
   productionCost: number;
+  bonuses: Bonuses;
 };
 
 export interface PlayerChanneled {
@@ -356,7 +364,17 @@ export function cityDetailsToChannel(city: CityCore): CityDetailsChanneled {
 
     totalProduction: city.totalProduction,
     turnsToProductionEnd: city.turnsToProductionEnd,
-    buildingsIds: Array.from(city.buildingsIds),
+    buildings: city.buildings.map((b) => ({
+      id: b.id,
+      name: b.name,
+      definition: {
+        id: b.id,
+        productType: b.productType,
+        name: b.name,
+        productionCost: b.productionCost,
+        bonuses: b.bonuses,
+      },
+    })),
     cultureToExpand: city.getCultureToExpand(),
     foodConsumed: city.foodConsumed,
     perTurn: city.perTurn,
@@ -520,6 +538,7 @@ export function cityProductToChannel(
       productType: product.productType,
       name: product.name,
       productionCost: product.productionCost,
+      bonuses: product.bonuses,
     },
   };
 }

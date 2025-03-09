@@ -23,6 +23,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
       new CityHaveBuildingRequirement("building_granary"),
       new CitySizeRequirement(3),
     ],
+    bonuses: {},
   },
   {
     id: "unit_worker",
@@ -38,6 +39,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     supplyRange: 0,
     strongRequirements: [],
     weakRequirements: [new CitySizeRequirement(2)],
+    bonuses: {},
   },
   {
     id: "unit_scout",
@@ -53,6 +55,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     supplyRange: 0,
     strongRequirements: [],
     weakRequirements: [],
+    bonuses: {},
   },
   {
     id: "unit_warrior",
@@ -68,6 +71,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     supplyRange: 0,
     strongRequirements: [],
     weakRequirements: [],
+    bonuses: {},
   },
   {
     id: "unit_tireme",
@@ -83,6 +87,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     supplyRange: 0,
     strongRequirements: [new CoastlineCityRequirement()],
     weakRequirements: [],
+    bonuses: {},
   },
   {
     id: "unit_galley",
@@ -98,6 +103,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     supplyRange: 0,
     strongRequirements: [new CoastlineCityRequirement()],
     weakRequirements: [],
+    bonuses: {},
   },
   {
     id: "unit_scout_ship",
@@ -113,6 +119,7 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     supplyRange: 0,
     strongRequirements: [new CoastlineCityRequirement()],
     weakRequirements: [],
+    bonuses: {},
   },
   {
     id: "unit_supply_wagon",
@@ -128,5 +135,6 @@ export const UNITS_DEFINITIONS: UnitDefinition[] = [
     supplyRange: 4,
     strongRequirements: [],
     weakRequirements: [],
+    bonuses: {},
   },
 ];

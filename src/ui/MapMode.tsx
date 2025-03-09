@@ -31,7 +31,7 @@ export function MapMode() {
       >
         <div className={styles.minimap}>
           <MapSettings />
-          <div className="flex flex-col items-end gap-5">
+          <div className="ml-4 flex flex-col items-end gap-5">
             {startInfo?.aiOnly && <SpectatorPanel />}
             <Panel corner="bottom-right">
               <div style={{ display: "flex", flexDirection: "column" }}>

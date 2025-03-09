@@ -7,11 +7,13 @@ import {
 } from "react";
 
 import styles from "./Tooltip.module.css";
+import clsx from "clsx";
 
 type Props = PropsWithChildren & {
   content: ReactNode;
+  className?: string;
 };
-export function Tooltip({ children, content }: Props) {
+export function Tooltip({ children, content, className }: Props) {
   const [visible, setVisible] = useState(false);
   const elRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +57,7 @@ export function Tooltip({ children, content }: Props) {
     <>
       <div
         ref={elRef}
-        className={styles.child}
+        className={clsx(className, styles.child)}
         onMouseEnter={show}
         onMouseLeave={hide}
       >

@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+@theme {
+  --color-food: #65ea4b;
+  --color-production: #ffb42c;
+  --color-culture: #d883ff;
+  --color-publicWorks: #e4d1b8;
+
+  --color-primary-100: #9491a6;
+  --color-primary-300: #636078;
+  --color-primary-500: #514e64;
+  --color-primary-600: #3c3a4a;
+  --color-primary-800: #22212b;
+}
+
 :root {
   --tile-size: 256px;
 
@@ -33,7 +46,7 @@
   --color-secondary-text: #5f5f5f;
   --color-danger-text: #ff2424;
 
-  --progress-bar-height: 18px;
+  --progress-bar-height: 35px;
   --progress-bar-color: royalblue;
   --progress-bar-total-color: rgba(0, 0, 0, 0.7);
 }

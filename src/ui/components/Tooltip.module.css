@@ -5,6 +5,7 @@
   background-color: #222;
   border: 2px solid #111;
   z-index: 1000;
+  max-width: 250px;
 }
 .child {
   /* display: inline-block; */
